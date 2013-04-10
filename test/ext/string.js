@@ -31,8 +31,10 @@ test("underscore()", function() {
 
 test("camelize()", function() {
     equal("active_model".camelize(), "ActiveModel");
+    equal("active_model".camelize(true), "ActiveModel");
     equal("active_model".camelize(false), "activeModel");
     equal("active_model/errors".camelize(), "ActiveModel::Errors");
+    equal("active_model/errors".camelize(true), "ActiveModel::Errors");
     equal("active_model/errors".camelize(false), "activeModel::Errors");
 });
 
