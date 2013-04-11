@@ -1,8 +1,12 @@
 Viking.js
 =========
 
-Dependencies
-------------
+
+### Download
+
+[Viking.js]()
+
+### Dependencies
 
 1. [jQuery](http://jquery.com/) (>= 1.9.1)
 
@@ -16,3 +20,4 @@ Dependencies
 
     To Get `strftime` working in the browser I had to comment out lines #18-23,
     and #26.
+
