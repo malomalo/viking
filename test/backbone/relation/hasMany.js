@@ -37,3 +37,115 @@ test("getRelationshipDetails() for hasMany ['carriers', {collection: 'ShipCollec
     delete Ship;
     delete ShipCollection;
 });
+
+test("coerceAttributes() initializes hasMany relation with array of hashes", function() {
+    Ship = Backbone.Model.extend({
+        hasMany: ['ships']
+    });
+    ShipCollection = Backbone.Collection.extend({
+        model: Ship
+    });
+    
+    var a = new Ship();
+
+    var result = a.coerceAttributes({ships: [{key: 'foo'},{key: 'bar'}]});
+    ok(result.ships instanceof ShipCollection);
+    ok(result.ships.models[0] instanceof Ship);
+    ok(result.ships.models[1] instanceof Ship);
+    deepEqual(result.ships.models[0].attributes, {key: 'foo'});
+    deepEqual(result.ships.models[1].attributes, {key: 'bar'});
+    
+    delete Ship;
+    delete ShipCollection;
+});
+
+test("coerceAttributes() initializes hasMany relation with array of models", function() {
+    Ship = Backbone.Model.extend({
+        hasMany: ['ships']
+    });
+    ShipCollection = Backbone.Collection.extend({
+        model: Ship
+    });
+    
+    var a = new Ship();
+    var models = [new Ship({key: 'foo'}), new Ship({key: 'bar'})];
+    
+
+    var result = a.coerceAttributes({ships: models});
+    ok(result.ships instanceof ShipCollection);
+    ok(result.ships.models[0] === models[0]);
+    ok(result.ships.models[1] === models[1]);
+    
+    delete Ship;
+    delete ShipCollection;
+});
+
+// setting attributes on a model coerces relations
+test("Using model.set(key, val) coerces hasMany relations", function() {
+    Ship = Backbone.Model.extend({
+        hasMany: ['ships']
+    });
+    ShipCollection = Backbone.Collection.extend({
+        model: Ship
+    });
+    
+    var a = new Ship();
+    a.set('ships', [{}, {}]);
+    ok(a.get('ships') instanceof ShipCollection);
+    equal(a.get('ships').length, 2);
+    ok(a.get('ships').first() instanceof Ship);
+    
+    delete Ship;
+    delete ShipCollection;
+});
+
+test("Using model.set({key, val}) coerces hasMany relations", function() {
+    Ship = Backbone.Model.extend({
+        hasMany: ['ships']
+    });
+    ShipCollection = Backbone.Collection.extend({
+        model: Ship
+    });
+    
+    var a = new Ship();
+    a.set({ships: [{}, {}]});
+    ok(a.get('ships') instanceof ShipCollection);
+    equal(a.get('ships').length, 2);
+    ok(a.get('ships').first() instanceof Ship);
+    
+    delete Ship;
+    delete ShipCollection;
+});
+
+test("Using new Model(attrs) coerces hasMany relations", function() {
+    Ship = Backbone.Model.extend({
+        hasMany: ['ships']
+    });
+    ShipCollection = Backbone.Collection.extend({
+        model: Ship
+    });
+    
+    var a = new Ship({ships: [{}, {}]});
+    ok(a.get('ships') instanceof ShipCollection);
+    equal(a.get('ships').length, 2);
+    ok(a.get('ships').first() instanceof Ship);
+    
+    delete Ship;
+    delete ShipCollection;
+});
+
+// toJSON --------------------------------------------------------------------
+test("toJSON for belongsTo relation", function() {
+    Ship = Backbone.Model.extend({
+        belongsTo: ['ship']
+    });
+        
+    var a = new Ship({'ship': {foo: 'bar'}, bat: 'baz'});
+    
+    deepEqual(a.toJSON(), {
+        bat: 'baz',
+        ship_attributes: {foo: 'bar'}
+    });
+    
+    delete Ship;
+});

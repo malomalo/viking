@@ -95,7 +95,7 @@ test("parse extracts cursor information", function() {
     var c = new c();
     
     c.cursor.set({page: 3, per_page: 40, offset: 0}, {silent: true});
-    c.parse({"page":3, "per_page":40, "total_pages":77, "offset":0, "count", 40, "total":3049, "listings":[ {"id":2069,"type":"lease"} ] });
+    c.parse({"page":3, "per_page":40, "total_pages":77, "offset":0, "count": 40, "total":3049, "listings":[ {"id":2069,"type":"lease"} ] });
     equal(77, c.cursor.get('total_pages'));
     equal(3049, c.cursor.get('total'));
     equal(40, c.cursor.get('count'));

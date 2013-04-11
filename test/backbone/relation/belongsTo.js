@@ -22,3 +22,81 @@ test("getRelationshipDetails() for belongsTo ['carriers', {model: 'Ship'}]", fun
     
     delete Ship;
 });
+
+test("coerceAttributes() initializes belongsTo relation with hash", function() {
+    Ship = Backbone.Model.extend({
+        belongsTo: ['ship']
+    });
+    var a = new Ship();
+
+    var result = a.coerceAttributes({ship: {key: 'value'}});
+    ok(result.ship instanceof Ship);
+    deepEqual(result.ship.attributes, {key: 'value'});
+    
+    delete Ship;
+});
+
+test("coerceAttributes() initializes belongsTo relation with instance of model", function() {
+    Ship = Backbone.Model.extend({
+        belongsTo: ['ship']
+    });
+    var a = new Ship();
+    var b = new Ship({key: 'value'});
+
+    var result = a.coerceAttributes({ship: b});
+    ok(result.ship === b);
+        
+    delete Ship;
+});
+
+// setting attributes on a model coerces relations
+test("Using model.set(key, val) coerces belongsTo relations", function() {
+    Ship = Backbone.Model.extend({
+        belongsTo: ['ship']
+    });
+        
+    var a = new Ship();
+    a.set('ship', {});
+    ok(a.get('ship') instanceof Ship);
+    
+    delete Ship;
+});
+
+test("Using model.set({key, val}) coerces belongsTo relations", function() {
+    Ship = Backbone.Model.extend({
+        belongsTo: ['ship']
+    });
+    
+    var a = new Ship();
+    a.set({ship: {}});
+    ok(a.get('ship') instanceof Ship);
+    
+    delete Ship;
+});
+
+test("Using new Model(attrs) coerces belongsTo relations", function() {
+    Ship = Backbone.Model.extend({
+        belongsTo: ['ship']
+    });
+        
+    var a = new Ship({'ship': {}});
+    ok(a.get('ship') instanceof Ship);
+    
+    delete Ship;
+});
+
+// toJSON --------------------------------------------------------------------
+test("toJSON for belongsTo relation", function() {
+    Ship = Backbone.Model.extend({
+        belongsTo: ['ship']
+    });
+        
+    var a = new Ship({'ship': {foo: 'bar'}, bat: 'baz'});
+    
+    deepEqual(a.toJSON(), {
+        bat: 'baz',
+        ship_attributes: {foo: 'bar'}
+    });
+    
+    delete Ship;
+});
