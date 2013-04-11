@@ -8,19 +8,19 @@ environment.append_path 'deps'
 
 desc "build viking.js and testing files"
 task :build do
-  FileUtils.mkdir_p('./out')
-  FileUtils.rm_f('./out/viking.js')
-  FileUtils.rm_f('./out/test.js')
+  FileUtils.mkdir_p('./tmp')
+  FileUtils.rm_f('./viking.js')
+  FileUtils.rm_f('./tmp/test.js')
   
-  File.open('./out/viking.js', "w") do |file|
+  File.open('./viking.js', "w") do |file|
     file.write(environment['viking.js'].to_s)
   end
 
-  File.open('./out/viking.bundled.js', "w") do |file|
+  File.open('./viking.bundled.js', "w") do |file|
     file.write(environment['viking.bundled.js'].to_s)
   end
   
-  File.open('./out/test.js', "w") do |file|
+  File.open('./tmp/test.js', "w") do |file|
     file.write(environment['test.js'].to_s)
   end
 end
@@ -28,7 +28,7 @@ end
 desc "build the docco documentation"
 task :doc => :build do
   check 'docco', 'docco', 'https://github.com/jashkenas/docco'
-  system 'docco out/viking.js' #  && docco examples/todos/todos.js examples/backbone.localstorage.js
+  system 'docco viking.js' #  && docco examples/todos/todos.js examples/backbone.localstorage.js
 end
 
 desc "run JavaScriptLint on the source"

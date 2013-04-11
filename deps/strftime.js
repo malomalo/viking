@@ -15,15 +15,15 @@
   var namespace;
 
   // CommonJS / Node module
-  // if (typeof module !== 'undefined') {
-  //   namespace = module.exports = strftime;
-  // }
+//  if (typeof module !== 'undefined') {
+//    namespace = module.exports = strftime;
+//  }
 
   // Browsers and other environments
-  // else {
+//  else {
     // Get the global object. Works in ES3, ES5, and ES5 strict mode.
     namespace = (function(){ return this || (1,eval)('this') }());
-  // }
+//  }
 
   namespace.strftime = strftime;
   namespace.strftimeUTC = strftimeUTC;
@@ -115,14 +115,13 @@
         case 'j':
           var y=new Date(d.getFullYear(), 0, 1);
           var day = Math.ceil((d.getTime() - y.getTime()) / (1000*60*60*24));
-          return day;
+          return pad(day, 3);
         case 'k': return pad(d.getHours(), padding == null ? ' ' : padding);
         case 'L': return pad(Math.floor(d.getTime() % 1000), 3);
         case 'l': return pad(hours12(d), padding == null ? ' ' : padding);
         case 'M': return pad(d.getMinutes(), padding);
         case 'm': return pad(d.getMonth() + 1, padding);
         case 'n': return '\n';
-        case 'N': return d.getMonth() + 1;
         case 'P': return d.getHours() < 12 ? locale.am : locale.pm;
         case 'p': return d.getHours() < 12 ? locale.AM : locale.PM;
         case 'R': return _strftime(locale.formats.R || '%H:%M', d, locale);
