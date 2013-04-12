@@ -1,10 +1,8 @@
-Viking.js
-=========
+![Viking.js](/vikingjs-logo.jpg)
 
+# Download
 
-### Download
-
-[Viking.js]()
+##[Viking.js]()
 
 ### Dependencies
 
