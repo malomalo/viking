@@ -135,17 +135,21 @@ test("Using new Model(attrs) coerces hasMany relations", function() {
 });
 
 // toJSON --------------------------------------------------------------------
-test("toJSON for belongsTo relation", function() {
+test("toJSON for hasMany relation", function() {
     Ship = Backbone.Model.extend({
-        belongsTo: ['ship']
+        hasMany: ['ships']
+    });
+    ShipCollection = Backbone.Collection.extend({
+        model: Ship
     });
         
-    var a = new Ship({'ship': {foo: 'bar'}, bat: 'baz'});
+    var a = new Ship({'ships': [{foo: 'bar'}], bat: 'baz'});
     
     deepEqual(a.toJSON(), {
         bat: 'baz',
-        ship_attributes: {foo: 'bar'}
+        ships_attributes: [{foo: 'bar'}]
     });
     
     delete Ship;
+    delete ShipCollection;
 });

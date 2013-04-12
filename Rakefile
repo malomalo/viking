@@ -33,8 +33,8 @@ end
 
 desc "run JavaScriptLint on the source"
 task :lint => :build do
-  check 'jsl', 'JavaScript Lint', 'http://www.javascriptlint.com/'
-  system "find lib -name '*.js' -exec jsl -nofilelisting -nologo -process '{}' \\\;"
+  check 'jsl', 'JavaScript Lint', 'npm install jsling --global'
+  system "find lib -name '*.js' -exec jslint --color --predef Backbone --predef _ --predef jQuery --predef strftime --predef Viking --predef strftimeUTC --browser --plusplus --nomen --white --regex --vars --sloppy '{}' \\\;"
 end
 
 # Check for the existence of an executable.

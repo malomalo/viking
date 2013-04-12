@@ -15,20 +15,17 @@ Date.prototype.strftimeUTC = function(fmt) {
 };
 Number.prototype.ordinalize = function() {
     var abs = Math.abs(this);
-    if(abs % 100 >= 11 && abs % 100 <= 13) {
+    
+    if (abs % 100 >= 11 && abs % 100 <= 13) {
         return this + 'th';
-    } else {
-        abs = abs % 10;
-        if(abs == 1) {
-            return this + 'st';
-        } else if (abs == 2) {
-            return this + 'nd';
-        } else if (abs == 3) {
-            return this + 'rd';
-        } else {
-            return this + 'th';
-        }
     }
+    
+    abs = abs % 10;
+    if (abs === 1) { return this + 'st'; }
+    if (abs === 2) { return this + 'nd'; }
+    if (abs === 3) { return this + 'rd'; }
+    
+    return this + 'th';
 };
 // Converts the first character to uppercase
 String.prototype.capitalize = function() {
@@ -94,7 +91,7 @@ String.prototype.underscore = function() {
 //    "SSLError".underscore.camelize # => "SslError"
 String.prototype.camelize = function(uppercase_first_letter) {
     var result = uppercase_first_letter === undefined || uppercase_first_letter ? this.capitalize() : this.anticapitalize();
-    result = result.replace(/(_|(\/))([a-z\d]*)/g, function() { return (arguments[2] || '') + arguments[3].capitalize(); });
+    result = result.replace(/(_|(\/))([a-z\d]*)/g, function(_a, _b, first, rest) { return (first || '') + rest.capitalize(); });
     return result.replace('/', '::');
 };
 
@@ -108,13 +105,10 @@ String.prototype.camelize = function(uppercase_first_letter) {
 //    "other".booleanize()      # => false
 //    "other".booleanize(true)  # => true
 String.prototype.booleanize = function(defaultTo) {
-    if(this == 'true') {
-        return true;
-    } else if (this == 'false') {
-        return false;
-    } else {
-        return (defaultTo === undefined ? false : defaultTo);
-    }
+    if(this.toString() === 'true') { return true; }
+    if (this.toString() === 'false') { return false; }
+    
+    return (defaultTo === undefined ? false : defaultTo);
 };
 
 // Replaces underscores with dashes in the string.
@@ -156,7 +150,7 @@ String.prototype.singularize = function() {
     };
 
     var getUrl = function(object) {
-      if (!(object && object.url)) return null;
+      if (!(object && object.url)) { return null; }
       return _.isFunction(object.url) ? object.url() : object.url;
     };
 
@@ -194,7 +188,7 @@ String.prototype.singularize = function() {
           dataType: 'json',
           beforeSend: function( xhr ) {
               var token = $('meta[name="csrf-token"]').attr('content');
-              if (token) xhr.setRequestHeader('X-CSRF-Token', token);
+              if (token) { xhr.setRequestHeader('X-CSRF-Token', token); }
           }
       };
 
@@ -221,11 +215,11 @@ String.prototype.singularize = function() {
       // And an `X-HTTP-Method-Override` header.
       if (options.emulateHTTP && (type === 'PUT' || type === 'DELETE' || type === 'PATCH')) {
         params.type = 'POST';
-        if (options.emulateJSON) params.data._method = type;
+        if (options.emulateJSON) { params.data._method = type; }
         var beforeSend = options.beforeSend;
         options.beforeSend = function(xhr) {
           xhr.setRequestHeader('X-HTTP-Method-Override', type);
-          if (beforeSend) return beforeSend.apply(this, arguments);
+          if (beforeSend) { return beforeSend.apply(this, arguments); }
         };
       }
 
@@ -236,7 +230,7 @@ String.prototype.singularize = function() {
 
       var success = options.success;
       options.success = function(resp) {
-        if (success) success(model, resp, options);
+        if (success) { success(model, resp, options); }
         model.trigger('sync', model, resp, options);
       };
 
@@ -245,10 +239,10 @@ String.prototype.singularize = function() {
       options.error = function(xhr) {
           if(xhr.status >= 400 && xhr.status <= 400) {
               var resp = JSON.parse(xhr.responseText);
-              if (invalid) invalid(model, resp, options);
+              if (invalid) { invalid(model, resp, options); }
               model.trigger('invalid', model, resp, options);
           } else {
-              if (error) error(model, xhr, options);
+              if (error) { error(model, xhr, options); }
               model.trigger('error', model, xhr, options);
           }
       };
@@ -260,9 +254,10 @@ String.prototype.singularize = function() {
     };
 
     Backbone.Model.prototype.updateAttribute = function (key, value){
+        var data;
+        
         this.set(key, value);
-        data = {};
-        data[key] = value;
+        (data = {})[key] = value;
         this.updateAttributes(data);
     };
     
@@ -273,70 +268,70 @@ String.prototype.singularize = function() {
         this.sync('update', this, { data: scoped_data });
     };
 
-})(jQuery);
-Backbone.Model.getRelationshipDetails = function(type, key, options) {
+}(jQuery));
+Backbone.Model.getRelationshipDetails = function (type, key, options) {
     // Handle both `type, key, options` and `type, [key, options]` style arguments
     if (_.isArray(key)) {
-      options = key[1];
-      key = key[0];
+        options = key[1];
+        key = key[0];
     }
 
     var relation = {
         key: key
     };
 
-    if(options) {
-        if(type == 'hasMany' && options.collection) {
+    if (options) {
+        if (type === 'hasMany' && options.collection) {
             relation.type = window[options.collection];
-        } else if (type == 'hasMany' && options.model) {
+        } else if (type === 'hasMany' && options.model) {
             relation.type = window[options.model + 'Collection'];
         } else {
             relation.type = window[options.model];
         }
     } else {
-        if(type == 'belongsTo') {
+        if (type === 'belongsTo') {
             relation.type = window[relation.key.camelize()];
-        } else if (type == 'hasMany') {
-            relation.type = window[relation.key.camelize(true).replace(/s$/,'') + 'Collection'];
+        } else if (type === 'hasMany') {
+            relation.type = window[relation.key.camelize(true).replace(/s$/, '') + 'Collection'];
         }
     }
     
     return relation;
 };
 
-Backbone.Model.prototype.coerceAttributes = function(attrs) {
+Backbone.Model.prototype.coerceAttributes = function (attrs) {
     var rel, i, type, klass;
     
-    if(this.belongsTo) {
-        for(i = 0; i < this.belongsTo.length; i++) {
+    if (this.belongsTo) {
+        for (i = 0; i < this.belongsTo.length; i++) {
             rel = Backbone.Model.getRelationshipDetails('belongsTo', this.belongsTo[i]);
-            if(attrs[rel.key] && !(attrs[rel.key] instanceof rel.type)) {
+            if (attrs[rel.key] && !(attrs[rel.key] instanceof rel.type)) {
                 attrs[rel.key] = new rel.type(attrs[rel.key]);
             }
         }
     }
     
-    if(this.hasMany) {
-        for(i = 0; i < this.hasMany.length; i++) {
+    if (this.hasMany) {
+        for (i = 0; i < this.hasMany.length; i++) {
             rel = Backbone.Model.getRelationshipDetails('hasMany', this.hasMany[i]);
-            if(attrs[rel.key] && !(attrs[rel.key] instanceof rel.type)) {
+            if (attrs[rel.key] && !(attrs[rel.key] instanceof rel.type)) {
                 attrs[rel.key] = new rel.type(attrs[rel.key]);
             }
         }
     }
     
-    if(this.coercions) {
-        _.each(this.coercions, function(type, key) {
-            if(attrs[key]) {
+    if (this.coercions) {
+        _.each(this.coercions, function (type, key) {
+            if (attrs[key]) {
                 klass = window[type];
 
                 if (klass === Date) {
-                    if (typeof attrs[key] == 'string' || typeof attrs[key] == 'number') {
+                    if (typeof attrs[key] === 'string' || typeof attrs[key] === 'number') {
                         attrs[key] = new Date(attrs[key]);
                     } else if (!(attrs[key] instanceof Date)) {
                         throw new TypeError(typeof attrs[key] + " can't be coerced into " + type);
                     }
-                } else  {
+                } else {
                     throw new TypeError("Coercion of " + type + " unsupported");
                 }
             }
@@ -348,16 +343,16 @@ Backbone.Model.prototype.coerceAttributes = function(attrs) {
 
 
 Backbone.Model.prototype.set = (function set(original) {
-    return function(key, val, options) {
+    return function (key, val, options) {
         var attrs;
-        if (key === null) return this;
+        if (key === null) { return this; }
 
         // Handle both `"key", value` and `{key: value}` -style arguments.
         if (typeof key === 'object') {
-          attrs = key;
-          options = val;
+            attrs = key;
+            options = val;
         } else {
-          (attrs = {})[key] = val;
+            (attrs = {})[key] = val;
         }
         
         this.coerceAttributes(attrs);
@@ -367,36 +362,36 @@ Backbone.Model.prototype.set = (function set(original) {
 }(Backbone.Model.prototype.set));
 
 
-Backbone.Model.prototype.toJSON = function(options) {
+Backbone.Model.prototype.toJSON = function (options) {
     var rel, i;
     var data = _.clone(this.attributes);
     
-    if(this.belongsTo) {
-        for(i = 0; i < this.belongsTo.length; i++) {
+    if (this.belongsTo) {
+        for (i = 0; i < this.belongsTo.length; i++) {
             rel = Backbone.Model.getRelationshipDetails('belongsTo', this.belongsTo[i]);
             
-            if(data[rel.key]) {
+            if (data[rel.key]) {
                 data[rel.key+'_attributes'] = data[rel.key].toJSON();
                 delete data[rel.key];
             }
         }
     }
     
-    if(this.hasMany) {
-        for(i = 0; i < this.hasMany.length; i++) {
+    if (this.hasMany) {
+        for (i = 0; i < this.hasMany.length; i++) {
             rel = Backbone.Model.getRelationshipDetails('hasMany', this.hasMany[i]);
                         
-            if(data[rel.key]) {
-                data[rel.key+'_attributes'] = data[key].toJSON();
-                delete data[key];
+            if (data[rel.key]) {
+                data[rel.key + '_attributes'] = data[rel.key].toJSON();
+                delete data[rel.key];
             }
         }
     }
     
-    if(this.coercions) {
-        _.each(this.coercions, function(type, key) {
-            if(data[key]) {
-                if (type == 'Date') {
+    if (this.coercions) {
+        _.each(this.coercions, function (type, key) {
+            if (data[key]) {
+                if (type === 'Date') {
                     data[key] = data[key].toISOString();
                 } else {
                     throw new TypeError("Coercion of " + type + " unsupported");
@@ -511,14 +506,14 @@ Viking.Collection = Backbone.Collection.extend({
             exceptModel = exceptModel.cid;
         }
         this.each(function(m) {
-            if(m.cid != exceptModel) {
+            if(m.cid !== exceptModel) {
                 m.set('@selected', false);
             }
         });
     },
     
     sync: function(method, model, options) {
-        if(method == 'read' && this._filter) {
+        if(method === 'read' && this._filter) {
             options.data || (options.data = {});
             options.data.filters = this._filter.attributes;
         }
@@ -529,7 +524,7 @@ Viking.Collection = Backbone.Collection.extend({
 Viking.PaginatedCollection = Viking.Collection.extend({
     constructor: function(models, options) {
         Viking.Collection.apply(this, arguments);
-        this.cursor = (options && options.cursor || new Viking.Cursor());
+        this.cursor = ((options && options.cursor) || new Viking.Cursor());
         this.listenTo(this.cursor, 'change', function() {
             if(this.cursor.requiresRefresh()) {
                 this.cursorChanged.apply(this, arguments);
@@ -559,7 +554,7 @@ Viking.PaginatedCollection = Viking.Collection.extend({
     },
     
     sync: function(method, model, options) {
-        if(method == 'read') {
+        if(method === 'read') {
             options.data || (options.data = {});
             options.data.page = model.cursor.get('page');
             options.data.per_page = model.cursor.get('per_page');
@@ -573,10 +568,10 @@ Viking.Controller = Backbone.Model.extend({}, {
     
     instance: function(onInstantiated, onInstantiation) {
         if(this._instance) {
-            if(onInstantiated) onInstantiated(this._instance);
+            if(onInstantiated) { onInstantiated(this._instance); }
         } else {
             this._instance = new this();
-            if(onInstantiation) onInstantiation(this._instance);
+            if(onInstantiation) { onInstantiation(this._instance); }
         }
 
         return this._instance;
@@ -622,9 +617,9 @@ Viking.Cursor = Backbone.Model.extend({
         if(changedAttributes) {
             var triggers = ['page', 'offset', 'per_page'];
             return (_.intersection(_.keys(changedAttributes), triggers).length > 0);
-        } else {
-            return false;
         }
+        
+        return false;
     }
     
     
@@ -632,7 +627,7 @@ Viking.Cursor = Backbone.Model.extend({
 Viking.Router = Backbone.Router.extend({
     
     route: function(route, callback) {
-        if (!_.isRegExp(route)) route = this._routeToRegExp(route);
+        if (!_.isRegExp(route)) { route = this._routeToRegExp(route); }
         Backbone.history.route(route, _.bind(function(fragment) {
             var args = this._extractParameters(route, fragment);
             if (window[callback.controller] && window[callback.controller][callback.action]) {
@@ -654,7 +649,7 @@ Viking.Router = Backbone.Router.extend({
     
     navigate: function(fragment, args) {
         var root_url = window.location.protocol + '//' + window.location.host;
-        if(fragment.indexOf(root_url) === 0) fragment = fragment.replace(root_url, '');
+        if(fragment.indexOf(root_url) === 0) { fragment = fragment.replace(root_url, ''); }
         
         Backbone.Router.prototype.navigate.call(this, fragment, args);
     }
