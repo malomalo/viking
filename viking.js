@@ -151,23 +151,20 @@ Backbone.sync = (function set(sync) {
     };
 }(Backbone.sync));
 
-(function($) {
-    Backbone.Model.prototype.updateAttribute = function (key, value){
-        var data;
-        
-        this.set(key, value);
-        (data = {})[key] = value;
-        this.updateAttributes(data);
-    };
+Backbone.Model.prototype.updateAttribute = function (key, value){
+    var data;
     
-    Backbone.Model.prototype.updateAttributes = function (data){
-        this.set(data);
-        var scoped_data = {};
-        scoped_data[_.result(this, 'paramRoot')] = data;
-        this.sync('update', this, { data: scoped_data });
-    };
+    this.set(key, value);
+    (data = {})[key] = value;
+    this.updateAttributes(data);
+};
 
-}(jQuery));
+Backbone.Model.prototype.updateAttributes = function (data){
+    this.set(data);
+    var scoped_data = {};
+    scoped_data[_.result(this, 'paramRoot')] = data;
+    this.sync('update', this, { data: scoped_data });
+};
 Backbone.Model.getRelationshipDetails = function (type, key, options) {
     // Handle both `type, key, options` and `type, [key, options]` style arguments
     if (_.isArray(key)) {
