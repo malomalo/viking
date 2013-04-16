@@ -147,7 +147,7 @@ Backbone.sync = (function set(sync) {
             if (beforeSend) { return beforeSend.apply(this, arguments); }
         };
         
-        if (options.data == null && model && (method === 'create' || method === 'update' || method === 'patch')) {
+        if (options.data === null && model && (method === 'create' || method === 'update' || method === 'patch')) {
             options.contentType = 'application/json';
             options.data = {};
             options.data[_.result(model, 'paramRoot')] = model.toJSON(options);
@@ -379,7 +379,7 @@ Viking.Collection = Backbone.Collection.extend({
     },
     
     filterChanged: function(filter, options) {
-        this.fetch(options);
+        this.fetch();
     },
 
     // Sets `'@selected'` to `true` on the `model`. If `clearCurrentlySelected`
@@ -437,11 +437,11 @@ Viking.PaginatedCollection = Viking.Collection.extend({
     
     filterChanged: function(filter, options) {
         this.cursor.reset({silent: true});
-        this.cursorChanged(undefined, options);
+        this.cursorChanged();
     },
     
     cursorChanged: function(cursor, options) {
-        this.fetch(options);
+        this.fetch();
     },
     
     parse: function(attrs, xhr) {

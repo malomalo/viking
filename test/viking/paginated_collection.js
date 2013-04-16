@@ -36,19 +36,6 @@ test("cursorChanged doesn't get called when not needed", function() {
     pc.cursor.set('total_pages', 4);
 });
 
-test("cursorChanged passes options to fetch", function() {
-    expect(3);
-    
-    var collection = Viking.PaginatedCollection.extend({
-        fetch: function(options) { deepEqual({test: 'this'}, options) }
-    });
-    var pc = new collection();
-    
-    pc.cursor.incrementPage({test: 'this'});
-    pc.cursor.decrementPage({test: 'this'});
-    pc.cursor.goToPage(2, {test: 'this'});
-});
-
 // Filter --------------------------------------------------------------------
 test("filterChanged method is called when filter is changed", function() {
     expect(1);
@@ -62,7 +49,7 @@ test("filterChanged method is called when filter is changed", function() {
     filter.trigger('change');
 });
 
-test("filterChanged resets the cursor and calls cursorChanged()", function() {
+test("filterChanged resets the cursor and calls fetch()", function() {
     expect(1);
 
     var collection = Viking.PaginatedCollection.extend({
@@ -74,19 +61,16 @@ test("filterChanged resets the cursor and calls cursorChanged()", function() {
     filter.trigger('change');
 });
 
-test("filterChanged() calls cursorChanged() with options from ", function() {
+test("filterChanged() calls cursorChanged()", function() {
     expect(1);
 
     var c = Viking.PaginatedCollection.extend({
-        cursorChanged: function(model, options) {
-            deepEqual({remove: false}, options);
-        }
+        cursorChanged: function() { ok(true); }
     });
     var c = new c();
     
-    c.filterChanged(null, {remove: false});
+    c.filterChanged();
 });
-
 
 // Parse ---------------------------------------------------------------------
 test("parse extracts cursor information", function() {
