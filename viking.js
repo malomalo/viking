@@ -219,6 +219,8 @@ Backbone.Model.prototype.coerceAttributes = function (attrs) {
             rel = Backbone.Model.getRelationshipDetails('hasMany', this.hasMany[i]);
             if (attrs[rel.key] && !(attrs[rel.key] instanceof rel.type)) {
                 attrs[rel.key] = new rel.type(attrs[rel.key]);
+            } else {
+                attrs[rel.key] = new rel.type();
             }
         }
     }
