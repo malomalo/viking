@@ -145,7 +145,7 @@ Backbone.sync = (function set(sync) {
     return function (method, model, options) {
         options || (options = {});
         
-        if (options.data === null && model && (method === 'create' || method === 'update' || method === 'patch')) {
+        if (!options.data && model && (method === 'create' || method === 'update' || method === 'patch')) {
             options.contentType = 'application/json';
             options.data = {};
             options.data[_.result(model, 'paramRoot')] = model.toJSON(options);
