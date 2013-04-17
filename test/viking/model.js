@@ -33,27 +33,27 @@ test("instance.paramRoot returns underscored modelName", function() {
 });
 
 // select() ------------------------------------------------------------------
-test("select() sets '@selected' to true on the model", function() {
+test("select() sets 'selected' to true on the model", function() {
     var c = new Viking.Collection([{}, {}]);
     var model = c.models[0];
     model.select();
     
-    ok(model.get('@selected'));
+    ok(model.get('selected'));
 });
 
-test("select() sets '@selected' to false other models", function() {
-    var c = new Viking.Collection([{'@selected': true}, {'@selected': true}, {'@selected': true}]);
+test("select() sets 'selected' to false other models", function() {
+    var c = new Viking.Collection([{'selected': true}, {'selected': true}, {'selected': true}]);
     var models = c.models;
     
-    ok(models[0].get('@selected'));
-    ok(models[1].get('@selected'));
-    ok(models[2].get('@selected'));
+    ok(models[0].get('selected'));
+    ok(models[1].get('selected'));
+    ok(models[2].get('selected'));
     
     models[1].select();
     
-    ok(!models[0].get('@selected'));
-    ok(models[1].get('@selected'));
-    ok(!models[2].get('@selected'));
+    ok(!models[0].get('selected'));
+    ok(models[1].get('selected'));
+    ok(!models[2].get('selected'));
 });
 
 test("select(true) doesn't unselect other modelts", function() {
@@ -64,9 +64,9 @@ test("select(true) doesn't unselect other modelts", function() {
     models[1].select(true);
     models[2].select(true);
     
-    ok(models[0].get('@selected'));
-    ok(models[1].get('@selected'));
-    ok(models[2].get('@selected'));
+    ok(models[0].get('selected'));
+    ok(models[1].get('selected'));
+    ok(models[2].get('selected'));
 });
 
 test("selected() triggers a 'selected' event", function() {
@@ -75,15 +75,15 @@ test("selected() triggers a 'selected' event", function() {
     var c = new Viking.Collection([{}]);
     var model = c.models[0];
 
-    model.on('change:@selected', function() { ok(model.get('@selected')); });
+    model.on('change:selected', function() { ok(model.get('selected')); });
     model.select();
-    model.off('change:@selected');
+    model.off('change:selected');
 });
 
 test("selected(model) triggers a 'selected' event only if change", function() {
     expect(0);
     
-    var c = new Viking.Collection([{'@selected': true}]);
+    var c = new Viking.Collection([{'selected': true}]);
     var m = c.models[0]
     m.on('selected', function() { ok(true); });
     m.select();

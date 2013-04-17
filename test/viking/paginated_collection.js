@@ -36,32 +36,32 @@ test("cursorChanged doesn't get called when not needed", function() {
     pc.cursor.set('total_pages', 4);
 });
 
-// Filter --------------------------------------------------------------------
-test("filterChanged method is called when filter is changed", function() {
+// Predicate -----------------------------------------------------------------
+test("predicateChanged method is called when predicate is changed", function() {
     expect(1);
     
     var collection = Viking.PaginatedCollection.extend({
-        filterChanged: function(options) { ok(true); }
+        predicateChanged: function(options) { ok(true); }
     });
-    var filter = new Viking.Filter();
-    var pc = new collection([], { filter: filter });
+    var predicate = new Viking.Predicate();
+    var pc = new collection([], { predicate: predicate });
     
-    filter.trigger('change');
+    predicate.trigger('change');
 });
 
-test("filterChanged resets the cursor and calls fetch()", function() {
+test("predicateChanged resets the cursor and calls fetch()", function() {
     expect(1);
 
     var collection = Viking.PaginatedCollection.extend({
         cursorChanged: function() { ok(true); }
     });
-    var filter = new Viking.Filter();
+    var predicate = new Viking.Predicate();
     var cursor = new Viking.Cursor({page: 10});
-    var pc = new collection([], { filter: filter, cursor: cursor });
-    filter.trigger('change');
+    var pc = new collection([], { predicate: predicate, cursor: cursor });
+    predicate.trigger('change');
 });
 
-test("filterChanged() calls cursorChanged()", function() {
+test("predicateChanged() calls cursorChanged()", function() {
     expect(1);
 
     var c = Viking.PaginatedCollection.extend({
@@ -69,7 +69,7 @@ test("filterChanged() calls cursorChanged()", function() {
     });
     var c = new c();
     
-    c.filterChanged();
+    c.predicateChanged();
 });
 
 // Parse ---------------------------------------------------------------------

@@ -1,80 +1,80 @@
 module("Viking.Collection");
 
-// Filters -------------------------------------------------------------------
-test("new set filter if passed in options", function() {
-    var filter = new Viking.Filter();
-    var vc = new Viking.Collection([], { filter: filter });
+// Predicates ----------------------------------------------------------------
+test("new set predicate if passed in options", function() {
+    var predicate = new Viking.Predicate();
+    var vc = new Viking.Collection([], { predicate: predicate });
     
-    ok(filter === vc._filter);
+    ok(predicate === vc.predicate);
 });
 
-test("setFilter sets new filter", function() {
-    var filter = new Viking.Filter();
-    var vc = new Viking.Collection([], { filter: filter });
-    var newFilter = new Viking.Filter();
-    vc.setFilter(newFilter, {silent: true});
+test("setPredicate sets new predicate", function() {
+    var predicate = new Viking.Predicate();
+    var vc = new Viking.Collection([], { predicate: predicate });
+    var newPredicate = new Viking.Predicate();
+    vc.setPredicate(newPredicate, {silent: true});
     
-    ok(newFilter === vc._filter);
+    ok(newPredicate === vc.predicate);
 });
 
-test("changing the filter triggers a fetch", function() {
+test("changing the predicate triggers a fetch", function() {
     expect(1);
     
     var collection = Viking.Collection.extend({
         fetch: function(options) { ok(true); }
     })
-    var filter = new Viking.Filter();
-    var vc = new collection([], { filter: filter });
-    filter.trigger('change');
+    var predicate = new Viking.Predicate();
+    var vc = new collection([], { predicate: predicate });
+    predicate.trigger('change');
 });
 
-test("setFilter removes old filter callbacks", function() {
+test("setPredicate removes old predicate callbacks", function() {
     expect(0);
     
     var collection = Viking.Collection.extend({
-        filterChanged: function() { ok(true); }
+        predicateChanged: function() { ok(true); }
     })
-    var filter = new Viking.Filter();
-    var vc = new collection([], { filter: filter });
-    var newFilter = new Viking.Filter();
-    vc.setFilter(newFilter, {silent: true});
+    var predicate = new Viking.Predicate();
+    var vc = new collection([], { predicate: predicate });
+    var newPredicate = new Viking.Predicate();
+    vc.setPredicate(newPredicate, {silent: true});
     
-    filter.trigger('change');
+    predicate.trigger('change');
 });
 
-test("setFilter to a falsey value removes the filter", function() {
+test("setPredicate to a falsey value removes the predicate", function() {
     expect(0);
     
     var collection = Viking.Collection.extend({
-        filterChanged: function(options) { ok(true); }
+        predicateChanged: function(options) { ok(true); }
     })
-    var filter = new Viking.Filter();
-    var vc = new collection([], { filter: filter });
+    var predicate = new Viking.Predicate();
+    var vc = new collection([], { predicate: predicate });
     
-    vc.setFilter(null);
-    filter.trigger('change');
+    vc.setPredicate(null);
+    predicate.trigger('change');
 });
 
-test("setFilter() triggers filterChanged()", function() {
+test("setPredicate() triggers predicateChanged()", function() {
     expect(1);
     
     var collection = Viking.Collection.extend({
-        filterChanged: function(options) { ok(true); }
+        predicateChanged: function(options) { ok(true); }
     })
     var vc = new collection();
     
-    vc.setFilter(new Viking.Filter());
+    vc.setPredicate(new Viking.Predicate());
 });
 
-test("setFilter() with options.silent = true doesn't trigger filterChanged()", function() {
+test("setPredicate() with options.silent = true doesn't trigger predicateChanged()", function() {
     expect(0);
     
     var collection = Viking.Collection.extend({
-        filterChanged: function(options) { ok(true); }
+        predicateChanged: function(options) { ok(true); }
     })
     var vc = new collection();
     
-    vc.setFilter(new Viking.Filter(), {silent: true});
+    vc.setPredicate(new Viking.Predicate(), {silent: true});
 });
 
 // Url -----------------------------------------------------------------------
@@ -113,27 +113,27 @@ test("paramRoot based on model.modelName", function() {
 });
 
 // select() ------------------------------------------------------------------
-test("select(model) sets '@selected' to true on the model", function() {
+test("select(model) sets 'selected' to true on the model", function() {
     var c = new Viking.Collection([{}, {}]);
     var model = c.models[0];
     c.select(model);
     
-    ok(model.get('@selected'));
+    ok(model.get('selected'));
 });
 
-test("select(model) sets '@selected' to false other models", function() {
-    var c = new Viking.Collection([{'@selected': true}, {'@selected': true}, {'@selected': true}]);
+test("select(model) sets 'selected' to false other models", function() {
+    var c = new Viking.Collection([{'selected': true}, {'selected': true}, {'selected': true}]);
     var models = c.models;
     
-    ok(models[0].get('@selected'));
-    ok(models[1].get('@selected'));
-    ok(models[2].get('@selected'));
+    ok(models[0].get('selected'));
+    ok(models[1].get('selected'));
+    ok(models[2].get('selected'));
     
     c.select(models[1]);
     
-    ok(!models[0].get('@selected'));
-    ok(models[1].get('@selected'));
-    ok(!models[2].get('@selected'));
+    ok(!models[0].get('selected'));
+    ok(models[1].get('selected'));
+    ok(!models[2].get('selected'));
 });
 
 test("select(model, true) doesn't unselect other modelts", function() {
@@ -144,9 +144,9 @@ test("select(model, true) doesn't unselect other modelts", function() {
     c.select(models[1], true);
     c.select(models[2], true);
     
-    ok(models[0].get('@selected'));
-    ok(models[1].get('@selected'));
-    ok(models[2].get('@selected'));
+    ok(models[0].get('selected'));
+    ok(models[1].get('selected'));
+    ok(models[2].get('selected'));
 });
 
 test("selected(model) triggers a 'selected' event on collection", function() {
@@ -155,7 +155,7 @@ test("selected(model) triggers a 'selected' event on collection", function() {
     var c = new Viking.Collection([{}]);
     var model = c.models[0];
 
-    c.on('selected', function() { ok(model.get('@selected')); }, model);
+    c.on('selected', function() { ok(model.get('selected')); }, model);
     c.select(model);
     c.off('selected');
 });
@@ -163,7 +163,7 @@ test("selected(model) triggers a 'selected' event on collection", function() {
 test("selected(model) triggers a 'selected' event only if change", function() {
     expect(0);
     
-    var c = new Viking.Collection([{'@selected': true}]);
+    var c = new Viking.Collection([{'selected': true}]);
     c.on('selected', function() { ok(true); });
     c.select(c.models[0]);
     c.off('selected');
@@ -189,16 +189,16 @@ test("selected() only returns selected models", function() {
 });
 
 // clearSelected() ------------------------------------------------------------
-test("clearSelected() set '@selected' to false on all models", function() {
-    var c = new Viking.Collection([{'@selected': true}, {'@selected': true}, {'@selected': true}]);
+test("clearSelected() set 'selected' to false on all models", function() {
+    var c = new Viking.Collection([{'selected': true}, {'selected': true}, {'selected': true}]);
     equal(3, c.selected().length);
     
     c.clearSelected()
     equal(0, c.selected().length);
 });
 
-test("clearSelected(except) set '@selected' to false on all models", function() {
-    var c = new Viking.Collection([{'@selected': true}, {'@selected': true}, {'@selected': true}]);
+test("clearSelected(except) set 'selected' to false on all models", function() {
+    var c = new Viking.Collection([{'selected': true}, {'selected': true}, {'selected': true}]);
     var model = c.models[1];
     
     equal(3, c.selected().length);
@@ -207,23 +207,23 @@ test("clearSelected(except) set '@selected' to false on all models", function() 
 });
 
 // sync() --------------------------------------------------------------------
-test("sync() adds in filter params", function() {
+test("sync() adds in predicate params", function() {
     expect(1);
     
     var m = Viking.Model.extend('model');
-    var f = new Viking.Filter({types: [1,2]});
+    var f = new Viking.Predicate({types: [1,2]});
     var c = Viking.Collection.extend({model: m});
-    var c = new c([], {filter: f});
+    var c = new c([], {predicate: f});
     
     var old = Backbone.sync;
     Backbone.sync = function(method, model, options) {
-        deepEqual(options.data.filters, {types: [1,2]});
+        deepEqual(options.data.predicate, {types: [1,2]});
     }
     c.fetch();
     Backbone.sync = old;
 });
 
-test("sync() doesn't add in filter params if there is no filter", function() {
+test("sync() doesn't add in predicate params if there is no predicate", function() {
     expect(1);
     
     var m = Viking.Model.extend('model');
@@ -250,18 +250,18 @@ test("decrementPage options get passed to callbacks", function() {
 });
 
 // set -----------------------------------------------------------------------
-test("filter.set() options get passed to filterChanged", function() {
+test("predicate.set() options get passed to predicateChanged", function() {
     expect(3);
 
-    var f = new Viking.Filter();
+    var f = new Viking.Predicate();
     var m = Viking.Model.extend('model');
     var c = Viking.Collection.extend({
         model: m,
-        filterChanged: function(model, options) {
+        predicateChanged: function(model, options) {
             deepEqual({remove: false}, options);
         }
     });
-    var c = new c([], {filter: f});
+    var c = new c([], {predicate: f});
     
     f.on('change', function(model, options) { deepEqual({remove: false}, options); });
     f.on('change:query', function(model, value, options) { deepEqual({remove: false}, options); });

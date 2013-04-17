@@ -348,8 +348,8 @@ Viking.Collection = Backbone.Collection.extend({
     constructor: function(models, options) {
         Backbone.Collection.apply(this, arguments);
         
-        if(options && options.filter) {
-            this.setFilter(options.filter, {silent: true});
+        if(options && options.predicate) {
+            this.setPredicate(options.predicate, {silent: true});
         }
     },
     
@@ -360,65 +360,61 @@ Viking.Collection = Backbone.Collection.extend({
         return this.model.modelName.underscore().pluralize();
     },
     
-    // If a filter is set it's paramaters will be passed as under the
-    // filter namespace when querying the server
-    setFilter: function(filter, options) {
-        if(this._filter) {
-            this.stopListening(this._filter);
-        }
+    // If a predicate is set it's paramaters will be passed under the
+    // predicate namespace when querying the server
+    setPredicate: function(predicate, options) {
+        if(this.predicate) { this.stopListening(this.predicate); }
         
-        if(filter) {
-            this._filter = filter;
-            this.listenTo(filter, 'change', this.filterChanged);
+        if(predicate) {
+            this.predicate = predicate;
+            this.listenTo(predicate, 'change', this.predicateChanged);
             if(!(options && options.silent)) {
-                this.filterChanged();
+                this.predicateChanged();
             }
         } else {
-            delete this._filter;
+            delete this.predicate;
         }
     },
     
-    filterChanged: function(filter, options) {
+    predicateChanged: function(predicate, options) {
         this.fetch();
     },
 
-    // Sets `'@selected'` to `true` on the `model`. If `clearCurrentlySelected`
-    // is truthy all other models will have `@selected` set to `false`.
+    // Sets `'selected'` to `true` on the `model`. If `clearCurrentlySelected`
+    // is truthy all other models will have `selected` set to `false`.
     // Also triggers the `selected` event on the collection. If the model is
     // already selected the `selected` event is not triggered
     select: function(model, clearCurrentlySelected) {
         if(!clearCurrentlySelected) {
             this.clearSelected(model);
         }
-        if(!model.get('@selected')) {
-            model.set('@selected', true);
+        if(!model.get('selected')) {
+            model.set('selected', true);
             this.trigger('selected', this.selected());
         }
     },
     
-    // returns all the models where `@selected` == true
+    // returns all the models where `selected` == true
     selected: function() {
-        return this.filter(function(m) {
-            return m.get('@selected');
-        });
+        return this.filter(function(m) { return m.get('selected'); });
     },
     
-    // Sets `'@selected'` to `false` on all models
+    // Sets `'selected'` to `false` on all models
     clearSelected: function(exceptModel) {
         if(exceptModel instanceof Viking.Model) {
             exceptModel = exceptModel.cid;
         }
         this.each(function(m) {
             if(m.cid !== exceptModel) {
-                m.set('@selected', false);
+                m.set('selected', false);
             }
         });
     },
     
     sync: function(method, model, options) {
-        if(method === 'read' && this._filter) {
+        if(method === 'read' && this.predicate) {
             options.data || (options.data = {});
-            options.data.filters = this._filter.attributes;
+            options.data.predicate = this.predicate.attributes;
         }
         Backbone.sync.call(this, method, model, options);
     }
@@ -435,7 +431,7 @@ Viking.PaginatedCollection = Viking.Collection.extend({
         });
     },
     
-    filterChanged: function(filter, options) {
+    predicateChanged: function(predicate, options) {
         this.cursor.reset({silent: true});
         this.cursorChanged();
     },
@@ -480,8 +476,7 @@ Viking.Controller = Backbone.Model.extend({}, {
         return this._instance;
     }
 });
-Viking.Filter = Backbone.Model.extend({
-});
+Viking.Predicate = Backbone.Model;
 Viking.Cursor = Backbone.Model.extend({
     defaults: {
         page: 1,
