@@ -217,8 +217,6 @@ Backbone.Model.prototype.coerceAttributes = function (attrs) {
             rel = Backbone.Model.getRelationshipDetails('hasMany', this.hasMany[i]);
             if (attrs[rel.key] && !(attrs[rel.key] instanceof rel.type)) {
                 attrs[rel.key] = new rel.type(attrs[rel.key]);
-            } else {
-                attrs[rel.key] = new rel.type();
             }
         }
     }
@@ -243,7 +241,6 @@ Backbone.Model.prototype.coerceAttributes = function (attrs) {
     
     return attrs;
 };
-
 
 Backbone.Model.prototype.set = (function set(original) {
     return function (key, val, options) {
@@ -309,6 +306,16 @@ Viking.Model = Backbone.Model.extend({
     constructor: function() {
         Backbone.Model.apply(this, arguments);
         this.modelName = this.constructor.modelName;
+        
+        var rel, i;
+        if (this.hasMany) {
+            for (i = 0; i < this.hasMany.length; i++) {
+                rel = Backbone.Model.getRelationshipDetails('hasMany', this.hasMany[i]);
+                if(!this.attributes[rel.key]) {
+                    this.attributes[rel.key] = new rel.type();
+                }
+            }
+        }
     },
     
     select: function(clearCurrentlySelected) {
