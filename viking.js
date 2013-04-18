@@ -140,35 +140,15 @@ jQuery(document).ajaxSend(function(event, xhr, settings) {
     var token = jQuery('meta[name="csrf-token"]').attr('content');
     if (token) { xhr.setRequestHeader('X-CSRF-Token', token); }
 });
-
-Backbone.sync = (function set(sync) {
-    return function (method, model, options) {
-        options || (options = {});
-        
-        if (!options.data && model && (method === 'create' || method === 'update' || method === 'patch')) {
-            options.contentType = 'application/json';
-            options.data = {};
-            options.data[_.result(model, 'paramRoot')] = model.toJSON(options);
-            options.data = JSON.stringify(options.data);
-        }
-        
-        return sync.call(this, method, model, options);
-    };
-}(Backbone.sync));
-
-Backbone.Model.prototype.updateAttribute = function (key, value){
+Backbone.Model.prototype.updateAttribute = function (key, value, options){
     var data;
     
-    this.set(key, value);
     (data = {})[key] = value;
-    this.updateAttributes(data);
+    this.updateAttributes(data, options);
 };
 
-Backbone.Model.prototype.updateAttributes = function (data){
-    this.set(data);
-    var scoped_data = {};
-    scoped_data[_.result(this, 'paramRoot')] = data;
-    this.sync('update', this, { data: scoped_data });
+Backbone.Model.prototype.updateAttributes = function (data, options) {
+    this.save(data, options)
 };
 Backbone.Model.getRelationshipDetails = function (type, key, options) {
     // Handle both `type, key, options` and `type, [key, options]` style arguments
@@ -304,9 +284,15 @@ Backbone.Model.prototype.toJSON = function (options) {
 };
 Viking.Model = Backbone.Model.extend({
     constructor: function() {
+        // Initialize the object as a Backbone Model
         Backbone.Model.apply(this, arguments);
+        
+        // Add a helper reference to get the model name from an instance
+        // of the model
         this.modelName = this.constructor.modelName;
         
+        // Initialize the `hasMany` collections to an empty collection if
+        // they are not defined
         var rel, i;
         if (this.hasMany) {
             for (i = 0; i < this.hasMany.length; i++) {
@@ -332,6 +318,21 @@ Viking.Model = Backbone.Model.extend({
     },
     paramRoot: function() {
         return this.modelName.underscore();
+    },
+    
+    // Override the default Backbone.Model.sync. Rails expects namespaced
+    // attribute
+    sync: function(method, model, options) {
+        options || (options = {});
+        
+        if (!options.data && model && (method === 'create' || method === 'update' || method === 'patch')) {
+            options.contentType = 'application/json';
+            options.data = {};
+            options.data[_.result(model, 'paramRoot')] = (options.attrs || model.toJSON(options));
+            options.data = JSON.stringify(options.data);
+        }
+
+        return Backbone.sync.call(this, method, model, options);
     }
     
 }, {
@@ -423,7 +424,7 @@ Viking.Collection = Backbone.Collection.extend({
             options.data || (options.data = {});
             options.data.predicate = this.predicate.attributes;
         }
-        Backbone.sync.call(this, method, model, options);
+        return Backbone.sync.call(this, method, model, options);
     }
     
 });
@@ -559,6 +560,7 @@ Viking.Router = Backbone.Router.extend({
     }
     
 });
+
 
 
 
