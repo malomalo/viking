@@ -4,7 +4,7 @@ module("Viking.Cursor");
 test("defaults are set", function() {
     var c = new Viking.Cursor();
 
-    deepEqual(c.attributes, {page: 1, offset: 0, per_page: 40, total: undefined, total_pages: undefined});
+    deepEqual(c.attributes, {page: 1, offset: 0, per_page: 25, total: undefined, total_pages: undefined});
 });
 
 // Reset ---------------------------------------------------------------------
