@@ -282,6 +282,19 @@ Backbone.Model.prototype.toJSON = function (options) {
 
     return data;
 };
+Viking.config = function(obj, key, val) {
+    var attrs;
+    
+    // Handle both `"key", value` and `{key: value}` -style arguments.
+    if (typeof key === 'object') {
+      attrs = key;
+    } else {
+      (attrs = {})[key] = val;
+    }
+    
+    return _.extend(obj.prototype.defaults, attrs);
+}
+;
 Viking.Model = Backbone.Model.extend({
     constructor: function() {
         // Initialize the object as a Backbone Model
@@ -369,7 +382,16 @@ Viking.Collection = Backbone.Collection.extend({
     },
     
     // If a predicate is set it's paramaters will be passed under the
-    // predicate namespace when querying the server
+    // predicate namespace when querying the server. #predicateChanged is
+    // set as a callback on the `change` event for the predicate
+    //
+    // #setPredicate accepts either attributes to instaniate a
+    // Viking.Predicate or an instanceof a Viking.Predicate
+    //
+    // To remove a predeicate call `#setPredicate` with a falsey value.
+    //
+    // Calling #setPredicate and setting it the same object that is currently
+    // the predicate will not trigger a #predicateChanged call
     setPredicate: function(predicate, options) {
         if (this.predicate === predicate) { return false; }
         
@@ -586,6 +608,7 @@ Viking.Router = Backbone.Router.extend({
     }
     
 });
+
 
 
 
