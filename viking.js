@@ -371,16 +371,20 @@ Viking.Collection = Backbone.Collection.extend({
     // If a predicate is set it's paramaters will be passed under the
     // predicate namespace when querying the server
     setPredicate: function(predicate, options) {
+        if (this.predicate === predicate) { return false; }
+        
         if(this.predicate) { this.stopListening(this.predicate); }
         
         if(predicate) {
+            if(!(predicate instanceof Viking.Predicate)) {
+                predicate = new Viking.Predicate(predicate);
+            }
             this.predicate = predicate;
             this.listenTo(predicate, 'change', this.predicateChanged);
-            if(!(options && options.silent)) {
-                this.predicateChanged();
-            }
-        } else {
+            if(!(options && options.silent)) { this.predicateChanged(); }
+        } else if (this.predicate) {
             delete this.predicate;
+            if(!(options && options.silent)) { this.predicateChanged(); }
         }
     },
     
