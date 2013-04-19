@@ -384,6 +384,10 @@ Viking.Collection = Backbone.Collection.extend({
         }
     },
     
+    // Called when the predicate is changed. Having this being called
+    // when the predicate changes instead of just `fetch` allows sub
+    // collections to overwrite what happens when it changes. An example
+    // of this would be the `Viking.PaginatedCollection`
     predicateChanged: function(predicate, options) {
         this.fetch();
     },
@@ -417,6 +421,24 @@ Viking.Collection = Backbone.Collection.extend({
                 m.set('selected', false);
             }
         });
+    },
+    
+    // Override the default Backbone.Collection#fetch to cancel any current
+    // fetch request if fetch is called again. For example when the predicate
+    // changes 3 times, if the first 2 request don't return before the 3rd is
+    // sent they will be canceled and only the last one will finish and update
+    // the collection. You won't get the collection being updated 3 times.
+    fetch: function(options) {
+        options || (options = {});
+        
+        var complete = options.complete
+        options.complete = _.bind(function() {
+            delete this.xhr;
+            if(complete) { complete(); }
+        }, this);
+        
+        if (this.xhr) { this.xhr.abort(); }
+        this.xhr = Backbone.Collection.prototype.fetch.call(this, options);
     },
     
     sync: function(method, model, options) {
@@ -467,7 +489,7 @@ Viking.PaginatedCollection = Viking.Collection.extend({
             options.data.per_page = model.cursor.get('per_page');
             options.data.offset = model.cursor.get('offset');
         }
-        Viking.Collection.prototype.sync.call(this, method, model, options);
+        return Viking.Collection.prototype.sync.call(this, method, model, options);
     }
     
 });
