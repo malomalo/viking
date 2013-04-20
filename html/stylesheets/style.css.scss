@@ -1,0 +1,32 @@
+@import 'bourbon/bourbon';
+$roboto:'Roboto', sans-serif;
+body{
+    background:white;
+    font-family:$roboto;
+    padding:0;
+    margin:0;
+}
+.head{
+    text-align:center;
+    padding:30pt 0;
+    .logo{
+        margin-bottom:20pt;
+    }
+    .tag{
+        font-weight:100;
+        font-style:italic;
+        font-size:1.7em;
+        color:lighten(black, 60);
+    }
+}
+.terminal{
+    background:darken(white, 55);
+    padding:15pt 0;
+    h1{
+        text-align:center;
+        font-weight:300;
+        color:darken(white, 30);
+        font-size:3em;
+        margin:0;
+    }
+}

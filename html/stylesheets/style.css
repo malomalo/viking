@@ -1,0 +1,26 @@
+body {
+  background: white;
+  font-family: "Roboto", sans-serif;
+  padding: 0;
+  margin: 0; }
+
+.head {
+  text-align: center;
+  padding: 30pt 0; }
+  .head .logo {
+    margin-bottom: 20pt; }
+  .head .tag {
+    font-weight: 100;
+    font-style: italic;
+    font-size: 1.7em;
+    color: #999999; }
+
+.terminal {
+  background: #737373;
+  padding: 15pt 0; }
+  .terminal h1 {
+    text-align: center;
+    font-weight: 300;
+    color: #b3b3b3;
+    font-size: 3em;
+    margin: 0; }
