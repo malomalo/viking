@@ -2,17 +2,32 @@
 //
 //     (c) 2012-2013 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
-//     For all details and documentation:
 //     http://vikingjs.com
 
+// Initial Setup
+// -------------
+
+// Setup the Viking namespace
 Viking = {};
+// Viking.Support
+// -------------
+//
+// Viking.Support is a collection of utility classes and standard library
+// extensions that were found useful for the Viking framework. These
+// additions reside in this package so they can be loaded as needed
+// in Javascript projects outside of Rails.
+// strftime relies on https://github.com/samsonjs/strftime. It supports
+// standard specifiers from C as well as some other extensions from Ruby.
 Date.prototype.strftime = function(fmt) {
     return strftime(fmt, this);
 };
-
-Date.prototype.strftimeUTC = function(fmt) {
-    return strftimeUTC(fmt, this);
-};
+// ordinalize returns the ordinal string corresponding to integer:
+//
+//     (1).ordinalize()    // => '1st'
+//     (2).ordinalize()    // => '2nd'
+//     (53).ordinalize()   // => '53rd'
+//     (2009).ordinalize() // => '2009th'
+//     (-134).ordinalize() // => '-134th'
 Number.prototype.ordinalize = function() {
     var abs = Math.abs(this);
     
@@ -57,8 +72,8 @@ String.prototype.humanize = function() {
 //
 // Examples:
 // 
-//    "ActiveModel".underscore         # => "active_model"
-//    "ActiveModel::Errors".underscore # => "active_model/errors"
+//     "ActiveModel".underscore         # => "active_model"
+//     "ActiveModel::Errors".underscore # => "active_model/errors"
 //
 // As a rule of thumb you can think of underscore as the inverse of camelize,
 // though there are cases where that does not hold:
@@ -79,16 +94,16 @@ String.prototype.underscore = function() {
 //
 // Examples:
 //
-//    "active_model".camelize               # => "ActiveModel"
-//    "active_model".camelize(true)         # => "ActiveModel"
-//    "active_model".camelize(false)        # => "activeModel"
-//    "active_model/errors".camelize        # => "ActiveModel::Errors"
-//    "active_model/errors".camelize(false) # => "activeModel::Errors"
+//     "active_model".camelize               // => "ActiveModel"
+//     "active_model".camelize(true)         // => "ActiveModel"
+//     "active_model".camelize(false)        // => "activeModel"
+//     "active_model/errors".camelize        // => "ActiveModel::Errors"
+//     "active_model/errors".camelize(false) // => "activeModel::Errors"
 //
 // As a rule of thumb you can think of camelize as the inverse of underscore,
 // though there are cases where that does not hold:
 //
-//    "SSLError".underscore.camelize # => "SslError"
+//     "SSLError".underscore.camelize // => "SslError"
 String.prototype.camelize = function(uppercase_first_letter) {
     var result = uppercase_first_letter === undefined || uppercase_first_letter ? this.capitalize() : this.anticapitalize();
     result = result.replace(/(_|(\/))([a-z\d]*)/g, function(_a, _b, first, rest) { return (first || '') + rest.capitalize(); });
@@ -100,10 +115,10 @@ String.prototype.camelize = function(uppercase_first_letter) {
 //
 // Examples:
 //
-//    "true".booleanize()       # => true
-//    "false".booleanize()      # => false
-//    "other".booleanize()      # => false
-//    "other".booleanize(true)  # => true
+//     "true".booleanize()       // => true
+//     "false".booleanize()      // => false
+//     "other".booleanize()      // => false
+//     "other".booleanize(true)  // => true
 String.prototype.booleanize = function(defaultTo) {
     if(this.toString() === 'true') { return true; }
     if (this.toString() === 'false') { return false; }
@@ -115,7 +130,7 @@ String.prototype.booleanize = function(defaultTo) {
 //
 // Example:
 //
-//    "puni_puni" # => "puni-puni"
+//     "puni_puni" // => "puni-puni"
 String.prototype.dasherize = function() {
     return this.replace('_','-');
 };
@@ -124,18 +139,24 @@ String.prototype.dasherize = function() {
 //
 // Example:
 //
-// "Donald E. Knuth".parameterize() # => 'donald-e-knuth'
+//     "Donald E. Knuth".parameterize() // => 'donald-e-knuth'
 String.prototype.parameterize = function(seperator) {
     return this.toLowerCase().replace(/[^a-z0-9\-_]+/g, seperator || '-');
 };
 
-// Binding on string for _.inflection
+// Add Underscore.inflection#pluralize function on the String object
 String.prototype.pluralize = function(count, includeNumber) {
     return _.pluralize(this, count, includeNumber);
 };
+
+// Add Underscore.inflection#singularize function on the String object
 String.prototype.singularize = function() {
     return _.singularize(this);
 };
+
+
+
+
 jQuery(document).ajaxSend(function(event, xhr, settings) {
     var token = jQuery('meta[name="csrf-token"]').attr('content');
     if (token) { xhr.setRequestHeader('X-CSRF-Token', token); }
@@ -300,8 +321,7 @@ Viking.config = function(obj, key, val) {
     }
     
     return _.extend(obj.prototype.defaults, attrs);
-}
-;
+};
 Viking.Model = Backbone.Model.extend({
     constructor: function() {
         // Initialize the object as a Backbone Model
@@ -617,6 +637,7 @@ Viking.Router = Backbone.Router.extend({
 });
 
 
+//
 
 
 

@@ -1,4 +1,4 @@
-module("Ext.Number");
+module("Number");
 
 test("1.ordinalize()", function() {
     equal('1st', (1).ordinalize());
