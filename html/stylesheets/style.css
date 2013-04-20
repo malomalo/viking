@@ -1,14 +1,44 @@
+@charset "UTF-8";
 body {
-  background: white;
+  background: #cccccc;
   font-family: "Roboto", sans-serif;
   padding: 0;
   margin: 0; }
 
+* {
+  box-sizing: border-box; }
+
+a {
+  text-decoration: none;
+  color: #aed13b;
+  cursor: pointer; }
+
+.btn {
+  display: inline-block;
+  vertical-align: baseline;
+  zoom: 1;
+  *display: inline;
+  *vertical-align: auto;
+  background: #e6e6e6;
+  padding: 10pt 30pt;
+  color: #666666;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.9em;
+  border-radius: 3px;
+  box-shadow: inset 0 -1px 1px rgba(0, 0, 0, 0.1); }
+  .btn:hover {
+    background: #ededed; }
+
+.main-pane {
+  width: 80%; }
+
 .head {
+  background: #fafafa;
   text-align: center;
   padding: 30pt 0; }
   .head .logo {
-    margin-bottom: 20pt; }
+    margin-bottom: 5pt; }
   .head .tag {
     font-weight: 100;
     font-style: italic;
@@ -24,3 +54,78 @@ body {
     color: #b3b3b3;
     font-size: 3em;
     margin: 0; }
+
+.actions {
+  text-align: center;
+  padding: 10pt 0;
+  background: #737373; }
+  .actions .btn.github {
+    margin-left: 10pt; }
+  .actions .download, .actions .github {
+    padding: 15pt 20pt;
+    padding-right: 55pt;
+    background: #defb6b url(../images/btn-download.png) no-repeat right center;
+    background-size: 80px;
+    line-height: 1.1em;
+    vertical-align: middle; }
+    .actions .download .version, .actions .github .version {
+      font-weight: normal;
+      font-style: italic;
+      color: rgba(0, 0, 0, 0.3);
+      text-transform: none;
+      margin-left: 5pt; }
+  .actions .github {
+    padding-right: 100px;
+    background-color: #e6e6e6;
+    background-image: url(../images/btn-github.png); }
+
+.docs-menu {
+  position: fixed;
+  height: 100%;
+  width: 20%;
+  right: 0;
+  top: 0;
+  padding: 10pt 0;
+  overflow-y: auto;
+  background-color: #1a1a1a;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #1a1a1a), color-stop(5%, #2e2e2e), color-stop(10%, #333333));
+  background-image: -webkit-linear-gradient(left, #1a1a1a 0, #2e2e2e 5%, #333333 10%);
+  background-image: linear-gradient(to right,#1a1a1a 0, #2e2e2e 5%, #333333 10%); }
+  .docs-menu ul {
+    margin: 0;
+    padding: 0; }
+    .docs-menu ul li {
+      margin: 0;
+      padding: 0;
+      list-style: none; }
+  .docs-menu ul li {
+    margin-bottom: 10pt; }
+    .docs-menu ul li a {
+      font-weight: 300;
+      font-size: 1.3em;
+      color: #bfbfbf;
+      display: block;
+      padding: 1pt 10pt; }
+      .docs-menu ul li a:hover {
+        background: rgba(174, 209, 59, 0.2); }
+  .docs-menu ul ul li {
+    margin-bottom: 0; }
+    .docs-menu ul ul li a {
+      font-size: .85em;
+      color: #999999;
+      font-weight: normal;
+      padding-left: 25pt; }
+    .docs-menu ul ul li:before {
+      content: "–";
+      position: absolute;
+      left: 15pt;
+      font-size: .85em;
+      color: #999999;
+      font-weight: normal; }
+
+.footer {
+  background: #cccccc;
+  padding: 20pt 40pt;
+  font-weight: 300;
+  color: #666666;
+  text-align: right; }
