@@ -142,13 +142,12 @@ jQuery(document).ajaxSend(function(event, xhr, settings) {
 });
 Backbone.Model.prototype.updateAttribute = function (key, value, options){
     var data;
-    
     (data = {})[key] = value;
     this.updateAttributes(data, options);
 };
 
 Backbone.Model.prototype.updateAttributes = function (data, options) {
-    this.save(data, options)
+    this.save(data, options);
 };
 Backbone.Model.getRelationshipDetails = function (type, key, options) {
     // Handle both `type, key, options` and `type, [key, options]` style arguments
@@ -282,6 +281,14 @@ Backbone.Model.prototype.toJSON = function (options) {
 
     return data;
 };
+// Helper method to configure defatuls on Viking Object.
+//
+// For example. Viking.Cursor defaults `per_page` to 25, to change this you
+// can do either of the following:
+//
+// Viking.configure(Viking.Cursor, {per_page: 40}); // per_page is 40 by defatult
+//
+// Viking.configure(Viking.Cursor, 'per_page', 5); // per_page is 5 by defatult
 Viking.config = function(obj, key, val) {
     var attrs;
     
@@ -457,7 +464,7 @@ Viking.Collection = Backbone.Collection.extend({
     fetch: function(options) {
         options || (options = {});
         
-        var complete = options.complete
+        var complete = options.complete;
         options.complete = _.bind(function() {
             delete this.xhr;
             if(complete) { complete(); }
