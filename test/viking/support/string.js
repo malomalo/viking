@@ -1,4 +1,4 @@
-module("Ext.String");
+module("String");
 
 test("capitalize()", function() {
     equal("test".capitalize(), 'Test');

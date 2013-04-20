@@ -5,6 +5,7 @@ environment = Sprockets::Environment.new
 environment.append_path 'lib'
 environment.append_path 'test'
 environment.append_path 'deps'
+environment.unregister_postprocessor 'application/javascript', Sprockets::SafetyColons
 
 desc "build viking.js and testing files"
 task :build do
