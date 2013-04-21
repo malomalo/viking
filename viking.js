@@ -9,6 +9,15 @@
 
 // Setup the Viking namespace
 Viking = {};
+// CSRF Support for Ajax Request
+// -----------------------------
+
+// Set a callback for all AJAX request to set the CSRF Token header
+// if the meta tag is present.
+jQuery(document).ajaxSend(function(event, xhr, settings) {
+    var token = jQuery('meta[name="csrf-token"]').attr('content');
+    if (token) { xhr.setRequestHeader('X-CSRF-Token', token); }
+});
 // Viking.Support
 // -------------
 //
@@ -157,9 +166,100 @@ String.prototype.singularize = function() {
 
 
 
-jQuery(document).ajaxSend(function(event, xhr, settings) {
-    var token = jQuery('meta[name="csrf-token"]').attr('content');
-    if (token) { xhr.setRequestHeader('X-CSRF-Token', token); }
+// Viking.config
+// -------------
+//
+// Helper method to configure defatults on an Viking Object.
+//
+// Example:
+//
+//     Viking.configure(Viking.Cursor, {per_page: 40});
+//     Viking.configure(Viking.Cursor, 'per_page', 5); // per_page is 5 by defatult
+Viking.config = function (obj, key, val) {
+    var attrs;
+    
+    if (typeof key === 'object') {
+      attrs = key;
+    } else {
+      (attrs = {})[key] = val;
+    }
+    
+    return _.extend(obj.prototype.defaults, attrs);
+};
+// Viking.Model
+// ------------
+//
+// Viking.Model is an extension of [Backbone.Model](http://backbonejs.org/#Model).
+// It adds naming,  relationships, data type coerions, and modifies sync to
+// work with [Ruby on Rails](http://rubyonrails.org/) out of the box.
+Viking.Model = Backbone.Model.extend({
+    
+    constructor: function () {
+        // Initialize the object as a Backbone Model
+        Backbone.Model.apply(this, arguments);
+        
+        // Add a helper reference to get the model name from an model instance.
+        this.modelName = this.constructor.modelName;
+        
+        // Initialize any `hasMany` relationships to empty collections if
+        // they are not defined yet.
+        var rel, i;
+        if (this.hasMany) {
+            for (i = 0; i < this.hasMany.length; i++) {
+                rel = Backbone.Model.getRelationshipDetails('hasMany', this.hasMany[i]);
+                if(!this.attributes[rel.key]) {
+                    this.attributes[rel.key] = new rel.type();
+                }
+            }
+        }
+    },
+    
+    select: function(clearCurrentlySelected) {
+        this.collection.select(this, clearCurrentlySelected);
+    },
+    
+    // TODO: testme
+    toParam: function() {
+        return this.isNew() ? null : this.get('id');
+    },
+    
+    urlRoot: function() {
+        return this.constructor.urlRoot();
+    },
+    paramRoot: function() {
+        return this.modelName.underscore();
+    },
+    
+    // Override [Backbone.Model#sync](http://backbonejs.org/#Model-sync).
+    // [Ruby on Rails](http://rubyonrails.org/) expects the attributes to be
+    // namespaced
+    sync: function(method, model, options) {
+        options || (options = {});
+        
+        if (!options.data && (method === 'create' || method === 'update' || method === 'patch')) {
+            options.contentType = 'application/json';
+            options.data = {};
+            options.data[_.result(model, 'paramRoot')] = (options.attrs || model.toJSON(options));
+            options.data = JSON.stringify(options.data);
+        }
+
+        return Backbone.sync.call(this, method, model, options);
+    }
+    
+}, {
+    extend: function(name, protoProps, staticProps) {
+        var child = Backbone.Model.extend.call(this, protoProps, staticProps);
+        child.modelName = name;
+        return child;
+    },
+    urlRoot: function() {
+        return "/" + this.modelName.pluralize();
+    },
+
+    find: function(id, options) {
+        Backbone.sync('GET', new this({id: id}), options);
+    }
+    
 });
 Backbone.Model.prototype.updateAttribute = function (key, value, options){
     var data;
@@ -302,94 +402,6 @@ Backbone.Model.prototype.toJSON = function (options) {
 
     return data;
 };
-// Helper method to configure defatuls on Viking Object.
-//
-// For example. Viking.Cursor defaults `per_page` to 25, to change this you
-// can do either of the following:
-//
-// Viking.configure(Viking.Cursor, {per_page: 40}); // per_page is 40 by defatult
-//
-// Viking.configure(Viking.Cursor, 'per_page', 5); // per_page is 5 by defatult
-Viking.config = function(obj, key, val) {
-    var attrs;
-    
-    // Handle both `"key", value` and `{key: value}` -style arguments.
-    if (typeof key === 'object') {
-      attrs = key;
-    } else {
-      (attrs = {})[key] = val;
-    }
-    
-    return _.extend(obj.prototype.defaults, attrs);
-};
-Viking.Model = Backbone.Model.extend({
-    constructor: function() {
-        // Initialize the object as a Backbone Model
-        Backbone.Model.apply(this, arguments);
-        
-        // Add a helper reference to get the model name from an instance
-        // of the model
-        this.modelName = this.constructor.modelName;
-        
-        // Initialize the `hasMany` collections to an empty collection if
-        // they are not defined
-        var rel, i;
-        if (this.hasMany) {
-            for (i = 0; i < this.hasMany.length; i++) {
-                rel = Backbone.Model.getRelationshipDetails('hasMany', this.hasMany[i]);
-                if(!this.attributes[rel.key]) {
-                    this.attributes[rel.key] = new rel.type();
-                }
-            }
-        }
-    },
-    
-    select: function(clearCurrentlySelected) {
-        this.collection.select(this, clearCurrentlySelected);
-    },
-    
-    // TODO: testme
-    toParam: function() {
-        return this.isNew() ? null : this.get('id');
-    },
-    
-    urlRoot: function() {
-        return this.constructor.urlRoot();
-    },
-    paramRoot: function() {
-        return this.modelName.underscore();
-    },
-    
-    // Override the default Backbone.Model.sync. Rails expects namespaced
-    // attribute
-    sync: function(method, model, options) {
-        options || (options = {});
-        
-        if (!options.data && model && (method === 'create' || method === 'update' || method === 'patch')) {
-            options.contentType = 'application/json';
-            options.data = {};
-            options.data[_.result(model, 'paramRoot')] = (options.attrs || model.toJSON(options));
-            options.data = JSON.stringify(options.data);
-        }
-
-        return Backbone.sync.call(this, method, model, options);
-    }
-    
-}, {
-    extend: function(name, protoProps, staticProps) {
-        var child = Backbone.Model.extend.call(this, protoProps, staticProps);
-        child.modelName = name;
-        return child;
-    },
-    urlRoot: function() {
-        return "/" + this.modelName.pluralize();
-    },
-
-    find: function(id, options) {
-        Backbone.sync('GET', new this({id: id}), options);
-    }
-    
-});
 Viking.Collection = Backbone.Collection.extend({
     model: Viking.Model,
 
@@ -637,10 +649,10 @@ Viking.Router = Backbone.Router.extend({
 });
 
 
+
+
+
 //
-
-
-
 
 
 

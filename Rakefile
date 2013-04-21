@@ -29,13 +29,13 @@ end
 desc "build the docco documentation"
 task :doc => :build do
   check 'docco', 'docco', 'https://github.com/jashkenas/docco'
-  system 'docco viking.js' #  && docco examples/todos/todos.js examples/backbone.localstorage.js
+  system 'docco --css docco.css viking.js' #  && docco examples/todos/todos.js examples/backbone.localstorage.js
 end
 
 desc "run JavaScriptLint on the source"
 task :lint => :build do
-  check 'jsl', 'JavaScript Lint', 'npm install jsling --global'
-  system "find lib -name '*.js' -exec jslint --color --predef Backbone --predef _ --predef jQuery --predef strftime --predef Viking --predef strftimeUTC --browser --plusplus --nomen --white --regex --vars --sloppy '{}' \\\;"
+  check 'jslint', 'JavaScript Lint', 'npm install jslint --global'
+  system "find lib -name '*.js' -exec jslint --color --predef Backbone --predef _ --predef jQuery --predef strftime --predef Viking --browser --plusplus --nomen --white --regex --vars --sloppy '{}' \\\;"
 end
 
 # Check for the existence of an executable.
