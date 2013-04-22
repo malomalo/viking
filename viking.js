@@ -95,11 +95,11 @@ String.prototype.underscore = function() {
     return result.replace('-','_').toLowerCase();
 };
 
-// By default, camelize converts strings to UpperCamelCase. If the argument
-// to camelize is set to :lower then camelize produces lowerCamelCase.
+// By default, #camelize converts strings to UpperCamelCase. If the argument
+// to camelize is set to `false` then #camelize produces lowerCamelCase.
 //
-// camelize will also convert '/' to '::' which is useful for converting paths
-// to namespaces.
+// \#camelize will also convert "/" to "::" which is useful for converting
+// paths to namespaces.
 //
 // Examples:
 //
@@ -112,15 +112,15 @@ String.prototype.underscore = function() {
 // As a rule of thumb you can think of camelize as the inverse of underscore,
 // though there are cases where that does not hold:
 //
-//     "SSLError".underscore.camelize // => "SslError"
+//     "SSLError".underscore().camelize()   // => "SslError"
 String.prototype.camelize = function(uppercase_first_letter) {
     var result = uppercase_first_letter === undefined || uppercase_first_letter ? this.capitalize() : this.anticapitalize();
     result = result.replace(/(_|(\/))([a-z\d]*)/g, function(_a, _b, first, rest) { return (first || '') + rest.capitalize(); });
     return result.replace('/', '::');
 };
 
-// Convert a string to a boolean value. If the argument to booleanize() is
-// passed if the string is not 'true' or 'false' it will return the argument
+// Convert a string to a boolean value. If the argument to #booleanize is
+// passed if the string is not 'true' or 'false' it will return the argument.
 //
 // Examples:
 //
@@ -135,16 +135,17 @@ String.prototype.booleanize = function(defaultTo) {
     return (defaultTo === undefined ? false : defaultTo);
 };
 
-// Replaces underscores with dashes in the string.
+// Replaces underscores with dashes.
 //
 // Example:
 //
-//     "puni_puni" // => "puni-puni"
+//     "puni_puni"  // => "puni-puni"
 String.prototype.dasherize = function() {
     return this.replace('_','-');
 };
 
-// Replaces special characters in a string so that it may be used as part of a ‘pretty’ URL.
+// Replaces special characters in a string so that it may be used as part of
+// a "pretty" URL.
 //
 // Example:
 //
@@ -214,20 +215,41 @@ Viking.Model = Backbone.Model.extend({
         }
     },
     
-    select: function(clearCurrentlySelected) {
-        this.collection.select(this, clearCurrentlySelected);
+    // TODO: make the select method work as described below
+    //
+    // When the model is part of a collection and you want to select a single
+    // or multiple items from a collection. If a model is selected `selected`
+    // will be set `true`, otherwise it will be `false`.
+    //
+    // By default any other models in the collection with be unselected. To
+    // prevent other models in the collection from being unselected you can
+    // pass `true`.
+    //
+    // The `selected` event is fired when the object is selected.
+    select: function(multiple) {
+        this.collection.select(this, multiple);
     },
     
-    // TODO: testme
-    toParam: function() {
-        return this.isNew() ? null : this.get('id');
+    // TODO: implement
+    unselect: function() {
+        
     },
     
+    // Alias for `::urlRoot`
     urlRoot: function() {
         return this.constructor.urlRoot();
     },
+    
+    // Returns string to use for params names. This is the key attributes from
+    // the model will be namespaced under when saving to the server
     paramRoot: function() {
         return this.modelName.underscore();
+    },
+    
+    // Returns a string representing the object’s key suitable for use in URLs,
+    // or nil if `#isNew` is true.
+    toParam: function() {
+        return this.isNew() ? null : this.get('id');
     },
     
     // Override [Backbone.Model#sync](http://backbonejs.org/#Model-sync).
@@ -247,15 +269,24 @@ Viking.Model = Backbone.Model.extend({
     }
     
 }, {
+    
+    // TODO: support not passing in name and just protoProps & staticProps
+    // Overide the default extend method to support passing in the model name
+    // to be used for url generation and replationships.
+    //
+    // `name` is optional, and must be a string
     extend: function(name, protoProps, staticProps) {
         var child = Backbone.Model.extend.call(this, protoProps, staticProps);
         child.modelName = name;
         return child;
     },
+    
+    // Generates the `urlRoot` based off of the model name.
     urlRoot: function() {
         return "/" + this.modelName.pluralize();
     },
 
+    // TODO
     find: function(id, options) {
         Backbone.sync('GET', new this({id: id}), options);
     }
