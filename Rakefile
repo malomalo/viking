@@ -1,11 +1,20 @@
 require 'fileutils'
 require 'sprockets'
+require './source_annotation_extractor'
 
+# Setup Sprockets
 environment = Sprockets::Environment.new
 environment.append_path 'lib'
 environment.append_path 'test'
 environment.append_path 'deps'
 environment.unregister_postprocessor 'application/javascript', Sprockets::SafetyColons
+
+# Check for the existence of an executable.
+def check(exec, name, url)
+  return unless `which #{exec}`.empty?
+  puts "#{name} not found.\nInstall it from #{url}"
+  exit
+end
 
 desc "build viking.js and testing files"
 task :build do
@@ -38,9 +47,21 @@ task :lint => :build do
   system "find lib -name '*.js' -exec jslint --color --predef Backbone --predef _ --predef jQuery --predef strftime --predef Viking --browser --plusplus --nomen --white --regex --vars --sloppy '{}' \\\;"
 end
 
-# Check for the existence of an executable.
-def check(exec, name, url)
-  return unless `which #{exec}`.empty?
-  puts "#{name} not found.\nInstall it from #{url}"
-  exit
+desc "Enumerate all annotations (use notes:optimize, :fixme, :todo for focus)"
+task :notes do
+  SourceAnnotationExtractor.enumerate "OPTIMIZE|FIXME|TODO", tag: true
+end
+
+namespace :notes do
+  ["OPTIMIZE", "FIXME", "TODO"].each do |annotation|
+    # desc "Enumerate all #{annotation} annotations"
+    task annotation.downcase.intern do
+      SourceAnnotationExtractor.enumerate annotation
+    end
+  end
+
+  desc "Enumerate a custom annotation, specify with ANNOTATION=CUSTOM"
+  task :custom do
+    SourceAnnotationExtractor.enumerate ENV['ANNOTATION']
+  end
 end
