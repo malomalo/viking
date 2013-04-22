@@ -319,7 +319,7 @@ Viking.Collection = Backbone.Collection.extend({
     },
     
     // If a predicate is set it's paramaters will be passed under the
-    // predicate namespace when querying the server. #predicateChanged is
+    // where key when querying the server. #predicateChanged is
     // set as a callback on the `change` event for the predicate
     //
     // #setPredicate accepts either attributes to instaniate a
@@ -407,7 +407,7 @@ Viking.Collection = Backbone.Collection.extend({
     sync: function(method, model, options) {
         if(method === 'read' && this.predicate) {
             options.data || (options.data = {});
-            options.data.predicate = this.predicate.attributes;
+            options.data.where = this.predicate.attributes;
         }
         return Backbone.sync.call(this, method, model, options);
     }
@@ -597,6 +597,7 @@ Viking.PaginatedCollection = Viking.Collection.extend({
     }
     
 });
+// TODO remove?
 Viking.Controller = Backbone.Model.extend({}, {
     
     instance: function(onInstantiated, onInstantiation) {

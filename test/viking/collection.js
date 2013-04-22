@@ -140,7 +140,7 @@ test("sync() adds in predicate params", function() {
     
     var old = Backbone.sync;
     Backbone.sync = function(method, model, options) {
-        deepEqual(options.data.predicate, {types: [1,2]});
+        deepEqual(options.data.where, {types: [1,2]});
     }
     c.fetch();
     Backbone.sync = old;
