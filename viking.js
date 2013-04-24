@@ -319,7 +319,7 @@ Viking.Collection = Backbone.Collection.extend({
     },
     
     // If a predicate is set it's paramaters will be passed under the
-    // where key when querying the server. #predicateChanged is
+    // `where` key when querying the server. #predicateChanged is
     // set as a callback on the `change` event for the predicate
     //
     // #setPredicate accepts either attributes to instaniate a

@@ -31,12 +31,13 @@ a {
     background: #ededed; }
 
 .main-pane {
-  width: 80%; }
+  margin-left: 20%; }
 
 .head {
   background: #fafafa;
   text-align: center;
-  padding: 30pt 0; }
+  padding: 30pt 0;
+  border-left: 1px solid #cccccc; }
   .head .logo {
     margin-bottom: 5pt; }
   .head .tag {
@@ -50,7 +51,7 @@ a {
   padding: 15pt 0; }
   .terminal h1 {
     text-align: center;
-    font-weight: 300;
+    font-weight: 100;
     color: #b3b3b3;
     font-size: 3em;
     margin: 0; }
@@ -83,14 +84,11 @@ a {
   position: fixed;
   height: 100%;
   width: 20%;
-  right: 0;
+  left: 0;
   top: 0;
   padding: 10pt 0;
   overflow-y: auto;
-  background-color: #1a1a1a;
-  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #1a1a1a), color-stop(5%, #2e2e2e), color-stop(10%, #333333));
-  background-image: -webkit-linear-gradient(left, #1a1a1a 0, #2e2e2e 5%, #333333 10%);
-  background-image: linear-gradient(to right,#1a1a1a 0, #2e2e2e 5%, #333333 10%); }
+  background: #fafafa; }
   .docs-menu ul {
     margin: 0;
     padding: 0; }
@@ -103,11 +101,13 @@ a {
     .docs-menu ul li a {
       font-weight: 300;
       font-size: 1.3em;
-      color: #bfbfbf;
+      color: gray;
       display: block;
-      padding: 1pt 10pt; }
+      padding: 1pt 10pt;
+      color: #aed13b;
+      font-weight: bold; }
       .docs-menu ul li a:hover {
-        background: rgba(174, 209, 59, 0.2); }
+        text-decoration: underline; }
   .docs-menu ul ul li {
     margin-bottom: 0; }
     .docs-menu ul ul li a {
@@ -127,5 +127,5 @@ a {
   background: #cccccc;
   padding: 20pt 40pt;
   font-weight: 300;
-  color: #666666;
+  color: #999999;
   text-align: right; }

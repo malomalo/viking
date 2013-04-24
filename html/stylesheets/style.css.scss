@@ -32,12 +32,14 @@ a{
     }
 }
 .main-pane{
-    width:80%;
+    margin-left:20%;
 }
 .head{
     background:darken(white, 2);
     text-align:center;
     padding:30pt 0;
+    
+    border-left:1px solid darken(white, 20);
     .logo{
         margin-bottom:5pt;
     }
@@ -53,7 +55,7 @@ a{
     padding:15pt 0;
     h1{
         text-align:center;
-        font-weight:300;
+        font-weight:100;
         color:darken(white, 30);
         font-size:3em;
         margin:0;
@@ -91,11 +93,11 @@ a{
     position:fixed;
     height:100%;
     width:20%;
-    right:0;
+    left:0;
     top:0;
     padding:10pt 0;
     overflow-y:auto;
-    @include linear-gradient(left, lighten(black, 10) 0, lighten(black, 18) 5%, lighten(black, 20) 10%);
+    background:darken(white, 2);
     ul{
         margin:0;
         padding:0;
@@ -111,11 +113,13 @@ a{
             a{
                 font-weight:300;
                 font-size:1.3em;
-                color:darken(white, 25);
+                color:darken(white, 50);
                 display:block;
                 padding:1pt 10pt;
+                color:$green;
+                font-weight:bold;
                 &:hover{
-                    background:rgba($green, .2);
+                    text-decoration:underline;
                 }
             }
         }
@@ -144,6 +148,6 @@ a{
     background:darken(white, 20);
     padding: 20pt 40pt;
     font-weight:300;
-    color:$gray;
+    color:lighten($gray, 20);
     text-align:right;
 }
