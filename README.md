@@ -1,6 +1,6 @@
 <a href="vikingjs.org">![Viking.js](/logo.jpg)</a>
 
-## Installation
+## Installation <img style="float:right" src="https://semaphoreapp.com/api/v1/projects/de13df90eadbe3e26d246510c52c6003f89bc890/41585/badge.png">
 
 Download the latest version here:
 
