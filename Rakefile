@@ -73,7 +73,8 @@ namespace :coveralls do
       :service_name => 'semaphore',
       :repo_token => ENV['COVERALLS_REPO_TOKEN'],
       :service_job_id => ENV['SEMAPHORE_BUILD_NUMBER'],
-      :source_files => []
+      :source_files => [],
+      :git => git_info
     }
     data = JSON.parse(File.read('coverage/jscoverage.json'))
     
@@ -120,4 +121,34 @@ def check(exec, name, url)
   return unless `which #{exec}`.empty?
   puts "#{name} not found.\nInstall it from #{url}"
   exit(1)
+end
+
+def git_info
+  hash = {}
+  
+  hash[:head] = {
+    :id => `git log -1 --pretty=format:'%H'`,
+    :author_name => `git log -1 --pretty=format:'%aN'`,
+    :author_email => `git log -1 --pretty=format:'%ae'`,
+    :committer_name => `git log -1 --pretty=format:'%cN'`,
+    :committer_email => `git log -1 --pretty=format:'%ce'`,
+    :message => `git log -1 --pretty=format:'%s'`
+  }
+
+  # Branch
+  branch = `git branch`.split("\n").delete_if { |i| i[0] != "*" }
+  hash[:branch] = [branch].flatten.first.gsub("* ","")
+
+  # Remotes
+  remotes = nil
+  begin
+    remotes = `git remote -v`.split(/\n/).map do |remote|
+      splits = remote.split(" ").compact
+      {:name => splits[0], :url => splits[1]}
+    end.uniq
+  rescue
+  end
+  hash[:remotes] = remotes
+  
+  hash
 end
