@@ -1,7 +1,7 @@
 @charset "UTF-8";
 body {
-  background: #cccccc;
-  font-family: "Roboto", sans-serif;
+  background: white;
+  font-family: "Open Sans", "Helvetica Neue", sans-serif;
   padding: 0;
   margin: 0; }
 
@@ -31,13 +31,18 @@ a {
     background: #ededed; }
 
 .main-pane {
-  margin-left: 20%; }
+  margin-left: 200px;
+  min-width: 490px;
+  max-width: 700px; }
+  .main-pane hr {
+    width: 65%;
+    border: none;
+    border-bottom: 1px dotted #737373; }
 
 .head {
-  background: #fafafa;
+  background: white;
   text-align: center;
-  padding: 30pt 0;
-  border-left: 1px solid #cccccc; }
+  padding: 30pt 0; }
   .head .logo {
     margin-bottom: 5pt; }
   .head .tag {
@@ -80,48 +85,43 @@ a {
     background-color: #e6e6e6;
     background-image: url(../images/btn-github.png); }
 
-.docs-menu {
+nav {
   position: fixed;
   height: 100%;
-  width: 20%;
+  width: 200px;
   left: 0;
   top: 0;
-  padding: 10pt 0;
+  padding: 5px 0 30px 15px;
   overflow-y: auto;
-  background: #fafafa; }
-  .docs-menu ul {
+  background: #fff;
+  border-right: 1px solid #b3b3b3; }
+  nav > a {
+    font-weight: 300;
+    font-size: 15px;
+    margin-top: 15px;
+    color: #aed13b;
+    font-weight: 600;
+    text-decoration: underline;
+    display: block; }
+    nav > a span {
+      font-size: 11px;
+      font-weight: normal; }
+  nav ul {
     margin: 0;
     padding: 0; }
-    .docs-menu ul li {
-      margin: 0;
-      padding: 0;
-      list-style: none; }
-  .docs-menu ul li {
-    margin-bottom: 10pt; }
-    .docs-menu ul li a {
-      font-weight: 300;
-      font-size: 1.3em;
-      color: gray;
-      display: block;
-      padding: 1pt 10pt;
-      color: #aed13b;
-      font-weight: bold; }
-      .docs-menu ul li a:hover {
-        text-decoration: underline; }
-  .docs-menu ul ul li {
-    margin-bottom: 0; }
-    .docs-menu ul ul li a {
-      font-size: .85em;
-      color: #999999;
-      font-weight: normal;
-      padding-left: 25pt; }
-    .docs-menu ul ul li:before {
-      content: "–";
-      position: absolute;
-      left: 15pt;
-      font-size: .85em;
-      color: #999999;
-      font-weight: normal; }
+    nav ul li {
+      list-style: none;
+      margin-bottom: 0; }
+      nav ul li a {
+        font-size: 12px;
+        color: #666666;
+        font-weight: normal;
+        padding-left: 5px; }
+      nav ul li:before {
+        content: "–";
+        font-size: 12px;
+        color: gray;
+        font-weight: normal; }
 
 .footer {
   background: #cccccc;
