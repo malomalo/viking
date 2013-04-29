@@ -4,8 +4,8 @@
   <meta charset='utf8'>
   <title>Viking Test Suite</title>
   
-  <script src="../deps/qunit.js"></script>
-  <script src="../deps/sinon.js"></script>
+  <script src="/deps/qunit.js"></script>
+  <script src="/deps/sinon.js"></script>
   <style type="text/css" media="screen">
       /**
        * QUnit v1.11.0 - A JavaScript Unit Testing Framework
@@ -253,8 +253,17 @@
       }
   </style>
 
-  <script src="../viking.bundled.js"></script>
-  <script src="../tmp/test.js"></script>  
+  <script src="/deps/jquery.js"></script>
+  <script src="/deps/strftime.js"></script>
+  <script src="/deps/underscore.js"></script>
+  <script src="/deps/underscore.inflection.js"></script>
+  <script src="/deps/backbone.js"></script>
+  <% viking_files.each do |f| %>
+  	<script src="<%= f %>"></script>
+  <% end %>
+  <% test_files.each do |f| %>
+  	<script src="<%= f %>"></script>
+  <% end %>
 </head>
 <body>
   <div id="qunit"></div>

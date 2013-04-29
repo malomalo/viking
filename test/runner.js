@@ -114,7 +114,7 @@
 
 			QUnit.done(function(result) {
 				console.log('Took ' + result.runtime +  'ms to run ' + result.total + ' tests. ' + result.passed + ' passed, ' + result.failed + ' failed.');
-
+				jscoverage_report();
 				if (typeof window.callPhantom === 'function') {
 					window.callPhantom({
 						'name': 'QUnit.done',

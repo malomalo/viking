@@ -6,3 +6,5 @@ out
 tmp
 viking.bundled.js
 .sass-cache
+coverage
+test/index.html
