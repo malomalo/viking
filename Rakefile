@@ -60,6 +60,7 @@ task :test do
     file.write(ERB.new(File.read('test/index.html.erb')).result(binding))
   end
   
+  FileUtils.rm_rf('coverage')
   pid = spawn('jscoverage-server --port=4321 --verbose --report-dir=coverage --no-highlight --no-instrument=/deps/ --no-instrument=/test/ --no-instrument=/coverage/')
   result = system "npm test"
   Process.kill(:SIGKILL, pid)

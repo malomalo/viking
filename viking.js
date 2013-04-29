@@ -525,6 +525,9 @@ Backbone.Model.prototype.toJSON = function (options) {
             if (data[rel.key]) {
                 data[rel.key+'_attributes'] = data[rel.key].toJSON();
                 delete data[rel.key];
+            } else if (data[rel.key] === null) {
+                data[rel.key+'_attributes'] = null;
+                delete data[rel.key];
             }
         }
     }

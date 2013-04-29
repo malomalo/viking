@@ -86,7 +86,7 @@ test("Using new Model(attrs) coerces belongsTo relations", function() {
 });
 
 // toJSON --------------------------------------------------------------------
-test("toJSON for belongsTo relation", function() {
+test("#toJSON for belongsTo relation", function() {
     Ship = Backbone.Model.extend({
         belongsTo: ['ship']
     });
@@ -96,6 +96,36 @@ test("toJSON for belongsTo relation", function() {
     deepEqual(a.toJSON(), {
         bat: 'baz',
         ship_attributes: {foo: 'bar'}
+    });
+    
+    delete Ship;
+});
+
+test('#toJSON sets relation attributes to null if relation is null', function() {
+    Ship = Backbone.Model.extend({
+        belongsTo: ['ship']
+    });
+        
+    var a = new Ship({'ship': null, bat: 'baz'});
+    
+    deepEqual(a.toJSON(), {
+        bat: 'baz',
+        ship_attributes: null
+    });
+    
+    delete Ship;
+});
+
+test("#toJSON doesn't sets relation attributes to null if relation is falsely and not null", function() {
+    Ship = Backbone.Model.extend({
+        belongsTo: ['ship']
+    });
+        
+    var a = new Ship({'ship': null, bat: 'baz'});
+    
+    deepEqual(a.toJSON(), {
+        bat: 'baz',
+        ship_attributes: null
     });
     
     delete Ship;
