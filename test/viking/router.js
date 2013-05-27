@@ -5,13 +5,13 @@ Viking.Router.prototype.cleanup = function() {
     Backbone.history.handlers = [];
 }
 
-test("extend set modelName on Model", function() {
+test("routes to a controller and action", function() {
     expect(2);
     
     Controller = { action: function() { ok(true); } }
     var router = Viking.Router.extend({
         routes: {
-            '': {controller: 'Controller', action: 'action', name: 'root'}
+            '': {to: 'Controller#action', name: 'root'}
         }
     });
     router = new router();
@@ -21,6 +21,61 @@ test("extend set modelName on Model", function() {
     router.cleanup();
     delete Controller;
 });
+
+test("routes to a function", function() {
+    expect(2);
+    
+    var func = function() { ok(true); };
+    var router = Viking.Router.extend({
+        routes: {
+            '': func
+        }
+    });
+    router = new router();
+    
+    ok(Backbone.history.handlers[0].route.test(''));
+    Backbone.history.handlers[0].callback('');
+    router.cleanup();
+    delete Controller;
+});
+
+test("routes to a function in the router", function() {
+    expect(2);
+    
+    var router = Viking.Router.extend({
+        routes: {
+            '': 'func'
+        },
+        func: function() { ok(true); }
+    });
+    router = new router();
+    
+    ok(Backbone.history.handlers[0].route.test(''));
+    Backbone.history.handlers[0].callback('');
+    router.cleanup();
+    delete Controller;
+});
+
+test("routes with a regex", function() {
+    expect(5);
+    
+    var router = Viking.Router.extend({
+        routes: {
+            'r/^\/([a-z][a-z])\/([^\/]+)\/([^\/]+)$/': 'func',
+        },
+        func: function(state,something,another) {
+            equal(state, 'ca');
+            equal(something, 'something');
+            equal(another, 'another');
+        }
+    });
+    router = new router();
+    ok(Backbone.history.handlers[0].route.test('/ca/something/another'));
+    ok(!Backbone.history.handlers[0].route.test('/dca/something/another'));
+    Backbone.history.handlers[0].callback.call(router, '/ca/something/another');
+    router.cleanup();
+    delete Controller;
+})
 
 test("router.start() starts Backbone.history", function() {
     expect(1);
@@ -49,7 +104,7 @@ test('router.start() calls callbacks with the name of the route', function() {
     
     Controller = { action: function() { ok(true); } }
     var r = {}
-    r[window.location.pathname.replace('/','')] = {controller: 'Controller', action: 'action', name: 'root'}
+    r[window.location.pathname.replace('/','')] = {to: 'Controller#action', name: 'root'}
     var Router = Viking.Router.extend({ routes: r });
 
     var router = new Router();
