@@ -61,7 +61,7 @@ test("routes with a regex", function() {
     
     var router = Viking.Router.extend({
         routes: {
-            'r/^\/([a-z][a-z])\/([^\/]+)\/([^\/]+)$/': 'func',
+            'r/^([a-z][a-z])\/([^\/]+)\/([^\/]+)$/': 'func',
         },
         func: function(state,something,another) {
             equal(state, 'ca');
@@ -70,9 +70,9 @@ test("routes with a regex", function() {
         }
     });
     router = new router();
-    ok(Backbone.history.handlers[0].route.test('/ca/something/another'));
-    ok(!Backbone.history.handlers[0].route.test('/dca/something/another'));
-    Backbone.history.handlers[0].callback.call(router, '/ca/something/another');
+    ok(Backbone.history.handlers[0].route.test('ca/something/another'));
+    ok(!Backbone.history.handlers[0].route.test('dca/something/another'));
+    Backbone.history.handlers[0].callback.call(router, 'ca/something/another');
     router.cleanup();
     delete Controller;
 })
