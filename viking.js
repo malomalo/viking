@@ -30,6 +30,43 @@ jQuery(document).ajaxSend(function(event, xhr, settings) {
 Date.prototype.strftime = function(fmt) {
     return strftime(fmt, this);
 };
+
+// Since IE8 does not support new Dates with the ISO 8601 format we'll add
+// supoprt for it
+(function(){
+    var d = new Date('2011-06-02T09:34:29+02:00');
+    if(!d || +d !== 1307000069000) {
+        Date.fromISO = function(s) {
+            var i, day, tz, regex, match;
+            
+            regex = /^(\d{4}\-\d\d\-\d\d([tT ][\d:\.]*)?)([zZ]|([+\-])(\d\d):(\d\d))?$/;
+            match = regex.exec(s) || [];
+            
+            if(match[1]){
+                day = match[1].split(/\D/);
+                for( i= 0; i < day.length; i++) {
+                    day[i] = parseInt(day[i], 10) || 0;
+                }
+                day[1] -= 1;
+                day = new Date(Date.UTC.apply(Date, day));
+                if(!day.getDate()) { return NaN; }
+                if(match[5]){
+                    tz = (parseInt(match[5], 10)*60);
+                    if(match[6]) { tz += parseInt(match[6], 10); }
+                    if(match[4] === '+') { tz*= -1; }
+                    if(tz) { day.setUTCMinutes(day.getUTCMinutes()+ tz); }
+                }
+                return day;
+            }
+
+            return NaN;
+        };
+    } else {
+        Date.fromISO = function(s){
+            return new Date(s);
+        };
+    }
+}());
 // ordinalize returns the ordinal string corresponding to integer:
 //
 //     (1).ordinalize()    // => '1st'
@@ -311,7 +348,7 @@ Viking.Model = Backbone.Model.extend({
                 klass = window[type];
                 if (klass === Date) {
                     if (typeof attrs[key] === 'string' || typeof attrs[key] === 'number') {
-                        attrs[key] = new Date(attrs[key]);
+                        attrs[key] = Date.fromISO(attrs[key]);
                     } else if (!(attrs[key] instanceof Date)) {
                         throw new TypeError(typeof attrs[key] + " can't be coerced into " + type);
                     }
@@ -658,20 +695,46 @@ Viking.Cursor = Backbone.Model.extend({
 });
 Viking.Router = Backbone.Router.extend({
     
-    route: function(route, callback) {
-        if (!_.isRegExp(route)) { route = this._routeToRegExp(route); }
-        Backbone.history.route(route, _.bind(function(fragment) {
-            var args = this._extractParameters(route, fragment);
-            if (window[callback.controller] && window[callback.controller][callback.action]) {
-                window[callback.controller][callback.action].apply(this, args);
+    route: function(route, name, callback) {
+        var router, controller, action;
+        
+        if (!_.isRegExp(route)) {
+            if(/^r\/.*\/$/.test(route)) {
+                route = new RegExp(route.slice(2, -1));
+            } else {
+                route = this._routeToRegExp(route);
             }
-            this.trigger.apply(this, ['route:' + callback.name].concat(args));
-            this.trigger('route', callback.name, args);
-            Backbone.history.trigger('route', this, route, args);
-        }, this));
+        }
+        if (_.isFunction(name)) {
+            callback = name;
+            name = '';
+        }
+
+        if (_.isObject(name)) {
+            // TODO: maybe this should be Controller::action since it's not
+            // an instance method
+            controller = /^(\w+)#(\w+)$/.exec(name.to);
+            action = controller[2];
+            controller = controller[1];
+            name = name.name;
+            
+            if (window[controller] && window[controller][action]) {
+                callback = window[controller][action];
+            }
+        }
+        if (!callback) { callback = this[name]; }
+                
+        router = this;
+        Backbone.history.route(route, function(fragment) {
+            var args = router._extractParameters(route, fragment);
+            callback && callback.apply(router, args);
+            router.trigger.apply(router, ['route:' + name].concat(args));
+            router.trigger('route', name, args);
+            Backbone.history.trigger('route', router, name, args);
+        });
         return this;
     },
-    
+        
     start: function() {
         return Backbone.history.start({pushState: true});
     },
