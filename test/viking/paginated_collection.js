@@ -85,6 +85,16 @@ test("parse extracts cursor information", function() {
     equal(40, c.cursor.get('count'));
 });
 
+test("parse doesn't set offset if not present", function() {
+    var m = Viking.Model.extend('model');
+    var c = Viking.PaginatedCollection.extend({model: m});
+    var c = new c();
+    
+    c.cursor.set({page: 3, per_page: 40, offset: 10}, {silent: true});
+    c.parse({"page":3, "per_page":40, "total_pages":77, "count": 40, "total":3049, "listings":[ {"id":2069,"type":"lease"} ] });
+    equal(10, c.cursor.get('offset'));
+});
+
 // sync() --------------------------------------------------------------------
 test("sync() adds in cursor params", function() {
     expect(3);
