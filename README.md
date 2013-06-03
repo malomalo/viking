@@ -21,6 +21,8 @@ Viking's dependencies are listed below:
     To Get `strftime` working in the browser I had to comment out lines #18-23,
     and #26.
 
+For older browsers add [ES5 Shim](https://github.com/kriskowal/es5-shim/).
+
 ## Building
 
 Run `rake build` from the base directory. It will output `viking.js` in the root dir.
