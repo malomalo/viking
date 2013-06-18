@@ -1,24 +1,27 @@
-module("Viking.Model#getRelationshipDetails - belongsTo");
+(function () {
+    module("Viking.Model#getRelationshipDetails - belongsTo");
 
-// getRelationshipDetails ----------------------------------------------------
-test("#getRelationshipDetails for belongsTo 'model'", function() {
-    Model = Viking.Model.extend();
+    // getRelationshipDetails ----------------------------------------------------
+    test("#getRelationshipDetails for belongsTo 'model'", function() {
+        Model = Viking.Model.extend();
     
-    deepEqual(
-        Viking.Model.getRelationshipDetails('belongsTo', 'model'),
-        {key: 'model', type: Model}
-    );
+        deepEqual(
+            Viking.Model.getRelationshipDetails('belongsTo', 'model'),
+            {key: 'model', type: Model}
+        );
     
-    delete Model;
-});
+        delete Model;
+    });
 
-test("#getRelationshipDetails for belongsTo ['carriers', {model: 'Ship'}]", function() {
-    Ship = Backbone.Model.extend();
+    test("#getRelationshipDetails for belongsTo ['carriers', {model: 'Ship'}]", function() {
+        Ship = Backbone.Model.extend();
 
-    deepEqual(
-        Viking.Model.getRelationshipDetails('belongsTo', 'carrier', {model: 'Ship'}),
-        {key: 'carrier', type: Ship}
-    );
+        deepEqual(
+            Viking.Model.getRelationshipDetails('belongsTo', 'carrier', {model: 'Ship'}),
+            {key: 'carrier', type: Ship}
+        );
     
-    delete Ship;
-});
+        delete Ship;
+    });
+
+}());

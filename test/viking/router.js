@@ -1,10 +1,17 @@
 (function () {
-    module("Viking.Router");
+    module("Viking.Router", {
+        setup: function () {
+            Viking.Router.prototype.cleanup = function() {
+                this.stop()
+                Backbone.history.handlers = [];
+            }
+        },
+        teardown: function () {
+            delete Viking.Router.prototype.cleanup;
+        }
+    });
 
-    Viking.Router.prototype.cleanup = function() {
-        this.stop()
-        Backbone.history.handlers = [];
-    }
+    
 
     test("routes to a controller and action", function() {
         expect(2);
