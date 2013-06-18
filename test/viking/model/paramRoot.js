@@ -1,8 +1,11 @@
-module("Viking.Model#paramRoot");
+(function () {
+    module("Viking.Model#paramRoot");
 
-test("instance.paramRoot returns underscored modelName", function() {
-    var Model = Viking.Model.extend('model');
-    var model = new Model();
+    test("instance.paramRoot returns underscored modelName", function() {
+        var Model = Viking.Model.extend('model');
+        var model = new Model();
     
-    equal(model.paramRoot(), 'model');
-});
+        equal(model.paramRoot(), 'model');
+    });
+
+}());

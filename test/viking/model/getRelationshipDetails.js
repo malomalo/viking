@@ -1,24 +1,27 @@
-module("Viking.Model::getRelationshipDetails");
+(function () {
+    module("Viking.Model::getRelationshipDetails");
 
-// getRelationshipDetails ----------------------------------------------------
-test("::getRelationshipDetails accepts `type, key, options` style arguments", function() {
-    Ship = Backbone.Model.extend();
+    // getRelationshipDetails ----------------------------------------------------
+    test("::getRelationshipDetails accepts `type, key, options` style arguments", function() {
+        Ship = Backbone.Model.extend();
     
-    deepEqual(
-        Viking.Model.getRelationshipDetails('belongsTo', 'model', {model: 'Ship'}),
-        {key: 'model', type: Ship}
-    );
+        deepEqual(
+            Viking.Model.getRelationshipDetails('belongsTo', 'model', {model: 'Ship'}),
+            {key: 'model', type: Ship}
+        );
     
-    delete Ship;
-});
+        delete Ship;
+    });
 
-test("::getRelationshipDetails accepts `type, [key, options]` style arguments", function() {
-    Ship = Backbone.Model.extend();
+    test("::getRelationshipDetails accepts `type, [key, options]` style arguments", function() {
+        Ship = Backbone.Model.extend();
     
-    deepEqual(
-        Viking.Model.getRelationshipDetails('belongsTo', ['model', {model: 'Ship'}]),
-        {key: 'model', type: Ship}
-    );
+        deepEqual(
+            Viking.Model.getRelationshipDetails('belongsTo', ['model', {model: 'Ship'}]),
+            {key: 'model', type: Ship}
+        );
     
-    delete Ship;
-});
+        delete Ship;
+    });
+
+}());

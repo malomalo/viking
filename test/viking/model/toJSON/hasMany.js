@@ -1,24 +1,27 @@
-module("Viking.Model#toJSON - hasMany");
+(function () {
+    module("Viking.Model#toJSON - hasMany");
 
-// toJSON --------------------------------------------------------------------
-test("toJSON for hasMany relation", function() {
-    Ship = Viking.Model.extend('ship', {
-        hasMany: ['ships']
-    });
-    ShipCollection = Backbone.Collection.extend({
-        model: Ship
-    });
+    // toJSON --------------------------------------------------------------------
+    test("toJSON for hasMany relation", function() {
+        Ship = Viking.Model.extend('ship', {
+            hasMany: ['ships']
+        });
+        ShipCollection = Backbone.Collection.extend({
+            model: Ship
+        });
         
-    var a = new Ship({'ships': [{foo: 'bar'}], bat: 'baz'});
+        var a = new Ship({'ships': [{foo: 'bar'}], bat: 'baz'});
     
-    deepEqual(a.toJSON(), {
-        bat: 'baz',
-        ships_attributes: [{
-            foo: 'bar',
-            ships_attributes: []
-        }]
+        deepEqual(a.toJSON(), {
+            bat: 'baz',
+            ships_attributes: [{
+                foo: 'bar',
+                ships_attributes: []
+            }]
+        });
+    
+        delete Ship;
+        delete ShipCollection;
     });
-    
-    delete Ship;
-    delete ShipCollection;
-});
+
+}());
