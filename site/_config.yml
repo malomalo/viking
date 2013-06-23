@@ -1,0 +1,6 @@
+name: Viking.js
+pygments: true
+exclude: [Gemfile, Gemfile.lock README.md Rakefile config]
+markdown: redcarpet
+redcarpet:
+  extensions: ['tables']

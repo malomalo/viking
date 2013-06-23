@@ -1,0 +1,42 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>{{ page.title }}</title>
+        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+        
+        <!-- syntax highlighting CSS -->
+        <link rel="stylesheet" href="/css/syntax.css">
+
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="/css/main.css">
+    </head>
+    <body>
+        <nav>{% include nav.html %}</nav>
+        
+        <div class="main-pane">
+            
+            <div class="head">
+                <img src="/images/viking.js.png" width="350" height="100" class="logo" />
+                <div class="tag">Pillage your servers!</div>
+            </div>
+            <hr>
+            <div class="terminal">
+                <h1>Rails bindings for Backbone.js</h1>
+            </div>
+        
+            {% include intro.html %}
+            
+            <h1 id="#model">Model</h1>
+            {% capture content %}{% include model.md %}{% endcapture %}
+            {{ content | markdownify }}
+            <h1 id="#model">Collection</h1>
+            <h1 id="#model">PaginatedCollection</h1>
+            <h1 id="#model">Cursor</h1>
+            <h1 id="#model">Predicate</h1>
+            <h1 id="#model">Router</h1>
+            <h1 id="#model">Utility</h1>
+
+        </div>
+        
+    </body>
+</html>
