@@ -42,22 +42,25 @@
         var model = c.models[0];
         c.select(model);
     
-        ok(model.get('selected'));
+        ok(model.selected);
     });
 
     test("select(model) sets 'selected' to false other models", function() {
-        var c = new Viking.Collection([{'selected': true}, {'selected': true}, {'selected': true}]);
+        var c = new Viking.Collection([{}, {}, {}]);
         var models = c.models;
+        models[0].selected = true;
+        models[1].selected = true;
+        models[2].selected = true;
     
-        ok(models[0].get('selected'));
-        ok(models[1].get('selected'));
-        ok(models[2].get('selected'));
+        ok(models[0].selected);
+        ok(models[1].selected);
+        ok(models[2].selected);
     
         c.select(models[1]);
     
-        ok(!models[0].get('selected'));
-        ok(models[1].get('selected'));
-        ok(!models[2].get('selected'));
+        ok(!models[0].selected);
+        ok(models[1].selected);
+        ok(!models[2].selected);
     });
 
     test("select(model, true) doesn't unselect other modelts", function() {
@@ -68,18 +71,17 @@
         c.select(models[1], true);
         c.select(models[2], true);
     
-        ok(models[0].get('selected'));
-        ok(models[1].get('selected'));
-        ok(models[2].get('selected'));
+        ok(models[0].selected);
+        ok(models[1].selected);
+        ok(models[2].selected);
     });
 
-    test("selected(model) triggers a 'selected' event on collection", function() {
+    test("select(model) triggers a 'selected' event on collection", function() {
         expect(1);
     
         var c = new Viking.Collection([{}]);
         var model = c.models[0];
-
-        c.on('selected', function() { ok(model.get('selected')); }, model);
+        c.on('selected', function() { ok(model.selected); });
         c.select(model);
         c.off('selected');
     });
@@ -87,7 +89,8 @@
     test("selected(model) triggers a 'selected' event only if change", function() {
         expect(0);
     
-        var c = new Viking.Collection([{'selected': true}]);
+        var c = new Viking.Collection([{}]);
+		c.models[0].selected = true;
         c.on('selected', function() { ok(true); });
         c.select(c.models[0]);
         c.off('selected');
@@ -114,17 +117,23 @@
 
     // clearSelected() ------------------------------------------------------------
     test("clearSelected() set 'selected' to false on all models", function() {
-        var c = new Viking.Collection([{'selected': true}, {'selected': true}, {'selected': true}]);
+        var c = new Viking.Collection([{}, {}, {}]);
+		c.models[0].selected = true;
+		c.models[1].selected = true;
+		c.models[2].selected = true;
+		
         equal(3, c.selected().length);
-    
         c.clearSelected()
         equal(0, c.selected().length);
     });
 
     test("clearSelected(except) set 'selected' to false on all models", function() {
-        var c = new Viking.Collection([{'selected': true}, {'selected': true}, {'selected': true}]);
+        var c = new Viking.Collection([{}, {}, {}]);
+		c.models[0].selected = true;
+		c.models[1].selected = true;
+		c.models[2].selected = true;
+		
         var model = c.models[1];
-    
         equal(3, c.selected().length);
         c.clearSelected(model)
         equal(1, c.selected().length);

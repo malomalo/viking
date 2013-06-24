@@ -6,22 +6,25 @@
         var model = c.models[0];
         model.select();
     
-        ok(model.get('selected'));
+        ok(model.selected);
     });
 
     test("select() sets 'selected' to false other models", function() {
-        var c = new Viking.Collection([{'selected': true}, {'selected': true}, {'selected': true}]);
+        var c = new Viking.Collection([{}, {}, {}]);
         var models = c.models;
+        models[0].selected = true;
+        models[1].selected = true;
+        models[2].selected = true;
     
-        ok(models[0].get('selected'));
-        ok(models[1].get('selected'));
-        ok(models[2].get('selected'));
+        ok(models[0].selected);
+        ok(models[1].selected);
+        ok(models[2].selected);
     
         models[1].select();
     
-        ok(!models[0].get('selected'));
-        ok(models[1].get('selected'));
-        ok(!models[2].get('selected'));
+        ok(!models[0].selected);
+        ok(models[1].selected);
+        ok(!models[2].selected);
     });
 
     test("select(true) doesn't unselect other modelts", function() {
@@ -32,9 +35,9 @@
         models[1].select(true);
         models[2].select(true);
     
-        ok(models[0].get('selected'));
-        ok(models[1].get('selected'));
-        ok(models[2].get('selected'));
+        ok(models[0].selected);
+        ok(models[1].selected);
+        ok(models[2].selected);
     });
 
     test("select() triggers a 'selected' event", function() {
@@ -43,16 +46,17 @@
         var c = new Viking.Collection([{}]);
         var model = c.models[0];
 
-        model.on('change:selected', function() { ok(model.get('selected')); });
+        model.on('selected', function() { ok(model.selected); });
         model.select();
-        model.off('change:selected');
+        model.off('selected');
     });
 
     test("select() triggers a 'selected' event only if change", function() {
         expect(0);
     
-        var c = new Viking.Collection([{'selected': true}]);
+        var c = new Viking.Collection([{}]);
         var m = c.models[0]
+		m.selected = true;
         m.on('selected', function() { ok(true); });
         m.select();
         m.off('selected');
