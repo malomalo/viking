@@ -1,8 +1,8 @@
 @import 'bourbon/bourbon';
 
 $roboto: 'Roboto', sans-serif;
-$green:#afd13c;
-$green-light:#DEFB6B;
+$green: #afd13c;
+$green-light: #DEFB6B;
 $gray:darken(white, 60);
 
 body{
@@ -44,10 +44,14 @@ a{
     h2 {
         font-size:18px;
         code {
-            font-size: 14px;
+            font-size: 12px;
             margin-left: 10px;
             font-weight: normal;
         }
+    }
+    h3 {
+        font-size:16px;
+				font-weight:normal;
     }
     p {
         line-height: 20px;
@@ -108,7 +112,6 @@ a{
     background-size:80px;
     line-height:1.1em;
     vertical-align:middle;
-            border: 1px solid #7dae00;
     .version{
         font-weight:normal;
         font-style:italic;
@@ -117,7 +120,7 @@ a{
         margin-left:5pt;
     }
     &:hover{
-        background:$green-light url(../images/btn-download.png) no-repeat right center;
+        background:$green url(../images/btn-download.png) no-repeat right center;
         background-size:80px;
     }
 }
@@ -125,6 +128,10 @@ a{
     padding-right:100px;
     background-color:darken(white, 10);
     background-image:url(../images/btn-github.png);
+    &:hover{
+        background:darken(white, 10) url(../images/btn-github.png) no-repeat right center;
+        background-size:80px;
+    }
 }
 
 nav {
@@ -134,9 +141,9 @@ nav {
     left:0;
     top:0;
     padding: 5px 0 30px 15px;
-    overflow-y:auto;
+    overflow-y:scroll;
     background: #fff;
-    border-right:1px solid darken(white, 30);
+		box-shadow: 1px 1px 1px 1px #ddd;
     > a {
         font-weight:300;
         font-size:15px;

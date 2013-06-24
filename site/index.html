@@ -1,13 +1,27 @@
 ---
 layout: default
-title: Your New Jekyll Site
+title: Viking.js
 ---
 
-<div id="home">
-  <h1>Blog Posts</h1>
-  <ul class="posts">
-    {% for post in site.posts %}
-      <li><span>{{ post.date | date_to_string }}</span> &raquo; <a href="{{ post.url }}">{{ post.title }}</a></li>
-    {% endfor %}
-  </ul>
+<div class="head">
+    <img src="/images/viking.js.png" width="350" height="100" class="logo" />
+    <div class="tag">Pillage your servers!</div>
 </div>
+<hr>
+<div class="terminal">
+    <h1>Rails bindings for Backbone.js</h1>
+</div>
+
+{% include intro.html %}
+
+<div id="model">
+{% capture content %}{% include model.md %}{% endcapture %}
+{{ content | markdownify }}
+</div>
+
+<h1 id="#model">Collection</h1>
+<h1 id="#model">PaginatedCollection</h1>
+<h1 id="#model">Cursor</h1>
+<h1 id="#model">Predicate</h1>
+<h1 id="#model">Router</h1>
+<h1 id="#model">Utility</h1>
