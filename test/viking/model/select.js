@@ -55,11 +55,32 @@
         expect(0);
     
         var c = new Viking.Collection([{}]);
-        var m = c.models[0]
+        var m = c.models[0];
 		m.selected = true;
         m.on('selected', function() { ok(true); });
         m.select();
         m.off('selected');
+    });
+	
+    test("unselect() triggers a 'unselected' event", function() {
+        expect(1);
+    
+        var c = new Viking.Collection([{}]);
+        var model = c.models[0];
+		model.selected = true;
+        model.on('unselected', function() { ok(!model.selected); });
+        model.unselect();
+        model.off('unselected');
+    });
+
+    test("unselect() triggers a 'selected' event only if change", function() {
+        expect(0);
+    
+        var c = new Viking.Collection([{}]);
+        var m = c.models[0];
+        m.on('unselected', function() { ok(true); });
+        m.unselect();
+        m.off('unselected');
     });
 
 }());
