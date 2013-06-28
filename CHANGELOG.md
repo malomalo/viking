@@ -8,6 +8,12 @@ New Features:
 Major Changes:
 
    - `Viking.Model`: `#select` now uses `model.select` instead of model attributes
+   - `Viking.Controller`: Any `Viking.Controller` is now initialized and
+     then the action is called. When routing to a new URL, if it is the
+     same controller the new action is called but the controller is not
+     reinitialized. When routing to another URL that is not using the
+     controller and then back, the controller is initialized again. Also
+     the current controller object is stored in `Viking.controller`
 
 Bugfixes:
 
