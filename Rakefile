@@ -12,8 +12,8 @@ environment.append_path 'test'
 environment.append_path 'deps'
 environment.unregister_postprocessor 'application/javascript', Sprockets::SafetyColons
 
-desc "build viking.js and testing files"
-task :build do
+desc "Compile viking.js and testing files"
+task :compile do
   FileUtils.rm_f('./viking.js')
   
   File.open('./viking.js', "w") do |file|
@@ -21,8 +21,8 @@ task :build do
   end
 end
 
-desc "build the docco documentation"
-task :doc => :build do
+desc "Build the docco documentation"
+task :doc => :compile do
   check 'docco', 'docco', 'https://github.com/jashkenas/docco'
   system 'docco --css docco.css viking.js'
 end

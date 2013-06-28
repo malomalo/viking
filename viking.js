@@ -252,25 +252,28 @@ Viking.Model = Backbone.Model.extend({
         }
     },
     
-    // TODO: make the select method work as described below
-    //
     // When the model is part of a collection and you want to select a single
-    // or multiple items from a collection. If a model is selected `selected`
-    // will be set `true`, otherwise it will be `false`.
+    // or multiple items from a collection. If a model is selected 
+	// `model.selected` will be set `true`, otherwise it will be `false`.
     //
     // By default any other models in the collection with be unselected. To
     // prevent other models in the collection from being unselected you can
     // pass `true`.
     //
-    // The `selected` event is fired when the object is selected.
+    // The `selected` and `unselected` events are fired when appropriate.
     select: function(multiple) {
         this.collection.select(this, multiple);
     },
     
     // TODO: implement
     unselect: function() {
-        
+		if(this.selected) {
+	        this.selected = false;
+			this.trigger('unselected', this);			
+		}
     },
+	
+	// TODO: overwrite url to use toParam()
     
     // Alias for `::urlRoot`
     urlRoot: function() {
@@ -425,13 +428,22 @@ Viking.Model = Backbone.Model.extend({
         return "/" + this.modelName.pluralize();
     },
 
-    // TODO
+	// Find model by id. Accepts success and error callbacks in the options
+	// hash, which are both passed (model, response, options) as arguments.
+	//
+	// Find returns the model, however it most likely won't have fetched the
+	// data	from the server if you immediately try to use attributes of the
+	// model.
     find: function(id, options) {
-        Backbone.sync('GET', new this({id: id}), options);
+		var model = new this({id: id});
+		model.fetch(options);
+		return model;
     },
     
+	// Used internally by Viking to translate relation arguments to key and
+	// Model
     getRelationshipDetails: function (type, key, options) {
-        // Handle both `type, key, options` and `type, [key, options]` style arguments
+		// Handle both `type, key, options` and `type, [key, options]` style arguments
         if (_.isArray(key)) {
             options = key[1];
             key = key[0];
@@ -532,25 +544,25 @@ Viking.Collection = Backbone.Collection.extend({
         if(!clearCurrentlySelected) {
             this.clearSelected(model);
         }
-        if(!model.get('selected')) {
-            model.set('selected', true);
-            this.trigger('selected', this.selected());
+        if(!model.selected) {
+            model.selected = true;
+			model.trigger('selected', this.selected());
         }
     },
     
     // returns all the models where `selected` == true
     selected: function() {
-        return this.filter(function(m) { return m.get('selected'); });
+        return this.filter(function(m) { return m.selected; });
     },
     
     // Sets `'selected'` to `false` on all models
     clearSelected: function(exceptModel) {
-        if(exceptModel instanceof Viking.Model) {
+        if(exceptModel instanceof Backbone.Model) {
             exceptModel = exceptModel.cid;
         }
         this.each(function(m) {
             if(m.cid !== exceptModel) {
-                m.set('selected', false);
+                m.selected = false;
             }
         });
     },
@@ -616,7 +628,7 @@ Viking.PaginatedCollection = Viking.Collection.extend({
         var cursor_attrs = _.pick(attrs, cursor_keys);
         _.each(cursor_attrs, function(v, k) {
             cursor_attrs[k] = parseInt(v, 10);
-        })
+        });
 
         this.cursor.set(cursor_attrs);
         return attrs[this.paramRoot()];
@@ -633,20 +645,7 @@ Viking.PaginatedCollection = Viking.Collection.extend({
     }
     
 });
-// TODO remove?
-Viking.Controller = Backbone.Model.extend({}, {
-    
-    instance: function(onInstantiated, onInstantiation) {
-        if(this._instance) {
-            if(onInstantiated) { onInstantiated(this._instance); }
-        } else {
-            this._instance = new this();
-            if(onInstantiation) { onInstantiation(this._instance); }
-        }
-
-        return this._instance;
-    }
-});
+Viking.Controller = Backbone.Model;
 Viking.Predicate = Backbone.Model;
 Viking.Cursor = Backbone.Model.extend({
     defaults: {
@@ -728,15 +727,33 @@ Viking.Router = Backbone.Router.extend({
 
         router = this;
         Backbone.history.route(route, function (fragment) {
+			var Controller;
             var args = router._extractParameters(route, fragment);
+			var current_controller = Viking.controller;
+			Viking.controller = undefined;
 
-            if (callback) {
-                if (_.isFunction(callback)) {
-                    callback.apply(router, args);
-                } else {
-                    window[callback.controller] && window[callback.controller][callback.action] && window[callback.controller][callback.action].apply(router, args);
-                }
-            }
+			if (!callback) { return; }
+			
+			if (_.isFunction(callback)) {
+				callback.apply(router, args);
+			} else if (window[callback.controller]) {
+				Controller = window[callback.controller];
+				
+				if (Controller.__super__ === Viking.Controller.prototype) {
+					if ( !(current_controller instanceof Controller) ) {
+						Viking.controller = new Controller();
+					} else {
+						Viking.controller = current_controller;
+					}
+				} else {
+					Viking.controller = Controller;
+				}
+				
+				if (Viking.controller && Viking.controller[callback.action]) {
+					Viking.controller[callback.action].apply(Viking.controller, args);
+				}
+			}
+			
             router.trigger.apply(router, ['route:' + name].concat(args));
             router.trigger('route', name, args);
             Backbone.history.trigger('route', router, name, args);

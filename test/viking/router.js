@@ -11,16 +11,14 @@
         }
     });
 
-    
-
-    test("routes to a controller and action", function() {
+    test("routes to a function in the router", function() {
         expect(2);
 
-        Controller = { action: function() { ok(true); } }
         var router = Viking.Router.extend({
             routes: {
-                '': {to: 'Controller#action', name: 'root'}
-            }
+                '': 'func'
+            },
+            func: function() { ok(true); }
         });
         router = new router();
 
@@ -47,14 +45,167 @@
         delete Controller;
     });
 
-    test("routes to a function in the router", function() {
+    test("routes to a controller and action (normal obj)", function() {
         expect(2);
+
+        Controller = { action: function() { ok(true); } }
+        var router = Viking.Router.extend({
+            routes: {
+                '': {to: 'Controller#action', name: 'root'}
+            }
+        });
+        router = new router();
+
+        ok(Backbone.history.handlers[0].route.test(''));
+        Backbone.history.handlers[0].callback('');
+        router.cleanup();
+        delete Controller;
+    });
+
+    test("routes to a controller and undefined action", function() {
+        expect(1);
+
+        Controller = { }
+        var router = Viking.Router.extend({
+            routes: {
+                '': {to: 'Controller#action', name: 'root'}
+            }
+        });
+        router = new router();
+
+        ok(Backbone.history.handlers[0].route.test(''));
+        Backbone.history.handlers[0].callback('');
+        router.cleanup();
+        delete Controller;
+    });
+	
+    test("routes to a undefined controller and undefined action", function() {
+        expect(1);
 
         var router = Viking.Router.extend({
             routes: {
-                '': 'func'
+                '': {to: 'Controller#action', name: 'root'}
+            }
+        });
+        router = new router();
+
+        ok(Backbone.history.handlers[0].route.test(''));
+        Backbone.history.handlers[0].callback('');
+        router.cleanup();
+        delete Controller;
+    });
+
+    test("routes to a uninitialized controller and action (Viking.Controller)", function() {
+        expect(2);
+
+        Controller = Viking.Controller.extend({ action: function() { ok(true); } })
+        var router = Viking.Router.extend({
+            routes: {
+                '': {to: 'Controller#action', name: 'root'}
+            }
+        });
+        router = new router();
+
+        ok(Backbone.history.handlers[0].route.test(''));
+        Backbone.history.handlers[0].callback('');
+        router.cleanup();
+        delete Controller;
+    });
+
+    test("routes to a initialized controller and action (Viking.Controller)", function() {
+        expect(2);
+
+        Controller = Viking.Controller.extend({ action: function() { ok(true); } })
+        var router = Viking.Router.extend({
+            routes: {
+                '': {to: 'Controller#action', name: 'root'}
+            }
+        });
+        router = new router();
+		Viking.controller = new Controller();
+		
+        ok(Backbone.history.handlers[0].route.test(''));
+        Backbone.history.handlers[0].callback('');
+        router.cleanup();
+        delete Controller;
+    });
+
+    test("routing to a Viking.Controller more than once in a row only initializes the controller once", function() {
+        expect(2);
+
+        Controller = Viking.Controller.extend({ initialize: function() { ok(true); } })
+        var router = Viking.Router.extend({
+            routes: {
+                '': {to: 'Controller#action', name: 'root'}
+            }
+        });
+        router = new router();
+		
+        ok(Backbone.history.handlers[0].route.test(''));
+        Backbone.history.handlers[0].callback('');
+        Backbone.history.handlers[0].callback('');
+        Backbone.history.handlers[0].callback('');
+        router.cleanup();
+        delete Controller;
+    });
+
+    test("routing to a Viking.Controller then to another route changes the controller", function() {
+        expect(6);
+
+        Controller = Viking.Controller.extend();
+        BController = Viking.Controller.extend();
+		Another = {};
+        var router = Viking.Router.extend({
+            routes: {
+                '': {to: 'Controller#action', name: 'root'},
+				'b': {to: 'BController#action', name: 'b'},
+                'other': {to: 'Other#action', name: 'other'},
+                'another': {to: 'Another#action', name: 'another'},
+				'func': 'func',
+				'closure': function() { }
             },
-            func: function() { ok(true); }
+			
+			func: function() { }
+        });
+        router = new router();
+		
+        Backbone.history.handlers[0].callback('');
+		ok(Viking.controller instanceof Controller);
+
+        Backbone.history.handlers[0].callback('');
+        Backbone.history.handlers[1].callback('b');
+		ok(Viking.controller instanceof BController);
+				
+        Backbone.history.handlers[0].callback('');
+        Backbone.history.handlers[2].callback('other');
+		equal(undefined, Viking.controller);
+		
+        Backbone.history.handlers[0].callback('');
+        Backbone.history.handlers[3].callback('another');
+		equal(Another, Viking.controller);
+		
+        Backbone.history.handlers[0].callback('');
+        Backbone.history.handlers[4].callback('func');
+		equal(undefined, Viking.controller);
+		
+        Backbone.history.handlers[0].callback('');
+        Backbone.history.handlers[5].callback('closure');
+		equal(undefined, Viking.controller);
+		
+        router.cleanup();
+        delete Controller;
+        delete BController;
+        delete Another;
+    });
+
+    test("routes to a Viking.Controller and undefined action", function() {
+        expect(1);
+
+        Controller = Viking.Controller.extend();
+        var router = Viking.Router.extend({
+            routes: {
+                '': {to: 'Controller#action', name: 'root'}
+            }
         });
         router = new router();
 
