@@ -4,6 +4,8 @@ New Features:
 
   - `Viking.Model`: added `#unselect` method
   - `Viking.Router`: added support for regex routes
+  - `Viking.View`: a `Backbone.View` that inherits both events and
+    initializers
 
 Major Changes:
 
