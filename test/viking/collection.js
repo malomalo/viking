@@ -158,6 +158,24 @@
         c.clearSelected(model)
         equal(1, c.selected().length);
     });
+	
+	test("clearSelected() triggers 'unselected' event on all models", function() {
+		expect(2);
+		
+        var c = new Viking.Collection([{}, {}, {}]);
+		c.models[0].selected = false;
+		c.models[1].selected = true;
+		c.models[2].selected = true;
+		c.models[0].on('unselected', function() { ok(true); });
+		c.models[1].on('unselected', function() { ok(true); });
+		c.models[2].on('unselected', function() { ok(true); });
+
+        c.clearSelected();
+		
+		c.models[0].off('unselected');
+		c.models[1].off('unselected');
+		c.models[2].off('unselected');
+    });
 
     // sync() --------------------------------------------------------------------
     test("sync() adds in predicate params", function() {
