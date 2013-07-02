@@ -9,6 +9,12 @@
 
 // Setup the Viking namespace
 Viking = {};
+Viking.NameError = function (message) {
+  this.name = "Viking.NameError";
+  this.message = message;
+};
+
+Viking.NameError.prototype = Error.prototype;
 // CSRF Support for Ajax Request
 // -----------------------------
 
@@ -199,6 +205,26 @@ String.prototype.pluralize = function(count, includeNumber) {
 // Add Underscore.inflection#singularize function on the String object
 String.prototype.singularize = function() {
     return _.singularize(this);
+};
+
+// Tries to find a variable with the name specified in context of `context`.
+// `context` defaults to the `window` variable.
+//
+// Examples:
+//     'Module'.constantize     # => Module
+//     'Test.Unit'.constantize  # => Test.Unit
+//     'Unit'.constantize(Test) # => Test.Unit
+//
+// Viking.NameError is raised when the variable is unknown.
+String.prototype.constantize = function(context) {
+	if(!context) { context = window; }
+	var name = this;
+	
+	return _.reduce(this.split('.'), function(context, name){
+		var v = context[name];
+		if (!v) { throw new Viking.NameError("uninitialized variable "+name); }
+		return v;
+	}, context);	
 };
 
 
@@ -562,7 +588,7 @@ Viking.Collection = Backbone.Collection.extend({
         }
         this.each(function(m) {
             if(m.cid !== exceptModel) {
-                m.selected = false;
+                m.unselect();
             }
         });
     },
@@ -607,7 +633,7 @@ Viking.View = Backbone.View.extend({
     
     extend: function(protoProps, staticProps) {
 		if(protoProps && protoProps.events && this.prototype.events) {
-			_.defaults(protoProps.events, this.prototype.events)
+			_.defaults(protoProps.events, this.prototype.events);
 		}
 		
 		if(protoProps && protoProps.initialize && this.prototype.initialize) {
@@ -804,6 +830,7 @@ Viking.Router = Backbone.Router.extend({
     }
 
 });
+
 
 
 

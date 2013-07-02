@@ -66,4 +66,19 @@
         equal("words".singularize(), "word");
     });
 
+	test("constantize()", function() {
+		equal("Viking".constantize(), Viking);
+		equal("Viking.Model".constantize(), Viking.Model);
+		equal("Model".constantize(Viking), Viking.Model);
+		throws(
+		    function() { "Unknown".constantize(); },
+		    Viking.NameError,
+		    "uninitialized variable Unknown"
+		);
+		throws(
+		    function() { "Unknown.Again".constantize(); },
+		    Viking.NameError,
+		    "uninitialized variable Unknown.Again"
+		);
+	})
 }());
