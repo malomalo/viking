@@ -7,7 +7,7 @@ $gray:darken(white, 60);
 
 body{
     background: white;
-    font-family: "Open Sans", "Helvetica Neue", sans-serif;
+    font-family: "Helvetica Neue", sans-serif;
     padding:0;
     margin:0;
 }
@@ -37,17 +37,32 @@ a{
     margin-left:200px;
     min-width:490px;
     max-width:700px;
+    padding: 5px 15px 15px 15px;
     
     hr {
         width: 65%;
         border: none;
         border-bottom: 1px dotted darken(white, 55);
     }
+    h1 {
+        font-weight:300;
+        font-size:32px;
+        margin:20px 0 5px 0;
+    }
+    p {
+        line-height: 20px;
+        color: #2b2b2b;
+        font-size: 14px;
+    }
+    
+    .center {
+        margin: 0 auto;
+    }
 }
 .head{
     background:white;
     text-align:center;
-    padding:30pt 0;
+    padding:40px 0 20px 0;
     
     .logo {
         margin-bottom:5pt;
@@ -60,20 +75,18 @@ a{
     }
 }
 .terminal{
-    background:darken(white, 55);
-    padding:15pt 0;
+    padding:20px 0;
     h1{
         text-align:center;
         font-weight:100;
-        color:darken(white, 30);
-        font-size:3em;
+        font-size:38px;
         margin:0;
     }
 }
-.actions{
-    text-align:center;
-    padding:10pt 0;
-    background:darken(white, 55);
+//.actions{
+//    text-align:center;
+//    padding:10pt 0;
+//    background:darken(white, 55);
     .btn.github{
         margin-left:10pt;
     }
@@ -97,7 +110,7 @@ a{
         background-color:darken(white, 10);
         background-image:url(../images/btn-github.png);
     }
-}
+//}
 nav {
     position:fixed;
     height:100%;
@@ -116,6 +129,7 @@ nav {
         font-weight:600;
         text-decoration:underline;
         display: block;
+        margin-bottom: 5px;
         span {
             font-size: 11px;
             font-weight:normal;
@@ -133,7 +147,6 @@ nav {
                 font-size: 12px;
                 color:darken(white, 60);
                 font-weight:normal;
-                padding-left:5px;
             }
             &:before{
                 content: "–";
