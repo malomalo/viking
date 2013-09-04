@@ -107,3 +107,11 @@ By default any other models in the collection with be unselected. To prevent
 other models in the collection from being unselected you can pass `true`.
 
 The `selected` and `unselected` events are fired when appropriate.
+
+\#unselect `model.unselect()`
+-----------------------------
+
+When the model is part of a collection and is selected, `model.unselect` will
+unselect the model from the collection. `model.selected` will be set `false`.
+
+Triggers an `unselected` event.
