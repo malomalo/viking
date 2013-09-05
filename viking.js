@@ -291,7 +291,7 @@ Viking.Model = Backbone.Model.extend({
         this.collection.select(this, multiple);
     },
     
-    // TODO: implement
+    // Opposite of #select. Triggers the `unselected` event.
     unselect: function() {
 		if(this.selected) {
 	        this.selected = false;
@@ -468,6 +468,12 @@ Viking.Model = Backbone.Model.extend({
     
 	// Used internally by Viking to translate relation arguments to key and
 	// Model
+    //
+    // - type: either 'hasMany' or 'belongsTo'
+    // - key:  the key of how the assoication is accessed on the model
+    // - options (optional):
+    //     - model: model to use
+    //     - collection: collection to use
     getRelationshipDetails: function (type, key, options) {
 		// Handle both `type, key, options` and `type, [key, options]` style arguments
         if (_.isArray(key)) {
@@ -479,21 +485,22 @@ Viking.Model = Backbone.Model.extend({
             key: key
         };
 
-        if (options) {
-            if (type === 'hasMany' && options.collection) {
+        if(type === 'hasMany') {
+            if (options && options.collection) {
                 relation.type = window[options.collection];
-            } else if (type === 'hasMany' && options.model) {
-                relation.type = window[options.model + 'Collection'];
+            } else if (options && options.model) {
+                relation.type = window[options.model + 'Collection'];                
             } else {
-                relation.type = window[options.model];
-            }
-        } else {
-            if (type === 'belongsTo') {
-                relation.type = window[relation.key.camelize()];
-            } else if (type === 'hasMany') {
                 relation.type = window[relation.key.camelize(true).replace(/s$/, '') + 'Collection'];
             }
+        } else if (type === 'belongsTo' || type === 'hasOne') {
+            if (options && options.model) {
+                relation.type = window[options.model];
+            } else {
+                relation.type = window[relation.key.camelize()];
+            }
         }
+
 
         return relation;
     }
