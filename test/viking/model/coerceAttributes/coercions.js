@@ -32,7 +32,7 @@
         delete Model;
     });
 
-    // coercing dates ------------------------------------------------------------
+    // coercing dates ---------------------------------------------------------
     test("#coerceAttributes coerces iso8601 string to date", function() {
         Model = Viking.Model.extend({ coercions: {date: 'Date'} });
         var a = new Model();
@@ -58,6 +58,59 @@
     
         delete Model;
     });
+    
+    // coercing strings -------------------------------------------------------
+    test("#coerceAttributes coerces boolean to string", function() {
+        Model = Viking.Model.extend({ coercions: {key: 'String'} });
+        var a = new Model();
+    
+        equal(a.coerceAttributes({key: true}).key, 'true');
+        equal(a.coerceAttributes({key: false}).key, 'false');
+    
+        delete Model;
+    });
+    
+    test("#coerceAttributes coerces number to string", function() {
+        Model = Viking.Model.extend({ coercions: {key: 'String'} });
+        var a = new Model();
+    
+        equal(a.coerceAttributes({key: 10}).key, '10');
+        equal(a.coerceAttributes({key: 10.5}).key, '10.5');
+    
+        delete Model;
+    });
+    
+    test("#coerceAttributes coerces null to string", function() {
+        Model = Viking.Model.extend({ coercions: {key: 'String'} });
+        var a = new Model();
+    
+        equal(a.coerceAttributes({key: null}).key, null);
+        delete Model;
+    });
+    
+    // coercing numbers -------------------------------------------------------
+    test("#coerceAttributes coerces string to number", function() {
+        Model = Viking.Model.extend({ coercions: {key: 'Number'} });
+        var a = new Model();
+    
+        equal(a.coerceAttributes({key: '10.5'}).key, 10.50);
+        equal(a.coerceAttributes({key: '10'}).key, 10);
+    
+        delete Model;
+    });
+
+    // coercing JSON ----------------------------------------------------------
+    test("#coerceAttributes coerces {} to Viking.Model", function() {
+        Model = Viking.Model.extend({ coercions: {key: 'JSON'} });
+        var a = new Model();
+
+        equal(a.coerceAttributes({key: {}}).key.constructor, Viking.Model);
+        deepEqual(a.coerceAttributes({key: {}}).key.attributes, {});
+        deepEqual(a.coerceAttributes({key: {key: 'value'}}).key.attributes, {key: 'value'});
+    
+        delete Model;
+    });
+
 
     test("#coerceAttributes thows error when can't coerce value", function() {
         expect(2);
