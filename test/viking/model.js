@@ -52,6 +52,5 @@
         c.models[0].unselect();
         c.off('unselected');
     });
-
-
+    
 }());

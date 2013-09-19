@@ -1,7 +1,14 @@
 (function () {
     module("Viking.Model#select");
 
-    test("select() sets 'selected' to true on the model", function() {
+    test("select() sets 'selected' to true on model when not in a collection", function() {
+        var model = new Viking.Model({});
+        model.select();
+    
+        ok(model.selected);
+    });
+    
+    test("select() sets 'selected' to true on the model when in a collection", function() {
         var c = new Viking.Collection([{}, {}]);
         var model = c.models[0];
         model.select();

@@ -111,6 +111,15 @@
         delete Model;
     });
 
+    test("#coerceAttributes coerces {} to Viking.Model and sets the modelName", function() {
+        Model = Viking.Model.extend({ coercions: {key: 'JSON'} });
+        var a = new Model();
+
+        deepEqual(a.coerceAttributes({key: {}}).key.modelName, 'key');
+    
+        delete Model;
+    });
+
 
     test("#coerceAttributes thows error when can't coerce value", function() {
         expect(2);
