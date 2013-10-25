@@ -27,7 +27,7 @@
         expect(0);
     
         var c = new Viking.Collection([{}]);
-		c.models[0].selected = true;
+        c.models[0].selected = true;
         c.on('selected', function() { ok(true); });
         c.models[0].select();
         c.off('selected');

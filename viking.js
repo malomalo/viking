@@ -288,7 +288,11 @@ Viking.Model = Backbone.Model.extend({
     //
     // The `selected` and `unselected` events are fired when appropriate.
     select: function(multiple) {
-        this.collection.select(this, multiple);
+        if (this.collection) {
+            this.collection.select(this, multiple);
+        } else {
+            this.selected = true;
+        }
     },
     
     // Opposite of #select. Triggers the `unselected` event.
@@ -390,12 +394,17 @@ Viking.Model = Backbone.Model.extend({
                     
                 } else if (klass == Number) {
                     if (typeof attrs[key] !== 'number') {
+                        if(typeof attrs[key] === 'string') {
+                            attrs[key] = attrs[key].replace(/\,/g, '');
+                        }
                         attrs[key] = Number(attrs[key]);
                     }
-                    
+                
+                // TODO: not sure about this
                 } else if (klass == JSON) {
                     if (typeof attrs[key] === 'object') {
                         attrs[key] = new Viking.Model(attrs[key]);
+                        attrs[key].modelName = key;
                     } else {
                         throw new TypeError("Coercion of " + type + " unsupported");
                     }
@@ -442,13 +451,115 @@ Viking.Model = Backbone.Model.extend({
             if (data[key]) {
                 if (type === 'Date') {
                     data[key] = data[key].toISOString();
-                } else {
+                } else if (type === 'JSON') {
+                    data[key] = data[key].toJSON();
+                } else if (type !== 'Number' && type !== 'String') {
                     throw new TypeError("Coercion of " + type + " unsupported");
                 }
             }
         });
 
         return data;
+    },
+    
+    // Overwrite Backbone.Model#save so that we can catch errors when a save
+    // fails.
+    save: function(key, val, options) {
+        var attrs, method, xhr, attributes = this.attributes;
+
+        // Handle both `"key", value` and `{key: value}` -style arguments.
+        if (key == null || typeof key === 'object') {
+          attrs = key;
+          options = val;
+        } else {
+          (attrs = {})[key] = val;
+        }
+
+        // If we're not waiting and attributes exist, save acts as `set(attr).save(null, opts)`.
+        if (attrs && (!options || !options.wait) && !this.set(attrs, options)) return false;
+
+        options = _.extend({validate: true}, options);
+
+        // Do not persist invalid models.
+        if (!this._validate(attrs, options)) return false;
+
+        // Set temporary attributes if `{wait: true}`.
+        if (attrs && options.wait) {
+          this.attributes = _.extend({}, attributes, attrs);
+        }
+
+        // After a successful server-side save, the client is (optionally)
+        // updated with the server-side state.
+        if (options.parse === void 0) options.parse = true;
+        var model = this;
+        var success = options.success;
+        options.success = function(resp) {
+          // Ensure attributes are restored during synchronous saves.
+          model.attributes = attributes;
+          var serverAttrs = model.parse(resp, options);
+          if (options.wait) serverAttrs = _.extend(attrs || {}, serverAttrs);
+          if (_.isObject(serverAttrs) && !model.set(serverAttrs, options)) {
+            return false;
+          }
+          if (success) success(model, resp, options);
+          model.trigger('sync', model, resp, options);
+        };
+        
+        // replacing #wrapError(this, options) with custom error handling to
+        // catch and throw invalid events
+        var error = options.error;
+        var model = this;
+        options.error = function(resp) {
+            if (resp.status === 400) {
+                var errors = JSON.parse(resp.responseText).errors;
+                if (options.invalid) options.invalid(model, errors, options);
+                model.setErrors(errors, options);
+            } else {
+                if (error) error(model, resp, options);
+                model.trigger('error', model, resp, options);
+            }
+        };
+
+        method = this.isNew() ? 'create' : (options.patch ? 'patch' : 'update');
+        if (method === 'patch') options.attrs = attrs;
+        xhr = this.sync(method, this, options);
+
+        // Restore attributes.
+        if (attrs && options.wait) this.attributes = attributes;
+
+        return xhr;
+    },
+    
+    setErrors: function(errors, options) {
+        if(_.size(errors) === 0) { return; }
+        
+        var model = this;
+        this.validationError = errors;
+        
+        model.trigger('invalid', this, errors, options);
+        _.each(errors, function(value, key) {
+            _.each(model.belongsTo, function(rel) {
+                rel = Viking.Model.getRelationshipDetails('belongsTo', rel);
+                if (errors[rel.key]) {
+                    model.get(rel.key).setErrors(errors[rel.key]);
+                }
+            });
+
+            _.each(model.hasMany, function(rel) {
+                rel = Viking.Model.getRelationshipDetails('hasMany', rel);
+                var collection = model.get(rel.key);
+                // TODO: move this to collection.setErrors(...)
+                _.each(errors[rel.key], function(value, index) {
+                   collection.at(index).setErrors(value);
+                });
+            });
+        });
+    },
+    
+    errorsOn: function(attribute) {
+        if (this.validationError) {
+            return this.validationError[attribute];
+        }
     }
     
 }, {
@@ -674,12 +785,13 @@ Viking.View = Backbone.View.extend({
     }
 });
 Backbone.Model.prototype.updateAttribute = function (key, value, options){
-    var data;
-    (data = {})[key] = value;
+    var data = {};
+    data[key] = value;
     this.updateAttributes(data, options);
 };
 
 Backbone.Model.prototype.updateAttributes = function (data, options) {
+    options.patch = true;
     this.save(data, options);
 };
 Viking.PaginatedCollection = Viking.Collection.extend({
