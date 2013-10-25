@@ -19,6 +19,7 @@ a{
     color: $green;
     cursor:pointer;
 }
+
 .main-pane{
     margin-left:190px;
     min-width:490px;
@@ -144,6 +145,10 @@ nav {
     overflow-y:scroll;
     background: #fff;
     box-shadow: 1px 1px 1px 1px #ddd;
+    
+    > a:first-of-type {
+        font-size: 20px;
+    }
     
     > a {
         font-weight:300;
