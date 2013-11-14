@@ -12,7 +12,7 @@ environment.append_path 'test'
 environment.append_path 'deps'
 environment.unregister_postprocessor 'application/javascript', Sprockets::SafetyColons
 
-desc "Compile viking.js and testing files"
+desc "Compile viking.js"
 task :compile do
   FileUtils.rm_f('./viking.js')
   

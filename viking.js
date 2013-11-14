@@ -280,7 +280,7 @@ Viking.Model = Backbone.Model.extend({
     
     // When the model is part of a collection and you want to select a single
     // or multiple items from a collection. If a model is selected 
-	// `model.selected` will be set `true`, otherwise it will be `false`.
+    // `model.selected` will be set `true`, otherwise it will be `false`.
     //
     // By default any other models in the collection with be unselected. To
     // prevent other models in the collection from being unselected you can
@@ -297,13 +297,13 @@ Viking.Model = Backbone.Model.extend({
     
     // Opposite of #select. Triggers the `unselected` event.
     unselect: function() {
-		if(this.selected) {
-	        this.selected = false;
-			this.trigger('unselected', this);			
-		}
+        if(this.selected) {
+            this.selected = false;
+            this.trigger('unselected', this);
+        }
     },
-	
-	// TODO: overwrite url to use toParam()
+
+    // TODO: overwrite url to use toParam()
     
     // Alias for `::urlRoot`
     urlRoot: function() {
@@ -378,37 +378,10 @@ Viking.Model = Backbone.Model.extend({
 
         _.each(this.coercions, function (type, key) {
             if (attrs[key] || attrs[key] === false) {
-                klass = window[type];
+                klass = Viking.Coercions[type];
                 
-                if (klass === Date) {
-                    if (typeof attrs[key] === 'string' || typeof attrs[key] === 'number') {
-                        attrs[key] = Date.fromISO(attrs[key]);
-                    } else if (!(attrs[key] instanceof Date)) {
-                        throw new TypeError(typeof attrs[key] + " can't be coerced into " + type);
-                    }
-                    
-                } else if (klass == String) {
-                    if (typeof attrs[key] !== 'string') {
-                        attrs[key] = String(attrs[key]);
-                    }
-                    
-                } else if (klass == Number) {
-                    if (typeof attrs[key] !== 'number') {
-                        if(typeof attrs[key] === 'string') {
-                            attrs[key] = attrs[key].replace(/\,/g, '');
-                        }
-                        attrs[key] = Number(attrs[key]);
-                    }
-                
-                // TODO: not sure about this
-                } else if (klass == JSON) {
-                    if (typeof attrs[key] === 'object') {
-                        attrs[key] = new Viking.Model(attrs[key]);
-                        attrs[key].modelName = key;
-                    } else {
-                        throw new TypeError("Coercion of " + type + " unsupported");
-                    }
-                    
+                if (klass) {
+                    attrs[key] = klass.load(attrs[key], key);
                 } else {
                     throw new TypeError("Coercion of " + type + " unsupported");
                 }
@@ -418,19 +391,41 @@ Viking.Model = Backbone.Model.extend({
         return attrs;
     },
     
+    // similar to Rails as_json method
     toJSON: function (options) {
         var rel, i;
         var data = _.clone(this.attributes);
+        if (options === undefined) { options = {}; }
+
+        if (options.include) {
+            if (typeof options.include === 'string') {
+                var key = options.include;
+                options.include = {};
+                options.include[key] = {};
+            } else if (_.isArray(options.include)) {
+                var array = options.include;
+                options.include = {};
+                _.each(array, function(key) {
+                    options.include[key] = {};
+                });
+            }
+        } else {
+            options.include = {};
+        }
 
         if (this.belongsTo) {
             for (i = 0; i < this.belongsTo.length; i++) {
                 rel = Viking.Model.getRelationshipDetails('belongsTo', this.belongsTo[i]);
 
-                if (data[rel.key]) {
-                    data[rel.key+'_attributes'] = data[rel.key].toJSON();
-                    delete data[rel.key];
-                } else if (data[rel.key] === null) {
-                    data[rel.key+'_attributes'] = null;
+                if (options.include[rel.key]) {
+                    if (data[rel.key]) {
+                        data[rel.key+'_attributes'] = data[rel.key].toJSON(options.include[rel.key]);
+                        delete data[rel.key];
+                    } else if (data[rel.key] === null) {
+                        data[rel.key+'_attributes'] = null;
+                        delete data[rel.key];
+                    }
+                } else {
                     delete data[rel.key];
                 }
             }
@@ -440,20 +435,24 @@ Viking.Model = Backbone.Model.extend({
             for (i = 0; i < this.hasMany.length; i++) {
                 rel = Viking.Model.getRelationshipDetails('hasMany', this.hasMany[i]);
 
-                if (data[rel.key]) {
-                    data[rel.key + '_attributes'] = data[rel.key].toJSON();
+                if (options.include[rel.key]) {
+                    if (data[rel.key]) {
+                        data[rel.key + '_attributes'] = data[rel.key].toJSON(options.include[rel.key]);
+                        delete data[rel.key];
+                    }
+                } else {
                     delete data[rel.key];
                 }
             }
         }
 
         _.each(this.coercions, function (type, key) {
-            if (data[key]) {
-                if (type === 'Date') {
-                    data[key] = data[key].toISOString();
-                } else if (type === 'JSON') {
-                    data[key] = data[key].toJSON();
-                } else if (type !== 'Number' && type !== 'String') {
+            if (data[key] || data[key] === false) {
+                klass = Viking.Coercions[type];
+
+                if (klass) {
+                    data[key] = klass.dump(data[key], key);
+                } else {
                     throw new TypeError("Coercion of " + type + " unsupported");
                 }
             }
@@ -466,9 +465,10 @@ Viking.Model = Backbone.Model.extend({
     // fails.
     save: function(key, val, options) {
         var attrs, method, xhr, attributes = this.attributes;
+        var model = this;
 
         // Handle both `"key", value` and `{key: value}` -style arguments.
-        if (key == null || typeof key === 'object') {
+        if (key === null || typeof key === 'object') {
           attrs = key;
           options = val;
         } else {
@@ -476,12 +476,16 @@ Viking.Model = Backbone.Model.extend({
         }
 
         // If we're not waiting and attributes exist, save acts as `set(attr).save(null, opts)`.
-        if (attrs && (!options || !options.wait) && !this.set(attrs, options)) return false;
+        if (attrs && (!options || !options.wait) && !this.set(attrs, options)) {
+            return false;
+        }
 
         options = _.extend({validate: true}, options);
 
         // Do not persist invalid models.
-        if (!this._validate(attrs, options)) return false;
+        if (!this._validate(attrs, options)) {
+            return false;
+        }
 
         // Set temporary attributes if `{wait: true}`.
         if (attrs && options.wait) {
@@ -490,42 +494,58 @@ Viking.Model = Backbone.Model.extend({
 
         // After a successful server-side save, the client is (optionally)
         // updated with the server-side state.
-        if (options.parse === void 0) options.parse = true;
-        var model = this;
+        if (options.parse === undefined) {
+            options.parse = true;
+        }
+
         var success = options.success;
         options.success = function(resp) {
           // Ensure attributes are restored during synchronous saves.
           model.attributes = attributes;
           var serverAttrs = model.parse(resp, options);
-          if (options.wait) serverAttrs = _.extend(attrs || {}, serverAttrs);
+          if (options.wait) {
+              serverAttrs = _.extend(attrs || {}, serverAttrs);
+          }
+
           if (_.isObject(serverAttrs) && !model.set(serverAttrs, options)) {
             return false;
           }
-          if (success) success(model, resp, options);
+
+          if (success) {
+              success(model, resp, options);
+          }
+
           model.trigger('sync', model, resp, options);
         };
         
         // replacing #wrapError(this, options) with custom error handling to
         // catch and throw invalid events
         var error = options.error;
-        var model = this;
         options.error = function(resp) {
             if (resp.status === 400) {
                 var errors = JSON.parse(resp.responseText).errors;
-                if (options.invalid) options.invalid(model, errors, options);
+                if (options.invalid) {
+                    options.invalid(model, errors, options);
+                }
                 model.setErrors(errors, options);
             } else {
-                if (error) error(model, resp, options);
+                if (error) {
+                    error(model, resp, options);
+                }
                 model.trigger('error', model, resp, options);
             }
         };
 
         method = this.isNew() ? 'create' : (options.patch ? 'patch' : 'update');
-        if (method === 'patch') options.attrs = attrs;
+        if (method === 'patch') {
+            options.attrs = attrs;
+        }
         xhr = this.sync(method, this, options);
 
         // Restore attributes.
-        if (attrs && options.wait) this.attributes = attributes;
+        if (attrs && options.wait) {
+            this.attributes = attributes;
+        }
 
         return xhr;
     },
@@ -537,29 +557,15 @@ Viking.Model = Backbone.Model.extend({
         this.validationError = errors;
         
         model.trigger('invalid', this, errors, options);
-        _.each(errors, function(value, key) {
-            _.each(model.belongsTo, function(rel) {
-                rel = Viking.Model.getRelationshipDetails('belongsTo', rel);
-                if (errors[rel.key]) {
-                    model.get(rel.key).setErrors(errors[rel.key]);
-                }
-            });
-
-            _.each(model.hasMany, function(rel) {
-                rel = Viking.Model.getRelationshipDetails('hasMany', rel);
-                var collection = model.get(rel.key);
-                // TODO: move this to collection.setErrors(...)
-                _.each(errors[rel.key], function(value, index) {
-                   collection.at(index).setErrors(value);
-                });
-            });
-        });
     },
     
+    // TODO: testme
     errorsOn: function(attribute) {
         if (this.validationError) {
             return this.validationError[attribute];
         }
+
+        return false;
     }
     
 }, {
@@ -757,6 +763,77 @@ Viking.Collection = Backbone.Collection.extend({
     }
     
 });
+Viking.Coercions = {};
+Viking.Coercions.Date = {
+    load: function(value) {
+        if (typeof value === 'string' || typeof value === 'number') {
+            return Date.fromISO(value);
+        }
+
+        if (!(value instanceof Date)) {
+            throw new TypeError(typeof value + " can't be coerced into Date");
+        }
+
+        return value;
+    },
+
+    dump: function(value) {
+        return value.toISOString();
+    }
+};
+Viking.Coercions.JSON = {
+    load: function(value, key) {
+        if (typeof value === 'object') {
+            var model = new Viking.Model(value);
+            model.modelName = key;
+            return model;
+        }
+
+        throw new TypeError(typeof value + " can't be coerced into JSON");
+    },
+
+    dump: function(value) {
+        if (value instanceof Viking.Model) {
+            return value.toJSON();
+        }
+
+        return value;
+    }
+};
+Viking.Coercions.Number = {
+    load: function(value) {
+        if (typeof value === 'string') {
+            value = value.replace(/\,/g, '');
+        }
+
+        return Number(value);
+    },
+
+    dump: function(value) {
+        if (typeof value === 'string') {
+            value = value.replace(/\,/g, '');
+        }
+
+        return Number(value);
+    }
+};
+Viking.Coercions.String = {
+    load: function(value) {
+        if (typeof value !== 'string' && value !== undefined && value !== null) {
+            return String(value);
+        }
+
+        return value;
+    },
+
+    dump: function(value) {
+        if (typeof value !== 'string' && value !== undefined && value !== null) {
+            return String(value);
+        }
+
+        return value;
+    }
+};
 // Viking.View
 // -----------
 //
@@ -968,6 +1045,11 @@ Viking.Router = Backbone.Router.extend({
     }
 
 });
+
+
+
+
+
 
 
 
