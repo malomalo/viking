@@ -6,7 +6,7 @@
         
         var a = new Ship({'ship': {foo: 'bar'}, bat: 'baz'});
     
-        deepEqual(a.toJSON(), {
+        deepEqual(a.toJSON({include: 'ship'}), {
             bat: 'baz',
             ship_attributes: {foo: 'bar'}
         });
@@ -19,7 +19,7 @@
         
         var a = new Ship({'ship': null, bat: 'baz'});
     
-        deepEqual(a.toJSON(), {
+        deepEqual(a.toJSON({include: 'ship'}), {
             bat: 'baz',
             ship_attributes: null
         });
@@ -32,7 +32,7 @@
         
         var a = new Ship({'ship': null, bat: 'baz'});
     
-        deepEqual(a.toJSON(), {
+        deepEqual(a.toJSON({include: 'ship'}), {
             bat: 'baz',
             ship_attributes: null
         });

@@ -1,15 +1,23 @@
 (function () {
     module("Viking.Model::new");
 
-    test("::new(attrs) coerces belongsTo relations", function() {
-        Ship = Viking.Model.extend({ belongsTo: ['ship'] });
+    test("::new sets modelName on the instance", function() {
+        var Ship = Viking.Model.extend('ship');
         
-        var a = new Ship({'ship': {}});
-        ok(a.get('ship') instanceof Ship);
+        equal((new Ship).modelName, 'ship');
+    });
     
+    test("::new sets associations on the instance as a refernce to the associations on the Class", function() {
+        Ship = Viking.Model.extend({ hasMany: [['ships', {collection: 'MyCollection'}]] });
+        MyCollection = Viking.Collection.extend();
+        
+        var myship = new Ship();
+        strictEqual(myship.associations, Ship.associations);
+        
+        delete MyCollection;
         delete Ship;
     });
-
+    
     test("::new(attrs) does coercions", function() {
         Model = Viking.Model.extend({ coercions: {date: 'Date'} });
     
@@ -18,7 +26,7 @@
     
         delete Model;
     });
-
+    
     test("::new(attrs) coerces hasMany relations", function() {
         Ship = Viking.Model.extend({ hasMany: ['ships'] });
         ShipCollection = Backbone.Collection.extend({ model: Ship });
@@ -32,6 +40,15 @@
         delete ShipCollection;
     });
 
+    test("::new(attrs) coerces belongsTo relations", function() {
+        Ship = Viking.Model.extend({ belongsTo: ['ship'] });
+        
+        var a = new Ship({'ship': {}});
+        ok(a.get('ship') instanceof Ship);
+    
+        delete Ship;
+    });
+
     test("::new(attrs) sets hasMany relations to an empty collection if not in attrs", function() {
         Ship = Viking.Model.extend('ship', { hasMany: ['ships'] });
         ShipCollection = Backbone.Collection.extend({ model: Ship });
@@ -43,5 +60,5 @@
         delete Ship;
         delete ShipCollection;
     });
-
+    
 }());

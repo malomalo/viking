@@ -12,7 +12,7 @@
         
         var a = new Ship({'ships': [{foo: 'bar'}], bat: 'baz'});
     
-        deepEqual(a.toJSON(), {
+        deepEqual(a.toJSON({include: {'ships': {include: 'ships'}}}), {
             bat: 'baz',
             ships_attributes: [{
                 foo: 'bar',

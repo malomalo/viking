@@ -25,7 +25,6 @@
         var a = new Ship();
         var models = [new Ship({key: 'foo'}), new Ship({key: 'bar'})];
     
-
         var result = a.coerceAttributes({ships: models});
         ok(result.ships instanceof ShipCollection);
         ok(result.ships.models[0] === models[0]);
