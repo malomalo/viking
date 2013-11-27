@@ -29,7 +29,7 @@
     
     test("::new(attrs) coerces hasMany relations", function() {
         Ship = Viking.Model.extend({ hasMany: ['ships'] });
-        ShipCollection = Backbone.Collection.extend({ model: Ship });
+        ShipCollection = Viking.Collection.extend({ model: Ship });
     
         var a = new Ship({ships: [{}, {}]});
         ok(a.get('ships') instanceof ShipCollection);
@@ -51,7 +51,7 @@
 
     test("::new(attrs) sets hasMany relations to an empty collection if not in attrs", function() {
         Ship = Viking.Model.extend('ship', { hasMany: ['ships'] });
-        ShipCollection = Backbone.Collection.extend({ model: Ship });
+        ShipCollection = Viking.Collection.extend({ model: Ship });
     
         var a = new Ship();
         ok(a.get('ships') instanceof ShipCollection);

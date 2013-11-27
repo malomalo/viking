@@ -20,7 +20,7 @@
 
     test("coerceAttributes() initializes hasMany relation with array of models", function() {
         Ship = Viking.Model.extend({ hasMany: ['ships'] });
-        ShipCollection = Backbone.Collection.extend({ model: Ship });
+        ShipCollection = Viking.Collection.extend({ model: Ship });
     
         var a = new Ship();
         var models = [new Ship({key: 'foo'}), new Ship({key: 'bar'})];

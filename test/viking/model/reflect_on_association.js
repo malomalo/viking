@@ -3,7 +3,7 @@
 
     test("::reflect_on_association() returns the assocation", function() {
         Ship = Viking.Model.extend({ hasMany: ['ships'], belongsTo: [['carrier', {model: 'Ship'}]] });
-        ShipCollection = Backbone.Collection.extend({ model: Ship });
+        ShipCollection = Viking.Collection.extend({ model: Ship });
         
         equal('ships', Ship.reflect_on_association('ships').name);
         equal('carrier', Ship.reflect_on_association('carrier').name);

@@ -3,7 +3,7 @@
 
     test("::reflect_on_associations() returns all the assocations", function() {
         Ship = Viking.Model.extend({ hasMany: ['ships'], belongsTo: [['carrier', {model: 'Ship'}]] });
-        ShipCollection = Backbone.Collection.extend({ model: Ship });
+        ShipCollection = Viking.Collection.extend({ model: Ship });
         
         deepEqual(['ships', 'carrier'], _.map(Ship.reflect_on_associations(), function(a) { return a.name; }));
     
@@ -13,7 +13,7 @@
     
     test("::reflect_on_associations(macro) returns all macro assocations", function() {
         Ship = Viking.Model.extend({ hasMany: ['ships'], belongsTo: [['carrier', {model: 'Ship'}]] });
-        ShipCollection = Backbone.Collection.extend({ model: Ship });
+        ShipCollection = Viking.Collection.extend({ model: Ship });
         
         deepEqual(['ships'], _.map(Ship.reflect_on_associations('hasMany'), function(a) { return a.name; }));
     

@@ -6,7 +6,7 @@
         Ship = Viking.Model.extend('ship', {
             hasMany: ['ships']
         });
-        ShipCollection = Backbone.Collection.extend({
+        ShipCollection = Viking.Collection.extend({
             model: Ship
         });
         
