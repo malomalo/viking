@@ -9,7 +9,7 @@
     "docco"      : "0.6.1"
   },
   "scripts": {
-    "test": "phantomjs test/runner.js http://127.0.0.1:4321/test/index.html?noglobals=true"
+    "test": "phantomjs test/runner.js http://127.0.0.1:4321/test/index.html"
   },
   "main"          : "viking.js",
   "version"       : "0.1.0"
