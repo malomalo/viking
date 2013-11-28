@@ -1,6 +1,6 @@
 <a href="vikingjs.org">![Viking.js](/logo.jpg)</a>
 
-## Installation <a href="https://semaphoreapp.com/projects/2007/branches/41585"><img style="float:right" src="https://semaphoreapp.com/api/v1/projects/de13df90eadbe3e26d246510c52c6003f89bc890/41585/badge.png"></a>&nbsp;[![Coverage Status](https://coveralls.io/repos/42floors/viking/badge.png?branch=master)](https://coveralls.io/r/42floors/viking)
+## Installation <a href="https://semaphoreapp.com/projects/2007/branches/41585"><img style="float:right" src="https://semaphoreapp.com/api/v1/projects/de13df90eadbe3e26d246510c52c6003f89bc890/41585/badge.png"></a>&nbsp;[![Coverage Status](https://coveralls.io/repos/malomalo/viking/badge.png?branch=master)](https://coveralls.io/r/malomalo/viking)
 
 Download the latest version here:
 
