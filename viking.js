@@ -282,7 +282,7 @@ Viking.AssociationReflection = function (macro, name, options) {
     } else {
         throw new TypeError("Unkown Macro " + macro);
     }
-}
+};
 
 Viking.AssociationReflection.prototype = {
     klass: function() {
@@ -300,7 +300,7 @@ Viking.AssociationReflection.prototype = {
     collection: function() {
         return this.collectionName.constantize();
     }
-}
+};
 // Viking.Model
 // ------------
 //
@@ -316,30 +316,30 @@ Viking.Model = Backbone.Model.extend({
         options || (options = {});
         this.cid = _.uniqueId('c');
         this.attributes = {};
-        
+
         // Add a helper reference to get the model name from an model instance.
         this.modelName = this.constructor.modelName;
-        
+
         // Set up associations
         this.associations = this.constructor.associations;
         this.reflect_on_association = this.constructor.reflect_on_association;
         this.reflect_on_associations = this.constructor.reflect_on_associations;
-        
+
         // Initialize any `hasMany` relationships to empty collections
         _.each(this.reflect_on_associations('hasMany'), function(association) {
             this.attributes[association.name] = new (association.collection())();
         }, this);
-        
-        if (options.collection) this.collection = options.collection;
-        if (options.parse) attrs = this.parse(attrs, options) || {};
+
+        if (options.collection) { this.collection = options.collection; }
+        if (options.parse) { attrs = this.parse(attrs, options) || {}; }
         attrs = _.defaults({}, attrs, _.result(this, 'defaults'));
         this.set(attrs, options);
         this.changed = {};
-        this.initialize.apply(this, arguments);
+        this.initialize.call(this, attributes, options);
     },
-    
+
     // When the model is part of a collection and you want to select a single
-    // or multiple items from a collection. If a model is selected 
+    // or multiple items from a collection. If a model is selected
     // `model.selected` will be set `true`, otherwise it will be `false`.
     //
     // By default any other models in the collection with be unselected. To
@@ -354,7 +354,7 @@ Viking.Model = Backbone.Model.extend({
             this.selected = true;
         }
     },
-    
+
     // Opposite of #select. Triggers the `unselected` event.
     unselect: function() {
         if(this.selected) {
@@ -362,30 +362,30 @@ Viking.Model = Backbone.Model.extend({
             this.trigger('unselected', this);
         }
     },
-    
+
     // TODO: overwrite url to use toParam()
-    
+
     // Alias for `::urlRoot`
     urlRoot: function() {
         return this.constructor.urlRoot();
     },
-    
+
     // Returns string to use for params names. This is the key attributes from
     // the model will be namespaced under when saving to the server
     paramRoot: function() {
         return this.modelName.underscore();
     },
-    
+
     // Returns a string representing the object’s key suitable for use in URLs,
     // or nil if `#isNew` is true.
     toParam: function() {
         return this.isNew() ? null : this.get('id');
     },
-    
+
     set: function (key, val, options) {
         var attrs;
         if (key === null) { return this; }
-        
+
         // Handle both `"key", value` and `{key: value}` -style arguments.
         if (typeof key === 'object') {
             attrs = key;
@@ -393,7 +393,7 @@ Viking.Model = Backbone.Model.extend({
         } else {
             (attrs = {})[key] = val;
         }
-        
+
         this.coerceAttributes(attrs);
         _.each(attrs, function(value, key) {
             var association = this.reflect_on_association(key);
@@ -402,16 +402,16 @@ Viking.Model = Backbone.Model.extend({
                 delete attrs[key];
             }
         }, this);
-        
+
         return Backbone.Model.prototype.set.call(this, attrs, options);
     },
-    
+
     // Override [Backbone.Model#sync](http://backbonejs.org/#Model-sync).
     // [Ruby on Rails](http://rubyonrails.org/) expects the attributes to be
     // namespaced
     sync: function(method, model, options) {
         options || (options = {});
-        
+
         if (!options.data && (method === 'create' || method === 'update' || method === 'patch')) {
             options.contentType = 'application/json';
             options.data = {};
@@ -421,22 +421,22 @@ Viking.Model = Backbone.Model.extend({
 
         return Backbone.sync.call(this, method, model, options);
     },
-    
+
     coerceAttributes: function(attrs) {
         var rel, i, type, klass;
-        
+
         _.each(this.associations, function(association) {
-            var type = association.klass();
-            
-            if (attrs[association.name] && !(attrs[association.name] instanceof type)) {
-                attrs[association.name] = new type(attrs[association.name]);
+            var Type = association.klass();
+
+            if (attrs[association.name] && !(attrs[association.name] instanceof Type)) {
+                attrs[association.name] = new Type(attrs[association.name]);
             }
         });
 
         _.each(this.coercions, function (type, key) {
             if (attrs[key] || attrs[key] === false) {
                 klass = Viking.Coercions[type];
-                
+
                 if (klass) {
                     attrs[key] = klass.load(attrs[key], key);
                 } else {
@@ -447,10 +447,10 @@ Viking.Model = Backbone.Model.extend({
 
         return attrs;
     },
-    
+
     // similar to Rails as_json method
     toJSON: function (options) {
-        var rel, i;
+        var rel, i, klass;
         var data = _.clone(this.attributes);
         if (options === undefined) { options = {}; }
 
@@ -469,7 +469,7 @@ Viking.Model = Backbone.Model.extend({
         } else {
             options.include = {};
         }
-        
+
         _.each(this.associations, function(association) {
             if (!options.include[association.name]) {
                 delete data[association.name];
@@ -481,7 +481,7 @@ Viking.Model = Backbone.Model.extend({
                     data[association.name+'_attributes'] = null;
                     delete data[association.name];
                 }
-            } else if (association.macro == 'hasMany') {
+            } else if (association.macro === 'hasMany') {
                 if (data[association.name]) {
                     data[association.name + '_attributes'] = data[association.name].toJSON(options.include[association.name]);
                     delete data[association.name];
@@ -503,13 +503,13 @@ Viking.Model = Backbone.Model.extend({
 
         return data;
     },
-    
+
     // Overwrite Backbone.Model#save so that we can catch errors when a save
     // fails.
     save: function(key, val, options) {
         var attrs, method, xhr, attributes = this.attributes;
         var model = this;
-        
+
         // Handle both `"key", value` and `{key: value}` -style arguments.
         if (key === null || typeof key === 'object') {
           attrs = key;
@@ -540,7 +540,7 @@ Viking.Model = Backbone.Model.extend({
         if (options.parse === undefined) {
             options.parse = true;
         }
-        
+
         var success = options.success;
         options.success = function(resp) {
           // Ensure attributes are restored during synchronous saves.
@@ -549,18 +549,18 @@ Viking.Model = Backbone.Model.extend({
           if (options.wait) {
               serverAttrs = _.extend(attrs || {}, serverAttrs);
           }
-          
+
           if (_.isObject(serverAttrs) && !model.set(serverAttrs, options)) {
             return false;
           }
-          
+
           if (success) {
               success(model, resp, options);
           }
-          
+
           model.trigger('sync', model, resp, options);
         };
-        
+
         // replacing #wrapError(this, options) with custom error handling to
         // catch and throw invalid events
         var error = options.error;
@@ -592,29 +592,29 @@ Viking.Model = Backbone.Model.extend({
 
         return xhr;
     },
-    
+
     setErrors: function(errors, options) {
         if(_.size(errors) === 0) { return; }
-        
+
         var model = this;
         this.validationError = errors;
-        
+
         model.trigger('invalid', this, errors, options);
     },
-    
+
     // TODO: testme
     errorsOn: function(attribute) {
         if (this.validationError) {
             return this.validationError[attribute];
         }
-        
+
         return false;
     }
-    
+
 }, {
-    
+
     associations: [],
-    
+
     // TODO: test support not passing in name and just protoProps & staticProps
     // Overide the default extend method to support passing in the model name
     // to be used for url generation and replationships.
@@ -626,29 +626,29 @@ Viking.Model = Backbone.Model.extend({
             protoProps = name;
         }
         protoProps || (protoProps = {});
-                
+
         var child = Backbone.Model.extend.call(this, protoProps, staticProps);
-        
+
         if(typeof name === 'string') { child.modelName = name; }
-        
+
         child.associations = {};
         _.each(['hasMany', 'belongsTo'], function(macro) {
             _.each(protoProps[macro], function(name) {
                 var options;
-                
+
                 // Handle both `type, key, options` and `type, [key, options]` style arguments
                 if (_.isArray(name)) {
                     options = name[1];
                     name = name[0];
                 }
-                
+
                 child.associations[name] = new Viking.AssociationReflection(macro, name, options);
             });
         });
-        
+
         return child;
     },
-    
+
     reflect_on_associations: function(macro) {
         var associations = _.values(this.associations);
         if (macro) {
@@ -656,14 +656,14 @@ Viking.Model = Backbone.Model.extend({
                 return a.macro === macro;
             });
         }
-        
+
         return associations;
     },
-    
+
     reflect_on_association: function(name) {
         return this.associations[name];
     },
-    
+
     // Generates the `urlRoot` based off of the model name.
     urlRoot: function() {
         return "/" + this.modelName.pluralize();
@@ -680,7 +680,7 @@ Viking.Model = Backbone.Model.extend({
 		model.fetch(options);
 		return model;
     }
-    
+
 });
 // Viking.Collection
 // -----------------
