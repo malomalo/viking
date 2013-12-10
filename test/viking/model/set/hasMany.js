@@ -55,4 +55,20 @@
         delete ShipCollection;
     })
 
+    test("#set(hasManyRelation, data) updates the current collection and doesn't create a new one", function() {
+      Ship = Viking.Model.extend({});
+      ShipCollection = Viking.Collection.extend({ model: Ship });
+      Fleet = Viking.Model.extend({ hasMany: ['ships']});
+
+      var f = new Fleet();
+      var s = new Ship();
+
+      f.set({ships: [s]});
+      strictEqual(s.collection, f.get('ships'));
+
+      delete Ship;
+      delete ShipCollection;
+      delete Fleet;
+    })
+
 }());

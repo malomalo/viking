@@ -1,4 +1,4 @@
-//     Viking.js 0.1.0
+//     Viking.js 0.1.1
 //
 //     (c) 2012-2013 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -399,6 +399,9 @@ Viking.Model = Backbone.Model.extend({
             var association = this.reflect_on_association(key);
             if (association && association.macro === 'hasMany') {
                 this.attributes[key].set(value.models);
+		_.each(value.models, function(model) {
+		  model.collection = this.attributes[key];
+	        }, this);
                 delete attrs[key];
             }
         }, this);
