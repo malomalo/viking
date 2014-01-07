@@ -415,7 +415,7 @@ Viking.Model = Backbone.Model.extend({
     sync: function(method, model, options) {
         options || (options = {});
 
-        if (!options.data && (method === 'create' || method === 'update' || method === 'patch')) {
+        if (options.data == null && (method === 'create' || method === 'update' || method === 'patch')) {
             options.contentType = 'application/json';
             options.data = {};
             options.data[_.result(model, 'paramRoot')] = (options.attrs || model.toJSON(options));
@@ -612,6 +612,35 @@ Viking.Model = Backbone.Model.extend({
         }
 
         return false;
+    },
+    
+    // PUTs to `/models/:id/touch` with the intention that the server sets the
+    // updated_at/on attributes to the current time.
+    //
+    // The JSON response is expected to return an JSON object with the attribute
+    // name and the new time. Any other attributes returned in the JSON will be
+    // updated on the Model as well
+    //
+    // If name is passed as an option it is passed as `name` paramater in the
+    // request
+    //
+    // TODO:
+    // Note that `#touch` must be used on a persisted object, or else an
+    // Viking.Model.RecordError will be thrown.
+    touch: function(name, options) {
+        _.defaults(options || (options = {}), {
+            type: 'PUT',
+            url: _.result(this, 'url') + '/touch',
+        });
+        
+        if (name) {
+            options.contentType = 'application/json';
+            options.data = JSON.stringify({name: name});
+        } else {
+            options.data = '';
+        }
+        
+        return this.save(null, options);
     }
 
 }, {
@@ -814,6 +843,19 @@ Viking.Collection = Backbone.Collection.extend({
     
 });
 Viking.Coercions = {};
+Viking.Coercions.Boolean = {
+    load: function(value) {
+        if (typeof value === 'string') {
+            value = (value === 'true')
+        }
+
+        return !!value;
+    },
+
+    dump: function(value) {
+        return value;
+    }
+};
 Viking.Coercions.Date = {
     load: function(value) {
         if (typeof value === 'string' || typeof value === 'number') {
@@ -1095,6 +1137,7 @@ Viking.Router = Backbone.Router.extend({
     }
 
 });
+
 
 
 

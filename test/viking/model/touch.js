@@ -19,7 +19,7 @@
         m.touch();
         equal(this.requests[0].method, 'PUT');
         equal(this.requests[0].url, '/models/2/touch');
-        deepEqual({}, this.requests[0].requestBody);
+        deepEqual(this.requests[0].requestBody, null);
     });
     
     test("#touch sends an empty body", function() {
@@ -27,7 +27,7 @@
     
         var m = new Model({id: 2, foo: 'bar'});
         m.touch();
-        deepEqual({}, this.requests[0].requestBody);
+        deepEqual(this.requests[0].requestBody, null);
     });
     
     test("#touch sends the name of the column to be touched if specified", function() {
@@ -35,7 +35,7 @@
     
         var m = new Model({id: 2, foo: 'bar'});
         m.touch('read_at');
-        deepEqual({name: 'read_at'}, this.requests[0].requestBody);
+        deepEqual(this.requests[0].requestBody, '{"name":"read_at"}');
     });
     
     test("#touch updates the attributes from the response", function() {
