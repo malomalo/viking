@@ -80,5 +80,29 @@
 		    Viking.NameError,
 		    "uninitialized variable Unknown.Again"
 		);
-	})
+	});
+    
+    test("rjust()", function() {
+        equal('hello'.rjust(4), 'hello');
+        equal('hello'.rjust(10), '     hello');
+        equal('hello'.rjust(10, '-'), '-----hello');
+        equal('hello'.rjust(10, '1234'), '12341hello');
+        
+        // Test doesn't modify original
+        var string = 'hello'
+        string.rjust(10)
+        equal(string, 'hello')
+    });
+    
+    test("ljust()", function() {
+        equal('hello'.ljust(4), 'hello');
+        equal('hello'.ljust(10), 'hello     ');
+        equal('hello'.ljust(10, '-'), 'hello-----');
+        equal('hello'.ljust(10, '1234'), 'hello12341');
+        
+        // Test doesn't modify original
+        var string = 'hello'
+        string.ljust(10)
+        equal(string, 'hello')
+    });
 }());

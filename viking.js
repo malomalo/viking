@@ -30,7 +30,7 @@ jQuery(document).ajaxSend(function(event, xhr, settings) {
 // Viking.Support is a collection of utility classes and standard library
 // extensions that were found useful for the Viking framework. These
 // additions reside in this package so they can be loaded as needed
-// in Javascript projects outside of Rails.
+// in Javascript projects outside of Viking.
 // strftime relies on https://github.com/samsonjs/strftime. It supports
 // standard specifiers from C as well as some other extensions from Ruby.
 Date.prototype.strftime = function(fmt) {
@@ -226,6 +226,46 @@ String.prototype.constantize = function(context) {
 		return v;
 	}, context);	
 };
+
+// If `length` is greater than the length of the string, returns a new String
+// of length `length` with the string right justified and padded with padString;
+// otherwise, returns string
+String.prototype.rjust = function(length, padString) {
+    if (!padString) { padString = ' '; }
+    
+    var padding = '';
+    var paddingLength = length - this.length;
+
+    while (padding.length < paddingLength) {
+        if (paddingLength - padding.length < padString.length) {
+            padding = padding + padString.slice(0, paddingLength - padding.length);
+        } else {
+            padding = padding + padString;
+        }
+    }
+
+    return padding + this;
+}
+
+// If `length` is greater than the length of the string, returns a new String
+// of length `length` with the string left justified and padded with padString;
+// otherwise, returns string
+String.prototype.ljust = function(length, padString) {
+    if (!padString) { padString = ' '; }
+    
+    var padding = '';
+    var paddingLength = length - this.length;
+
+    while (padding.length < paddingLength) {
+        if (paddingLength - padding.length < padString.length) {
+            padding = padding + padString.slice(0, paddingLength - padding.length);
+        } else {
+            padding = padding + padString;
+        }
+    }
+
+    return this + padding;
+}
 
 
 
