@@ -1,4 +1,4 @@
-//     Viking.js 0.1.1
+//     Viking.js 0.2.0
 //
 //     (c) 2012-2013 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -378,29 +378,46 @@ Viking.Model = Backbone.Model.extend({
         this.initialize.call(this, attributes, options);
     },
 
+    // select(options)
+    // select(value[, options])
+    //
     // When the model is part of a collection and you want to select a single
     // or multiple items from a collection. If a model is selected
     // `model.selected` will be set `true`, otherwise it will be `false`.
     //
+    // If you pass `true` or `false` as the first paramater to `select` it will
+    // select the model if true, or unselect if it is false.
+    //
     // By default any other models in the collection with be unselected. To
     // prevent other models in the collection from being unselected you can
-    // pass `true`.
+    // pass `{multiple: true}` as an option.
     //
     // The `selected` and `unselected` events are fired when appropriate.
-    select: function(multiple) {
-        if (this.collection) {
-            this.collection.select(this, multiple);
+    select: function(value, options) {
+
+        // Handle both `value[, options]` and `options` -style arguments.
+        if (value === undefined || typeof value === 'object') {
+          options = value;
+          value = true;
+        }
+        
+        if (value === true) {
+            if (this.collection) {
+                this.collection.select(this, options);
+            } else {
+                this.selected = true;
+            }
         } else {
-            this.selected = true;
+            if (this.selected) {
+                this.selected = false;
+                this.trigger('unselected', this);
+            }
         }
     },
 
     // Opposite of #select. Triggers the `unselected` event.
-    unselect: function() {
-        if(this.selected) {
-            this.selected = false;
-            this.trigger('unselected', this);
-        }
+    unselect: function(options) {
+        this.select(false, options);
     },
 
     // TODO: overwrite url to use toParam()
@@ -824,17 +841,20 @@ Viking.Collection = Backbone.Collection.extend({
         this.fetch();
     },
 
-    // Sets `'selected'` to `true` on the `model`. If `clearCurrentlySelected`
-    // is truthy all other models will have `selected` set to `false`.
-    // Also triggers the `selected` event on the collection. If the model is
-    // already selected the `selected` event is not triggered
-    select: function(model, clearCurrentlySelected) {
-        if(!clearCurrentlySelected) {
+    // Sets `'selected'` to `true` on the `model`. By default all other models
+    // will be unselected. If `{multiple: true}` is passed as an option the other
+    // models will not be unselected. Triggers the `selected` event on the
+    // collection. If the model is already selected the `selected` event is
+    // not triggered
+    select: function(model, options) {
+        options || (options = {});
+        
+        if(!options.multiple) {
             this.clearSelected(model);
         }
         if(!model.selected) {
             model.selected = true;
-			model.trigger('selected', this.selected());
+            model.trigger('selected', this.selected());
         }
     },
     

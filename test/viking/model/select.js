@@ -33,14 +33,34 @@
         ok(models[1].selected);
         ok(!models[2].selected);
     });
+    
+    test("select(true) selects the model", function () {
+        var c = new Viking.Collection([{}, {}, {}]);
+        var models = c.models;
+        
+        ok(!models[0].selected);
+        models[0].select(true);
+        ok(models[0].selected);
+    });
+    
+    test("select(false) unselects the model", function () {
+        var c = new Viking.Collection([{}, {}, {}]);
+        var models = c.models;
+        
+        models[0].select();
+        
+        ok(models[0].selected);
+        models[0].select(false);
+        ok(!models[0].selected);
+    });
 
-    test("select(true) doesn't unselect other modelts", function() {
+    test("select({multiple: true}) doesn't unselect other models", function() {
         var c = new Viking.Collection([{}, {}, {}]);
         var models = c.models;
     
         models[0].select();
-        models[1].select(true);
-        models[2].select(true);
+        models[1].select({multiple: true});
+        models[2].select({multiple: true});
     
         ok(models[0].selected);
         ok(models[1].selected);
@@ -57,6 +77,15 @@
         model.select();
         model.off('selected');
     });
+    
+    test("select() triggers a 'selected' event on the collection", function() {
+        expect(1);
+    
+        var c = new Viking.Collection([{}]);
+        c.on('selected', function() { ok(true); });
+        c.models[0].select();
+        c.off('selected');
+    });
 
     test("select() triggers a 'selected' event only if change", function() {
         expect(0);
@@ -67,6 +96,16 @@
         m.on('selected', function() { ok(true); });
         m.select();
         m.off('selected');
+    });
+    
+    test("select() triggers a 'selected' event on collection only if change", function() {
+        expect(0);
+    
+        var c = new Viking.Collection([{}]);
+        c.models[0].selected = true;
+        c.on('selected', function() { ok(true); });
+        c.models[0].select();
+        c.off('selected');
     });
 	
     test("unselect() triggers a 'unselected' event", function() {
@@ -79,6 +118,16 @@
         model.unselect();
         model.off('unselected');
     });
+    
+    test("unselect() triggers a 'unselected' event on collection", function() {
+        expect(1);
+    
+        var c = new Viking.Collection([{}]);
+		c.models[0].selected = true;
+        c.on('unselected', function() { ok(true); });
+        c.models[0].unselect();
+        c.off('unselected');
+    });
 
     test("unselect() triggers a 'selected' event only if change", function() {
         expect(0);
@@ -89,5 +138,16 @@
         m.unselect();
         m.off('unselected');
     });
+    
+    test("unselect() triggers a 'unselected' event on collection only if change", function() {
+        expect(0);
+    
+        var c = new Viking.Collection([{}]);
+		c.models[0].selected = false;
+        c.on('unselected', function() { ok(true); });
+        c.models[0].unselect();
+        c.off('unselected');
+    });
+
 
 }());

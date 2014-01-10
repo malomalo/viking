@@ -63,13 +63,13 @@
         ok(!models[2].selected);
     });
 
-    test("select(model, true) doesn't unselect other modelts", function() {
+    test("select(model, {multiple: true}) doesn't unselect other models", function() {
         var c = new Viking.Collection([{}, {}, {}]);
         var models = c.models;
     
         c.select(models[0]);
-        c.select(models[1], true);
-        c.select(models[2], true);
+        c.select(models[1], {multiple: true});
+        c.select(models[2], {multiple: true});
     
         ok(models[0].selected);
         ok(models[1].selected);
@@ -125,8 +125,8 @@
         equal(1, selected.length);
         equal(c.models[0].cid, selected[0].cid);
     
-        c.select(models[1], true);
-        c.select(models[2], true);
+        c.select(models[1], {multiple: true});
+        c.select(models[2], {multiple: true});
     
         selected = c.selected();    
         equal(3, selected.length);
