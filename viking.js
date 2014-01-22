@@ -31,6 +31,24 @@ jQuery(document).ajaxSend(function(event, xhr, settings) {
 // extensions that were found useful for the Viking framework. These
 // additions reside in this package so they can be loaded as needed
 // in Javascript projects outside of Viking.
+// Calls `to_param` on all its elements and joins the result with slashes.
+// This is used by url_for in Viking Pack.
+Array.prototype.toParam = function() {
+	return _.map(this, function(e) { return e.toParam(); }).join('/');
+}
+
+// Converts an array into a string suitable for use as a URL query string,
+// using the given key as the param name.
+Array.prototype.toQuery = function(key) {
+	var prefix = key + "[]";
+	return _.map(this, function(value) { return value === null ? escape(prefix) + '=' : value.toQuery(prefix) }).join('&');
+}
+// Alias of to_s.
+Boolean.prototype.toParam = Boolean.prototype.toString;
+
+Boolean.prototype.toQuery = function(key) {
+	return escape(key.toParam()) + "=" + escape(this.toParam());
+}
 // strftime relies on https://github.com/samsonjs/strftime. It supports
 // standard specifiers from C as well as some other extensions from Ruby.
 Date.prototype.strftime = function(fmt) {
@@ -73,6 +91,13 @@ Date.prototype.strftime = function(fmt) {
         };
     }
 }());
+
+// Alias of to_s.
+Date.prototype.toParam = Date.prototype.toJSON;
+
+Date.prototype.toQuery = function(key) {
+	return escape(key.toParam()) + "=" + escape(this.toParam());
+}
 // ordinalize returns the ordinal string corresponding to integer:
 //
 //     (1).ordinalize()    // => '1st'
@@ -94,6 +119,54 @@ Number.prototype.ordinalize = function() {
     
     return this + 'th';
 };
+
+// Alias of to_s.
+Number.prototype.toParam = Number.prototype.toString;
+
+Number.prototype.toQuery = function(key) {
+	return escape(key.toParam()) + "=" + escape(this.toParam());
+}
+// Returns a string representation of the receiver suitable for use as a URL
+// query string:
+// 
+// {name: 'David', nationality: 'Danish'}.toParam()
+// // => "name=David&nationality=Danish"
+// An optional namespace can be passed to enclose the param names:
+// 
+// {name: 'David', nationality: 'Danish'}.toParam('user')
+// // => "user[name]=David&user[nationality]=Danish"
+//
+// The string pairs “key=value” that conform the query string are sorted
+// lexicographically in ascending order.
+Object.defineProperty(Object.prototype, 'toParam', {
+	value: function(namespace) {
+		return _.map(this, function(value, key) {
+			var namespaceWithKey = (namespace ? (namespace + "[" + key + "]") : key);
+		
+			if (value !== null) {
+				return value.toQuery(namespaceWithKey)
+			} else {
+				return escape(namespaceWithKey) + "=";
+			}
+		
+		}).join('&');
+	},
+	writable: true,
+	configureable: true,
+	enumerable: false
+});
+
+// Converts an object into a string suitable for use as a URL query string,
+// using the given key as the param name.
+//
+// Note: This method is defined as a default implementation for all Objects for
+// Object#toQuery to work.
+Object.defineProperty(Object.prototype, 'toQuery', {
+	value: Object.prototype.toParam,
+	writable: true,
+	configureable: true,
+	enumerable: false
+});
 // Converts the first character to uppercase
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
@@ -266,6 +339,16 @@ String.prototype.ljust = function(length, padString) {
 
     return this + padding;
 }
+
+// Alias of to_s.
+String.prototype.toParam = String.prototype.toString;
+
+String.prototype.toQuery = function(key) {
+	return escape(key.toParam()) + "=" + escape(this.toParam());
+}
+
+
+
 
 
 

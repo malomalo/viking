@@ -105,4 +105,13 @@
         string.ljust(10)
         equal(string, 'hello')
     });
+	
+	test('#toParam()', function() {
+		equal("myString", ("myString").toParam());
+	});
+	
+	test('#toQuery(key)', function() {
+		equal('key=gnirts', 'gnirts'.toQuery('key'));
+	});
+	
 }());

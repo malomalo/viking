@@ -26,5 +26,13 @@
     test("1013.ordinalize()", function() {
         equal('1013th', (1013).ordinalize());
     });
+	
+	test('#toParam()', function() {
+		equal('1013', (1013).toParam());
+	});
+	
+	test('#toQuery(key)', function() {
+		equal('key=42', (42).toQuery('key'));
+	});
 
 }());
