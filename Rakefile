@@ -41,7 +41,7 @@ end
 task :test do
   # Checks
   check 'npm', 'npm', 'http://nodejs.org/'
-  check 'jscoverage', 'jscoverage', 'http://siliconforks.com/jscoverage/'
+  check 'jscover', 'jscover', 'http://tntim96.github.io/JSCover/'
 
   # Add our custom Processor to turn viking.js into a list of files to include
   environment.unregister_postprocessor 'application/javascript', Sprockets::DirectiveProcessor
@@ -61,9 +61,10 @@ task :test do
   end
   
   FileUtils.rm_rf('coverage')
-  pid = spawn('jscoverage-server --port=4321 --verbose --report-dir=coverage --no-highlight --no-instrument=/deps/ --no-instrument=/test/ --no-instrument=/coverage/')
+  pid = spawn('java -jar /usr/local/lib/jscover-all.jar -ws --port=4321 --report-dir=coverage --no-instrument=/deps/ --no-instrument=/test/ --no-instrument=/coverage/')
   result = system "npm test"
-  Process.kill(:SIGKILL, pid)
+  Process.kill(:SIGINT, pid)
+
   fail unless result
 end
 

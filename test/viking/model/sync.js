@@ -12,7 +12,7 @@
         }
     });
 
-    test("#sync namespaces the data to the paramRoot of the model when !optinos.data", function() {
+    test("#sync namespaces the data to the paramRoot of the model when !options.data", function() {
         var Model = Viking.Model.extend('model');
     
         var m = new Model({foo: 'bar'});

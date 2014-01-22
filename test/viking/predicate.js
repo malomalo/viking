@@ -1,4 +1,0 @@
-(function () {
-    module("Viking.Filter");
-
-}());
