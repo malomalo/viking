@@ -177,38 +177,6 @@
 		c.models[2].off('unselected');
     });
 
-    // sync() --------------------------------------------------------------------
-    test("sync() adds in predicate params", function() {
-        expect(1);
-    
-        var m = Viking.Model.extend('model');
-        var f = new Viking.Predicate({types: [1,2]});
-        var c = Viking.Collection.extend({model: m});
-        var c = new c([], {predicate: f});
-    
-        var old = Backbone.sync;
-        Backbone.sync = function(method, model, options) {
-            deepEqual(options.data.where, {types: [1,2]});
-        }
-        c.fetch();
-        Backbone.sync = old;
-    });
-
-    test("sync() doesn't add in predicate params if there is no predicate", function() {
-        expect(1);
-    
-        var m = Viking.Model.extend('model');
-        var c = Viking.Collection.extend({model: m});
-        var c = new c();
-    
-        var old = Backbone.sync;
-        Backbone.sync = function(method, model, options) {
-            equal(options.data, undefined);
-        }
-        c.fetch();
-        Backbone.sync = old;
-    });
-
     test("decrementPage options get passed to callbacks", function() {
         expect(2);
 
