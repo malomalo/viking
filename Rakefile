@@ -41,7 +41,7 @@ end
 task :test do
   # Checks
   check 'npm', 'npm', 'http://nodejs.org/'
-  check 'jscover', 'jscover', 'http://tntim96.github.io/JSCover/'
+  #check 'jscover', 'jscover', 'http://tntim96.github.io/JSCover/'
 
   # Add our custom Processor to turn viking.js into a list of files to include
   environment.unregister_postprocessor 'application/javascript', Sprockets::DirectiveProcessor
@@ -81,11 +81,11 @@ namespace :coveralls do
     data = JSON.parse(File.read('coverage/jscoverage.json'))
     
     data.each do |k, v|
-      v['coverage'].shift
+      v['lineData'].shift
       payload[:source_files] << {
         :name => k,
-        :coverage => v['coverage'],
-        :source => v['source'].join("\n")
+        :coverage => v['lineData'],
+        :source => File.read(".#{k}")
       }
     end
     
