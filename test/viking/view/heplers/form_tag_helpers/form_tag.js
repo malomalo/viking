@@ -27,6 +27,10 @@
         equal(Viking.View.Helpers.formTag('data'), "<form>data</form>");
     });
     
+    test("formTag(emptyContent)", function() {
+        equal(Viking.View.Helpers.formTag(''), "<form></form>");
+    });
+    
     test("formTag(content, options)", function() {
         equal(Viking.View.Helpers.formTag('data', {action: '/action', method: 'get'}), '<form action="/action" method="get">data</form>');
     });
