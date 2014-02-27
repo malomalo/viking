@@ -1,4 +1,4 @@
-//     Viking.js 0.2.0
+//     Viking.js 0.3.0
 //
 //     (c) 2012-2013 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -35,26 +35,27 @@ jQuery(document).ajaxSend(function(event, xhr, settings) {
 // This is used by url_for in Viking Pack.
 Array.prototype.toParam = function() {
 	return _.map(this, function(e) { return e.toParam(); }).join('/');
-}
+};
 
 // Converts an array into a string suitable for use as a URL query string,
 // using the given key as the param name.
 Array.prototype.toQuery = function(key) {
 	var prefix = key + "[]";
-	return _.map(this, function(value) { return value === null ? escape(prefix) + '=' : value.toQuery(prefix) }).join('&');
-}
+	return _.map(this, function(value) { return value === null ? escape(prefix) + '=' : value.toQuery(prefix); }).join('&');
+};
 // Alias of to_s.
 Boolean.prototype.toParam = Boolean.prototype.toString;
 
 Boolean.prototype.toQuery = function(key) {
 	return escape(key.toParam()) + "=" + escape(this.toParam());
-}
+};
 // strftime relies on https://github.com/samsonjs/strftime. It supports
 // standard specifiers from C as well as some other extensions from Ruby.
 Date.prototype.strftime = function(fmt) {
     return strftime(fmt, this);
 };
 
+// TODO: move to depedency for old browsers
 // Since IE8 does not support new Dates with the ISO 8601 format we'll add
 // supoprt for it
 (function(){
@@ -97,7 +98,7 @@ Date.prototype.toParam = Date.prototype.toJSON;
 
 Date.prototype.toQuery = function(key) {
 	return escape(key.toParam()) + "=" + escape(this.toParam());
-}
+};
 // ordinalize returns the ordinal string corresponding to integer:
 //
 //     (1).ordinalize()    // => '1st'
@@ -125,7 +126,7 @@ Number.prototype.toParam = Number.prototype.toString;
 
 Number.prototype.toQuery = function(key) {
 	return escape(key.toParam()) + "=" + escape(this.toParam());
-}
+};
 // Returns a string representation of the receiver suitable for use as a URL
 // query string:
 // 
@@ -144,10 +145,10 @@ Object.defineProperty(Object.prototype, 'toParam', {
 			var namespaceWithKey = (namespace ? (namespace + "[" + key + "]") : key);
 		
 			if (value !== null) {
-				return value.toQuery(namespaceWithKey)
-			} else {
-				return escape(namespaceWithKey) + "=";
+				return value.toQuery(namespaceWithKey);
 			}
+            
+			return escape(namespaceWithKey) + "=";
 		
 		}).join('&');
 	},
@@ -291,7 +292,6 @@ String.prototype.singularize = function() {
 // Viking.NameError is raised when the variable is unknown.
 String.prototype.constantize = function(context) {
 	if(!context) { context = window; }
-	var name = this;
 	
 	return _.reduce(this.split('.'), function(context, name){
 		var v = context[name];
@@ -318,7 +318,7 @@ String.prototype.rjust = function(length, padString) {
     }
 
     return padding + this;
-}
+};
 
 // If `length` is greater than the length of the string, returns a new String
 // of length `length` with the string left justified and padded with padString;
@@ -338,14 +338,14 @@ String.prototype.ljust = function(length, padString) {
     }
 
     return this + padding;
-}
+};
 
 // Alias of to_s.
 String.prototype.toParam = String.prototype.toString;
 
 String.prototype.toQuery = function(key) {
 	return escape(key.toParam()) + "=" + escape(this.toParam());
-}
+};
 
 
 
@@ -366,9 +366,9 @@ Viking.config = function (obj, key, val) {
     var attrs;
     
     if (typeof key === 'object') {
-      attrs = key;
+        attrs = key;
     } else {
-      (attrs = {})[key] = val;
+        (attrs = {})[key] = val;
     }
     
     return _.extend(obj.prototype.defaults, attrs);
@@ -566,8 +566,6 @@ Viking.Model = Backbone.Model.extend({
     },
 
     coerceAttributes: function(attrs) {
-        var rel, i, type, klass;
-
         _.each(this.associations, function(association) {
             var Type = association.klass();
 
@@ -578,7 +576,7 @@ Viking.Model = Backbone.Model.extend({
 
         _.each(this.coercions, function (type, key) {
             if (attrs[key] || attrs[key] === false) {
-                klass = Viking.Coercions[type];
+                var klass = Viking.Coercions[type];
 
                 if (klass) {
                     attrs[key] = klass.load(attrs[key], key);
@@ -593,8 +591,8 @@ Viking.Model = Backbone.Model.extend({
 
     // similar to Rails as_json method
     toJSON: function (options) {
-        var rel, i, klass;
         var data = _.clone(this.attributes);
+        
         if (options === undefined) { options = {}; }
 
         if (options.include) {
@@ -634,7 +632,7 @@ Viking.Model = Backbone.Model.extend({
 
         _.each(this.coercions, function (type, key) {
             if (data[key] || data[key] === false) {
-                klass = Viking.Coercions[type];
+                var klass = Viking.Coercions[type];
 
                 if (klass) {
                     data[key] = klass.dump(data[key], key);
@@ -651,26 +649,24 @@ Viking.Model = Backbone.Model.extend({
     // fails.
     save: function(key, val, options) {
         var attrs, method, xhr, attributes = this.attributes;
-        var model = this;
 
         // Handle both `"key", value` and `{key: value}` -style arguments.
-        if (key === null || typeof key === 'object') {
+        if (key == null || typeof key === 'object') {
           attrs = key;
           options = val;
         } else {
           (attrs = {})[key] = val;
         }
 
-        // If we're not waiting and attributes exist, save acts as `set(attr).save(null, opts)`.
-        if (attrs && (!options || !options.wait) && !this.set(attrs, options)) {
-            return false;
-        }
-
         options = _.extend({validate: true}, options);
 
-        // Do not persist invalid models.
-        if (!this._validate(attrs, options)) {
-            return false;
+        // If we're not waiting and attributes exist, save acts as
+        // `set(attr).save(null, opts)` with validation. Otherwise, check if
+        // the model will be valid when the attributes, if any, are set.
+        if (attrs && !options.wait) {
+          if (!this.set(attrs, options)) return false;
+        } else {
+          if (!this._validate(attrs, options)) return false;
         }
 
         // Set temporary attributes if `{wait: true}`.
@@ -680,27 +676,18 @@ Viking.Model = Backbone.Model.extend({
 
         // After a successful server-side save, the client is (optionally)
         // updated with the server-side state.
-        if (options.parse === undefined) {
-            options.parse = true;
-        }
-
+        if (options.parse === void 0) options.parse = true;
+        var model = this;
         var success = options.success;
         options.success = function(resp) {
           // Ensure attributes are restored during synchronous saves.
           model.attributes = attributes;
           var serverAttrs = model.parse(resp, options);
-          if (options.wait) {
-              serverAttrs = _.extend(attrs || {}, serverAttrs);
-          }
-
+          if (options.wait) serverAttrs = _.extend(attrs || {}, serverAttrs);
           if (_.isObject(serverAttrs) && !model.set(serverAttrs, options)) {
             return false;
           }
-
-          if (success) {
-              success(model, resp, options);
-          }
-
+          if (success) success(model, resp, options);
           model.trigger('sync', model, resp, options);
         };
 
@@ -715,23 +702,17 @@ Viking.Model = Backbone.Model.extend({
                 }
                 model.setErrors(errors, options);
             } else {
-                if (error) {
-                    error(model, resp, options);
-                }
+                if (error) error(model, resp, options);
                 model.trigger('error', model, resp, options);
             }
         };
 
         method = this.isNew() ? 'create' : (options.patch ? 'patch' : 'update');
-        if (method === 'patch') {
-            options.attrs = attrs;
-        }
+        if (method === 'patch') options.attrs = attrs;
         xhr = this.sync(method, this, options);
 
         // Restore attributes.
-        if (attrs && options.wait) {
-            this.attributes = attributes;
-        }
+        if (attrs && options.wait) this.attributes = attributes;
 
         return xhr;
     },
@@ -873,7 +854,7 @@ Viking.Collection = Backbone.Collection.extend({
     model: Viking.Model,
 
     constructor: function(models, options) {
-        Backbone.Collection.apply(this, arguments);
+        Backbone.Collection.call(this, models, options);
         
         if(options && options.predicate) {
             this.setPredicate(options.predicate, {silent: true});
@@ -1031,7 +1012,7 @@ Viking.Coercions = {};
 Viking.Coercions.Boolean = {
     load: function(value) {
         if (typeof value === 'string') {
-            value = (value === 'true')
+            value = (value === 'true');
         }
 
         return !!value;
@@ -1114,30 +1095,1319 @@ Viking.Coercions.String = {
 // Viking.View
 // -----------
 //
-// Viking.View is a simple extension of [Backbone.View](http://backbonejs.org/#View).
-// When a Viking.View is extended events the parent events get merged in with
-// the child events. When a Viking.View is instantiated the parent initalizers
-// are also automatically called, first the parent's initalizer then the
-// child's. 
-Viking.View = Backbone.View.extend({    
-}, {
+// Viking.View is a framework fro handling view template lookup and rendering.
+// It provides view helpers that assisst when building HTML forms and more.
+Viking.View = {};
+Viking.View.Helpers = {};
+(function () {
+    var booleanAttributes = ['disabled', 'readonly', 'multiple', 'checked',
+        'autobuffer', 'autoplay', 'controls', 'loop', 'selected', 'hidden',
+        'scoped', 'async', 'defer', 'reversed', 'ismap', 'seemless', 'muted',
+        'required', 'autofocus', 'novalidate', 'formnovalidate', 'open',
+        'pubdate', 'itemscope'];
     
-    extend: function(protoProps, staticProps) {
-		if(protoProps && protoProps.events && this.prototype.events) {
-			_.defaults(protoProps.events, this.prototype.events);
-		}
-		
-		if(protoProps && protoProps.initialize && this.prototype.initialize) {
-			var parentInitialize = this.prototype.initialize;
-			protoProps.initialize = _.wrap(protoProps.initialize, function(childInitialize, arguments) {
-				parentInitialize.apply(this, arguments);
-				childInitialize.apply(this, arguments);
-			});
-		}
-		
-		return Backbone.View.extend.call(this, protoProps, staticProps);
+    Viking.View.tagOption = function (key, value, escape) {
+        if (_.isArray(value)) { value = value.join(" "); }
+        if (escape) { value = _.escape(value); }
+    
+        return key + '="' + value + '"';
+    };
+
+    Viking.View.dataTagOption = function (key, value, escape) {
+        key = "data-" + key;
+        if (_.isObject(value)) { value = JSON.stringify(value); }
+    
+        return Viking.View.tagOption(key, value, escape);
+    };
+
+    Viking.View.tagOptions = function (options, escape) {
+        if (options === undefined) { return ""; }
+        if (escape === undefined) { escape = true; }
+    
+        var attrs = [];
+        _.each(options, function(value, key) {
+            if (key === "data" && _.isObject(value)) {
+                // TODO testme
+                _.each(value, function(value, key) {
+                    attrs.push(Viking.View.dataTagOption(key, value, escape));
+                });
+            } else if (value === true && _.contains(booleanAttributes, key)) {
+                attrs.push(key);
+            } else if (value !== null && value !== undefined) {
+                attrs.push(Viking.View.tagOption(key, value, escape));
+            }
+        });
+
+        if (attrs.length === 0) {
+           return '';
+        }
+        
+        return " " + attrs.sort().join(' ');
+    };
+    
+    // see http://www.w3.org/TR/html4/types.html#type-name
+    Viking.View.sanitizeToId = function (name) {
+        return name.replace(/[^\-a-zA-Z0-9:.]/g, "_").replace(/_+/g, '_').replace(/_+$/, '').replace(/_+/g, '_');
+    };
+
+    // TODO: move to model_helpers?
+    Viking.View.tagNameForModelAttribute = function (model, attribute) {
+        var value = model.get(attribute);
+        var name = model.modelName + '[' + attribute + ']';
+         if (value instanceof Viking.Collection || _.isArray(value)) {
+             name = name + '[]';
+         }
+     
+         return name;
+    };
+
+    // TODO: move to model_helpers?
+    Viking.View.addErrorClassToOptions = function(model, attribute, options) {
+        if (model.errorsOn(attribute)) {
+            if (options.class) {
+                options.class = options.class + ' error';
+            } else {
+                options.class = 'error';
+            }
+        }
+    };
+
+    // TODO: move to model_helpers?
+    // TODO: testme
+    Viking.View.methodOrAttribute = function (model, funcOrAttribute) {
+        if (typeof funcOrAttribute !== 'function') {
+            if (model[funcOrAttribute]) {
+                return _.result(model, funcOrAttribute);
+            }
+            
+            return model.get(funcOrAttribute);
+        }
+
+        return funcOrAttribute(model);
+    };
+    
+}());
+// tag(name, [options = {}, escape = true])
+// ========================================
+//
+// Returns an empty HTML tag of type `name` add HTML attributes by passing
+// an attributes hash to `options`. Set escape to `false` to disable attribute
+// value escaping.
+//
+// Arguments
+// ---------
+// - Use `true` with boolean attributes that can render with no value, like `disabled` and `readonly`.
+// - HTML5 data-* attributes can be set with a single data key pointing to a hash of sub-attributes.
+// - Values are encoded to JSON, with the exception of strings and symbols.
+//
+// Examples
+// --------
+//
+//   tag("br")
+//   // => <br>
+//
+//   tag("input", {type: 'text', disabled: true})
+//   // => <input type="text" disabled="disabled" />
+//
+//   tag("img", {src: "open & shut.png"})
+//   // => <img src="open &amp; shut.png" />
+//   
+//   tag("img", {src: "open &amp; shut.png"}, false, false)
+//   // => <img src="open &amp; shut.png" />
+//   
+//   tag("div", {data: {name: 'Stephen', city_state: ["Chicago", "IL"]}})
+//   // => <div data-name="Stephen" data-city_state="[&quot;Chicago&quot;,&quot;IL&quot;]" />
+Viking.View.Helpers.tag = function (name, options, escape) {
+    return "<" + name + Viking.View.tagOptions(options, escape) + ">";
+};
+// contentTag(name, [content], [options], [escape=true], [&block])
+// ================================================================
+//
+// Returns an HTML block tag of type name surrounding the content. Add HTML
+// attributes by passing an attributes hash to options. Instead of passing the
+// content as an argument, you can also use a function in which case, you pass
+// your options as the second parameter. Set escape to false to disable attribute
+// value escaping.
+//
+// Examples
+//
+//   contentTag("p", "Hello world & all!")
+//   // => <p>Hello world &amp; all!</p>
+//
+//   contentTag("p", "Hello world & all!", false)
+//   // => <p>Hello world & all!</p>
+//
+//   contentTag("div", contentTag("p", "Hello world!"), {class: "strong"})
+//   // => <div class="strong"><p>Hello world!</p></div>
+//
+//   contentTag("select", options, {multiple: true})
+//   // => <select multiple="multiple">...options...</select>
+//   
+//   contentTag("div", {class: "strong"}, function() {
+//      return "Hello world!";
+//   });
+//   // => <div class="strong">Hello world!</div>
+Viking.View.Helpers.contentTag = function (name, content, options, escape) {
+    var tmp;
+
+    // Handle `name, content`, `name, content, options`,
+    // `name, content, options, escape`, `name, content, escape`, `name, block`,
+    // `name, options, block`, `name, options, escape, block`, && `name, escape, block`
+    // style arguments
+    if (typeof content === "boolean") {
+        escape = content;
+        content = options;
+        options = undefined;
+    } else if (typeof content === 'object') {
+        if (typeof options === 'function') {
+            tmp = options;
+            options = content;
+            content = tmp;
+        } else if (typeof options === 'boolean') {
+            tmp = content;
+            content = escape;
+            escape = options;
+            options = tmp;
+        }
+    } else if (typeof options === 'boolean') {
+        escape = options;
+        options = undefined;
     }
-});
+    if (typeof content === 'function') {
+        content = content();
+    }
+    if (escape || escape === undefined) {
+        content = _.escape(content);
+    }
+
+    return "<" + name + Viking.View.tagOptions(options, escape) + ">" + content + "</" + name + ">";
+};
+// buttonTag(content, options), buttonTag(options, block)
+// ========================================================
+//
+// Creates a button element that defines a submit button, reset button or a
+// generic button which can be used in JavaScript, for example. You can use
+// the button tag as a regular submit tag but it isn’t supported in legacy
+// browsers. However, the button tag allows richer labels such as images and
+// emphasis.
+//
+// Options
+// -------
+//      - disabled: If true, the user will not be able to use this input.
+//      - Any other key creates standard HTML attributes for the tag
+//
+// Examples
+// --------
+//   buttonTag("Button")
+//   // => <button name="button" type="submit">Button</button>
+//   
+//   buttonTag("Checkout", { :disabled => true })
+//   // => <button disabled name="button" type="submit">Checkout</button>
+//   
+//   buttonTag({type: "button"}, function() {
+//      return "Ask me!";
+//   });
+//   // <button name="button" type="button"><strong>Ask me!</strong></button>
+Viking.View.Helpers.buttonTag = function (content, options) {
+    var tmp;
+
+    // Handle `content, options` && `options` style arguments
+    if (typeof content === 'object') {
+        tmp = options;
+        options = content;
+        content = tmp;
+    } else if (options === undefined) {
+        options = {}; 
+    }
+
+    _.defaults(options, {name: 'button', type: 'submit'});
+    return Viking.View.Helpers.contentTag('button', content, options);
+};
+// checkBoxTag(name, value="1", checked=false, options)
+// ======================================================
+//
+// Creates a check box form input tag.
+//
+// Options
+// -------
+//      - disabled: If true, the user will not be able to use this input.
+//      - Any other key creates standard HTML attributes for the tag
+//
+// Examples
+// --------
+//   checkBoxTag('accept')
+//   // => <input name="accept" type="checkbox" value="1" />
+//   
+//   checkBoxTag('rock', 'rock music')
+//   // => <input name="rock" type="checkbox" value="rock music" />
+//   
+//   checkBoxTag('receive_email', 'yes', true)
+//   // => <input checked="checked" name="receive_email" type="checkbox" value="yes" />
+//   
+//   checkBoxTag('tos', 'yes', false, class: 'accept_tos')
+//   // => <input class="accept_tos" name="tos" type="checkbox" value="yes" />
+//   
+//   checkBoxTag('eula', 'accepted', false, disabled: true)
+//   // => <input disabled="disabled" name="eula" type="checkbox" value="accepted" />
+Viking.View.Helpers.checkBoxTag = function (name, value, checked, options) {
+    if (value === undefined) { value = "1"; }
+    if (options === undefined) { options = {}; }
+    if (checked === true) { options.checked = true; }
+
+    _.defaults(options, {
+        type: "checkbox",
+        value: value,
+        id: Viking.View.sanitizeToId(name),
+        name: name
+    });
+
+    return Viking.View.Helpers.tag("input", options);
+};
+// textFieldTag(name, [value], [options])
+// ======================================
+//
+// Creates a standard text field. Returns the duplicated String.
+//
+// Arguments
+// ---------
+// name:    The name of the input
+// value:   The value of the input
+// options: A object with any of the following:
+//      - disabled: If set to true, the user will not be able to use this input
+//      - size: The number of visible characters that will fit in the input
+//      - maxlength: The maximum number of characters that the browser will
+//                   allow the user to enter
+//      - placehoder: The text contained in the field by default, which is
+//                    removed when the field receives focus
+//      - Any other key creates standard HTML attributes for the tag
+//
+// Examples
+// --------
+//
+//   textFieldTag('name')
+//   // => <input name="name" type="text" />
+//   
+//   textFieldTag('query', 'Enter your search')
+//   // => <input name="query" value="Enter your search" type="text" />
+//   
+//   textFieldTag('search', {placeholder: 'Enter search term...'})
+//   // => <input name="search" placeholder="Enter search term..." type="text" />
+//   
+//   textFieldTag('request', {class: 'special_input'})
+//   // => <input class="special_input" name="request" type="text" />
+//   
+//   textFieldTag('address', '', {size: 75})
+//   // => <input name="address" size="75" value="" type="text" />
+//   
+//   textFieldTag('zip', {maxlength: 5})
+//   // => <input maxlength="5" name="zip" type="text" />
+//   
+//   textFieldTag('payment_amount', '$0.00', {disabled: true})
+//   // => <input disabled="disabled" name="payment_amount" value="$0.00" type="text" />
+//   
+//   textFieldTag('ip', '0.0.0.0', {maxlength: 15, size: 20, class: "ip-input"})
+//   // => <input class="ip-input" maxlength="15" name="ip" size="20" value="0.0.0.0" type="text" />
+Viking.View.Helpers.textFieldTag = function (name, value, options) {
+
+    // Handle both `name, value` && `name, options` style arguments
+    if (value !== null && typeof value === 'object' && !(value instanceof Backbone.Model)) {
+        options = value;
+        value = undefined;
+    }
+
+    return Viking.View.Helpers.tag('input', _.extend({
+        type:  'text',
+        id: Viking.View.sanitizeToId(name),
+        name:  name,
+        value: value
+    }, options));
+};
+// hiddenFieldTag(name, value = nil, options = {})
+// ===============================================
+//
+// Creates a hidden form input field used to transmit data that would be lost
+// due to HTTP’s statelessness or data that should be hidden from the user.
+//
+// Options
+// -------
+//      - Any key creates standard HTML attributes for the tag
+//
+// Examples
+// --------
+//   hiddenFieldTag('tags_list')
+//   // => <input name="tags_list" type="hidden">
+//   
+//   hiddenFieldTag('token', 'VUBJKB23UIVI1UU1VOBVI@')
+//   // => <input name="token" type="hidden" value="VUBJKB23UIVI1UU1VOBVI@">
+Viking.View.Helpers.hiddenFieldTag = function (name, value, options) {
+    if (options === undefined) { options = {}; }
+    _.defaults(options, {type: "hidden", id: null});
+
+    return Viking.View.Helpers.textFieldTag(name, value, options);
+};
+// formTag([options], [content])
+// formTag([content], [options])
+// =============================
+//
+// ==== Options
+// * <tt>:action</tt> - The url the action of the form should be set to.
+// * <tt>:multipart</tt> - If set to true, the enctype is set to "multipart/form-data".
+// * <tt>:method</tt> - The method to use when submitting the form, usually either "get" or "post".
+//   If "patch", "put", "delete", or another verb is used, a hidden input with name <tt>_method</tt>
+//   is added to simulate the verb over post. The default is "POST". Only set if
+//   :action is passed as an option.
+//
+// ==== Examples
+//   formTag();
+//   // => <form>
+//
+//   formTag({action: '/posts'});
+//   // => <form action="/posts" method="post">
+//
+//   formTag({action: '/posts/1', method: "put"});
+//   // => <form action="/posts/1" method="post"><input name="_method" type="hidden" value="put" />
+//
+//   formTag({action: '/upload', multipart: true});
+//   // => <form action="/upload" method="post" enctype="multipart/form-data">
+//
+//   formTag({action: '/posts'}, function() {
+//      return submitTag('Save');
+//   });
+//   // => <form action="/posts" method="post"><input type="submit" name="commit" value="Save" /></form>
+Viking.View.Helpers.formTag = function (options, content) {
+    var tmp, methodOverride = '';
+    
+    if (typeof options === 'function' || typeof options == 'string') {
+        tmp = content;
+        content = options;
+        options = tmp;
+    }
+    options || (options = {});
+    
+    if (options.action && !options.method) {
+        options.method = 'post';
+    } else if (options.method && options.method !== 'get' && options.method !== 'post') {
+        methodOverride = Viking.View.Helpers.hiddenFieldTag('_method', options.method);
+        options.method = 'post'
+    }
+    
+    if (options.multipart) {
+        options.enctype="multipart/form-data";
+        delete options.multipart;
+    }
+    
+
+    if(typeof content !== "undefined") {
+        content = methodOverride + (typeof content === 'function' ? content() : content);
+
+        return Viking.View.Helpers.contentTag('form', content, options, false);
+    }
+
+    return Viking.View.Helpers.tag('form', options, false) + methodOverride;
+};
+// labelTag(content, options)
+// ========================================================
+//
+// Creates a label element. Accepts a block.
+//
+// Options - Creates standard HTML attributes for the tag.
+//
+// Examples
+// --------
+//   labelTag('Name')
+//   // => <label>Name</label>
+//   
+//   labelTag('name', 'Your name')
+//   // => <label for="name">Your name</label>
+//   
+//   labelTag('name', nil, {for: 'id'})
+//   // => <label for="name" class="small_label">Name</label>
+Viking.View.Helpers.labelTag = function (content, options) {
+    var tmp;
+
+    if (typeof options === 'function') {
+        tmp = content;
+        content = options;
+        options = tmp;
+    }
+
+    return Viking.View.Helpers.contentTag('label', content, options);
+};
+// optionsForSelectTag(container[, selected])
+// =======================================
+//
+// Accepts a container (hash, array, collection, your type) and returns a
+// string of option tags. Given a container where the elements respond to
+// first and last (such as a two-element array), the "lasts" serve as option
+// values and the "firsts" as option text. Hashes are turned into this
+// form automatically, so the keys become "firsts" and values become lasts.
+// If +selected+ is specified, the matching "last" or element will get the
+// selected option-tag. +selected+ may also be an array of values to be
+// selected when using a multiple select.
+//
+//   optionsForSelectTag([["Dollar", "$"], ["Kroner", "DKK"]])
+//   // => <option value="$">Dollar</option>
+//   // => <option value="DKK">Kroner</option>
+//
+//   optionsForSelectTag([ "VISA", "MasterCard" ], "MasterCard")
+//   // => <option>VISA</option>
+//   // => <option selected>MasterCard</option>
+//
+//   optionsForSelectTag({ "Basic" => "$20", "Plus" => "$40" }, "$40")
+//   // => <option value="$20">Basic</option>
+//   // => <option value="$40" selected>Plus</option>
+//
+//   optionsForSelectTag([ "VISA", "MasterCard", "Discover" ], ["VISA", "Discover"])
+//   // => <option selected>VISA</option>
+//   // => <option>MasterCard</option>
+//   // => <option selected>Discover</option>
+//
+// You can optionally provide html attributes as the last element of the array.
+//
+//   optionsForSelectTag([ "Denmark", ["USA", {class: 'bold'}], "Sweden" ], ["USA", "Sweden"])
+//   // => <option value="Denmark">Denmark</option>
+//   // => <option value="USA" class="bold" selected>USA</option>
+//   // => <option value="Sweden" selected>Sweden</option>
+//
+//   optionsForSelectTag([["Dollar", "$", {class: "bold"}], ["Kroner", "DKK", {class: "alert"}]])
+//   // => <option value="$" class="bold">Dollar</option>
+//   // => <option value="DKK" class="alert">Kroner</option>
+//
+// If you wish to specify disabled option tags, set +selected+ to be a hash,
+// with <tt>:disabled</tt> being either a value or array of values to be
+// disabled. In this case, you can use <tt>:selected</tt> to specify selected
+// option tags.
+//
+//   optionsForSelectTag(["Free", "Basic", "Advanced", "Super Platinum"], {disabled: "Super Platinum"})
+//   // => <option value="Free">Free</option>
+//   // => <option value="Basic">Basic</option>
+//   // => <option value="Advanced">Advanced</option>
+//   // => <option value="Super Platinum" disabled>Super Platinum</option>
+//
+//   optionsForSelectTag(["Free", "Basic", "Advanced", "Super Platinum"], {disabled: ["Advanced", "Super Platinum"]})
+//   // => <option value="Free">Free</option>
+//   // => <option value="Basic">Basic</option>
+//   // => <option value="Advanced" disabled>Advanced</option>
+//   // => <option value="Super Platinum" disabled>Super Platinum</option>
+//
+//   optionsForSelectTag(["Free", "Basic", "Advanced", "Super Platinum"], {selected: "Free", disabled: "Super Platinum"})
+//   // => <option value="Free" selected>Free</option>
+//   // => <option value="Basic">Basic</option>
+//   // => <option value="Advanced">Advanced</option>
+//   // => <option value="Super Platinum" disabled>Super Platinum</option>
+//
+// NOTE: Only the option tags are returned, you have to wrap this call in a
+// regular HTML select tag.
+Viking.View.Helpers.optionsForSelectTag = function (container, selected) {
+    var disabled;
+    var arrayWrap = function (data) {
+        if (_.isArray(data)) { return data; }
+        return [data];
+    };
+
+    
+    if (typeof selected !== 'object' && typeof selected !== 'function') {
+        selected = arrayWrap(selected);
+    } else if (!_.isArray(selected) && typeof selected !== 'function') {
+        disabled = typeof selected.disabled === 'function' ? selected.disabled : arrayWrap(selected.disabled);
+        selected = typeof selected.selected === 'function' ? selected.selected : arrayWrap(selected.selected);
+    }
+    
+    if(_.isArray(container)) {
+        return _.map(container, function(text) {
+            var value, options = {};
+            if (_.isArray(text)) {
+                if (typeof _.last(text) === 'object') { options = text.pop(); }
+                if (text.length === 2) {
+                    options.value = value = text[1];
+                    text = text[0];
+                } else {
+                    value = text = text[0];
+                }
+            } else {
+                value = text;
+            }
+            
+            if(typeof selected === 'function') {
+                if (selected(value)) { options.selected = true; }
+            } else if(_.contains(selected, value)) {
+                options.selected = true;
+            }
+            if(typeof disabled === 'function') {
+                if (disabled(value)) { options.disabled = true; }
+            } else if(_.contains(disabled, value)) {
+                options.disabled = true;
+            }
+            
+            return Viking.View.Helpers.contentTag('option', text, options);
+        }).join("\n");
+    }
+    
+    return _.map(container, function(value, text) {
+        var options = {value: value};
+
+        if(typeof selected === 'function') {
+            if (selected(value)) { options.selected = true; }
+        } else if(_.contains(selected, value)) {
+            options.selected = true;
+        }
+        if(typeof disabled === 'function') {
+            if (disabled(value)) { options.disabled = true; }
+        } else if(_.contains(disabled, value)) {
+            options.disabled = true;
+        }
+        
+        return Viking.View.Helpers.contentTag('option', text, options);
+    }).join("\n");
+};
+// optionsFromCollectionForSelectTag(collection, valueMethod, textMethod, selected)
+// =============================================================================
+//
+// Returns a string of option tags that have been compiled by iterating over
+// the collection and assigning the result of a call to the valueMethod as
+// the option value and the textMethod as the option text.
+//
+//   optionsFromCollectionForSelectTag(people, 'id', 'name')
+//   // => <option value="person's id">person's name</option>
+//
+// This is more often than not used inside a selectTag like this example:
+//
+//   selectTag(person, optionsFromCollectionForSelectTag(people, 'id', 'name'))
+//
+// If selected is specified as a value or array of values, the element(s)
+// returning a match on valueMethod will be selected option tag(s).
+//
+// If selected is specified as a Proc, those members of the collection that
+// return true for the anonymous function are the selected values.
+//
+// selected can also be a hash, specifying both :selected and/or :disabled
+// values as required.
+//
+// Be sure to specify the same class as the valueMethod when specifying
+// selected or disabled options. Failure to do this will produce undesired
+// results. Example:
+//
+//   optionsFromCollectionForSelectTag(people, 'id', 'name', '1')
+//
+// Will not select a person with the id of 1 because 1 (an Integer) is not
+// the same as ‘1’ (a string)
+//
+//   optionsFromCollectionForSelectTag(people, 'id', 'name', 1)
+//
+// should produce the desired results.
+Viking.View.Helpers.optionsFromCollectionForSelectTag = function(collection, valueAttribute, textAttribute, selected) {
+    var selectedForSelect;
+    
+    var options = collection.map(function(model) {
+        return [Viking.View.methodOrAttribute(model, textAttribute), Viking.View.methodOrAttribute(model, valueAttribute)];
+    });
+    
+    if (_.isArray(selected)) {
+        selectedForSelect = selected;
+    } else if (typeof selected === 'object'){
+        selectedForSelect = {
+            selected: selected.selected,
+            disabled: selected.disabled
+        };
+    } else {
+        selectedForSelect = selected;
+    }
+
+    return Viking.View.Helpers.optionsForSelectTag(options, selectedForSelect);
+};
+// passwordFieldTag(name = "password", value = nil, options = {})
+// ================================================================
+// 
+// Creates a password field, a masked text field that will hide the users input
+// behind a mask character.
+//
+// Options
+// -------
+//      - disabled:  If true, the user will not be able to use this input.
+//      - size:      The number of visible characters that will fit in the input.
+//      - maxlength: The maximum number of characters that the browser will allow the user to enter.
+//      - Any other key creates standard HTML attributes for the tag
+//
+// Examples
+// --------
+//   
+//   passwordFieldTag('pass')
+//   // => <input name="pass" type="password">
+//   
+//   passwordFieldTag('secret', 'Your secret here')
+//   // => <input" name="secret" type="password" value="Your secret here">
+//   
+//   passwordFieldTag('masked', nil, {class: 'masked_input_field'})
+//   // => <input class="masked_input_field" name="masked" type="password">
+//   
+//   passwordFieldTag('token', '', {size: 15})
+//   # => <input name="token" size="15" type="password" value="">
+//   
+//   passwordFieldTag('key', null, {maxlength: 16})
+//   // => <input maxlength="16" name="key" type="password">
+//   
+//   passwordFieldTag('confirm_pass', null, {disabled: true})
+//   // => <input disabled name="confirm_pass" type="password">
+//   
+//   passwordFieldTag('pin', '1234', {maxlength: 4, size: 6, class: "pin_input"})
+//   // => <input class="pin_input" maxlength="4" name="pin" size="6" type="password" value="1234">
+Viking.View.Helpers.passwordFieldTag = function (name, value, options) {
+    if (name === undefined) { name = 'password'; }
+    if (options === undefined) { options = {}; }
+    _.defaults(options, {type: "password"});
+
+    return Viking.View.Helpers.textFieldTag(name, value, options);
+};
+// radioButtonTag(name, value, checked, options)
+// =============================================
+//
+// Creates a radio button; use groups of radio buttons named the same to allow
+// users to select from a group of options.
+//
+// Options
+// -------
+//      - disabled: If true, the user will not be able to use this input.
+//      - Any other key creates standard HTML attributes for the tag
+//
+// Examples
+// --------
+//   radioButtonTag('gender', 'male')
+//   // => <input name="gender" type="radio" value="male">
+//   
+//   radioButtonTag('receive_updates', 'no', true)
+//   // => <input checked="checked" name="receive_updates" type="radio" value="no">
+//
+//   radioButtonTag('time_slot', "3:00 p.m.", false, {disabled: true})
+//   // => <input disabled name="time_slot" type="radio" value="3:00 p.m.">
+//   
+//   radioButtonTag('color', "green", true, {class: "color_input"})
+//   // => <input checked class="color_input" name="color" type="radio" value="green">
+Viking.View.Helpers.radioButtonTag = function (name, value, checked, options) {
+    if (options === undefined) { options = {}; }
+    if (checked === true) { options.checked = true; }
+    _.defaults(options, {
+        type: "radio",
+        value: value,
+        name: name,
+        id: Viking.View.sanitizeToId(name)
+    });
+
+    return Viking.View.Helpers.tag("input", options);
+};
+// selectTag(name, option_tags, options)
+// ======================================
+//
+// Creates a dropdown selection box, or if the :multiple option is set to true,
+// a multiple choice selection box.
+//
+// Options
+// -------
+//    - multiple:      If set to true the selection will allow multiple choices.
+//    - disabled:      If set to true, the user will not be able to use this input.
+//    - includeBlank: If set to true, an empty option will be created.
+//    - prompt:        Create a prompt option with blank value and the text asking user to select something
+//    - Any other key creates standard HTML attributes for the tag.
+//
+// Examples
+// --------
+//   selectTag("people", options_for_select({ "Basic": "$20"}))
+//   // <select name="people"><option value="$20">Basic</option></select>
+//   
+//   selectTag("people", "<option>David</option>")
+//   // => <select name="people"><option>David</option></select>
+//   
+//   selectTag("count", "<option>1</option><option>2</option><option>3</option>")
+//   // => <select name="count"><option>1</option><option>2</option><option>3</option></select>
+//   
+//   selectTag("colors", "<option>Red</option><option>Green</option><option>Blue</option>", {multiple: true})
+//   // => <select multiple="multiple" name="colors[]"><option>Red</option>
+//   //    <option>Green</option><option>Blue</option></select>
+//   
+//   selectTag("locations", "<option>Home</option><option selected='selected'>Work</option><option>Out</option>")
+//   // => <select name="locations"><option>Home</option><option selected='selected'>Work</option>
+//   //    <option>Out</option></select>
+//   
+//   selectTag("access", "<option>Read</option><option>Write</option>", {multiple: true, class: 'form_input'})
+//   // => <select class="form_input" multiple="multiple" name="access[]"><option>Read</option>
+//   //    <option>Write</option></select>
+//   
+//   selectTag("people", options_for_select({ "Basic": "$20"}), {includeBlank: true})
+//   // => <select name="people"><option value=""></option><option value="$20">Basic</option></select>
+//   
+//   selectTag("people", options_for_select({"Basic": "$20"}), {prompt: "Select something"})
+//   // => <select name="people"><option value="">Select something</option><option value="$20">Basic</option></select>
+//   
+//   selectTag("destination", "<option>NYC</option>", {disabled: true})
+//   // => <select disabled name="destination"><option>NYC</option></select>
+//   
+//   selectTag("credit_card", options_for_select([ "VISA", "MasterCard" ], "MasterCard"))
+//   // => <select name="credit_card"><option>VISA</option><option selected>MasterCard</option></select>
+Viking.View.Helpers.selectTag = function (name, option_tags, options) {
+    var tag_name = name;
+    if (options === undefined) { options = {}; }
+    if (options.multiple) { tag_name = tag_name + "[]"; }
+    _.defaults(options, {
+        id: Viking.View.sanitizeToId(name),
+        name: tag_name
+    });
+
+    if (options.includeBlank) {
+        option_tags = Viking.View.Helpers.contentTag('option', '', {value: ''}) + option_tags;
+        delete options.includeBlank;
+    }
+
+    if (options.prompt) {
+        if (options.prompt === true) { options.prompt = 'Select'; }
+        option_tags = Viking.View.Helpers.contentTag('option', options.prompt, {value: ''}) + option_tags;
+        delete options.prompt;
+    }
+
+    return Viking.View.Helpers.contentTag('select', option_tags, options, false);
+};
+// submitTag(value="Save", options)
+// =================================
+//
+// Creates a submit button with the text value as the caption.
+//
+// Options
+// -------
+//    - disabled:      If set to true, the user will not be able to use this input.
+//    - Any other key creates standard HTML attributes for the tag.
+//   
+//   submitTag()
+//   // => <input name="commit" type="submit" value="Save">
+//   
+//   submitTag "Edit this article"
+//   // => <input name="commit" type="submit" value="Edit this article">
+//   
+//   submitTag("Save edits", {disabled: true})
+//   // => <input disabled name="commit" type="submit" value="Save edits">
+//   
+//   submitTag(nil, {class: "form_submit"})
+//   // => <input class="form_submit" name="commit" type="submit">
+//   
+//   submitTag("Edit", class: "edit_button")
+//   // => <input class="edit_button" name="commit" type="submit" value="Edit">
+Viking.View.Helpers.submitTag = function (value, options) {
+    if (options === undefined) { options = {}; }
+    if (!value) { value = 'Save'; }
+    _.defaults(options, {
+        type: 'submit',
+        name: 'commit',
+        id: null,
+        value: value
+    });
+
+    return Viking.View.Helpers.tag('input', options);
+};
+// textAreaTag(name, [content], [options], [escape=true])
+// =========================================
+//
+// Creates a text input area; use a textarea for longer text inputs such as
+// blog posts or descriptions.
+//
+// Options
+// -------
+//    - size: A string specifying the dimensions (columns by rows) of the textarea (e.g., "25x10").
+//    - rows: Specify the number of rows in the textarea
+//    - cols: Specify the number of columns in the textarea
+//    - disabled: If set to true, the user will not be able to use this input.
+//    - Any other key creates standard HTML attributes for the tag.
+//
+// Examples
+// --------
+//   
+//   textAreaTag('post')
+//   // => <textarea name="post"></textarea>
+//   
+//   textAreaTag('bio', user.bio)
+//   // => <textarea name="bio">This is my biography.</textarea>
+//   
+//   textAreaTag('body', null, {rows: 10, cols: 25})
+//   // => <textarea cols="25" name="body" rows="10"></textarea>
+//   
+//   textAreaTag('body', null, {size: "25x10"})
+//   // => <textarea name="body" cols="25" rows="10"></textarea>
+//   
+//   textAreaTag('description', "Description goes here.", {disabled: true})
+//   // => <textarea disabled name="description">Description goes here.</textarea>
+//   
+//   textAreaTag('comment', null, {class: 'comment_input'})
+//   // => <textarea class="comment_input" name="comment"></textarea>
+Viking.View.Helpers.textAreaTag = function (name, content, options, escape) {
+    if (options === undefined) { options = {}; }
+    if (escape === undefined) { escape = true; }
+    _.defaults(options, {
+        id: Viking.View.sanitizeToId(name),
+        name: name
+    });
+
+    if (options.size) {
+        options.cols = options.size.split('x')[0];
+        options.rows = options.size.split('x')[1];
+        delete options.size;
+    }
+
+    if (escape) { content = _.escape(content); }
+
+    return Viking.View.Helpers.contentTag('textarea', content, options, false);
+};
+// checkBox(model, attribute, options={}, checkedValue="true", uncheckedValue="false")
+// =====================================================================================
+//
+// Returns a checkbox tag tailored for accessing a specified attribute (identified
+// by attribute) on an object. This object must be an instance of Viking.Model.
+// Additional options on the input tag can be passed as a hash with options.
+// The checkedValue defaults to the string `"true"` while the default
+// uncheckedValue is set to the string `"false"`.
+//
+// Gotcha
+// ------
+//
+// The HTML specification says unchecked check boxes are not successful, and
+// thus web browsers do not send them. Unfortunately this introduces a gotcha:
+// if an Invoice model has a paid flag, and in the form that edits a paid invoice
+// the user unchecks its check box, no paid parameter is sent. So, any
+// mass-assignment idiom like
+//
+//   @invoice.update(params[:invoice])
+//
+// wouldn’t update the flag.
+//
+// To prevent this the helper generates an auxiliary hidden field before the very
+// check box. The hidden field has the same name and its attributes mimic an
+// unchecked check box.
+//
+// This way, the client either sends only the hidden field (representing the
+// check box is unchecked), or both fields. Since the HTML specification says
+// key/value pairs have to be sent in the same order they appear in the form,
+// and parameters extraction gets the last occurrence of any repeated key in
+// the query string, that works for ordinary forms.
+//
+// Unfortunately that workaround does not work when the check box goes within an
+// array-like parameter, as in
+// 
+// <%= fields_for "project[invoice_attributes][]", invoice, index: nil do |form| %>
+//   <%= form.check_box :paid %>
+//   ...
+// <% end %>
+//
+// because parameter name repetition is precisely what Rails seeks to distinguish
+// the elements of the array. For each item with a checked check box you get an
+// extra ghost item with only that attribute, assigned to “0”.
+//
+// In that case it is preferable to either use check_box_tag or to use hashes
+// instead of arrays.
+//
+// Examples
+// --------
+//   // Let's say that post.get('validated') is `true`:
+//   checkBox(post, "validated")
+//   // => <input name="post[validated]" type="hidden" value="false">
+//   //    <input checked type="checkbox" name="post[validated]" value="true">
+//   
+//   // Let's say that puppy.get('gooddog') is `"no"`:
+//   checkBox("puppy", "gooddog", {}, "yes", "no")
+//   // => <input name="puppy[gooddog]" type="hidden" value="no">
+//   //    <input type="checkbox" name="puppy[gooddog]" value="yes">
+//   
+//   checkBox("eula", "accepted", { class: 'eula_check' }, "yes", "no")
+//   // => <input name="eula[accepted]" type="hidden" value="no">
+//   //    <input type="checkbox" class="eula_check" name="eula[accepted]" value="yes">
+Viking.View.Helpers.checkBox = function (model, attribute, options, checkedValue, uncheckedValue) {
+    var output = '';
+    var value = model.get(attribute);
+    var name = Viking.View.tagNameForModelAttribute(model, attribute);
+
+    if (options === undefined) { options = {}; }
+    if (checkedValue === undefined) { checkedValue = true; }
+    if (uncheckedValue === undefined) { uncheckedValue = false; }
+    Viking.View.addErrorClassToOptions(model, attribute, options);
+    
+    output += Viking.View.Helpers.hiddenFieldTag(name, uncheckedValue);
+    output += Viking.View.Helpers.checkBoxTag(name, checkedValue, checkedValue === value, options);
+    
+    return output;
+};
+// collectionSelect(model, attribute, collection, valueAttribute, textAttribute, options)
+// ====================================================================================
+//
+// Returns <select> and <option> tags for the collection of existing return
+// values of method for object‘s class. The value returned from calling method
+// on the instance object will be selected. If calling method returns nil, no
+// selection is made without including :prompt or :includeBlank in the options
+// hash.
+//
+// The :value_method and :text_method parameters are methods to be called on
+// each member of collection. The return values are used as the value attribute
+// and contents of each <option> tag, respectively. They can also be any object
+// that responds to call, such as a proc, that will be called for each member
+// of the collection to retrieve the value/text.
+//
+// Example object structure for use with this method:
+//
+//   Post = Viking.Model.extend({
+//       belongsTo: ['author']
+//   });
+//   
+//   Author = Viking.Model.extend({
+//       hasMany: ['posts'],
+//       
+//       nameWithInitial: function() {
+//           return this.get('first_name')[0] + '. ' + this.get("last_name");
+//       }
+//   });
+// 
+// Sample usage (selecting the associated Author for an instance of Post):
+//
+//   collectionSelect(post, 'author_id', Author.all, 'id', 'nameWithInitial', {prompt: true})
+// 
+// If post.get('author_id') is already 1, this would return:
+// 
+//   <select name="post[author_id]">
+//     <option value="">Please select</option>
+//     <option value="1" selected>D. Heinemeier Hansson</option>
+//     <option value="2">D. Thomas</option>
+//     <option value="3">M. Clark</option>
+//   </select>
+Viking.View.Helpers.collectionSelect = function (model, attribute, collection, valueAttribute, textAttribute, options) {
+    if (options === undefined) { options = {}; }
+
+    var name = Viking.View.tagNameForModelAttribute(model, attribute);
+    var optionOptions = _.pick(options, 'selected');
+    var selectOptions = _.omit(options, 'selected');
+    if (model.get(attribute) && optionOptions.selected === undefined) {
+        optionOptions.selected = Viking.View.methodOrAttribute(model.get(attribute), valueAttribute);
+    }
+
+    var optionsTags = Viking.View.Helpers.optionsFromCollectionForSelectTag(collection, valueAttribute, textAttribute, selectOptions);
+    return Viking.View.Helpers.selectTag(name, optionsTags, selectOptions);
+};
+// hiddenField(model, attribute, options = {})
+// =========================================
+// 
+// Returns a hidden input tag tailored for accessing a specified attribute
+// (identified by method) on an object assigned to the template (identified
+// by object). Additional options on the input tag can be passed as a hash
+// with options. These options will be tagged onto the HTML as an HTML element
+// attribute as in the example shown.
+//
+// Examples
+// --------
+//   hiddenField(:signup, :pass_confirm)
+//   // => <input type="hidden" name="signup[pass_confirm]" value="">
+//   
+//   hiddenField(:post, :tag_list)
+//   // => <input type="hidden" name="post[tag_list]" value="tag1 tag2 tag3">
+//   
+//   hiddenField(:user, :token)
+//   // => <input type="hidden" name="user[token]" value="token">
+Viking.View.Helpers.hiddenField = function (model, attribute, options) {
+    var value = model.get(attribute);
+    var name = Viking.View.tagNameForModelAttribute(model, attribute);
+    
+    return Viking.View.Helpers.hiddenFieldTag(name, (value || ''), options);
+};
+// label(model, attribute, content, options)
+// =========================================
+//
+// Returns a label tag tailored for labelling an input field for a specified
+// attribute (identified by method) on an object assigned to the template
+// (identified by object). The text of label will default to the attribute
+// name unless a translation is found in the current I18n locale (through
+// helpers.label.<modelname>.<attribute>) or you specify it explicitly.
+// Additional options on the label tag can be passed as a hash with options.
+// These options will be tagged onto the HTML as an HTML element attribute as
+// in the example shown, except for the :value option, which is designed to
+// target labels for #radioButton tags (where the value is used in the ID
+// of the input tag).
+//
+// Examples
+// --------
+//   label(post, "title")
+//   // => <label for="post_title">Title</label>
+//   
+//   label(post, "title", "A short title")
+//   // => <label for="post_title">A short title</label>
+//   
+//   label(post, "title", "A short title", {class: "title_label"})
+//   // => <label for="post_title" class="title_label">A short title</label>
+//   
+//   label(post, "privacy", "Public Post", {value: "public"})
+//   // => <label for="post_privacy_public">Public Post</label>
+//   
+//   label(post, "terms", function() {
+//       return 'Accept <a href="/terms">Terms</a>.';
+//   })
+//   // => <label for="post_privacy_public">Public Post</label>
+Viking.View.Helpers.label = function (model, attribute, content, options) {
+    var tmp;
+    var name = Viking.View.tagNameForModelAttribute(model, attribute);
+    
+    if (typeof content === 'object') {
+        tmp = options;
+        options = content;
+        content = tmp;
+    }
+
+    if (options === undefined) { options = {}; }
+    if (content === undefined) { content = attribute.humanize(); }
+    if (typeof content === 'function') { content = content(); }
+    if (!options.for) { options.for = Viking.View.sanitizeToId(name); }
+    Viking.View.addErrorClassToOptions(model, attribute, options);
+    
+    return Viking.View.Helpers.labelTag(content, options);
+};
+// passwordField(model, attribute, options)
+// ========================================
+//
+// Returns an input tag of the “password” type tailored for accessing a specified
+// attribute on the model. Additional options on the input tag can be passed as
+// a hash with options. These options will be tagged onto the HTML as an HTML
+// element attribute as in the example shown. For security reasons this field
+// is blank by default; pass value via options if this is not desired.
+//
+// Examples
+// --------
+//   passwordField(user, 'pass', {size: 20})
+//   // => <input id="login_pass" name="login[pass]" type="password" size="20">
+//   
+//   passwordField(account, 'secret', {class: "form_input", value: account.get('secret')})
+//   // => <input class="form_input" id="account_secret" name="account[secret]" type="password" value="unkown">
+Viking.View.Helpers.passwordField = function (model, attribute, options) {
+    var name = Viking.View.tagNameForModelAttribute(model, attribute);
+
+    if (options === undefined) { options = {}; }
+    Viking.View.addErrorClassToOptions(model, attribute, options);
+    
+    return Viking.View.Helpers.passwordFieldTag(name, undefined, options);
+};
+// radioButton(model, attribute, tag_value, options)
+// ==================================================
+//
+// Returns a radio button tag for accessing a specified attribute on a model.
+// If the current value of attribute is tag_value the radio button will be checked.
+//
+// To force the radio button to be checked pass checked: true in the options hash.
+// You may pass HTML options there as well.
+//   
+//   // Let's say that @post.category returns "rails":
+//   radioButton("post", "category", "rails")
+//   radioButton("post", "category", "java")
+//   // => <input type="radio" id="post_category_rails" name="post[category]" value="rails" checked>
+//   //    <input type="radio" id="post_category_java" name="post[category]" value="java">
+//   
+//   radioButton("user", "receive_newsletter", "yes")
+//   radioButton("user", "receive_newsletter", "no")
+//   // => <input type="radio" id="user_receive_newsletter_yes" name="user[receive_newsletter]" value="yes">
+//   //    <input type="radio" id="user_receive_newsletter_no" name="user[receive_newsletter]" value="no" checked>
+Viking.View.Helpers.radioButton = function (model, attribute, tag_value, options) {
+    var name = Viking.View.tagNameForModelAttribute(model, attribute);
+
+    if (options === undefined) { options = {}; }
+    _.defaults(options, {
+        id: Viking.View.sanitizeToId(name + "_" + tag_value)
+    });
+    Viking.View.addErrorClassToOptions(model, attribute, options);
+    
+    var value = tag_value;
+    if (value === undefined || value === null) {
+        value = "";
+    }
+    
+    return Viking.View.Helpers.radioButtonTag(name, value, tag_value === model.get(attribute), options);
+};
+// Create a select tag and a series of contained option tags for the provided
+// object and method. The option currently held by the object will be selected,
+// provided that the object is available.
+//
+// There are two possible formats for the +choices+ parameter, corresponding
+// to other helpers' output:
+//
+// * A flat collection (see +optionsForSelect+).
+//
+// * A nested collection (see +groupedOptionsForSelect+).
+//
+// For example:
+//
+//   select("post", "person_id", _.map(people, function(p) { return [p.name, p.id] }), { include_blank: true })
+//
+// would become:
+//
+//   <select name="post[person_id]">
+//     <option value=""></option>
+//     <option value="1" selected="selected">David</option>
+//     <option value="2">Sam</option>
+//     <option value="3">Tobias</option>
+//   </select>
+//
+// assuming the associated person has ID 1.
+//
+// By default, `post.get('person_id')` is the selected option. Specify
+// `selected: value` to use a different selection or `selected: nil` to leave
+// all options unselected. Similarly, you can specify values to be disabled in
+// the option tags by specifying the `:disabled` option. This can either be a
+// single value or an array of values to be disabled.
+//
+// ==== Gotcha
+//
+// The HTML specification says when +multiple+ parameter passed to select and
+// all options got deselected web browsers do not send any value to server.
+// Unfortunately this introduces a gotcha: if an +User+ model has many +roles+
+// and have +role_ids+ accessor, and in the form that edits roles of the user
+// the user deselects all roles from +role_ids+ multiple select box, no
+// +role_ids+ parameter is sent. So, any mass-assignment idiom like
+//
+//   @user.update(params[:user])
+//
+// wouldn't update roles.
+//
+// To prevent this the helper generates an auxiliary hidden field before every
+// multiple select. The hidden field has the same name as multiple select and
+// blank value.
+//
+// This way, the client either sends only the hidden field (representing
+// the deselected multiple select box), or both fields. Since the HTML
+// specification says key/value pairs have to be sent in the same order they
+// appear in the form, and parameters extraction gets the last occurrence of
+// any repeated key in the query string, that works for ordinary forms.
+//
+// In case if you don't want the helper to generate this hidden field you can
+// specify `include_hidden: false` option.
+Viking.View.Helpers.select = function (model, attribute, collection, options) {
+    if (options === undefined) { options = {}; }
+    
+    var name = Viking.View.tagNameForModelAttribute(model, attribute);
+    var optionOptions = _.pick(options, 'selected');
+    var selectOptions = _.omit(options, 'selected');
+    if (model.get(attribute) && optionOptions.selected === undefined) {
+        optionOptions.selected = model.get(attribute);
+    }
+
+    return Viking.View.Helpers.selectTag(name, Viking.View.Helpers.optionsForSelectTag(collection, optionOptions), selectOptions);
+};
+// textArea(model, attribute, options)
+// ====================================
+//
+// Returns a textarea opening and closing tag set tailored for accessing a
+// specified attribute on a model. Additional options on the input tag can be
+// passed as a hash with options.
+//
+// Examples
+// ========
+//   textArea(post, 'body', {cols: 20, rows: 40})
+//   // => <textarea cols="20" rows="40" id="post_body" name="post[body]">
+//   //      post body
+//   //    </textarea>
+//   
+//   textArea(comment, 'text', {size: "20x30"})
+//   // => <textarea cols="20" rows="30" id="comment_text" name="comment[text]">
+//   //      comment text
+//   //    </textarea>
+//   
+//   textArea(application, 'notes', {cols: 40, rows: 15, class: 'app_input'})
+//   // => <textarea cols="40" rows="15" id="application_notes" name="application[notes]" class="app_input">
+//   //      application notes
+//   //    </textarea>
+//   
+//   textArea(entry, 'body', {size: "20x20", disabled: true})
+//   // => <textarea cols="20" rows="20" id="entry_body" name="entry[body]" disabled>
+//   //      entry body
+//   //    </textarea>
+Viking.View.Helpers.textArea = function (model, attribute, options) {
+    var name = Viking.View.tagNameForModelAttribute(model, attribute);
+    
+    if (options === undefined) { options = {}; }
+    Viking.View.addErrorClassToOptions(model, attribute, options);
+    
+    return Viking.View.Helpers.textAreaTag(name, model.get(attribute), options);
+};
+// textField(model, attribute, options)
+// ====================================
+//
+// Returns an input tag of the “text” type tailored for accessing a specified
+// attribute on a model. Additional options on the input tag can be passed as
+// a hash with options. These options will be tagged onto the HTML as an HTML
+// element attribute as in the example shown.
+//
+// Examples
+// ========
+//   text_field(post, "title", {size: 20})
+//   // => <input id="post_title" name="post[title]" size="20" type="text" value="title">
+//   
+//   text_field(post, "title", {class: "create_input"})
+//   // => <input class="create_input" id="post_title" name="post[title]" type="text" value="title">
+Viking.View.Helpers.textField = function (model, attribute, options) {
+    var name = Viking.View.tagNameForModelAttribute(model, attribute);
+    
+    if (options === undefined) { options = {}; }
+    Viking.View.addErrorClassToOptions(model, attribute, options);
+    
+    return Viking.View.Helpers.textFieldTag(name, model.get(attribute), options);
+};
+
+//
+
+//
+
+
+
+
+
+
+// TODO: color_field_tag
+// TODO: date_field_tag
+// TODO: datetime_field_tag
+// TODO: datetime_local_field_tag
+// TODO: email_field_tag
+// TODO: field_set_tag
+// TODO: file_field_tag
+
+// TODO: image_submit_tag
+// TODO: month_field_tag
+// TODO: number_field_tag
+// TODO: phone_field_tag
+// TODO: range_field_tag
+// TODO: search_field_tag
+// TODO: telephone_field_tag
+// TODO: time_field_tag
+// TODO: url_field_tag
+// TODO: week_field_tag
+
+
+
+
+
+
+
+
+//
+// TODO: make this accept model string names
+
+
+// TODO: date_field
+// TODO: date_select
+// TODO: day_field
+// TODO: file_field
+
+
+// TODO: month_field
+// TODO: number_field
+
+// TODO: phone_field
+
+// TODO: range_field
+// TODO: search_field
+
+// TODO: telephone_field
+
+
+// TODO: time_field
+// TODO: url_field
+// TODO: week_field
+// TODO: year_field
+//
+// require viking/view/form_builder
 Backbone.Model.prototype.updateAttribute = function (key, value, options){
     var data = {};
     data[key] = value;
