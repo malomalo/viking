@@ -1,3 +1,9 @@
+## Edge
+
+Major Changes:
+
+  - Removed CSRF token injection for AJAX request. Can added on a per project basis
+  
 ## 0.3.0 (Feburary 26th, 2014)
 
 Major Changes:
