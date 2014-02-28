@@ -1,14 +1,14 @@
 (function () {
     module("Viking.Model#select");
 
-    test("select() sets 'selected' to true on model when not in a collection", function() {
+    test("#select() sets 'selected' to true on model when not in a collection", function() {
         var model = new Viking.Model({});
         model.select();
     
         ok(model.selected);
     });
     
-    test("select() sets 'selected' to true on the model when in a collection", function() {
+    test("#select() sets 'selected' to true on the model when in a collection", function() {
         var c = new Viking.Collection([{}, {}]);
         var model = c.models[0];
         model.select();
@@ -16,7 +16,7 @@
         ok(model.selected);
     });
 
-    test("select() sets 'selected' to false other models", function() {
+    test("#select() sets 'selected' to false other models", function() {
         var c = new Viking.Collection([{}, {}, {}]);
         var models = c.models;
         models[0].selected = true;
@@ -34,7 +34,7 @@
         ok(!models[2].selected);
     });
     
-    test("select(true) selects the model", function () {
+    test("#select(true) selects the model", function () {
         var c = new Viking.Collection([{}, {}, {}]);
         var models = c.models;
         
@@ -43,7 +43,7 @@
         ok(models[0].selected);
     });
     
-    test("select(false) unselects the model", function () {
+    test("#select(false) unselects the model", function () {
         var c = new Viking.Collection([{}, {}, {}]);
         var models = c.models;
         
@@ -54,7 +54,7 @@
         ok(!models[0].selected);
     });
 
-    test("select({multiple: true}) doesn't unselect other models", function() {
+    test("#select({multiple: true}) doesn't unselect other models", function() {
         var c = new Viking.Collection([{}, {}, {}]);
         var models = c.models;
     
@@ -67,7 +67,7 @@
         ok(models[2].selected);
     });
 
-    test("select() triggers a 'selected' event", function() {
+    test("#select() triggers a 'selected' event", function() {
         expect(1);
     
         var c = new Viking.Collection([{}]);
@@ -78,7 +78,7 @@
         model.off('selected');
     });
     
-    test("select() triggers a 'selected' event on the collection", function() {
+    test("#select() triggers a 'selected' event on the collection", function() {
         expect(1);
     
         var c = new Viking.Collection([{}]);
@@ -87,7 +87,7 @@
         c.off('selected');
     });
 
-    test("select() triggers a 'selected' event only if change", function() {
+    test("#select() triggers a 'selected' event only if change", function() {
         expect(0);
     
         var c = new Viking.Collection([{}]);
@@ -98,7 +98,7 @@
         m.off('selected');
     });
     
-    test("select() triggers a 'selected' event on collection only if change", function() {
+    test("#select() triggers a 'selected' event on collection only if change", function() {
         expect(0);
     
         var c = new Viking.Collection([{}]);

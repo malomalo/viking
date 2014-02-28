@@ -1,7 +1,7 @@
 (function () {
     module("Viking.Model#unselect");
 	
-    test("unselect() triggers a 'unselected' event", function() {
+    test("#unselect() triggers a 'unselected' event", function() {
         expect(1);
     
         var c = new Viking.Collection([{}]);
@@ -12,7 +12,7 @@
         model.off('unselected');
     });
     
-    test("unselect() triggers a 'unselected' event on collection", function() {
+    test("#unselect() triggers a 'unselected' event on collection", function() {
         expect(1);
     
         var c = new Viking.Collection([{}]);
@@ -22,7 +22,7 @@
         c.off('unselected');
     });
 
-    test("unselect() triggers a 'selected' event only if change", function() {
+    test("#unselect() triggers a 'selected' event only if change", function() {
         expect(0);
     
         var c = new Viking.Collection([{}]);
@@ -32,7 +32,7 @@
         m.off('unselected');
     });
     
-    test("unselect() triggers a 'unselected' event on collection only if change", function() {
+    test("#unselect() triggers a 'unselected' event on collection only if change", function() {
         expect(0);
     
         var c = new Viking.Collection([{}]);

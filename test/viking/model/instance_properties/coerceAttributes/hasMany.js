@@ -18,7 +18,7 @@
         delete ShipCollection;
     });
 
-    test("coerceAttributes() initializes hasMany relation with array of models", function() {
+    test("#coerceAttributes() initializes hasMany relation with array of models", function() {
         Ship = Viking.Model.extend({ hasMany: ['ships'] });
         ShipCollection = Viking.Collection.extend({ model: Ship });
     

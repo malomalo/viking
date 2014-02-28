@@ -2,7 +2,7 @@
     module("Viking.Model#toJSON - hasMany");
 
     // toJSON --------------------------------------------------------------------
-    test("toJSON for hasMany relation", function() {
+    test("#toJSON for hasMany relation", function() {
         Ship = Viking.Model.extend('ship', {
             hasMany: ['ships']
         });
