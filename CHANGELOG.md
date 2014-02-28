@@ -1,4 +1,37 @@
-## 1.1.0 (June 24th, 2013)
+## 0.3.0 (Feburary 26th, 2014)
+
+Major Changes:
+
+  - Added `Viking.View.Helpers` to make rendering forms in templates easier.
+  - Removed `Viking.View`, was not being used
+  
+Minor Changes:
+
+ - Updated to test against Backbone v1.1.2, jQuery v2.1.0, & Underscore.js 1.4.4
+ 
+### 0.2.0 (Feburary 21st, 2014)
+
+New Features:
+
+  - Added a `::where(query)` function to Model. Returns a unfetched collection with
+    the predicate set to the query
+  - Adding coercions for data types
+  - Replaced `#save` to set errors if returned in the save
+  - Added `#setErrors` function.
+  - Added `String#ljust` and `String#rjust` to `Viking.Support`
+  - Added `Viking.Model#touch`
+  - Added `toParam` and `toQuery` methods
+  
+Major Changes:
+
+  - `hasMany` collections are no longer replace but merged when set on a model
+  - `Viking.Model#select` method signature has changed
+  
+Minor Changes:
+
+- `Viking.Model#select` now works when the model isn't part of a collection
+
+## 0.1.0 (June 24th, 2013)
 
 New Features:
 
@@ -25,6 +58,6 @@ Bugfixes:
   - `Viking.PaginatedCollection`: if `offset` is not included in a paginated
     response it's ignored. it was causing the inital request to load twice.
 	
-## 1.0.0 (April 30th, 2013)
+## 0.1.0 (April 30th, 2013)
 
 Inital Release!
