@@ -1,0 +1,1 @@
+exclude = '{$exclude,test/coverage,test/index.html,.tm_properties}'
