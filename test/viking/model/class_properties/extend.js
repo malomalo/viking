@@ -99,4 +99,31 @@
         delete Agent;
     });
     
+    test("::extend a Viking.Model unions the coercions", function () {
+        Account = Viking.Model.extend('account', { coercions: {
+            created_at: 'Date'
+        }});
+        
+        Agent   = Account.extend('agent', { coercions: {
+            name: 'String'
+        }});
+        
+        deepEqual(Account.prototype.coercions, {created_at: 'Date'});
+        deepEqual(Agent.prototype.coercions, {created_at: 'Date', name: 'String'});
+        
+        delete Account;
+        delete Agent;
+    });
+    
+    test("::extend a Viking.Model adds itself to the descendants", function () {
+        Account = Viking.Model.extend('account');
+        Agent   = Account.extend('agent');
+
+        deepEqual(Account.descendants, [Agent]);
+        deepEqual(Agent.descendants, []);
+        
+        delete Account;
+        delete Agent;
+    });
+    
 }());

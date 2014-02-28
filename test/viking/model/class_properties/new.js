@@ -62,6 +62,28 @@
     });
     
     // STI
+    test("::new(attrs) on subtype sets the type to the submodel type", function() {
+        Account = Viking.Model.extend('account');
+        Agent = Account.extend('agent');
+        
+        var agent = new Agent();
+        equal('agent', agent.get('type'));
+        
+        delete Account;
+        delete Agent;
+    });
+    
+    test("::new(attrs) on model sets the type if there are submodels", function() {
+        Account = Viking.Model.extend('account');
+        Agent = Account.extend('agent');
+        
+        var account = new Account();
+        equal('account', account.get('type'));
+        
+        delete Account;
+        delete Agent;
+    });
+    
     test("::new(attrs) with type set to a sub-type returns subtype", function() {
         Account = Viking.Model.extend('account');
         Agent = Account.extend('agent');
@@ -72,6 +94,6 @@
         
         delete Account;
         delete Agent;
-    })
+    });
     
 }());

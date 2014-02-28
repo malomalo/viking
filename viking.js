@@ -428,6 +428,9 @@ Viking.AssociationReflection.prototype = {
 // sync to work with [Ruby on Rails](http://rubyonrails.org/) out of the box.
 Viking.Model = Backbone.Model.extend({
 
+    // inheritanceAttribute is the attirbutes used for STI
+    inheritanceAttribute: 'type',
+    
     // Below is the same code from the Backbone.Model function
     // except where there are comments
     constructor: function (attributes, options) {
@@ -436,8 +439,28 @@ Viking.Model = Backbone.Model.extend({
         this.cid = _.uniqueId('c');
         this.attributes = {};
 
+        if (attrs.type && this.constructor.modelName !== attrs.type) {
+            // OPTIMIZE:  Mutating the [[Prototype]] of an object, no matter how
+            // this is accomplished, is strongly discouraged, because it is very
+            // slow and unavoidably slows down subsequent execution in modern
+            // JavaScript implementations
+            // Ideas: Move to Model.new(...) method of initializing models
+            var type = attrs.type.camelize().constantize();
+            this.constructor = type;
+            this.__proto__ = type.prototype;
+        }
+        
         // Add a helper reference to get the model name from an model instance.
         this.modelName = this.constructor.modelName;
+        this.baseModel = this.constructor.baseModel;
+        
+        if (this.baseModel) {
+            if (this.baseModel.descendants.length > 0 && this.baseModel == this.constructor) {
+                attrs.type = this.modelName;
+            } else if (_.contains(this.baseModel.descendants, this.constructor)) {
+                attrs.type = this.modelName;
+            }
+        }
 
         // Set up associations
         this.associations = this.constructor.associations;
@@ -458,12 +481,15 @@ Viking.Model = Backbone.Model.extend({
     }
     
 }, {
-
+    
     associations: [],
-
-    // TODO: test support not passing in name and just protoProps & staticProps
-    // Overide the default extend method to support passing in the model name
-    // to be used for url generation and replationships.
+    
+    // Overide the default extend method to support passing in the modelName
+    // and support STI
+    //
+    // The modelName is used for generating urls and relationships.
+    //
+    // If a Model is extended further is acts simlar to ActiveRecords STI.
     //
     // `name` is optional, and must be a string
     extend: function(name, protoProps, staticProps) {
@@ -478,8 +504,17 @@ Viking.Model = Backbone.Model.extend({
         if(typeof name === 'string') { child.modelName = name; }
 
         child.associations = {};
+        child.inheritanceAttribute = (protoProps.inheritanceAttribute || this.prototype.inheritanceAttribute);
+        if (this === Viking.Model) {
+            child.descendants = [];
+            child.baseModel = child;
+        } else {
+            child.descendants = [];
+            child.baseModel.descendants.push(child);
+        }
+        
         _.each(['hasMany', 'belongsTo'], function(macro) {
-            _.each(protoProps[macro], function(name) {
+            _.each((protoProps[macro] || []).concat(this[macro] || []), function(name) {
                 var options;
 
                 // Handle both `type, key, options` and `type, [key, options]` style arguments
@@ -488,10 +523,21 @@ Viking.Model = Backbone.Model.extend({
                     name = name[0];
                 }
 
-                child.associations[name] = new Viking.AssociationReflection(macro, name, options);
+                if (!child.associations[name]) {
+                    child.associations[name] = new Viking.AssociationReflection(macro, name, options);
+                }
             });
-        });
+        }, this.prototype);
+        
+        if (this.prototype.coercions && protoProps.coercions) {
+            _.each(this.prototype.coercions, function(value, key) {
+                if(!child.prototype.coercions[key]) {
+                    child.prototype.coercions[key] = value;
+                }
+            });
+        }
 
+        
         return child;
     }
 
@@ -522,7 +568,7 @@ Viking.Model.reflectOnAssociations = function(macro) {
 }
 // Generates the `urlRoot` based off of the model name.
 Viking.Model.urlRoot = function() {
-    return "/" + this.modelName.pluralize();
+    return "/" + this.baseModel.modelName.pluralize();
 };
 // Returns a unfetched collection with the predicate set to the query
 Viking.Model.where = function(options) {
@@ -832,7 +878,17 @@ Viking.Model.prototype.updateAttributes = function (data, options) {
     
     return this.save(data, options);
 };
-// TODO: overwrite url to use toParam()
+// Default URL for the model's representation on the server
+Viking.Model.prototype.url = function() {
+    var base =
+      _.result(this, 'urlRoot') ||
+      _.result(this.collection, 'url') ||
+      urlError();
+
+    if (this.isNew()) return base;
+        
+    return base.replace(/([^\/])$/, '$1/') + this.toParam();
+};
 // Alias for `::urlRoot`
 Viking.Model.prototype.urlRoot = function() {
     return this.constructor.urlRoot();
