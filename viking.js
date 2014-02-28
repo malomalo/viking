@@ -15,15 +15,6 @@ Viking.NameError = function (message) {
 };
 
 Viking.NameError.prototype = Error.prototype;
-// CSRF Support for Ajax Request
-// -----------------------------
-
-// Set a callback for all AJAX request to set the CSRF Token header
-// if the meta tag is present.
-jQuery(document).ajaxSend(function(event, xhr, settings) {
-    var token = jQuery('meta[name="csrf-token"]').attr('content');
-    if (token) { xhr.setRequestHeader('X-CSRF-Token', token); }
-});
 // Viking.Support
 // -------------
 //
@@ -424,6 +415,11 @@ Viking.AssociationReflection.prototype = {
         return this.collectionName.constantize();
     }
 };
+
+
+
+
+
 // Viking.Model
 // ------------
 //
@@ -445,11 +441,11 @@ Viking.Model = Backbone.Model.extend({
 
         // Set up associations
         this.associations = this.constructor.associations;
-        this.reflect_on_association = this.constructor.reflect_on_association;
-        this.reflect_on_associations = this.constructor.reflect_on_associations;
+        this.reflectOnAssociation = this.constructor.reflectOnAssociation;
+        this.reflectOnAssociations = this.constructor.reflectOnAssociations;
 
         // Initialize any `hasMany` relationships to empty collections
-        _.each(this.reflect_on_associations('hasMany'), function(association) {
+        _.each(this.reflectOnAssociations('hasMany'), function(association) {
             this.attributes[association.name] = new (association.collection())();
         }, this);
 
@@ -459,311 +455,8 @@ Viking.Model = Backbone.Model.extend({
         this.set(attrs, options);
         this.changed = {};
         this.initialize.call(this, attributes, options);
-    },
-
-    // select(options)
-    // select(value[, options])
-    //
-    // When the model is part of a collection and you want to select a single
-    // or multiple items from a collection. If a model is selected
-    // `model.selected` will be set `true`, otherwise it will be `false`.
-    //
-    // If you pass `true` or `false` as the first paramater to `select` it will
-    // select the model if true, or unselect if it is false.
-    //
-    // By default any other models in the collection with be unselected. To
-    // prevent other models in the collection from being unselected you can
-    // pass `{multiple: true}` as an option.
-    //
-    // The `selected` and `unselected` events are fired when appropriate.
-    select: function(value, options) {
-
-        // Handle both `value[, options]` and `options` -style arguments.
-        if (value === undefined || typeof value === 'object') {
-          options = value;
-          value = true;
-        }
-        
-        if (value === true) {
-            if (this.collection) {
-                this.collection.select(this, options);
-            } else {
-                this.selected = true;
-            }
-        } else {
-            if (this.selected) {
-                this.selected = false;
-                this.trigger('unselected', this);
-            }
-        }
-    },
-
-    // Opposite of #select. Triggers the `unselected` event.
-    unselect: function(options) {
-        this.select(false, options);
-    },
-
-    // TODO: overwrite url to use toParam()
-
-    // Alias for `::urlRoot`
-    urlRoot: function() {
-        return this.constructor.urlRoot();
-    },
-
-    // Returns string to use for params names. This is the key attributes from
-    // the model will be namespaced under when saving to the server
-    paramRoot: function() {
-        return this.modelName.underscore();
-    },
-
-    // Returns a string representing the object’s key suitable for use in URLs,
-    // or nil if `#isNew` is true.
-    toParam: function() {
-        return this.isNew() ? null : this.get('id');
-    },
-
-    set: function (key, val, options) {
-        var attrs;
-        if (key === null) { return this; }
-
-        // Handle both `"key", value` and `{key: value}` -style arguments.
-        if (typeof key === 'object') {
-            attrs = key;
-            options = val;
-        } else {
-            (attrs = {})[key] = val;
-        }
-
-        this.coerceAttributes(attrs);
-        _.each(attrs, function(value, key) {
-            var association = this.reflect_on_association(key);
-            if (association && association.macro === 'hasMany') {
-                this.attributes[key].set(value.models);
-		_.each(value.models, function(model) {
-		  model.collection = this.attributes[key];
-	        }, this);
-                delete attrs[key];
-            }
-        }, this);
-
-        return Backbone.Model.prototype.set.call(this, attrs, options);
-    },
-
-    // Override [Backbone.Model#sync](http://backbonejs.org/#Model-sync).
-    // [Ruby on Rails](http://rubyonrails.org/) expects the attributes to be
-    // namespaced
-    sync: function(method, model, options) {
-        options || (options = {});
-
-        if (options.data == null && (method === 'create' || method === 'update' || method === 'patch')) {
-            options.contentType = 'application/json';
-            options.data = {};
-            options.data[_.result(model, 'paramRoot')] = (options.attrs || model.toJSON(options));
-            options.data = JSON.stringify(options.data);
-        }
-
-        return Backbone.sync.call(this, method, model, options);
-    },
-
-    coerceAttributes: function(attrs) {
-        _.each(this.associations, function(association) {
-            var Type = association.klass();
-
-            if (attrs[association.name] && !(attrs[association.name] instanceof Type)) {
-                attrs[association.name] = new Type(attrs[association.name]);
-            }
-        });
-
-        _.each(this.coercions, function (type, key) {
-            if (attrs[key] || attrs[key] === false) {
-                var klass = Viking.Coercions[type];
-
-                if (klass) {
-                    attrs[key] = klass.load(attrs[key], key);
-                } else {
-                    throw new TypeError("Coercion of " + type + " unsupported");
-                }
-            }
-        });
-
-        return attrs;
-    },
-
-    // similar to Rails as_json method
-    toJSON: function (options) {
-        var data = _.clone(this.attributes);
-        
-        if (options === undefined) { options = {}; }
-
-        if (options.include) {
-            if (typeof options.include === 'string') {
-                var key = options.include;
-                options.include = {};
-                options.include[key] = {};
-            } else if (_.isArray(options.include)) {
-                var array = options.include;
-                options.include = {};
-                _.each(array, function(key) {
-                    options.include[key] = {};
-                });
-            }
-        } else {
-            options.include = {};
-        }
-
-        _.each(this.associations, function(association) {
-            if (!options.include[association.name]) {
-                delete data[association.name];
-            } else if (association.macro === 'belongsTo' || association.macro === 'hasOne') {
-                if (data[association.name]) {
-                    data[association.name+'_attributes'] = data[association.name].toJSON(options.include[association.name]);
-                    delete data[association.name];
-                } else if (data[association.name] === null) {
-                    data[association.name+'_attributes'] = null;
-                    delete data[association.name];
-                }
-            } else if (association.macro === 'hasMany') {
-                if (data[association.name]) {
-                    data[association.name + '_attributes'] = data[association.name].toJSON(options.include[association.name]);
-                    delete data[association.name];
-                }
-            }
-        });
-
-        _.each(this.coercions, function (type, key) {
-            if (data[key] || data[key] === false) {
-                var klass = Viking.Coercions[type];
-
-                if (klass) {
-                    data[key] = klass.dump(data[key], key);
-                } else {
-                    throw new TypeError("Coercion of " + type + " unsupported");
-                }
-            }
-        });
-
-        return data;
-    },
-
-    // Overwrite Backbone.Model#save so that we can catch errors when a save
-    // fails.
-    save: function(key, val, options) {
-        var attrs, method, xhr, attributes = this.attributes;
-
-        // Handle both `"key", value` and `{key: value}` -style arguments.
-        if (key == null || typeof key === 'object') {
-          attrs = key;
-          options = val;
-        } else {
-          (attrs = {})[key] = val;
-        }
-
-        options = _.extend({validate: true}, options);
-
-        // If we're not waiting and attributes exist, save acts as
-        // `set(attr).save(null, opts)` with validation. Otherwise, check if
-        // the model will be valid when the attributes, if any, are set.
-        if (attrs && !options.wait) {
-          if (!this.set(attrs, options)) return false;
-        } else {
-          if (!this._validate(attrs, options)) return false;
-        }
-
-        // Set temporary attributes if `{wait: true}`.
-        if (attrs && options.wait) {
-          this.attributes = _.extend({}, attributes, attrs);
-        }
-
-        // After a successful server-side save, the client is (optionally)
-        // updated with the server-side state.
-        if (options.parse === void 0) options.parse = true;
-        var model = this;
-        var success = options.success;
-        options.success = function(resp) {
-          // Ensure attributes are restored during synchronous saves.
-          model.attributes = attributes;
-          var serverAttrs = model.parse(resp, options);
-          if (options.wait) serverAttrs = _.extend(attrs || {}, serverAttrs);
-          if (_.isObject(serverAttrs) && !model.set(serverAttrs, options)) {
-            return false;
-          }
-          if (success) success(model, resp, options);
-          model.trigger('sync', model, resp, options);
-        };
-
-        // replacing #wrapError(this, options) with custom error handling to
-        // catch and throw invalid events
-        var error = options.error;
-        options.error = function(resp) {
-            if (resp.status === 400) {
-                var errors = JSON.parse(resp.responseText).errors;
-                if (options.invalid) {
-                    options.invalid(model, errors, options);
-                }
-                model.setErrors(errors, options);
-            } else {
-                if (error) error(model, resp, options);
-                model.trigger('error', model, resp, options);
-            }
-        };
-
-        method = this.isNew() ? 'create' : (options.patch ? 'patch' : 'update');
-        if (method === 'patch') options.attrs = attrs;
-        xhr = this.sync(method, this, options);
-
-        // Restore attributes.
-        if (attrs && options.wait) this.attributes = attributes;
-
-        return xhr;
-    },
-
-    setErrors: function(errors, options) {
-        if(_.size(errors) === 0) { return; }
-
-        var model = this;
-        this.validationError = errors;
-
-        model.trigger('invalid', this, errors, options);
-    },
-
-    // TODO: testme
-    errorsOn: function(attribute) {
-        if (this.validationError) {
-            return this.validationError[attribute];
-        }
-
-        return false;
-    },
-    
-    // PUTs to `/models/:id/touch` with the intention that the server sets the
-    // updated_at/on attributes to the current time.
-    //
-    // The JSON response is expected to return an JSON object with the attribute
-    // name and the new time. Any other attributes returned in the JSON will be
-    // updated on the Model as well
-    //
-    // If name is passed as an option it is passed as `name` paramater in the
-    // request
-    //
-    // TODO:
-    // Note that `#touch` must be used on a persisted object, or else an
-    // Viking.Model.RecordError will be thrown.
-    touch: function(name, options) {
-        _.defaults(options || (options = {}), {
-            type: 'PUT',
-            url: _.result(this, 'url') + '/touch',
-        });
-        
-        if (name) {
-            options.contentType = 'application/json';
-            options.data = JSON.stringify({name: name});
-        } else {
-            options.data = '';
-        }
-        
-        return this.save(null, options);
     }
-
+    
 }, {
 
     associations: [],
@@ -800,48 +493,350 @@ Viking.Model = Backbone.Model.extend({
         });
 
         return child;
-    },
-
-    reflect_on_associations: function(macro) {
-        var associations = _.values(this.associations);
-        if (macro) {
-            associations = _.select(associations, function(a) {
-                return a.macro === macro;
-            });
-        }
-
-        return associations;
-    },
-
-    reflect_on_association: function(name) {
-        return this.associations[name];
-    },
-
-    // Generates the `urlRoot` based off of the model name.
-    urlRoot: function() {
-        return "/" + this.modelName.pluralize();
-    },
-    
-    // Returns a unfetched collection with the predicate set to the query
-    where: function(options) {
-        var Collection = (this.modelName.capitalize() + 'Collection').constantize();
-        
-        return new Collection(undefined, {predicate: options});
-    },
-
-	// Find model by id. Accepts success and error callbacks in the options
-	// hash, which are both passed (model, response, options) as arguments.
-	//
-	// Find returns the model, however it most likely won't have fetched the
-	// data	from the server if you immediately try to use attributes of the
-	// model.
-    find: function(id, options) {
-		var model = new this({id: id});
-		model.fetch(options);
-		return model;
     }
 
 });
+// Find model by id. Accepts success and error callbacks in the options
+// hash, which are both passed (model, response, options) as arguments.
+//
+// Find returns the model, however it most likely won't have fetched the
+// data	from the server if you immediately try to use attributes of the
+// model.
+Viking.Model.find = function(id, options) {
+	var model = new this({id: id});
+	model.fetch(options);
+	return model;
+};
+Viking.Model.reflectOnAssociation = function(name) {
+    return this.associations[name];
+}
+Viking.Model.reflectOnAssociations = function(macro) {
+    var associations = _.values(this.associations);
+    if (macro) {
+        associations = _.select(associations, function(a) {
+            return a.macro === macro;
+        });
+    }
+
+    return associations;
+}
+// Generates the `urlRoot` based off of the model name.
+Viking.Model.urlRoot = function() {
+    return "/" + this.modelName.pluralize();
+};
+// Returns a unfetched collection with the predicate set to the query
+Viking.Model.where = function(options) {
+    var Collection = (this.modelName.capitalize() + 'Collection').constantize();
+    
+    return new Collection(undefined, {predicate: options});
+};
+Viking.Model.prototype.coerceAttributes = function(attrs) {
+    
+    _.each(this.associations, function(association) {
+        var Type = association.klass();
+
+        if (attrs[association.name] && !(attrs[association.name] instanceof Type)) {
+            attrs[association.name] = new Type(attrs[association.name]);
+        }
+    });
+
+    _.each(this.coercions, function (type, key) {
+        if (attrs[key] || attrs[key] === false) {
+            var klass = Viking.Coercions[type];
+
+            if (klass) {
+                attrs[key] = klass.load(attrs[key], key);
+            } else {
+                throw new TypeError("Coercion of " + type + " unsupported");
+            }
+        }
+    });
+
+    return attrs;
+    
+};
+// TODO: testme
+Viking.Model.prototype.errorsOn = function(attribute) {
+    if (this.validationError) {
+        return this.validationError[attribute];
+    }
+
+    return false;
+};
+// Returns string to use for params names. This is the key attributes from
+// the model will be namespaced under when saving to the server
+Viking.Model.prototype.paramRoot = function() {
+    return this.modelName.underscore();
+};
+// Overwrite Backbone.Model#save so that we can catch errors when a save
+// fails.
+Viking.Model.prototype.save = function(key, val, options) {
+    var attrs, method, xhr, attributes = this.attributes;
+
+    // Handle both `"key", value` and `{key: value}` -style arguments.
+    if (key == null || typeof key === 'object') {
+      attrs = key;
+      options = val;
+    } else {
+      (attrs = {})[key] = val;
+    }
+
+    options = _.extend({validate: true}, options);
+
+    // If we're not waiting and attributes exist, save acts as
+    // `set(attr).save(null, opts)` with validation. Otherwise, check if
+    // the model will be valid when the attributes, if any, are set.
+    if (attrs && !options.wait) {
+      if (!this.set(attrs, options)) return false;
+    } else {
+      if (!this._validate(attrs, options)) return false;
+    }
+
+    // Set temporary attributes if `{wait: true}`.
+    if (attrs && options.wait) {
+      this.attributes = _.extend({}, attributes, attrs);
+    }
+
+    // After a successful server-side save, the client is (optionally)
+    // updated with the server-side state.
+    if (options.parse === void 0) options.parse = true;
+    var model = this;
+    var success = options.success;
+    options.success = function(resp) {
+      // Ensure attributes are restored during synchronous saves.
+      model.attributes = attributes;
+      var serverAttrs = model.parse(resp, options);
+      if (options.wait) serverAttrs = _.extend(attrs || {}, serverAttrs);
+      if (_.isObject(serverAttrs) && !model.set(serverAttrs, options)) {
+        return false;
+      }
+      if (success) success(model, resp, options);
+      model.trigger('sync', model, resp, options);
+    };
+
+    // replacing #wrapError(this, options) with custom error handling to
+    // catch and throw invalid events
+    var error = options.error;
+    options.error = function(resp) {
+        if (resp.status === 400) {
+            var errors = JSON.parse(resp.responseText).errors;
+            if (options.invalid) {
+                options.invalid(model, errors, options);
+            }
+            model.setErrors(errors, options);
+        } else {
+            if (error) error(model, resp, options);
+            model.trigger('error', model, resp, options);
+        }
+    };
+
+    method = this.isNew() ? 'create' : (options.patch ? 'patch' : 'update');
+    if (method === 'patch') options.attrs = attrs;
+    xhr = this.sync(method, this, options);
+
+    // Restore attributes.
+    if (attrs && options.wait) this.attributes = attributes;
+
+    return xhr;
+}
+// select(options)
+// select(value[, options])
+//
+// When the model is part of a collection and you want to select a single
+// or multiple items from a collection. If a model is selected
+// `model.selected` will be set `true`, otherwise it will be `false`.
+//
+// If you pass `true` or `false` as the first paramater to `select` it will
+// select the model if true, or unselect if it is false.
+//
+// By default any other models in the collection with be unselected. To
+// prevent other models in the collection from being unselected you can
+// pass `{multiple: true}` as an option.
+//
+// The `selected` and `unselected` events are fired when appropriate.
+Viking.Model.prototype.select = function(value, options) {
+
+    // Handle both `value[, options]` and `options` -style arguments.
+    if (value === undefined || typeof value === 'object') {
+      options = value;
+      value = true;
+    }
+    
+    if (value === true) {
+        if (this.collection) {
+            this.collection.select(this, options);
+        } else {
+            this.selected = true;
+        }
+    } else {
+        if (this.selected) {
+            this.selected = false;
+            this.trigger('unselected', this);
+        }
+    }
+};
+Viking.Model.prototype.set = function (key, val, options) {
+    var attrs;
+    if (key === null) { return this; }
+
+    // Handle both `"key", value` and `{key: value}` -style arguments.
+    if (typeof key === 'object') {
+        attrs = key;
+        options = val;
+    } else {
+        (attrs = {})[key] = val;
+    }
+
+    this.coerceAttributes(attrs);
+    _.each(attrs, function(value, key) {
+        var association = this.reflectOnAssociation(key);
+        if (association && association.macro === 'hasMany') {
+            this.attributes[key].set(value.models);
+	_.each(value.models, function(model) {
+	  model.collection = this.attributes[key];
+        }, this);
+            delete attrs[key];
+        }
+    }, this);
+
+    return Backbone.Model.prototype.set.call(this, attrs, options);
+};
+Viking.Model.prototype.setErrors = function(errors, options) {
+    if(_.size(errors) === 0) { return; }
+
+    var model = this;
+    this.validationError = errors;
+
+    model.trigger('invalid', this, errors, options);
+};
+// Override [Backbone.Model#sync](http://backbonejs.org/#Model-sync).
+// [Ruby on Rails](http://rubyonrails.org/) expects the attributes to be
+// namespaced
+Viking.Model.prototype.sync = function(method, model, options) {
+    options || (options = {});
+
+    if (options.data == null && (method === 'create' || method === 'update' || method === 'patch')) {
+        options.contentType = 'application/json';
+        options.data = {};
+        options.data[_.result(model, 'paramRoot')] = (options.attrs || model.toJSON(options));
+        options.data = JSON.stringify(options.data);
+    }
+
+    return Backbone.sync.call(this, method, model, options);
+};
+// similar to Rails as_json method
+Viking.Model.prototype.toJSON = function (options) {
+    var data = _.clone(this.attributes);
+    
+    if (options === undefined) { options = {}; }
+
+    if (options.include) {
+        if (typeof options.include === 'string') {
+            var key = options.include;
+            options.include = {};
+            options.include[key] = {};
+        } else if (_.isArray(options.include)) {
+            var array = options.include;
+            options.include = {};
+            _.each(array, function(key) {
+                options.include[key] = {};
+            });
+        }
+    } else {
+        options.include = {};
+    }
+
+    _.each(this.associations, function(association) {
+        if (!options.include[association.name]) {
+            delete data[association.name];
+        } else if (association.macro === 'belongsTo' || association.macro === 'hasOne') {
+            if (data[association.name]) {
+                data[association.name+'_attributes'] = data[association.name].toJSON(options.include[association.name]);
+                delete data[association.name];
+            } else if (data[association.name] === null) {
+                data[association.name+'_attributes'] = null;
+                delete data[association.name];
+            }
+        } else if (association.macro === 'hasMany') {
+            if (data[association.name]) {
+                data[association.name + '_attributes'] = data[association.name].toJSON(options.include[association.name]);
+                delete data[association.name];
+            }
+        }
+    });
+
+    _.each(this.coercions, function (type, key) {
+        if (data[key] || data[key] === false) {
+            var klass = Viking.Coercions[type];
+
+            if (klass) {
+                data[key] = klass.dump(data[key], key);
+            } else {
+                throw new TypeError("Coercion of " + type + " unsupported");
+            }
+        }
+    });
+
+    return data;
+};
+// Returns a string representing the object’s key suitable for use in URLs,
+// or nil if `#isNew` is true.
+Viking.Model.prototype.toParam = function() {
+    return this.isNew() ? null : this.get('id');
+};
+// PUTs to `/models/:id/touch` with the intention that the server sets the
+// updated_at/on attributes to the current time.
+//
+// The JSON response is expected to return an JSON object with the attribute
+// name and the new time. Any other attributes returned in the JSON will be
+// updated on the Model as well
+//
+// If name is passed as an option it is passed as `name` paramater in the
+// request
+//
+// TODO:
+// Note that `#touch` must be used on a persisted object, or else an
+// Viking.Model.RecordError will be thrown.
+Viking.Model.prototype.touch = function(name, options) {
+
+    // TODO move to extend and extend a new object so not writing to old options
+    _.defaults(options || (options = {}), {
+        type: 'PUT',
+        url: _.result(this, 'url') + '/touch',
+    });
+    
+    if (name) {
+        options.contentType = 'application/json';
+        options.data = JSON.stringify({name: name});
+    } else {
+        options.data = '';
+    }
+    
+    return this.save(null, options);
+};
+// Opposite of #select. Triggers the `unselected` event.
+Viking.Model.prototype.unselect = function(options) {
+    this.select(false, options);
+};
+// TODO: test return
+Viking.Model.prototype.updateAttribute = function (key, value, options) {
+    var data = {};
+    data[key] = value;
+    
+    return this.updateAttributes(data, options);
+};
+// TODO: test return
+Viking.Model.prototype.updateAttributes = function (data, options) {
+    options || (options = {});
+    options.patch = true;
+    
+    return this.save(data, options);
+};
+// TODO: overwrite url to use toParam()
+// Alias for `::urlRoot`
+Viking.Model.prototype.urlRoot = function() {
+    return this.constructor.urlRoot();
+};
 // Viking.Collection
 // -----------------
 //
@@ -2408,16 +2403,6 @@ Viking.View.Helpers.textField = function (model, attribute, options) {
 // TODO: year_field
 //
 // require viking/view/form_builder
-Backbone.Model.prototype.updateAttribute = function (key, value, options){
-    var data = {};
-    data[key] = value;
-    this.updateAttributes(data, options);
-};
-
-Backbone.Model.prototype.updateAttributes = function (data, options) {
-    options.patch = true;
-    this.save(data, options);
-};
 Viking.PaginatedCollection = Viking.Collection.extend({
     constructor: function(models, options) {
         Viking.Collection.apply(this, arguments);
@@ -2606,9 +2591,7 @@ Viking.Router = Backbone.Router.extend({
 
 
 
-
 //
-
 
 
 
