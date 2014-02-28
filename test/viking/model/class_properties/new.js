@@ -61,4 +61,17 @@
         delete ShipCollection;
     });
     
+    // STI
+    test("::new(attrs) with type set to a sub-type returns subtype", function() {
+        Account = Viking.Model.extend('account');
+        Agent = Account.extend('agent');
+        
+        var agent = new Account({type: 'agent'});
+        ok(agent instanceof Agent);
+        ok(agent instanceof Account);
+        
+        delete Account;
+        delete Agent;
+    })
+    
 }());

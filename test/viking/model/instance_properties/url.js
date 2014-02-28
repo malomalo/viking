@@ -17,5 +17,14 @@
     
         equal(model.url(), '/models/slug');
     });
+    
+    // STI test
+    test("#url returns an URL based on modelName of the baseModel", function() {
+        var Ship = Viking.Model.extend('ship');
+        var Carrier = Ship.extend();
+        var carrier = new Carrier({id: 42});
+        
+        equal(carrier.url(), '/ships/42');
+    });
 
 }());

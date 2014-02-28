@@ -66,4 +66,37 @@
         delete Ship;
     });
     
+    // STI
+    // ========================================================================
+    
+    test("::extend a Viking.Model unions the hasMany relationships", function () {
+        Key = Viking.Model.extend('key');
+        Comment = Viking.Model.extend('comment');
+        Account = Viking.Model.extend('account', { hasMany: ['comments'] });
+        Agent   = Account.extend('agent', { hasMany: ['keys'] });
+        
+        deepEqual(['comments'], _.map(Account.associations, function(a) { return a.name; }));
+        deepEqual(['comments', 'keys'], _.map(Agent.associations, function(a) { return a.name; }).sort());
+        
+        delete Key;
+        delete Comment;
+        delete Account;
+        delete Agent;
+    });
+    
+    test("::extend a Viking.Model unions the belongsTo relationships", function () {
+        State = Viking.Model.extend('state');
+        Region = Viking.Model.extend('region');
+        Account = Viking.Model.extend('account', { belongsTo: ['state'] });
+        Agent   = Account.extend('agent', { belongsTo: ['region'] });
+        
+        deepEqual(['state'], _.map(Account.associations, function(a) { return a.name; }));
+        deepEqual(['region', 'state'], _.map(Agent.associations, function(a) { return a.name; }).sort());
+        
+        delete State;
+        delete Region;
+        delete Account;
+        delete Agent;
+    });
+    
 }());
