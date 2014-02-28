@@ -3,13 +3,14 @@ require 'sprockets'
 require 'erb'
 require 'json'
 require 'rest_client'
-require './source_annotation_extractor'
+require './test/source_annotation_extractor'
 
 # Setup Sprockets
 environment = Sprockets::Environment.new
 environment.append_path 'lib'
 environment.append_path 'test'
-environment.append_path 'deps'
+environment.append_path 'dependencies'
+environment.append_path 'test/dependencies'
 environment.unregister_postprocessor 'application/javascript', Sprockets::SafetyColons
 
 desc "Compile viking.js"
@@ -42,26 +43,25 @@ task :test do
   # Checks
   check 'npm', 'npm', 'http://nodejs.org/'
   #check 'jscover', 'jscover', 'http://tntim96.github.io/JSCover/'
+  #
+  # Installation for jscover:
+  # mkdir -p jscover
+  # wget --trust-server-name --output-document=jscover/jscover.zip "http://downloads.sourceforge.net/project/jscover/JSCover-1.0.6.zip?r=http%3A%2F%2Ftntim96.github.io%2FJSCover%2F&ts=1366915691&use_mirror=hivelocity"
+  # unzip -d jscover/jscover jscover/jscover.zip
+  # mv jscover/jscover/target/dist/JSCover-all.jar /usr/local/lib/jscover-all.jar
+  # rm -rf jscover
 
   # Add our custom Processor to turn viking.js into a list of files to include
   environment.unregister_postprocessor 'application/javascript', Sprockets::DirectiveProcessor
   environment.register_postprocessor 'application/javascript', UrlGenerator  
-  
-  viking_files = environment['viking.js'].to_s.lines.map do |l|
-    l.sub(Dir.pwd, '').strip
-  end
-  
-  test_files = environment['test.js'].to_s.lines.map do |l|
-    l.sub(Dir.pwd, '').strip
-  end
-  
+    
   # Render the test html file
   File.open('test/index.html', 'w') do |file|
     file.write(ERB.new(File.read('test/index.html.erb')).result(binding))
   end
   
-  FileUtils.rm_rf('coverage')
-  pid = spawn('java -jar /usr/local/lib/jscover-all.jar -ws --port=4321 --report-dir=coverage --no-instrument=/deps/ --no-instrument=/test/ --no-instrument=/coverage/')
+  FileUtils.rm_rf('test/coverage')
+  pid = spawn('java -jar /usr/local/lib/jscover-all.jar -ws --port=4321 --report-dir=test/coverage --no-instrument=/deps/ --no-instrument=/test/')
   result = system "npm test"
   Process.kill(:SIGINT, pid)
 
@@ -78,7 +78,7 @@ namespace :coveralls do
       :source_files => [],
       :git => git_info
     }
-    data = JSON.parse(File.read('coverage/jscoverage.json'))
+    data = JSON.parse(File.read('test/coverage/jscoverage.json'))
     
     data.each do |k, v|
       v['lineData'].shift

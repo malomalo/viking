@@ -4,8 +4,6 @@
   <meta charset='utf8'>
   <title>Viking Test Suite</title>
   
-  <script src="/deps/qunit.js"></script>
-  <script src="/deps/sinon.js"></script>
   <style type="text/css" media="screen">
     /*!
      * QUnit 1.14.0
@@ -245,17 +243,12 @@
     	height: 1000px;
     }
   </style>
-
-  <script src="/deps/jquery.js"></script>
-  <script src="/deps/strftime.js"></script>
-  <script src="/deps/underscore.js"></script>
-  <script src="/deps/underscore.inflection.js"></script>
-  <script src="/deps/backbone.js"></script>
-  <% viking_files.each do |f| %>
-  	<script src="<%= f %>"></script>
-  <% end %>
-  <% test_files.each do |f| %>
-  	<script src="<%= f %>"></script>
+  
+  <% ['dependencies.js', 'viking.js', 'test.js'].each do |file| %>
+    <% environment[file].to_s.lines.each do |i| %>
+    <%= i %>
+  	  <script src="<%= i.sub(Dir.pwd, '').strip %>"></script>
+    <% end %>
   <% end %>
 </head>
 <body>
