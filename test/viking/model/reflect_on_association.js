@@ -1,24 +1,24 @@
 (function () {
-    module("Viking.Model::reflect_on_association");
+    module("Viking.Model::reflectOnAssociation");
 
-    test("::reflect_on_association() returns the assocation", function() {
+    test("::reflectOnAssociation() returns the assocation", function() {
         Ship = Viking.Model.extend({ hasMany: ['ships'], belongsTo: [['carrier', {model: 'Ship'}]] });
         ShipCollection = Viking.Collection.extend({ model: Ship });
         
-        equal('ships', Ship.reflect_on_association('ships').name);
-        equal('carrier', Ship.reflect_on_association('carrier').name);
-        equal(undefined, Ship.reflect_on_association('bird'));
+        equal('ships', Ship.reflectOnAssociation('ships').name);
+        equal('carrier', Ship.reflectOnAssociation('carrier').name);
+        equal(undefined, Ship.reflectOnAssociation('bird'));
         
         delete Ship;
         delete ShipCollection;
     });
     
-    module("Viking.Model#reflect_on_association");
+    module("Viking.Model#reflectOnAssociation");
     
-    test("#reflect_on_association() is a reference to ::reflect_on_association()", function() {
+    test("#reflectOnAssociation() is a reference to ::reflectOnAssociation()", function() {
         var Ship = Viking.Model.extend();
 
-        strictEqual(Ship.reflect_on_association, (new Ship()).reflect_on_association)
+        strictEqual(Ship.reflectOnAssociation, (new Ship()).reflectOnAssociation)
     });
 
 }());

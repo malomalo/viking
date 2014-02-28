@@ -1,32 +1,32 @@
 (function () {
-    module("Viking.Model::reflect_on_associations");
+    module("Viking.Model::reflectOnAssociations");
 
-    test("::reflect_on_associations() returns all the assocations", function() {
+    test("::reflectOnAssociations() returns all the assocations", function() {
         Ship = Viking.Model.extend({ hasMany: ['ships'], belongsTo: [['carrier', {model: 'Ship'}]] });
         ShipCollection = Viking.Collection.extend({ model: Ship });
         
-        deepEqual(['ships', 'carrier'], _.map(Ship.reflect_on_associations(), function(a) { return a.name; }));
+        deepEqual(['ships', 'carrier'], _.map(Ship.reflectOnAssociations(), function(a) { return a.name; }));
     
         delete Ship;
         delete ShipCollection;
     });
     
-    test("::reflect_on_associations(macro) returns all macro assocations", function() {
+    test("::reflectOnAssociations(macro) returns all macro assocations", function() {
         Ship = Viking.Model.extend({ hasMany: ['ships'], belongsTo: [['carrier', {model: 'Ship'}]] });
         ShipCollection = Viking.Collection.extend({ model: Ship });
         
-        deepEqual(['ships'], _.map(Ship.reflect_on_associations('hasMany'), function(a) { return a.name; }));
+        deepEqual(['ships'], _.map(Ship.reflectOnAssociations('hasMany'), function(a) { return a.name; }));
     
         delete Ship;
         delete ShipCollection;
     });
 
-    module("Viking.Model#reflect_on_associations");
+    module("Viking.Model#reflectOnAssociations");
     
-    test("#reflect_on_associations() is a reference to ::reflect_on_associations()", function() {
+    test("#reflectOnAssociations() is a reference to ::reflectOnAssociations()", function() {
         var Ship = Viking.Model.extend();
 
-        strictEqual(Ship.reflect_on_associations, (new Ship()).reflect_on_associations)
+        strictEqual(Ship.reflectOnAssociations, (new Ship()).reflectOnAssociations)
     });
 
 }());
