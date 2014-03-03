@@ -1,3 +1,9 @@
+## Edge
+
+Bugfixes:
+
+  - `belongsTo: ['api_key']` assumes `ApiKey` is the class not `Api_key`
+  
 ## 0.4.0 (March 3rd, 2014)
 
 Major Changes:

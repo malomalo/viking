@@ -385,13 +385,13 @@ Viking.AssociationReflection = function (macro, name, options) {
         } else if (options.model) {
             this.collectionName = (options.model + 'Collection');
         } else {
-            this.collectionName = (this.name.singularize().capitalize() + 'Collection');
+            this.collectionName = (this.name.singularize().camelize() + 'Collection');
         }
     } else if (macro === 'belongsTo' || macro === 'hasOne') {
         if (options.model) {
             this.modelName = options.model;
         } else {
-            this.modelName = name.capitalize();
+            this.modelName = name.camelize();
         }
     } else {
         throw new TypeError("Unkown Macro " + macro);
