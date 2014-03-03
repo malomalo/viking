@@ -1,8 +1,14 @@
-## Edge
+## 0.4.0 (March 3rd, 2014)
 
 Major Changes:
 
+  - Inital support for STI
+  - `Viking.Model#url` now uses `#toParam` to get the objects key for the url
   - Removed CSRF token injection for AJAX request. Can added on a per project basis
+
+Minor Changes:
+
+  - `updateAttribute` & `updateAttributes` moved from `Backbone.Model` to `Viking.Model`
   
 ## 0.3.0 (Feburary 26th, 2014)
 
