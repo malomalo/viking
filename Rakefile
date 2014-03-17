@@ -4,6 +4,7 @@ require 'erb'
 require 'json'
 require 'rest_client'
 require './test/source_annotation_extractor'
+require 'rake/clean'
 
 # Setup Sprockets
 environment = Sprockets::Environment.new
@@ -14,16 +15,22 @@ environment.append_path 'test/dependencies'
 environment.unregister_postprocessor 'application/javascript', Sprockets::SafetyColons
 
 desc "Compile viking.js"
-task :compile do
+file "viking.js" => FileList["lib/**/*.js"] do
   FileUtils.rm_f('./viking.js')
-  
+
   File.open('./viking.js', "w") do |file|
     file.write(environment['viking.js'].to_s)
   end
 end
 
+desc "Compile viking.js"
+task :compile => ["viking.js"]
+
+CLEAN.include("test/coverage")
+CLOBBER.include("viking.js")
+
 desc "Build the docco documentation"
-task :doc => :compile do
+task :doc => "viking.js" do
   check 'docco', 'docco', 'https://github.com/jashkenas/docco'
   system 'docco --css docco.css viking.js'
 end

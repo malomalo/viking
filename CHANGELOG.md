@@ -1,4 +1,9 @@
-## Edge
+## 0.5.0 (March 17th, 2014)
+
+New Features:
+
+  - added `FormBuilder` helper
+  - added `Viking.View.Helpers.formFor` helper for creating and rendering `FormBuilder`s
 
 Bugfixes:
 
