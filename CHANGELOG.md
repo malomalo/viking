@@ -3,6 +3,7 @@
 Bugfixes:
 
   - `Router#start` now takes `options` and passes them to `Backbone.history.start`
+  - `Model#paramRoot` returns the `baseModel.modelName` when used with STI
 
 ## 0.5.0 (March 17th, 2014)
 
