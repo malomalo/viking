@@ -1,3 +1,9 @@
+## Edge
+
+Bugfixes:
+
+  - `Router#start` now takes `options` and passes them to `Backbone.history.start`
+
 ## 0.5.0 (March 17th, 2014)
 
 New Features:

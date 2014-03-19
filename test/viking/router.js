@@ -264,6 +264,26 @@
         Backbone.history.start = oldstart;
     });
 
+    test("router.start() passes {pushState: true} as options to Backbone.history", function() {
+        expect(1);
+
+        var router = new Viking.Router();
+        var oldstart = Backbone.history.start
+        Backbone.history.start = function(options) { deepEqual({pushState: true}, options); }
+        router.start();
+        Backbone.history.start = oldstart;
+    });
+    
+    test("router.start(options) passes options to Backbone.history", function() {
+        expect(1);
+
+        var router = new Viking.Router();
+        var oldstart = Backbone.history.start
+        Backbone.history.start = function(options) { deepEqual({pushState: true, silent: true}, options); }
+        router.start({silent: true});
+        Backbone.history.start = oldstart;
+    });
+
     test("router.stop() stops Backbone.history", function() {
         expect(1);
 
