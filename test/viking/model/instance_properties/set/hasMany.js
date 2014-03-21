@@ -53,7 +53,7 @@
 
         delete Ship;
         delete ShipCollection;
-    })
+    });
 
     test("#set(hasManyRelation, data) updates the current collection and doesn't create a new one", function() {
       Ship = Viking.Model.extend({});
@@ -69,6 +69,25 @@
       delete Ship;
       delete ShipCollection;
       delete Fleet;
-    })
+    });
+    
+    test("#set({type: klass}) initilizes hasMany associations", function() {
+        Ship = Viking.Model.extend('ship');
+        ShipCollection = Viking.Collection.extend({ model: Ship });
+        Account = Viking.Model.extend('account');
+        Agent   = Account.extend('agent', { hasMany: ['ships'] });
+        
+        var account = new Account();
+        ok(!(account instanceof Agent));
+        account.set({type: 'agent'});
+        ok(account instanceof Agent);
+        ok(account.get('ships') instanceof ShipCollection);
+        
+        delete Ship;
+        delete ShipCollection;
+        delete Account;
+        delete Agent;
+    });
+
 
 }());

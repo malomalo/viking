@@ -744,6 +744,31 @@ Viking.Model.prototype.set = function (key, val, options) {
         (attrs = {})[key] = val;
     }
 
+    if (attrs.type && this.constructor.modelName !== attrs.type) {
+        // OPTIMIZE:  Mutating the [[Prototype]] of an object, no matter how
+        // this is accomplished, is strongly discouraged, because it is very
+        // slow and unavoidably slows down subsequent execution in modern
+        // JavaScript implementations
+        // Ideas: Move to Model.new(...) method of initializing models
+        var type = attrs.type.camelize().constantize();
+        this.constructor = type;
+        this.__proto__ = type.prototype;
+        
+        // TODO: move to function, used in Model.new
+        // TODO: probably move to a becomes method
+        // Set up associations
+        this.associations = this.constructor.associations;
+        this.reflectOnAssociation = this.constructor.reflectOnAssociation;
+        this.reflectOnAssociations = this.constructor.reflectOnAssociations;
+
+        // Initialize any `hasMany` relationships to empty collections
+        _.each(this.reflectOnAssociations('hasMany'), function(association) {
+            if (!this.attributes[association.name]) {
+                this.attributes[association.name] = new (association.collection())();
+            }
+        }, this);
+    }
+
     this.coerceAttributes(attrs);
     _.each(attrs, function(value, key) {
         var association = this.reflectOnAssociation(key);
@@ -755,7 +780,7 @@ Viking.Model.prototype.set = function (key, val, options) {
             delete attrs[key];
         }
     }, this);
-
+    
     return Backbone.Model.prototype.set.call(this, attrs, options);
 };
 Viking.Model.prototype.setErrors = function(errors, options) {
@@ -2427,9 +2452,6 @@ Viking.View.Helpers.textField = function (model, attribute, options) {
     
     return Viking.View.Helpers.textFieldTag(name, model.get(attribute), options);
 };
-/*global contentTag, checkBox, hiddenField, hiddenFieldTag, label, passwordField, radioButton, textArea, textField*/
-
-
 function FormBuilder(model, options, content) {
     if (typeof options === 'function') {
         content = options;
