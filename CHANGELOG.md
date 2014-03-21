@@ -4,6 +4,7 @@ Minor Changes:
 
  - `Viking.Model#set` now changes the prototype of the model to type if type was passed
  - `Viking.Model#set` initializes new `hasMany` associations when set is called with new type
+ - Added `Viking.View.Helpers.timeTag`
  
 Bugfixes:
 
