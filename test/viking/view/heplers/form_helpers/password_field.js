@@ -24,4 +24,9 @@
                '<input class="error" id="model_password" name="model[password]" type="password">');
     });
     
+    test("passwordField(model, attribute, options) allows name to be overridden", function() {
+        equal( Viking.View.Helpers.passwordField(this.model, 'password', {name: 'overridden'}),
+               '<input id="overridden" name="overridden" type="password">');
+    });
+    
 }());

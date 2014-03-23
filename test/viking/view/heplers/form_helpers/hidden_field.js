@@ -22,4 +22,9 @@
                '<input class="test" name="model[key]" type="hidden" value="">');
     });
     
+    test("hiddenField(model, attribute, options) allows name to be overridden", function() {
+        equal( Viking.View.Helpers.hiddenField(this.model, 'key', {name: 'overridden'}),
+               '<input name="overridden" type="hidden" value="">');
+    });
+    
 }());

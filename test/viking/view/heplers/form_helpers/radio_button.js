@@ -27,4 +27,9 @@
                '<input class="error" id="model_eula_true" name="model[eula]" type="radio" value="true">');
     });
     
+    test("radioButton(model, attribute) allows name to be overridden", function() {
+        equal( Viking.View.Helpers.radioButton(this.model, 'eula', 'true', {name: 'overridden'}),
+               '<input id="overridden_true" name="overridden" type="radio" value="true">');
+    });
+    
 }());

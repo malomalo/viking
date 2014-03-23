@@ -39,4 +39,8 @@
                '<label class="error" for="model_eula">Eula</label>');
     });
     
+    test("label(model, attribute, {for: 'override'}) uses 'override' for the `for` attribute", function() {
+        equal( Viking.View.Helpers.label(this.model, 'key', {for: 'override'}), '<label for="override">Key</label>');
+    });
+    
 }());

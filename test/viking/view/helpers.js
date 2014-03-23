@@ -73,10 +73,9 @@
     
     // sanitizeToId(name)
     // =========================================================================
-    test("tagNameForModelAttribute(model, attribute)", function() {
+    test("sanitizeToId(modelName)", function() {
         equal("model_name", Viking.View.sanitizeToId("model[name]"));
     });
-    
     
     // tagNameForModelAttribute(model, attribute)
     // =========================================================================
@@ -87,11 +86,25 @@
         equal("model[name]", Viking.View.tagNameForModelAttribute(model, 'name'));
     });
     
+    test("tagNameForModelAttribute(model, attribute, {namespace: ...})", function() {
+        var Model = Viking.Model.extend('model');
+        var model = new Model({name: "name"});
+
+        equal("key[model][name]", Viking.View.tagNameForModelAttribute(model, 'name', {namespace: 'key'}));
+    });
+    
     test("tagNameForModelAttribute(model, arrayAttribute)", function() {
         var Model = Viking.Model.extend('model');
         var model = new Model({names: ["name"]});
 
         equal("model[names][]", Viking.View.tagNameForModelAttribute(model, 'names'));
+    });
+    
+    test("tagNameForModelAttribute(model, arrayAttribute, {namespace: ...})", function() {
+        var Model = Viking.Model.extend('model');
+        var model = new Model({names: ["name"]});
+
+        equal("key[model][names][]", Viking.View.tagNameForModelAttribute(model, 'names', {namespace: 'key'}));
     });
     
     test("tagNameForModelAttribute(model, vikingCollectionAttribute)", function() {
@@ -100,6 +113,14 @@
         var model = new Model({models: new ModelCollection()});
 
         equal("model[models][]", Viking.View.tagNameForModelAttribute(model, 'models'));
+    });
+    
+    test("tagNameForModelAttribute(model, vikingCollectionAttribute)", function() {
+        var Model = Viking.Model.extend('model');
+        var ModelCollection = Viking.Collection.extend({model: Model});
+        var model = new Model({models: new ModelCollection()});
+
+        equal("key[model][models][]", Viking.View.tagNameForModelAttribute(model, 'models', {namespace: 'key'}));
     });
     
     // addErrorClassToOptions(model, attribute, options)

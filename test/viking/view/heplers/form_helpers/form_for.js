@@ -12,17 +12,13 @@
         equal(Viking.View.Helpers.formFor(this.model, function() { return ''; }), '<form method="get"></form>');
     });
 
-    test("formFor(model, options, content())", function() {
-        equal(Viking.View.Helpers.formFor(this.model, {method: "post"}, function() { return ''; }), '<form method="post"></form>');
-    });
-
     test("formFor(model, {method: 'get'}, content())", function() {
         equal( Viking.View.Helpers.formFor(this.model, {method: 'get'}, function() { return ''; }),
                '<form method="get"></form>');
     });
-
+    
     test("formFor(model, {method: 'post'}, content())", function() {
-        equal( Viking.View.Helpers.formFor(this.model, {method: 'post'}, function() { return ''; }),
+        equal( Viking.View.Helpers.formFor(this.model, {method: "post"}, function() { return ''; }),
                '<form method="post"></form>');
     });
 
@@ -55,5 +51,5 @@
         equal( Viking.View.Helpers.formFor(this.model, {multipart: true, method: 'get'}, function() { return ''; }),
                '<form enctype="multipart/form-data" method="post"><div style="margin:0;padding:0;display:inline"><input name="_method" type="hidden" value="get"></div></form>');
     });
-    
+
 }());

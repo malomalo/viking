@@ -1,10 +1,19 @@
 ## Edge
 
+Major Changes:
+
+ - `FormBuilder` no longer accepts content as an argument
+ - `FormBuilder#render` has been removed
+ - `Viking.Viking.Helpers.formFor` is now responsible for output the `form` tags
+ - Added `FormBuilder.fieldsFor` that acts similar to (Rail's fields\_for)[http://api.rubyonrails.org/classes/ActionView/Helpers/FormBuilder.html#method-i-fields_for]
+ 
 Minor Changes:
 
  - `Viking.Model#set` now changes the prototype of the model to type if type was passed
  - `Viking.Model#set` initializes new `hasMany` associations when set is called with new type
  - Added `Viking.View.Helpers.timeTag`
+ - All form helpers allow the name to be passed in as an option to override the generated name
+ - `Viking.View.tagNameForModelAttribute` now accepts namespace as an option
  
 Bugfixes:
 

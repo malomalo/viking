@@ -1238,9 +1238,17 @@ Viking.View.Helpers = {};
     };
 
     // TODO: move to model_helpers?
-    Viking.View.tagNameForModelAttribute = function (model, attribute) {
+    Viking.View.tagNameForModelAttribute = function (model, attribute, options) {
+        options || (options = {});
+        
         var value = model.get(attribute);
-        var name = model.modelName + '[' + attribute + ']';
+        var name;
+        if (options.namespace) {
+            name = options.namespace + '[' + model.modelName + '][' + attribute + ']';
+        } else {
+            name = model.modelName + '[' + attribute + ']';
+        }
+        
          if (value instanceof Viking.Collection || _.isArray(value)) {
              name = name + '[]';
          }
@@ -2151,13 +2159,13 @@ Viking.View.Helpers.textAreaTag = function (name, content, options, escape) {
 Viking.View.Helpers.checkBox = function (model, attribute, options, checkedValue, uncheckedValue) {
     var output = '';
     var value = model.get(attribute);
-    var name = Viking.View.tagNameForModelAttribute(model, attribute);
 
     if (options === undefined) { options = {}; }
     if (checkedValue === undefined) { checkedValue = true; }
     if (uncheckedValue === undefined) { uncheckedValue = false; }
     Viking.View.addErrorClassToOptions(model, attribute, options);
-    
+
+    var name = options.name || Viking.View.tagNameForModelAttribute(model, attribute);    
     output += Viking.View.Helpers.hiddenFieldTag(name, uncheckedValue);
     output += Viking.View.Helpers.checkBoxTag(name, checkedValue, checkedValue === value, options);
     
@@ -2207,13 +2215,13 @@ Viking.View.Helpers.checkBox = function (model, attribute, options, checkedValue
 Viking.View.Helpers.collectionSelect = function (model, attribute, collection, valueAttribute, textAttribute, options) {
     if (options === undefined) { options = {}; }
 
-    var name = Viking.View.tagNameForModelAttribute(model, attribute);
     var optionOptions = _.pick(options, 'selected');
     var selectOptions = _.omit(options, 'selected');
     if (model.get(attribute) && optionOptions.selected === undefined) {
         optionOptions.selected = Viking.View.methodOrAttribute(model.get(attribute), valueAttribute);
     }
-
+    
+    var name = options.name || Viking.View.tagNameForModelAttribute(model, attribute);
     var optionsTags = Viking.View.Helpers.optionsFromCollectionForSelectTag(collection, valueAttribute, textAttribute, selectOptions);
     return Viking.View.Helpers.selectTag(name, optionsTags, selectOptions);
 };
@@ -2233,9 +2241,25 @@ Viking.View.Helpers.formFor = function (model, options, content) {
         options = {};
     }
     
-    var form = new FormBuilder(model, options, content);
+    var method = options.method;
+    if (options.multipart === true) {
+        options.enctype = "multipart/form-data";
+        options.method = 'post';
+        delete options.multipart;
+    } else if (!options.method) {
+        options.method = 'get';
+    }
+
+    var builder = new FormBuilder(model, options);
+    if ( (options.method !== 'get' && options.method !== 'post') || (method && method !== options.method) ) {
+        options.method = 'post';
+        content = _.wrap(content, function(func, form) {
+            var hiddenInput = Viking.View.Helpers.hiddenFieldTag('_method', method);
+            return Viking.View.Helpers.contentTag('div', hiddenInput, {style: 'margin:0;padding:0;display:inline'}, false) + func(builder);
+        });
+    }
     
-    return form.render();
+    return Viking.View.Helpers.contentTag('form', content(builder), options, false);
 };
 // hiddenField(model, attribute, options = {})
 // =========================================
@@ -2296,18 +2320,20 @@ Viking.View.Helpers.hiddenField = function (model, attribute, options) {
 //   // => <label for="post_privacy_public">Public Post</label>
 Viking.View.Helpers.label = function (model, attribute, content, options) {
     var tmp;
-    var name = Viking.View.tagNameForModelAttribute(model, attribute);
-    
     if (typeof content === 'object') {
         tmp = options;
         options = content;
         content = tmp;
     }
-
+    
     if (options === undefined) { options = {}; }
     if (content === undefined) { content = attribute.humanize(); }
-    if (typeof content === 'function') { content = content(); }
-    if (!options.for) { options.for = Viking.View.sanitizeToId(name); }
+    if (typeof content === 'function') { content = content(); }        
+    if (!options.for) {
+        var name = Viking.View.tagNameForModelAttribute(model, attribute);
+        options.for = Viking.View.sanitizeToId(name);
+    }
+    
     Viking.View.addErrorClassToOptions(model, attribute, options);
     
     return Viking.View.Helpers.labelTag(content, options);
@@ -2329,7 +2355,8 @@ Viking.View.Helpers.label = function (model, attribute, content, options) {
 //   passwordField(account, 'secret', {class: "form_input", value: account.get('secret')})
 //   // => <input class="form_input" id="account_secret" name="account[secret]" type="password" value="unkown">
 Viking.View.Helpers.passwordField = function (model, attribute, options) {
-    var name = Viking.View.tagNameForModelAttribute(model, attribute);
+    options || (options = {});
+    var name = options.name || Viking.View.tagNameForModelAttribute(model, attribute);
 
     if (options === undefined) { options = {}; }
     Viking.View.addErrorClassToOptions(model, attribute, options);
@@ -2356,9 +2383,9 @@ Viking.View.Helpers.passwordField = function (model, attribute, options) {
 //   // => <input type="radio" id="user_receive_newsletter_yes" name="user[receive_newsletter]" value="yes">
 //   //    <input type="radio" id="user_receive_newsletter_no" name="user[receive_newsletter]" value="no" checked>
 Viking.View.Helpers.radioButton = function (model, attribute, tag_value, options) {
-    var name = Viking.View.tagNameForModelAttribute(model, attribute);
-
     if (options === undefined) { options = {}; }
+    var name = options.name || Viking.View.tagNameForModelAttribute(model, attribute);
+
     _.defaults(options, {
         id: Viking.View.sanitizeToId(name + "_" + tag_value)
     });
@@ -2499,79 +2526,124 @@ Viking.View.Helpers.textField = function (model, attribute, options) {
     
     return Viking.View.Helpers.textFieldTag(name, model.get(attribute), options);
 };
-function FormBuilder(model, options, content) {
-    if (typeof options === 'function') {
-        content = options;
-        options = {};
-    }
+function FormBuilder(model, options) {
+    options || (options = {});
     
     this.model = model;
     this.options = options;
-    this.content = content;
 }
 
+// TODO: options passed to the helpers can be made into a helper
 FormBuilder.prototype = {
 
-    render: function () {
-        var content = this.content;
-        var options = _.clone(this.options);
-        var method = options.method;
-        
-        if (options.multipart === true) {
-            options.enctype = "multipart/form-data";
-            options.method = 'post';
-            delete options.multipart;
-        } else if (!options.method) {
-            options.method = 'get';
-        }
-    
-
-        if ( (options.method !== 'get' && options.method !== 'post') || (method && method !== options.method) ) {
-            var form = this;
-            options.method = 'post';
-            content = _.wrap(content, function(func, form) {
-                var hiddenInput = Viking.View.Helpers.hiddenFieldTag('_method', method);
-                return Viking.View.Helpers.contentTag('div', hiddenInput, {style: 'margin:0;padding:0;display:inline'}, false) + func(form);
-            });
-        }
-
-        return Viking.View.Helpers.contentTag('form', content(this), options, false);
-    },
-
     checkBox: function(attribute, options, checkedValue, uncheckedValue) {
+        options || (options = {});
+        
+        if (!options.name && this.options.namespace) {
+            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+        }
+        
         return Viking.View.Helpers.checkBox(this.model, attribute, options, checkedValue, uncheckedValue);
     },
 
     collectionSelect: function(attribute, collection, valueAttribute, textAttribute, options) {
+        options || (options = {});
+        
+        if (!options.name && this.options.namespace) {
+            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+        }
+        
         return Viking.View.Helpers.collectionSelect(this.model, attribute, collection, valueAttribute, textAttribute, options);
     },
 
     hiddenField: function(attribute, options) {
+        options || (options = {});
+        
+        if (!options.name && this.options.namespace) {
+            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+        }
+        
         return Viking.View.Helpers.hiddenField(this.model, attribute, options);
     },
     
     label: function(attribute, content, options) {
+        options || (options = {});
+        
+        if (!options.name && this.options.namespace) {
+            options.for = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+            options.for = Viking.View.sanitizeToId(options.for);
+        }
+        
         return Viking.View.Helpers.label(this.model, attribute, content, options);
     },
 
     passwordField: function(attribute, options) {
+        options || (options = {});
+        
+        if (!options.name && this.options.namespace) {
+            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+        }
+        
         return Viking.View.Helpers.passwordField(this.model, attribute, options);
     },
     
     radioButton: function(attribute, tagValue, options) {
+        options || (options = {});
+        
+        if (!options.name && this.options.namespace) {
+            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+        }
+        
         return Viking.View.Helpers.radioButton(this.model, attribute, tagValue, options);
     },
     
     select: function(attribute, collection, options) {
+        options || (options = {});
+        
+        if (!options.name && this.options.namespace) {
+            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+        }
+        
         return Viking.View.Helpers.select(this.model, attribute, collection, options);
     },
 
     textArea: function(attribute, options) {
+        options || (options = {});
+        
+        if (!options.name && this.options.namespace) {
+            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+        }
+        
         return Viking.View.Helpers.textArea(this.model, attribute, options);
     },
 
     textField: function(attribute, options) {
+        options || (options = {});
+        
+        if (!options.name && this.options.namespace) {
+            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+        }
+        
         return Viking.View.Helpers.textField(this.model, attribute, options);
+    },
+    
+    fieldsFor: function(attribute, options, content) {
+        if (typeof options === 'function') {
+            content = options;
+            options = {};
+        }
+        
+        if (!options.namespace) {
+            if (this.options.namespace) {
+                options.namespace = this.options.namespace + '[' + this.model.modelName + ']';
+            } else {
+                options.namespace = this.model.modelName;
+            }
+        }
+        
+        var builder = new FormBuilder(this.model.get(attribute), options);
+    
+        return content(builder);
     }
     
 };
