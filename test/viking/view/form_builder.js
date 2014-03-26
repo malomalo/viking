@@ -251,6 +251,59 @@
         
         Viking.View.Helpers.label = old_func;
     });
+    
+    // number()
+    // ==========
+    test("#number() passes to Viking.View.Helpers.number", function () {
+        expect(3);
+        
+        var model = this.model;
+        var form = new FormBuilder(this.model);
+        old_func = Viking.View.Helpers.numberField;
+        
+        Viking.View.Helpers.numberField = function(m, attribute, options) {
+            strictEqual(model, m);
+            strictEqual('key', attribute);
+            deepEqual({}, options);
+        }
+        form.number('key', {});
+        
+        Viking.View.Helpers.numberField = old_func;
+    });
+    
+    test("#number() uses namepsace on for attribute", function () {
+        expect(3);
+        
+        var model = this.model;
+        var form = new FormBuilder(this.model, {namespace: 'ns'})
+        old_func = Viking.View.Helpers.numberField
+        
+        Viking.View.Helpers.numberField = function(m, attribute, options) {
+            strictEqual(model, m);
+            strictEqual('key', attribute);
+            deepEqual({'name': 'ns[model][key]'}, options);
+        }
+        form.number('key', {});
+        
+        Viking.View.Helpers.numberField = old_func;
+    });
+    
+    test("#number() allows for attribute to be overridden", function () {
+        expect(3);
+        
+        var model = this.model;
+        var form = new FormBuilder(this.model)
+        old_func = Viking.View.Helpers.numberField
+        
+        Viking.View.Helpers.numberField = function(m, attribute, options) {
+            strictEqual(model, m);
+            strictEqual('key', attribute);
+            deepEqual({'for': 'me'}, options);
+        }
+        form.number('key', {'for': 'me'});
+        
+        Viking.View.Helpers.numberField = old_func;
+    });
 
     // passwordField()
     // ==========

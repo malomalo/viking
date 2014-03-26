@@ -2641,6 +2641,16 @@ FormBuilder.prototype = {
         
         return Viking.View.Helpers.label(this.model, attribute, content, options);
     },
+    
+    number: function(attribute, options) {
+        options || (options = {});
+        
+        if (!options.name && this.options.namespace) {
+            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+        }
+        
+        return Viking.View.Helpers.numberField(this.model, attribute, options);
+    },
 
     passwordField: function(attribute, options) {
         options || (options = {});
