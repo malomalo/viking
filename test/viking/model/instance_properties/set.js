@@ -15,4 +15,16 @@
         delete Agent;
     });
     
+    test("::set({type: string}) doesn't change the object prototype when inheritanceAttribute set to false", function() {
+        var Ship = Viking.Model.extend('ship', {
+            inheritanceAttribute: false
+        });
+        var Battleship = Ship.extend('battleship', {});
+        
+        var bship = new Battleship();
+        bship.set({type: 'ship'});
+        
+        strictEqual(Battleship, bship.baseModel);
+    });
+    
 }());

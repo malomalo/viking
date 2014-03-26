@@ -20,5 +20,16 @@
         
         equal('class_name', Ship.inheritanceAttribute);
     });
+    
+    test("::inheritanceAttribute set to false disabled STI", function() {
+        var Ship = Viking.Model.extend({
+            inheritanceAttribute: false
+        });
+        var Battleship = Ship.extend('battleship');
+        
+        var bship = new Battleship();
+        strictEqual(false, Ship.inheritanceAttribute);
+        strictEqual(Battleship, bship.baseModel);
+    });
 
 }());

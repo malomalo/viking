@@ -14,6 +14,7 @@ Minor Changes:
  - Added `Viking.View.Helpers.timeTag`
  - All form helpers allow the name to be passed in as an option to override the generated name
  - `Viking.View.tagNameForModelAttribute` now accepts namespace as an option
+ - setting `inheritanceAttribute = false` on a Model disableds STI
  
 Bugfixes:
 
