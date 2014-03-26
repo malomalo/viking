@@ -1603,6 +1603,45 @@ Viking.View.Helpers.formTag = function (options, content) {
 
     return Viking.View.Helpers.tag('form', options, false) + methodOverride;
 };
+// numberFieldTag(name, value = nil, options = {})
+// ===============================================
+// 
+// Creates a number field.
+//
+// Options
+// -------
+//      - min:  The minimum acceptable value.
+//      - max:  The maximum acceptable value.
+//      - step: The acceptable value granularity.
+//      - Otherwise accepts the same options as text_field_tag.
+//
+// Examples
+// --------
+//   
+//   numberFieldTag('count')
+//   // => <input name="count" type="number">
+//   
+//   nubmerFieldTag('count', 10)
+//   // => <input" name="count" type="number" value="10">
+//   
+//   numberFieldTag('count', 4, {min: 1, max: 9})
+//   // => <input min="1" max="9" name="count" type="number" value="4">
+//   
+//   passwordFieldTag('count', {step: 25})
+//   # => <input name="count" step="25" type="number">
+Viking.View.Helpers.numberFieldTag = function (name, value, options) {
+    
+    // Handle both `name, value, options`, and `name, options` syntax
+    if (typeof value === 'object') {
+        options = value;
+        value = undefined;
+    }
+    
+    options = _.extend({type: 'number'}, options);
+    if (value) { options.value = value; }
+
+    return Viking.View.Helpers.textFieldTag(name, value, options);
+};
 // timeTag(date, [options], [value])
 // =================================
 //
@@ -2341,6 +2380,29 @@ Viking.View.Helpers.label = function (model, attribute, content, options) {
     
     return Viking.View.Helpers.labelTag(content, options);
 };
+// numberField(model, attribute, options)
+// ======================================
+//
+// Returns an input tag of the “number” type tailored for accessing a specified
+// attribute on the model. Additional options on the input tag can be passed as
+// a hash with options. These options will be tagged onto the HTML as an HTML
+// element attribute as in the example shown.
+//
+// Examples
+// --------
+//   numberField(user, 'age', {min: 0, max: 100})
+//   // => <input id="user_age" name="user[age]" type="number" value="27">
+//   
+//   numberField(account, 'requests', {class: "form_input"})
+//   // => <input class="form_input" id="account_requests" name="account[requests]" type="number" value="27">
+Viking.View.Helpers.numberField = function (model, attribute, options) {
+    options = _.extend({}, options);
+    var name = options.name || Viking.View.tagNameForModelAttribute(model, attribute);
+
+    Viking.View.addErrorClassToOptions(model, attribute, options);
+    
+    return Viking.View.Helpers.numberFieldTag(name, model.get(attribute), options);
+};
 // passwordField(model, attribute, options)
 // ========================================
 //
@@ -2670,7 +2732,7 @@ FormBuilder.prototype = {
 
 // TODO: image_submit_tag
 // TODO: month_field_tag
-// TODO: number_field_tag
+
 // TODO: phone_field_tag
 // TODO: range_field_tag
 // TODO: search_field_tag
@@ -2699,7 +2761,7 @@ FormBuilder.prototype = {
 
 
 // TODO: month_field
-// TODO: number_field
+
 
 // TODO: phone_field
 

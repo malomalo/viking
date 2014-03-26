@@ -15,6 +15,7 @@ Minor Changes:
  - All form helpers allow the name to be passed in as an option to override the generated name
  - `Viking.View.tagNameForModelAttribute` now accepts namespace as an option
  - setting `inheritanceAttribute = false` on a Model disableds STI
+ - added `Viking.View.Helpers.numberField` and `Viking.View.Helpers.numberFieldTag` helpers
  
 Bugfixes:
 
