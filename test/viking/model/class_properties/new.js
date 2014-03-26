@@ -96,4 +96,19 @@
         delete Agent;
     });
     
+    test("::new() with default type", function() {
+        Account = Viking.Model.extend('account', {
+            defaults: {
+                type: 'agent'
+            }
+        });
+        Agent = Account.extend('agent');
+        
+        var agent = new Account();
+        ok(agent instanceof Agent);
+        
+        delete Account;
+        delete Agent;
+    });
+    
 }());
