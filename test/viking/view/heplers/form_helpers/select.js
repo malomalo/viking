@@ -37,6 +37,28 @@
             Viking.View.Helpers.select(this.model, 'key', {"Dollar": "$", "Kroner": "DKK"})
         );
     });
+    
+    test("select(model, has_many_attribute, collection) Assumes multiple select", function () {
+        Post = Viking.Model.extend('post', {
+            hasMany: ['authors']
+        });
+        
+        Author = Viking.Model.extend('author', {
+        });
+
+        AuthorCollection = Viking.Collection.extend({
+            model: Author
+        });
+                
+        var post = new Post();
+        var authors = new AuthorCollection([{id: 1, first_name: 'Jon', last_name: 'Bracy'},{id: 2, first_name: "Daniel", last_name: "O'Shea"}]);
+        equal(
+            Viking.View.Helpers.select(post, 'authors', authors.map(function(a){ return [a.get('last_name'), a.get('id')]})),
+            '<select id="post_authors" multiple name="post[authors][]"><option value="1">Bracy</option>\n<option value="2">O&#x27;Shea</option></select>');
+        delete Post
+        delete AuthorCollection
+        delete Author
+    });
 
     //TODO: add test for model, attribute, simple_array, {selected: nil} (key set)
     //TODO: add test for model, attribute, simple_array, {selected: nil} (key unset)    
