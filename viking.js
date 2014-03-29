@@ -1130,6 +1130,7 @@ Viking.Coercions.Date = {
     }
 };
 Viking.Coercions.JSON = {
+
     load: function(value, key) {
         if (typeof value === 'object') {
             var model = new Viking.Model(value);
@@ -1147,6 +1148,7 @@ Viking.Coercions.JSON = {
 
         return value;
     }
+
 };
 Viking.Coercions.Number = {
     load: function(value) {
@@ -1181,6 +1183,25 @@ Viking.Coercions.String = {
 
         return value;
     }
+};
+Viking.Coercions.Array = {
+
+    load: function(value, key) {
+        if (_.isArray(value)) {
+            return value;
+        }
+
+        throw new TypeError(typeof value + " can't be coerced into Array");
+    },
+
+    dump: function(value) {
+        if (_.isArray(value)) {
+            return value
+        }
+
+        throw new TypeError(typeof value + " can't be dumped into Array");
+    }
+
 };
 // Viking.View
 // -----------
@@ -2029,7 +2050,7 @@ Viking.View.Helpers.radioButtonTag = function (name, value, checked, options) {
 Viking.View.Helpers.selectTag = function (name, option_tags, options) {
     var tag_name = name;
     if (options === undefined) { options = {}; }
-    if (options.multiple) { tag_name = tag_name + "[]"; }
+    if (options.multiple && tag_name.slice(-2) !== "[]") { tag_name = tag_name + "[]"; }
     _.defaults(options, {
         id: Viking.View.sanitizeToId(name),
         name: tag_name
@@ -2522,14 +2543,16 @@ Viking.View.Helpers.radioButton = function (model, attribute, tag_value, options
 // specify `include_hidden: false` option.
 Viking.View.Helpers.select = function (model, attribute, collection, options) {
     if (options === undefined) { options = {}; }
-    
+
     var name = Viking.View.tagNameForModelAttribute(model, attribute);
     var optionOptions = _.pick(options, 'selected');
     var selectOptions = _.omit(options, 'selected');
     if (model.get(attribute) && optionOptions.selected === undefined) {
         optionOptions.selected = model.get(attribute);
     }
-
+    if (selectOptions.multiple === undefined && model.associations[attribute] && model.associations[attribute].macro === "hasMany") {
+        selectOptions.multiple = true;
+    }
     return Viking.View.Helpers.selectTag(name, Viking.View.Helpers.optionsForSelectTag(collection, optionOptions), selectOptions);
 };
 // textArea(model, attribute, options)
@@ -2964,6 +2987,7 @@ Viking.Router = Backbone.Router.extend({
     }
 
 });
+
 
 
 
