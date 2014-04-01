@@ -40,6 +40,27 @@
         });
     });
 
+    test("#toJSON doesn't include belongsTo that is undefined", function() {
+        // undefined means probably not loaded
+        this.ship.unset('ship');
+
+        deepEqual(this.ship.toJSON({include: 'ship'}), {
+            foo: 'bar',
+            date: "2013-04-10T21:24:28.000Z"
+        });
+    });
+
+    test("#toJSON includes belongsTo that is null", function() {
+        // null probably means loaded, but set to null to remove
+        this.ship.set('ship', null);
+
+        deepEqual(this.ship.toJSON({include: 'ship'}), {
+            foo: 'bar',
+            date: "2013-04-10T21:24:28.000Z",
+            ship_attributes: null
+        });
+    });
+
     test('#toJSON include belongsTo includes belongsTo', function () {
         deepEqual(this.ship.toJSON({include: {
             ship: {include: 'ship'}
