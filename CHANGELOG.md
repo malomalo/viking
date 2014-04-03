@@ -7,6 +7,7 @@ Major Changes:
  - `Viking.Viking.Helpers.formFor` is now responsible for output the `form` tags
  - Added `FormBuilder.fieldsFor` that acts similar to (Rail's fields\_for)[http://api.rubyonrails.org/classes/ActionView/Helpers/FormBuilder.html#method-i-fields_for]
  - Added array type coercion
+ - Added inital support for polymorphic belongsTo associations in `Viking.Model`
  
 Minor Changes:
 

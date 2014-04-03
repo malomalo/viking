@@ -70,6 +70,16 @@
         delete Region;
     });
     
+    test("::new('belongsTo', 'subject', {polymorphic: true})", function () {
+        Photo = Viking.Model.extend();
+        
+        var assocation = new Viking.AssociationReflection('belongsTo', 'subject', {polymorphic: true});
+        equal(assocation.macro, 'belongsTo');
+        equal(assocation.name, 'subject');
+        deepEqual(assocation.options, {polymorphic: true});
+        equal(assocation.modelName, undefined);
+    });
+    
     module("Viking.AssociationReflection::new - hasOne macro");
 
     test("::new('hasOne', 'parent')", function() {

@@ -399,10 +399,8 @@ Viking.AssociationReflection = function (macro, name, options) {
             this.collectionName = (this.name.singularize().camelize() + 'Collection');
         }
     } else if (macro === 'belongsTo' || macro === 'hasOne') {
-        if (options.model) {
-            this.modelName = options.model;
-        } else {
-            this.modelName = name.camelize();
+        if (!options.polymorphic) {
+            this.modelName = options.model ? options.model : name.camelize();
         }
     } else {
         throw new TypeError("Unkown Macro " + macro);
@@ -593,9 +591,18 @@ Viking.Model.where = function(options) {
 Viking.Model.prototype.coerceAttributes = function(attrs) {
     
     _.each(this.associations, function(association) {
-        var Type = association.klass();
-
-        if (attrs[association.name] && !(attrs[association.name] instanceof Type)) {
+        var polymorphic = association.options.polymorphic;
+        
+        if (!attrs[association.name]) return;
+        
+        if (polymorphic && (attrs[association.name] instanceof Viking.Model)) {
+            attrs[association.name + '_id'] = attrs[association.name].id;
+            attrs[association.name + '_type'] = attrs[association.name].modelName;
+        } else if (polymorphic && attrs[association.name + '_type']) {
+            var Type = attrs[association.name + '_type'].camelize().constantize();
+            attrs[association.name] = new Type(attrs[association.name]);
+        } else if (!(attrs[association.name] instanceof association.klass())) {
+            var Type = association.klass();
             attrs[association.name] = new Type(attrs[association.name]);
         }
     });
@@ -777,9 +784,9 @@ Viking.Model.prototype.set = function (key, val, options) {
         var association = this.reflectOnAssociation(key);
         if (association && association.macro === 'hasMany') {
             this.attributes[key].set(value.models);
-	_.each(value.models, function(model) {
-	  model.collection = this.attributes[key];
-        }, this);
+            _.each(value.models, function(model) {
+                model.collection = this.attributes[key];
+            }, this);
             delete attrs[key];
         }
     }, this);
@@ -1210,6 +1217,11 @@ Viking.Coercions.Array = {
 // It provides view helpers that assisst when building HTML forms and more.
 Viking.View = {};
 Viking.View.Helpers = {};
+
+
+
+
+
 (function () {
     var booleanAttributes = ['disabled', 'readonly', 'multiple', 'checked',
         'autobuffer', 'autoplay', 'controls', 'loop', 'selected', 'hidden',
@@ -2157,6 +2169,39 @@ Viking.View.Helpers.textAreaTag = function (name, content, options, escape) {
 
     return Viking.View.Helpers.contentTag('textarea', content, options, false);
 };
+
+
+
+
+
+
+// TODO: color_field_tag
+// TODO: date_field_tag
+// TODO: datetime_field_tag
+// TODO: datetime_local_field_tag
+// TODO: email_field_tag
+// TODO: field_set_tag
+// TODO: file_field_tag
+
+// TODO: image_submit_tag
+// TODO: month_field_tag
+
+// TODO: phone_field_tag
+// TODO: range_field_tag
+// TODO: search_field_tag
+// TODO: telephone_field_tag
+// TODO: time_field_tag
+
+// TODO: url_field_tag
+// TODO: week_field_tag
+
+
+
+
+
+
+
+
 // checkBox(model, attribute, options={}, checkedValue="true", uncheckedValue="false")
 // =====================================================================================
 //
@@ -2614,6 +2659,31 @@ Viking.View.Helpers.textField = function (model, attribute, options) {
     
     return Viking.View.Helpers.textFieldTag(name, model.get(attribute), options);
 };
+// TODO: make this accept model string names
+
+
+// TODO: date_field
+// TODO: date_select
+// TODO: day_field
+// TODO: file_field
+
+
+
+// TODO: month_field
+
+
+// TODO: phone_field
+
+// TODO: range_field
+// TODO: search_field
+
+// TODO: telephone_field
+
+
+// TODO: time_field
+// TODO: url_field
+// TODO: week_field
+// TODO: year_field
 function FormBuilder(model, options) {
     options || (options = {});
     
@@ -2746,69 +2816,6 @@ FormBuilder.prototype = {
     
 };
 
-//
-
-//
-
-
-
-
-
-
-// TODO: color_field_tag
-// TODO: date_field_tag
-// TODO: datetime_field_tag
-// TODO: datetime_local_field_tag
-// TODO: email_field_tag
-// TODO: field_set_tag
-// TODO: file_field_tag
-
-// TODO: image_submit_tag
-// TODO: month_field_tag
-
-// TODO: phone_field_tag
-// TODO: range_field_tag
-// TODO: search_field_tag
-// TODO: telephone_field_tag
-// TODO: time_field_tag
-
-// TODO: url_field_tag
-// TODO: week_field_tag
-
-
-
-
-
-
-
-
-//
-// TODO: make this accept model string names
-
-
-// TODO: date_field
-// TODO: date_select
-// TODO: day_field
-// TODO: file_field
-
-
-
-// TODO: month_field
-
-
-// TODO: phone_field
-
-// TODO: range_field
-// TODO: search_field
-
-// TODO: telephone_field
-
-
-// TODO: time_field
-// TODO: url_field
-// TODO: week_field
-// TODO: year_field
-//
 
 Viking.PaginatedCollection = Viking.Collection.extend({
     constructor: function(models, options) {
