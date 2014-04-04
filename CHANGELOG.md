@@ -22,10 +22,11 @@ Minor Changes:
  
 Bugfixes:
 
-  - `Router#start` now takes `options` and passes them to `Backbone.history.start`
-  - `Model#paramRoot` returns the `baseModel.modelName` when used with STI
-  - `Array.toParam` and `Array.toQuery` no longer show up in array iterators
+ - `Router#start` now takes `options` and passes them to `Backbone.history.start`
+ - `Model#paramRoot` returns the `baseModel.modelName` when used with STI
+ - `Array.toParam` and `Array.toQuery` no longer show up in array iterators
  - if default `type` set on an STI model, initializes with that model
+ - Fixed issue when using STI and changing `type` the `modelName` was not being updated
  
 ## 0.5.0 (March 17th, 2014)
 

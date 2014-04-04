@@ -763,6 +763,7 @@ Viking.Model.prototype.set = function (key, val, options) {
         var type = attrs[this.inheritanceAttribute].camelize().constantize();
         this.constructor = type;
         this.__proto__ = type.prototype;
+		this.modelName = type.modelName
         
         // TODO: move to function, used in Model.new
         // TODO: probably move to a becomes method
