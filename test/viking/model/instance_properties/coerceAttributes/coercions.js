@@ -104,7 +104,7 @@
         Model = Viking.Model.extend({ coercions: {key: 'JSON'} });
         var a = new Model();
 
-        equal(a.coerceAttributes({key: {}}).key.constructor, Viking.Model);
+        ok(a.coerceAttributes({key: {}}).key instanceof Viking.Model);
         deepEqual(a.coerceAttributes({key: {}}).key.attributes, {});
         deepEqual(a.coerceAttributes({key: {key: 'value'}}).key.attributes, {key: 'value'});
     

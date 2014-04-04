@@ -23,6 +23,10 @@
             equal(e.message, "boolean can't be coerced into JSON");
         }
     });
+	
+	test("::load doesn't use the type key for STI", function () {
+        deepEqual(Viking.Coercions.JSON.load({type: 'my_value'}).attributes, {type: 'my_value'});
+	});
 
     test("::dump calls toJSON() on model", function() {
         var model = new Viking.Model({

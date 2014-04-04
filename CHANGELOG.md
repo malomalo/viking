@@ -18,6 +18,7 @@ Minor Changes:
  - `Viking.View.tagNameForModelAttribute` now accepts namespace as an option
  - setting `inheritanceAttribute = false` on a Model disableds STI
  - added `Viking.View.Helpers.numberField` and `Viking.View.Helpers.numberFieldTag` helpers
+ - JSON data type coercions now allows the key `type`
  
 Bugfixes:
 
