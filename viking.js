@@ -1743,7 +1743,7 @@ Viking.View.Helpers.timeTag = function (date, content, options) {
 //   
 //   labelTag('name', nil, {for: 'id'})
 //   // => <label for="name" class="small_label">Name</label>
-Viking.View.Helpers.labelTag = function (content, options) {
+Viking.View.Helpers.labelTag = function (content, options, escape) {
     var tmp;
 
     if (typeof options === 'function') {
@@ -1752,7 +1752,7 @@ Viking.View.Helpers.labelTag = function (content, options) {
         options = tmp;
     }
 
-    return Viking.View.Helpers.contentTag('label', content, options);
+    return Viking.View.Helpers.contentTag('label', content, options, escape);
 };
 // optionsForSelectTag(container[, selected])
 // =======================================

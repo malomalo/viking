@@ -10,6 +10,10 @@
     test("labelTag(content, options)", function() {
         equal( Viking.View.Helpers.labelTag("Name", {for: "input"}), '<label for="input">Name</label>');
     });
+	
+    test("labelTag(content, options, escape)", function() {
+        equal( Viking.View.Helpers.labelTag("<Name>", {for: "input"}, false), '<label for="input"><Name></label>');
+    });
     
     test("labelTag(block)", function() {
         equal( Viking.View.Helpers.labelTag(function() { return "Name"; }), '<label>Name</label>');

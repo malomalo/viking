@@ -3,6 +3,10 @@
 Minor Changes:
 
  - `Viking.Coercions.Number.load` now coerces an empty string to `null`
+ 
+Bugfixes:
+
+ - `Viking.View.Helpers#label_tag` now accepts the `escape` paramater
 
 ## 0.6.0 (April 5th, 2014)
 
