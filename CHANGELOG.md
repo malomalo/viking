@@ -1,3 +1,9 @@
+## Edge
+
+Minor Changes:
+
+ - `Viking.Coercions.Number.load` now coerces an empty string to `null`
+
 ## 0.6.0 (April 5th, 2014)
 
 Major Changes:
