@@ -1,5 +1,9 @@
 ## Edge
 
+Major Changes:
+
+ - added `Viking.View.Helpers::mailTo` url helper
+
 Minor Changes:
 
  - `Viking.Coercions.Number.load` now coerces an empty string to `null`
