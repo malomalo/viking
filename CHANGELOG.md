@@ -3,6 +3,8 @@
 Major Changes:
 
  - added `Viking.View.Helpers::mailTo` url helper
+ - `Viking.Collection#order` now takes `(order, options)`
+ - `Viking.Collection#order` now calls `Viking.Collection#orderChanged` when changed
 
 Minor Changes:
 
