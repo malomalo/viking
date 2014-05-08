@@ -10,7 +10,8 @@ Minor Changes:
  
 Bugfixes:
 
- - `Viking.View.Helpers#label_tag` now accepts the `escape` paramater
+ - `Viking.View.Helpers::labelTag` now accepts the `escape` paramater
+ - `Viking.View.Helpers::label` now accepts the `escape` paramater
 
 ## 0.6.0 (April 5th, 2014)
 

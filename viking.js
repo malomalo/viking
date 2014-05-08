@@ -2432,7 +2432,7 @@ Viking.View.Helpers.hiddenField = function (model, attribute, options) {
 //       return 'Accept <a href="/terms">Terms</a>.';
 //   })
 //   // => <label for="post_privacy_public">Public Post</label>
-Viking.View.Helpers.label = function (model, attribute, content, options) {
+Viking.View.Helpers.label = function (model, attribute, content, options, escape) {
     var tmp;
     if (typeof content === 'object') {
         tmp = options;
@@ -2450,7 +2450,7 @@ Viking.View.Helpers.label = function (model, attribute, content, options) {
     
     Viking.View.addErrorClassToOptions(model, attribute, options);
     
-    return Viking.View.Helpers.labelTag(content, options);
+    return Viking.View.Helpers.labelTag(content, options, escape);
 };
 // numberField(model, attribute, options)
 // ======================================
@@ -2808,7 +2808,7 @@ FormBuilder.prototype = {
         return Viking.View.Helpers.hiddenField(this.model, attribute, options);
     },
     
-    label: function(attribute, content, options) {
+    label: function(attribute, content, options, escape) {
         options || (options = {});
         
         if (!options.name && this.options.namespace) {
@@ -2816,7 +2816,7 @@ FormBuilder.prototype = {
             options.for = Viking.View.sanitizeToId(options.for);
         }
         
-        return Viking.View.Helpers.label(this.model, attribute, content, options);
+        return Viking.View.Helpers.label(this.model, attribute, content, options, escape);
     },
     
     number: function(attribute, options) {

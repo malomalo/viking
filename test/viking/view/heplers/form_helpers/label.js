@@ -43,4 +43,8 @@
         equal( Viking.View.Helpers.label(this.model, 'key', {for: 'override'}), '<label for="override">Key</label>');
     });
     
+    test("label(model, attribute, content, options, escape)", function() {
+        equal( Viking.View.Helpers.label(this.model, 'key', '<key>', {class: 'options'}, false), '<label class="options" for="model_key"><key></label>');
+    });
+    
 }());
