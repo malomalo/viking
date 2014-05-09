@@ -5,6 +5,8 @@ Major Changes:
  - added `Viking.View.Helpers::mailTo` url helper
  - `Viking.Collection#order` now takes `(order, options)`
  - `Viking.Collection#order` now calls `Viking.Collection#orderChanged` when changed
+ - `Viking.sync` added, converts objects via `.toParam()` as opposed to letting jQuery use `$.param()`
+ - `Viking.Model` and `Viking.Collection` now use `Viking.sync`
 
 Minor Changes:
 

@@ -104,14 +104,14 @@
         var c = Viking.PaginatedCollection.extend({model: m});
         var c = new c([]);
     
-        var old = Backbone.sync;
-        Backbone.sync = function(method, model, options) {
+        var old = Viking.sync;
+        Viking.sync = function(method, model, options) {
             equal(1, options.data.page);
             equal(40, options.data.per_page);
             equal(3, options.data.offset);
         }
         c.cursor.set({page: 1, per_page: 40, offset: 3});
-        Backbone.sync = old;
+        Viking.sync = old;
     });
 
 }());
