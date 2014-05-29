@@ -2946,16 +2946,13 @@ urlFor = function (modelOrUrl, options) {
 //
 // ==== Signatures
 //
-//   linkTo(url)
+//   linkTo(content, url)
 //   
-//   linkTo(url, body)
+//   linkTo(content, url, options)
 //
-//   linkTo(url, body, options)
+//   linkTo(url, contentFunc)
 //
-//   linkTo(url, options)
-//
-//   linkTo(url, options, body)
-//
+//   linkTo(url, options, contentFunc)
 //
 // ==== Options
 //   - data: This option can be used to add custom data attributes.
@@ -2969,19 +2966,18 @@ urlFor = function (modelOrUrl, options) {
 //
 // ==== Examples
 //
-//   linkTo(profilePath(profile), "Profile")
+//   linkTo("Profile", profilePath(profile))
 //   // => <a href="/profiles/1">Profile</a>
 //
 // or the even pithier
 //
-//   linkTo(profile, "Profile")
+//   linkTo("Profile", profile)
 //   // => <a href="/profiles/1">Profile</a>
 //
 // Similarly,
 //
-//   linkTo(profiles_path(), "Profiles")
+//   linkTo("Profiles", profiles_path())
 //   // => <a href="/profiles">Profiles</a>
-//
 //
 // You can use a function as well if your link target is hard to fit into the
 // name parameter. EJS example:
@@ -2995,53 +2991,60 @@ urlFor = function (modelOrUrl, options) {
 //
 // Classes and ids for CSS are easy to produce:
 //
-//   linkTo(articles_path(), "Articles", {id: 'news', class: 'article'})
+//   linkTo("Articles", articles_path(), {id: 'news', class: 'article'})
 //   // => <a href="/articles" class="article" id="news">Articles</a>
 //
 // +linkTo+ can also produce links with anchors or query strings:
 //
-//   linkTo(profilePath(profile, {anchor: "wall"}), "Comment wall")
+//   linkTo("Comment wall", profilePath(profile, {anchor: "wall"}))
 //   // => <a href="/profiles/1#wall">Comment wall</a>
 //
-//   linkTo(searches_path({foo: "bar", baz: "quux"}), "Nonsense search")
+//   linkTo("Nonsense search", searches_path({foo: "bar", baz: "quux"}))
 //   // => <a href="/searches?foo=bar&amp;baz=quux">Nonsense search</a>
 //
 // TODO: method not supported yet
 // The only option specific to +linkTo+ (+:method+) is used as follows:
 //
-//   linkTo("http://www.example.com", "Destroy", {method: "delete"})
+//   linkTo("Destroy", "http://www.example.com", {method: "delete"})
 //   // => <a href='http://www.example.com' rel="nofollow" data-method="delete">Destroy</a>
 //
 // You can also use custom data attributes using the +:data+ option:
 //
-//   linkTo("http://www.rubyonrails.org/", "Visit Other Site", { data: { confirm: "Are you sure?" }})
+//   linkTo("Visit Other Site", "http://www.rubyonrails.org/", { data: { confirm: "Are you sure?" }})
 //   // => <a href="http://www.rubyonrails.org/" data-confirm="Are you sure?">Visit Other Site</a>
-Viking.View.Helpers.linkTo = function (modelOrUrl, name, options) {
-    if (typeof name === 'object') {
-        var tmp = options;
-        options = name;
-        name = tmp;
+Viking.View.Helpers.linkTo = function (content, modelOrUrl, options) {
+    var tmp;
+    
+    if (typeof modelOrUrl === 'function') {
+        tmp = content;
+        content = modelOrUrl;
+        modelOrUrl = tmp;
+    } else if (typeof options === 'function') {
+        tmp = options;
+        options = modelOrUrl;
+        modelOrUrl = content;
+        content = tmp;
     }
     
     options = _.extend({
         href: urlFor(modelOrUrl)
     }, options);
     
-    if (!name) { 
-        if (modelOrUrl instanceof Viking.Model) {
-            if (modelOrUrl.isNew()) {
-                name = 'new ' + modelOrUrl.modelName.humanize();
-            } else {
-                name = modelOrUrl.modelName.humanize() + ' #' + modelOrUrl.id;
-            }
-        } else if (modelOrUrl.modelName) {
-            name = modelOrUrl.modelName.pluralize().humanize();
-        } else {
-            name = modelOrUrl;
-        }
-    }
+    // if (!name) { 
+    //     if (modelOrUrl instanceof Viking.Model) {
+    //         if (modelOrUrl.isNew()) {
+    //             name = 'new ' + modelOrUrl.modelName.humanize();
+    //         } else {
+    //             name = modelOrUrl.modelName.humanize() + ' #' + modelOrUrl.id;
+    //         }
+    //     } else if (modelOrUrl.modelName) {
+    //         name = modelOrUrl.modelName.pluralize().humanize();
+    //     } else {
+    //         name = modelOrUrl;
+    //     }
+    // }
 
-    return Viking.View.Helpers.contentTag('a', name, options);
+    return Viking.View.Helpers.contentTag('a', content, options);
 };
 
         // 
