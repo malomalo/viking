@@ -31,7 +31,7 @@
         delete workshopsUrl;
     });
     
-    test("urlFor(class)", function() {
+    test("urlFor(model)", function() {
         expect(2);
         
         Workshop = Viking.Model.extend('workshop');
@@ -43,6 +43,23 @@
         );
         
         delete Workshop;
+        delete workshopUrl;
+    });
+    
+    test("urlFor(STIModel)", function() {
+        expect(2);
+        
+        Workshop = Viking.Model.extend('workshop');
+        SantaWorkshop = Workshop.extend('santa_workshop');
+        workshopUrl = function(m) { ok(true); return '/workshops/' + m.toParam(); }
+
+        equal(
+            urlFor(new SantaWorkshop({id: 10})),
+            window.location.origin + '/workshops/10'
+        );
+        
+        delete Workshop;
+        delete SantaWorkshop;
         delete workshopUrl;
     });
     

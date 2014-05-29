@@ -2905,17 +2905,17 @@ urlFor = function (modelOrUrl, options) {
     }, options);
     
     var route;
-    var klass = modelOrUrl.modelName.camelize().constantize();
+    var klass = modelOrUrl.baseModel.modelName.camelize().constantize();
     if (modelOrUrl instanceof klass) {
         if (modelOrUrl.isNew()) {
-            route = (klass.modelName.pluralize() + (options.onlyPath ? 'Path' : 'Url')).constantize();
+            route = (klass.baseModel.modelName.pluralize() + (options.onlyPath ? 'Path' : 'Url')).constantize();
             route = route();
         } else {
-            route = (klass.modelName + (options.onlyPath ? 'Path' : 'Url')).constantize();
+            route = (klass.baseModel.modelName + (options.onlyPath ? 'Path' : 'Url')).constantize();
             route = route(modelOrUrl);
         }
     } else {
-        route = (modelOrUrl.modelName.pluralize() + (options.onlyPath ? 'Path' : 'Url')).constantize();
+        route = (modelOrUrl.baseModel.modelName.pluralize() + (options.onlyPath ? 'Path' : 'Url')).constantize();
         route = route();
     }
     
@@ -3029,34 +3029,9 @@ Viking.View.Helpers.linkTo = function (content, modelOrUrl, options) {
     options = _.extend({
         href: urlFor(modelOrUrl)
     }, options);
-    
-    // if (!name) { 
-    //     if (modelOrUrl instanceof Viking.Model) {
-    //         if (modelOrUrl.isNew()) {
-    //             name = 'new ' + modelOrUrl.modelName.humanize();
-    //         } else {
-    //             name = modelOrUrl.modelName.humanize() + ' #' + modelOrUrl.id;
-    //         }
-    //     } else if (modelOrUrl.modelName) {
-    //         name = modelOrUrl.modelName.pluralize().humanize();
-    //     } else {
-    //         name = modelOrUrl;
-    //     }
-    // }
 
     return Viking.View.Helpers.contentTag('a', content, options);
 };
-
-        // 
-        // html_options, options, name = options, name, block if block_given?
-        // options ||= {}
-        // 
-        // html_options = convert_options_to_data_attributes(options, html_options)
-        // 
-        // url = url_for(options)
-        // html_options['href'] ||= url
-        // 
-        // content_tag(:a, name || url, html_options, &block)
 // mailTo(email, name, options)
 // mailTo(email, contentFunc)
 // mailTo(email, options, contentFunc)
