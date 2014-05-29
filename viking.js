@@ -139,7 +139,7 @@ Number.prototype.toQuery = function(key) {
 // {name: 'David', nationality: 'Danish'}.toParam('user')
 // // => "user[name]=David&user[nationality]=Danish"
 //
-// The string pairs “key=value” that conform the query string are sorted
+// The string pairs "key=value" that conform the query string are sorted
 // lexicographically in ascending order.
 Object.defineProperty(Object.prototype, 'toParam', {
 	value: function(namespace) {
@@ -187,7 +187,7 @@ String.prototype.titleize = function() {
 };
 
 // Capitalizes the first word and turns underscores into spaces and strips a
-// trailing “_id”, if any. Like titleize, this is meant for creating pretty output.
+// trailing "_id", if any. Like titleize, this is meant for creating pretty output.
 String.prototype.humanize = function() {
     var result = this.toLowerCase().replace(/_id$/, '').replace(/_/g, ' ');
     result = result.replace(/([a-z\d]*)/g, function(m) { return m.toLowerCase(); });
@@ -196,7 +196,7 @@ String.prototype.humanize = function() {
 
 // Makes an underscored, lowercase form from the expression in the string.
 //
-// Changes ‘::’ to ‘/’ to convert namespaces to paths.
+// Changes '::' to '/' to convert namespaces to paths.
 //
 // Examples:
 // 
@@ -956,7 +956,7 @@ Viking.Model.prototype.toJSON = function (options) {
 
     return data;
 };
-// Returns a string representing the object’s key suitable for use in URLs,
+// Returns a string representing the object's key suitable for use in URLs,
 // or nil if `#isNew` is true.
 Viking.Model.prototype.toParam = function() {
     return this.isNew() ? null : this.get('id');
@@ -1544,7 +1544,7 @@ Viking.View.Helpers.contentTag = function (name, content, options, escape) {
 //
 // Creates a button element that defines a submit button, reset button or a
 // generic button which can be used in JavaScript, for example. You can use
-// the button tag as a regular submit tag but it isn’t supported in legacy
+// the button tag as a regular submit tag but it isn't supported in legacy
 // browsers. However, the button tag allows richer labels such as images and
 // emphasis.
 //
@@ -1683,7 +1683,7 @@ Viking.View.Helpers.textFieldTag = function (name, value, options) {
 // ===============================================
 //
 // Creates a hidden form input field used to transmit data that would be lost
-// due to HTTP’s statelessness or data that should be hidden from the user.
+// due to HTTP's statelessness or data that should be hidden from the user.
 //
 // Options
 // -------
@@ -2033,7 +2033,7 @@ Viking.View.Helpers.optionsForSelectTag = function (container, selected) {
 //   optionsFromCollectionForSelectTag(people, 'id', 'name', '1')
 //
 // Will not select a person with the id of 1 because 1 (an Integer) is not
-// the same as ‘1’ (a string)
+// the same as '1' (a string)
 //
 //   optionsFromCollectionForSelectTag(people, 'id', 'name', 1)
 //
@@ -2348,7 +2348,7 @@ Viking.View.Helpers.textAreaTag = function (name, content, options, escape) {
 //
 //   @invoice.update(params[:invoice])
 //
-// wouldn’t update the flag.
+// wouldn't update the flag.
 //
 // To prevent this the helper generates an auxiliary hidden field before the very
 // check box. The hidden field has the same name and its attributes mimic an
@@ -2370,7 +2370,7 @@ Viking.View.Helpers.textAreaTag = function (name, content, options, escape) {
 //
 // because parameter name repetition is precisely what Rails seeks to distinguish
 // the elements of the array. For each item with a checked check box you get an
-// extra ghost item with only that attribute, assigned to “0”.
+// extra ghost item with only that attribute, assigned to "0".
 //
 // In that case it is preferable to either use check_box_tag or to use hashes
 // instead of arrays.
@@ -2409,7 +2409,7 @@ Viking.View.Helpers.checkBox = function (model, attribute, options, checkedValue
 // ====================================================================================
 //
 // Returns <select> and <option> tags for the collection of existing return
-// values of method for object‘s class. The value returned from calling method
+// values of method for object's class. The value returned from calling method
 // on the instance object will be selected. If calling method returns nil, no
 // selection is made without including :prompt or :includeBlank in the options
 // hash.
@@ -2575,7 +2575,7 @@ Viking.View.Helpers.label = function (model, attribute, content, options, escape
 // numberField(model, attribute, options)
 // ======================================
 //
-// Returns an input tag of the “number” type tailored for accessing a specified
+// Returns an input tag of the "number" type tailored for accessing a specified
 // attribute on the model. Additional options on the input tag can be passed as
 // a hash with options. These options will be tagged onto the HTML as an HTML
 // element attribute as in the example shown.
@@ -2598,7 +2598,7 @@ Viking.View.Helpers.numberField = function (model, attribute, options) {
 // passwordField(model, attribute, options)
 // ========================================
 //
-// Returns an input tag of the “password” type tailored for accessing a specified
+// Returns an input tag of the "password" type tailored for accessing a specified
 // attribute on the model. Additional options on the input tag can be passed as
 // a hash with options. These options will be tagged onto the HTML as an HTML
 // element attribute as in the example shown. For security reasons this field
@@ -2765,7 +2765,7 @@ Viking.View.Helpers.textArea = function (model, attribute, options) {
 // textField(model, attribute, options)
 // ====================================
 //
-// Returns an input tag of the “text” type tailored for accessing a specified
+// Returns an input tag of the "text" type tailored for accessing a specified
 // attribute on a model. Additional options on the input tag can be passed as
 // a hash with options. These options will be tagged onto the HTML as an HTML
 // element attribute as in the example shown.

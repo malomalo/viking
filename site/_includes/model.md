@@ -142,7 +142,7 @@ relationships are converted to JSON and put in an array under `relations_attribu
 \#toParam `model.toParam()`
 ---------------------------
 
-Returns a string representing the object’s key suitable for use in URLs, or
+Returns a string representing the object's key suitable for use in URLs, or
 `null` if `#isNew` is `true`.
 
 <div id="Model-paramRoot"></div>
