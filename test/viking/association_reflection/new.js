@@ -78,6 +78,8 @@
         equal(assocation.name, 'subject');
         deepEqual(assocation.options, {polymorphic: true});
         equal(assocation.modelName, undefined);
+        
+        delete Photo
     });
     
     module("Viking.AssociationReflection::new - hasOne macro");

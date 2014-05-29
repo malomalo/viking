@@ -7,6 +7,8 @@ Major Changes:
  - `Viking.Collection#order` now calls `Viking.Collection#orderChanged` when changed
  - `Viking.sync` added, converts objects via `.toParam()` as opposed to letting jQuery use `$.param()`
  - `Viking.Model` and `Viking.Collection` now use `Viking.sync`
+ - global `urlFor` helper added
+ - `Viking.View.Helpers.linkTo` helper added
 
 Minor Changes:
 

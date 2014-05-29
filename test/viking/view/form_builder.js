@@ -29,7 +29,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model)
-        old_func = Viking.View.Helpers.checkBox
+        var old_func = Viking.View.Helpers.checkBox
         
         Viking.View.Helpers.checkBox = function(m, attribute, options, checkedValue, uncheckedValue) {
             strictEqual(model, m);
@@ -48,7 +48,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model, {namespace: 'ns'})
-        old_func = Viking.View.Helpers.checkBox
+        var old_func = Viking.View.Helpers.checkBox
         
         Viking.View.Helpers.checkBox = function(m, attribute, options, checkedValue, uncheckedValue) {
             strictEqual(model, m);
@@ -67,7 +67,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model, {namespace: 'ns'})
-        old_func = Viking.View.Helpers.checkBox
+        var old_func = Viking.View.Helpers.checkBox
         
         Viking.View.Helpers.checkBox = function(m, attribute, options, checkedValue, uncheckedValue) {
             strictEqual(model, m);
@@ -88,7 +88,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model)
-        old_func = Viking.View.Helpers.collectionSelect
+        var old_func = Viking.View.Helpers.collectionSelect
         
         Viking.View.Helpers.collectionSelect = function(m, attribute, collection, valueAttribute, textAttribute, options) {
             strictEqual(model, m);
@@ -108,7 +108,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model, {namespace: 'ns'})
-        old_func = Viking.View.Helpers.collectionSelect
+        var old_func = Viking.View.Helpers.collectionSelect
         
         Viking.View.Helpers.collectionSelect = function(m, attribute, collection, valueAttribute, textAttribute, options) {
             strictEqual(model, m);
@@ -128,7 +128,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model, {namespace: 'ns'})
-        old_func = Viking.View.Helpers.collectionSelect
+        var old_func = Viking.View.Helpers.collectionSelect
         
         Viking.View.Helpers.collectionSelect = function(m, attribute, collection, valueAttribute, textAttribute, options) {
             strictEqual(model, m);
@@ -150,7 +150,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model)
-        old_func = Viking.View.Helpers.hiddenField
+        var old_func = Viking.View.Helpers.hiddenField
         
         Viking.View.Helpers.hiddenField = function(m, attribute, options) {
             strictEqual(model, m);
@@ -167,7 +167,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model, {namespace: 'ns'})
-        old_func = Viking.View.Helpers.hiddenField
+        var old_func = Viking.View.Helpers.hiddenField
         
         Viking.View.Helpers.hiddenField = function(m, attribute, options) {
             strictEqual(model, m);
@@ -184,7 +184,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model, {namespace: 'ns'})
-        old_func = Viking.View.Helpers.hiddenField
+        var old_func = Viking.View.Helpers.hiddenField
         
         Viking.View.Helpers.hiddenField = function(m, attribute, options) {
             strictEqual(model, m);
@@ -203,7 +203,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model)
-        old_func = Viking.View.Helpers.label
+        var old_func = Viking.View.Helpers.label
         
         Viking.View.Helpers.label = function(m, attribute, content, options) {
             strictEqual(model, m);
@@ -221,7 +221,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model, {namespace: 'ns'})
-        old_func = Viking.View.Helpers.label
+        var old_func = Viking.View.Helpers.label
         
         Viking.View.Helpers.label = function(m, attribute, content, options) {
             strictEqual(model, m);
@@ -239,7 +239,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model)
-        old_func = Viking.View.Helpers.label
+        var old_func = Viking.View.Helpers.label
         
         Viking.View.Helpers.label = function(m, attribute, content, options) {
             strictEqual(model, m);
@@ -259,7 +259,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model);
-        old_func = Viking.View.Helpers.numberField;
+        var old_func = Viking.View.Helpers.numberField;
         
         Viking.View.Helpers.numberField = function(m, attribute, options) {
             strictEqual(model, m);
@@ -276,7 +276,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model, {namespace: 'ns'})
-        old_func = Viking.View.Helpers.numberField
+        var old_func = Viking.View.Helpers.numberField
         
         Viking.View.Helpers.numberField = function(m, attribute, options) {
             strictEqual(model, m);
@@ -293,7 +293,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model)
-        old_func = Viking.View.Helpers.numberField
+        var old_func = Viking.View.Helpers.numberField
         
         Viking.View.Helpers.numberField = function(m, attribute, options) {
             strictEqual(model, m);
@@ -312,7 +312,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model)
-        old_func = Viking.View.Helpers.passwordField
+        var old_func = Viking.View.Helpers.passwordField
         
         Viking.View.Helpers.passwordField = function(m, attribute, options) {
             strictEqual(model, m);
@@ -329,7 +329,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model, {namespace: 'ns'})
-        old_func = Viking.View.Helpers.passwordField
+        var old_func = Viking.View.Helpers.passwordField
         
         Viking.View.Helpers.passwordField = function(m, attribute, options) {
             strictEqual(model, m);
@@ -346,7 +346,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model, {namespace: 'ns'})
-        old_func = Viking.View.Helpers.passwordField
+        var old_func = Viking.View.Helpers.passwordField
         
         Viking.View.Helpers.passwordField = function(m, attribute, options) {
             strictEqual(model, m);
@@ -365,7 +365,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model)
-        old_func = Viking.View.Helpers.radioButton
+        var old_func = Viking.View.Helpers.radioButton
         
         Viking.View.Helpers.radioButton = function(m, attribute, tagValue, options) {
             strictEqual(model, m);
@@ -383,7 +383,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model, {namespace: 'ns'})
-        old_func = Viking.View.Helpers.radioButton
+        var old_func = Viking.View.Helpers.radioButton
         
         Viking.View.Helpers.radioButton = function(m, attribute, tagValue, options) {
             strictEqual(model, m);
@@ -401,7 +401,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model, {namespace: 'ns'})
-        old_func = Viking.View.Helpers.radioButton
+        var old_func = Viking.View.Helpers.radioButton
         
         Viking.View.Helpers.radioButton = function(m, attribute, tagValue, options) {
             strictEqual(model, m);
@@ -421,7 +421,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model)
-        old_func = Viking.View.Helpers.select
+        var old_func = Viking.View.Helpers.select
         
         Viking.View.Helpers.select = function(m, attribute, collection, options) {
             strictEqual(model, m);
@@ -439,7 +439,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model, {namespace: 'ns'})
-        old_func = Viking.View.Helpers.select
+        var old_func = Viking.View.Helpers.select
         
         Viking.View.Helpers.select = function(m, attribute, collection, options) {
             strictEqual(model, m);
@@ -457,7 +457,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model, {namespace: 'ns'})
-        old_func = Viking.View.Helpers.select
+        var old_func = Viking.View.Helpers.select
         
         Viking.View.Helpers.select = function(m, attribute, collection, options) {
             strictEqual(model, m);
@@ -477,7 +477,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model)
-        old_func = Viking.View.Helpers.textArea
+        var old_func = Viking.View.Helpers.textArea
         
         Viking.View.Helpers.textArea = function(m, attribute, options) {
             strictEqual(model, m);
@@ -494,7 +494,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model, {namespace: 'ns'})
-        old_func = Viking.View.Helpers.textArea
+        var old_func = Viking.View.Helpers.textArea
         
         Viking.View.Helpers.textArea = function(m, attribute, options) {
             strictEqual(model, m);
@@ -511,7 +511,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model, {namespace: 'ns'})
-        old_func = Viking.View.Helpers.textArea
+        var old_func = Viking.View.Helpers.textArea
         
         Viking.View.Helpers.textArea = function(m, attribute, options) {
             strictEqual(model, m);
@@ -530,7 +530,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model)
-        old_func = Viking.View.Helpers.textField
+        var old_func = Viking.View.Helpers.textField
         
         Viking.View.Helpers.textField = function(m, attribute, options) {
             strictEqual(model, m);
@@ -547,7 +547,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model, {namespace: 'ns'})
-        old_func = Viking.View.Helpers.textField
+        var old_func = Viking.View.Helpers.textField
         
         Viking.View.Helpers.textField = function(m, attribute, options) {
             strictEqual(model, m);
@@ -564,7 +564,7 @@
         
         var model = this.model;
         var form = new FormBuilder(this.model, {namespace: 'ns'})
-        old_func = Viking.View.Helpers.textField
+        var old_func = Viking.View.Helpers.textField
         
         Viking.View.Helpers.textField = function(m, attribute, options) {
             strictEqual(model, m);
