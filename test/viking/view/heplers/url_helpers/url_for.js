@@ -5,7 +5,7 @@
         expect(2);
         
         Workshop = Viking.Model.extend('workshop');
-        workshopsUrl = function() { ok(true); return '/workshops'; }
+        workshopsPath = function() { ok(true); return '/workshops'; }
 
         equal(
             urlFor(Workshop),
@@ -13,14 +13,14 @@
         );
         
         delete Workshop;
-        delete workshopsUrl;
+        delete workshopsPath;
     });
     
     test("urlFor(new Class())", function() {
         expect(2);
         
         Workshop = Viking.Model.extend('workshop');
-        workshopsUrl = function() { ok(true); return '/workshops'; }
+        workshopsPath = function() { ok(true); return '/workshops'; }
 
         equal(
             urlFor(new Workshop()),
@@ -28,14 +28,14 @@
         );
         
         delete Workshop;
-        delete workshopsUrl;
+        delete workshopsPath;
     });
     
     test("urlFor(model)", function() {
         expect(2);
         
         Workshop = Viking.Model.extend('workshop');
-        workshopUrl = function(m) { ok(true); return '/workshops/' + m.toParam(); }
+        workshopPath = function(m) { ok(true); return '/workshops/' + m.toParam(); }
 
         equal(
             urlFor(new Workshop({id: 10})),
@@ -43,7 +43,7 @@
         );
         
         delete Workshop;
-        delete workshopUrl;
+        delete workshopPath;
     });
     
     test("urlFor(STIModel)", function() {
@@ -51,7 +51,7 @@
         
         Workshop = Viking.Model.extend('workshop');
         SantaWorkshop = Workshop.extend('santa_workshop');
-        workshopUrl = function(m) { ok(true); return '/workshops/' + m.toParam(); }
+        workshopPath = function(m) { ok(true); return '/workshops/' + m.toParam(); }
 
         equal(
             urlFor(new SantaWorkshop({id: 10})),
@@ -60,12 +60,12 @@
         
         delete Workshop;
         delete SantaWorkshop;
-        delete workshopUrl;
+        delete workshopPath;
     });
     
     test("urlFor(class, {anchor: STRING})", function() {
         Workshop = Viking.Model.extend('workshop');
-        workshopUrl = function(m) { return '/workshops/' + m.toParam(); }
+        workshopPath = function(m) { return '/workshops/' + m.toParam(); }
 
         equal(
             urlFor(new Workshop({id: 10}), {anchor: 'location'}),
@@ -73,7 +73,7 @@
         );
         
         delete Workshop;
-        delete workshopUrl;
+        delete workshopPath;
     });
     
     test("urlFor(class, {onlyPath: true})", function() {
@@ -91,7 +91,7 @@
     
     test("urlFor(class, {trailingSlash: true})", function() {
         Workshop = Viking.Model.extend('workshop');
-        workshopUrl = function(m) { return '/workshops/' + m.toParam(); }
+        workshopPath = function(m) { return '/workshops/' + m.toParam(); }
 
         equal(
             urlFor(new Workshop({id: 10}), {trailingSlash: true}),
@@ -99,12 +99,12 @@
         );
         
         delete Workshop;
-        delete workshopUrl;
+        delete workshopPath;
     });
     
     test("urlFor(class, {host: STRING})", function() {
         Workshop = Viking.Model.extend('workshop');
-        workshopUrl = function(m) { return '/workshops/' + m.toParam(); }
+        workshopPath = function(m) { return '/workshops/' + m.toParam(); }
 
         equal(
             urlFor(new Workshop({id: 10}), {host: 'example.com'}),
@@ -112,12 +112,12 @@
         );
         
         delete Workshop;
-        delete workshopUrl;
+        delete workshopPath;
     });
     
     test("urlFor(class, {port: NUMBER})", function() {
         Workshop = Viking.Model.extend('workshop');
-        workshopUrl = function(m) { return '/workshops/' + m.toParam(); }
+        workshopPath = function(m) { return '/workshops/' + m.toParam(); }
 
         equal(
             urlFor(new Workshop({id: 10}), {port: 9292}),
@@ -125,12 +125,12 @@
         );
         
         delete Workshop;
-        delete workshopUrl;
+        delete workshopPath;
     });
     
     test("urlFor(class, {protocol: STRING})", function() {
         Workshop = Viking.Model.extend('workshop');
-        workshopUrl = function(m) { return '/workshops/' + m.toParam(); }
+        workshopPath = function(m) { return '/workshops/' + m.toParam(); }
 
         equal(
             urlFor(new Workshop({id: 10}), {protocol: 'custom'}),
@@ -138,12 +138,12 @@
         );
         
         delete Workshop;
-        delete workshopUrl;
+        delete workshopPath;
     });
     
     test("urlFor(class, {scriptName: STRING})", function() {
         Workshop = Viking.Model.extend('workshop');
-        workshopUrl = function(m) { return '/workshops/' + m.toParam(); }
+        workshopPath = function(m) { return '/workshops/' + m.toParam(); }
 
         equal(
             urlFor(new Workshop({id: 10}), {scriptName: '/base'}),
@@ -151,12 +151,12 @@
         );
         
         delete Workshop;
-        delete workshopUrl;
+        delete workshopPath;
     });
     
     test("urlFor(class, {user: STRING, password: STRING})", function() {
         Workshop = Viking.Model.extend('workshop');
-        workshopUrl = function(m) { return '/workshops/' + m.toParam(); }
+        workshopPath = function(m) { return '/workshops/' + m.toParam(); }
 
         equal(
             urlFor(new Workshop({id: 10}), {user: 'username', password: 'password'}),
@@ -164,7 +164,7 @@
         );
         
         delete Workshop;
-        delete workshopUrl;
+        delete workshopPath;
     });
     
     test("urlFor(string)", function() {

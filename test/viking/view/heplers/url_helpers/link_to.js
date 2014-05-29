@@ -38,7 +38,7 @@
     
     test("linkTo(content, model)", function() {
         Workshop = Viking.Model.extend('workshop');
-        workshopUrl = function(m) { return '/workshops/' + m.toParam(); }
+        workshopPath = function(m) { return '/workshops/' + m.toParam(); }
         
         equal(
             Viking.View.Helpers.linkTo('Model', new Workshop({id: 10})),
@@ -46,12 +46,12 @@
         );
         
         delete Workshop;
-        delete workshopUrl;
+        delete workshopPath;
     });
     
     test("linkTo(model, contentFunc)", function() {
         Workshop = Viking.Model.extend('workshop');
-        workshopUrl = function(m) { return '/workshops/' + m.toParam(); }
+        workshopPath = function(m) { return '/workshops/' + m.toParam(); }
         
         equal(
             Viking.View.Helpers.linkTo(new Workshop({id: 10}), function () { return 'Example'; }),
@@ -59,12 +59,12 @@
         );
         
         delete Workshop;
-        delete workshopUrl;
+        delete workshopPath;
     });
     
     test("linkTo(model, options, contentFunc)", function() {
         Workshop = Viking.Model.extend('workshop');
-        workshopUrl = function(m) { return '/workshops/' + m.toParam(); }
+        workshopPath = function(m) { return '/workshops/' + m.toParam(); }
         
         equal(
             Viking.View.Helpers.linkTo(new Workshop({id: 10}), {class: 'myclass'}, function () { return 'Example'; }),
@@ -72,7 +72,7 @@
         );
         
         delete Workshop;
-        delete workshopUrl;
+        delete workshopPath;
     });
     
 }());
