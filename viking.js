@@ -679,7 +679,7 @@ Viking.Model.prototype.coerceAttributes = function(attrs) {
         if (!attrs[association.name]) return;
         
         if (polymorphic && (attrs[association.name] instanceof Viking.Model)) {
-			// TODO: remove setting the id?
+            // TODO: remove setting the id?
             attrs[association.name + '_id'] = attrs[association.name].id;
             attrs[association.name + '_type'] = attrs[association.name].modelName;
         } else if (polymorphic && attrs[association.name + '_type']) {
@@ -693,10 +693,27 @@ Viking.Model.prototype.coerceAttributes = function(attrs) {
 
     _.each(this.coercions, function (type, key) {
         if (attrs[key] || attrs[key] === false) {
-            var klass = Viking.Coercions[type];
-
+            var tmp, klass, options;
+            
+            if (_.isArray(type)) {
+                options = type[1];
+                type = type[0];
+            } else {
+                options = {};
+            }
+            
+            klass = Viking.Coercions[type];
+            
             if (klass) {
-                attrs[key] = klass.load(attrs[key], key);
+                if (options.array) {
+                    tmp = [];
+                    _.each(attrs[key], function(value) {
+                        tmp.push(klass.load(value, key));
+                    });
+                    attrs[key] = tmp;
+                } else {
+                    attrs[key] = klass.load(attrs[key], key);
+                }
             } else {
                 throw new TypeError("Coercion of " + type + " unsupported");
             }
@@ -944,10 +961,29 @@ Viking.Model.prototype.toJSON = function (options) {
 
     _.each(this.coercions, function (type, key) {
         if (data[key] || data[key] === false) {
-            var klass = Viking.Coercions[type];
+            var tmp, klass, options;
+            
+            // TODO: this and coercison.js do the same transformation, run at
+            // inital load like relations?
+            if (_.isArray(type)) {
+                options = type[1];
+                type = type[0];
+            } else {
+                options = {};
+            }
+            
+            klass = Viking.Coercions[type];
 
             if (klass) {
-                data[key] = klass.dump(data[key], key);
+                if (options.array) {
+                    tmp = [];
+                    _.each(data[key], function(value) {
+                        tmp.push(klass.dump(value, key));
+                    });
+                    data[key] = tmp;
+                } else {
+                    data[key] = klass.dump(data[key], key);
+                }
             } else {
                 throw new TypeError("Coercion of " + type + " unsupported");
             }
@@ -1315,25 +1351,6 @@ Viking.Coercions.String = {
 
         return value;
     }
-};
-Viking.Coercions.Array = {
-
-    load: function(value, key) {
-        if (_.isArray(value)) {
-            return value;
-        }
-
-        throw new TypeError(typeof value + " can't be coerced into Array");
-    },
-
-    dump: function(value) {
-        if (_.isArray(value)) {
-            return value
-        }
-
-        throw new TypeError(typeof value + " can't be dumped into Array");
-    }
-
 };
 // Viking.View
 // -----------
@@ -3421,7 +3438,6 @@ Viking.Router = Backbone.Router.extend({
     }
 
 });
-
 
 
 

@@ -137,5 +137,16 @@
     
         delete Model;
     });
-
+    
+    // Array support
+    test("#coerceAttributes support array coercion", function() {
+        Model = Viking.Model.extend({ coercions: {key: ['Number', {array: true}]} });
+        var a = new Model();
+        
+        deepEqual(a.coerceAttributes({key: [10, '10.5']}).key, [10, 10.5]);
+        deepEqual(a.coerceAttributes({key: ['10.5']}).key, [10.50]);
+        
+        delete Model;
+    });
+    
 }());

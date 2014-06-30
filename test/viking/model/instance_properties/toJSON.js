@@ -31,6 +31,20 @@
             date: "2013-04-10T21:24:28.000Z"
         });
     });
+    
+    test("#toJSON supports arrays", function() {
+        Ship = Viking.Model.extend({
+            coercions: {date: ['Date', {array: true}]}
+        });
+        
+        var ship = new Ship({
+            date: ["2013-04-10T21:24:28.000Z"]
+        });
+        
+        deepEqual(ship.toJSON(), {
+            date: ["2013-04-10T21:24:28.000Z"]
+        });
+    });
 
     test('#toJSON include belongsTo', function() {
         deepEqual(this.ship.toJSON({include: 'ship'}), {

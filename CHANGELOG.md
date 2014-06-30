@@ -9,6 +9,7 @@ Major Changes:
  - `Viking.Model` and `Viking.Collection` now use `Viking.sync`
  - global `urlFor` helper added
  - `Viking.View.Helpers.linkTo` helper added
+ - `Viking.Model.coercions` now supports `Array` data types via options
 
 Minor Changes:
 
