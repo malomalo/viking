@@ -576,6 +576,43 @@
         Viking.View.Helpers.textField = old_func;
     });
     
+    // checkBoxGroup
+    test("#checkBoxGroup() passes to Viking.View.Helpers.checkBox", function () {
+        expect(4);
+        
+        var model = this.model;
+        var form = new FormBuilder(this.model)
+        var old_func = Viking.View.Helpers.checkBoxGroup
+        
+        Viking.View.Helpers.checkBoxGroup = function(m, attribute, options, content) {
+            strictEqual(model, m);
+            strictEqual('key', attribute);
+            deepEqual({}, options);
+            strictEqual(2, content);
+        }
+        form.checkBoxGroup('key', {}, 2);
+        
+        Viking.View.Helpers.checkBoxGroup = old_func;
+    });
+    
+    test("#checkBoxGroup() uses namepsace on for attribute", function () {
+        expect(4);
+        
+        var model = this.model;
+        var form = new FormBuilder(this.model, {namespace: 'ns'})
+        var old_func = Viking.View.Helpers.checkBoxGroup
+        
+        Viking.View.Helpers.checkBoxGroup = function(m, attribute, options, content) {
+            strictEqual(model, m);
+            strictEqual('key', attribute);
+            deepEqual({'namespace': 'ns'}, options);
+            strictEqual(2, content);
+        }
+        form.checkBoxGroup('key', {}, 2);
+        
+        Viking.View.Helpers.checkBoxGroup = old_func;
+    });
+    
     // formFor()
     // =========
     test("#fieldsFor() yields a FormBuilder with the namespace set", function (attribute, options, content) {

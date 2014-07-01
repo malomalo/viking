@@ -2456,6 +2456,19 @@ FormBuilder.prototype = {
         return Viking.View.Helpers.textField(this.model, attribute, options);
     },
     
+    checkBoxGroup: function(attribute, options, content) {
+        if (typeof options === 'function') {
+            content = options;
+            options = {};
+        }
+
+        if (!options.namespace && this.options.namespace) {
+            options.namespace = this.options.namespace;
+        }
+
+        return Viking.View.Helpers.checkBoxGroup(this.model, attribute, options, content);
+    },
+    
     fieldsFor: function(attribute, options, content) {
         if (typeof options === 'function') {
             content = options;

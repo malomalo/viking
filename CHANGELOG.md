@@ -11,6 +11,7 @@ Major Changes:
  - `Viking.View.Helpers.linkTo` helper added
  - `Viking.Model.coercions` now supports `Array` data types via options
  - Added `CheckBoxGroupBuilder` and `Viking.View.checkBoxGroup`
+ - Added `FromBuilder#checkBoxGroup` helper
  
 Minor Changes:
 
