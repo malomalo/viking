@@ -359,7 +359,7 @@
     });
     
     // radioButton()
-    // ==========
+    // =============
     test("#radioButton() passes to Viking.View.Helpers.radioButton", function () {
         expect(4);
         
@@ -415,7 +415,7 @@
     });
     
     // select()
-    // ==========
+    // ========
     test("#select() passes to Viking.View.Helpers.select", function () {
         expect(4);
         

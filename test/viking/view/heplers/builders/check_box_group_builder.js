@@ -53,5 +53,65 @@
         equal( form.checkBox('agent'), '<input checked id="ns_model_roles_agent" name="ns[model][roles][]" type="checkbox" value="agent">');
     });
     
+    // label(value, content, options, escape)
+    // ======================================
+    test("#label() passes to Viking.View.Helpers.label", function () {
+        expect(5);
+        
+        var model = this.model;
+        var form = new CheckBoxGroupBuilder(this.model, 'roles')
+        var old_func = Viking.View.Helpers.label
+        
+        Viking.View.Helpers.label = function(m, attribute, content, options, escape) {
+            strictEqual(model, m);
+            strictEqual('roles', attribute);
+            strictEqual(1, content);
+            deepEqual({for: 'model_roles_key'}, options);
+            strictEqual(2, escape);
+        }
+        form.label('key', 1, {}, 2);
+        
+        Viking.View.Helpers.label = old_func;
+    });
+    
+    test("#label() uses namepsace on for attribute", function () {
+        expect(5);
+        
+        var model = this.model;
+        var form = new CheckBoxGroupBuilder(this.model, 'roles', {namespace: 'ns'})
+        var old_func = Viking.View.Helpers.label
+        
+        Viking.View.Helpers.label = function(m, attribute, content, options, escape) {
+            strictEqual(model, m);
+            strictEqual('roles', attribute);
+            strictEqual(1, content);
+            deepEqual({'for': 'ns_model_roles_agent'}, options);
+            strictEqual(2, escape);
+        }
+        form.label('agent', 1, {}, 2);
+        
+        Viking.View.Helpers.label = old_func;
+    });
+    
+    test("#label() allows for attribute to be overridden", function () {
+        expect(5);
+        
+        var model = this.model;
+        var form = new CheckBoxGroupBuilder(this.model, 'roles')
+        var old_func = Viking.View.Helpers.label
+        
+        Viking.View.Helpers.label = function(m, attribute, content, options, escape) {
+            strictEqual(model, m);
+            strictEqual('roles', attribute);
+            strictEqual(1, content);
+            deepEqual({'for': 'me'}, options);
+            strictEqual(2, escape);
+        }
+        form.label('agent', 1, {'for': 'me'}, 2);
+        
+        Viking.View.Helpers.label = old_func;
+    });
+
+    
 
 }());

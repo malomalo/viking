@@ -2388,6 +2388,7 @@ FormBuilder.prototype = {
     label: function(attribute, content, options, escape) {
         options || (options = {});
         
+        //TODO shouldn't options.name be options.for?
         if (!options.name && this.options.namespace) {
             options.for = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
             options.for = Viking.View.sanitizeToId(options.for);
@@ -2509,11 +2510,24 @@ CheckBoxGroupBuilder.prototype = {
         } else if (!options.name) {
             options.name = Viking.View.tagNameForModelAttribute(this.model, this.attribute);
         }
+        
         if (!options.id) {
             options.id = Viking.View.sanitizeToId(options.name) + '_' + checkedValue;
         }
         
         return Viking.View.Helpers.checkBoxTag(options.name, checkedValue, _.contains(values, checkedValue), options);
+    },
+    
+    label: function(value, content, options, escape) {
+        options || (options = {});
+        
+        //TODO shouldn't options.name be options.for?
+        if (!options.name && !options.for) {
+            options.for = Viking.View.tagNameForModelAttribute(this.model, this.attribute, {namespace: this.options.namespace});
+            options.for = Viking.View.sanitizeToId(options.for) + '_' + value;
+        }
+        
+        return Viking.View.Helpers.label(this.model, this.attribute, content, options, escape);
     }
     
 }
