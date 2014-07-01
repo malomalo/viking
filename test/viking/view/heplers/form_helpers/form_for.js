@@ -6,7 +6,7 @@
         }
     });
 
-    // form_for(model, options, content())
+    // formFor(model, options, content())
     // =================================
     test("formFor(model, content())", function() {
         equal(Viking.View.Helpers.formFor(this.model, function() { return ''; }), '<form method="get"></form>');

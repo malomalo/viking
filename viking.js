@@ -2345,6 +2345,167 @@ Viking.View.Helpers.textAreaTag = function (name, content, options, escape) {
 
 
 
+function FormBuilder(model, options) {
+    options || (options = {});
+    
+    this.model = model;
+    this.options = options;
+}
+
+// TODO: options passed to the helpers can be made into a helper
+FormBuilder.prototype = {
+
+    checkBox: function(attribute, options, checkedValue, uncheckedValue) {
+        options || (options = {});
+        
+        if (!options.name && this.options.namespace) {
+            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+        }
+        
+        return Viking.View.Helpers.checkBox(this.model, attribute, options, checkedValue, uncheckedValue);
+    },
+
+    collectionSelect: function(attribute, collection, valueAttribute, textAttribute, options) {
+        options || (options = {});
+        
+        if (!options.name && this.options.namespace) {
+            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+        }
+        
+        return Viking.View.Helpers.collectionSelect(this.model, attribute, collection, valueAttribute, textAttribute, options);
+    },
+
+    hiddenField: function(attribute, options) {
+        options || (options = {});
+        
+        if (!options.name && this.options.namespace) {
+            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+        }
+        
+        return Viking.View.Helpers.hiddenField(this.model, attribute, options);
+    },
+    
+    label: function(attribute, content, options, escape) {
+        options || (options = {});
+        
+        if (!options.name && this.options.namespace) {
+            options.for = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+            options.for = Viking.View.sanitizeToId(options.for);
+        }
+        
+        return Viking.View.Helpers.label(this.model, attribute, content, options, escape);
+    },
+    
+    number: function(attribute, options) {
+        options || (options = {});
+        
+        if (!options.name && this.options.namespace) {
+            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+        }
+        
+        return Viking.View.Helpers.numberField(this.model, attribute, options);
+    },
+
+    passwordField: function(attribute, options) {
+        options || (options = {});
+        
+        if (!options.name && this.options.namespace) {
+            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+        }
+        
+        return Viking.View.Helpers.passwordField(this.model, attribute, options);
+    },
+    
+    radioButton: function(attribute, tagValue, options) {
+        options || (options = {});
+        
+        if (!options.name && this.options.namespace) {
+            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+        }
+        
+        return Viking.View.Helpers.radioButton(this.model, attribute, tagValue, options);
+    },
+    
+    select: function(attribute, collection, options) {
+        options || (options = {});
+        
+        if (!options.name && this.options.namespace) {
+            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+        }
+        
+        return Viking.View.Helpers.select(this.model, attribute, collection, options);
+    },
+
+    textArea: function(attribute, options) {
+        options || (options = {});
+        
+        if (!options.name && this.options.namespace) {
+            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+        }
+        
+        return Viking.View.Helpers.textArea(this.model, attribute, options);
+    },
+
+    textField: function(attribute, options) {
+        options || (options = {});
+        
+        if (!options.name && this.options.namespace) {
+            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+        }
+        
+        return Viking.View.Helpers.textField(this.model, attribute, options);
+    },
+    
+    fieldsFor: function(attribute, options, content) {
+        if (typeof options === 'function') {
+            content = options;
+            options = {};
+        }
+        
+        if (!options.namespace) {
+            if (this.options.namespace) {
+                options.namespace = this.options.namespace + '[' + this.model.modelName + ']';
+            } else {
+                options.namespace = this.model.modelName;
+            }
+        }
+        
+        var builder = new FormBuilder(this.model.get(attribute), options);
+    
+        return content(builder);
+    }
+    
+};
+function CheckBoxGroupBuilder(model, attribute, options) {
+    options || (options = {});
+    
+    this.model = model;
+    this.attribute = attribute;
+    this.options = options;
+}
+
+// TODO: options passed to the helpers can be made into a helper
+CheckBoxGroupBuilder.prototype = {
+
+    checkBox: function(checkedValue, options) {
+        var values = this.model.get(this.attribute);
+        options || (options = {});
+        
+        if (!options.name && this.options.namespace) {
+            options.name = Viking.View.tagNameForModelAttribute(this.model, this.attribute, {namespace: this.options.namespace});
+        } else if (!options.name) {
+            options.name = Viking.View.tagNameForModelAttribute(this.model, this.attribute);
+        }
+        if (!options.id) {
+            options.id = Viking.View.sanitizeToId(options.name) + '_' + checkedValue;
+        }
+        
+        return Viking.View.Helpers.checkBoxTag(options.name, checkedValue, _.contains(values, checkedValue), options);
+    }
+    
+}
+
+
 // checkBox(model, attribute, options={}, checkedValue="true", uncheckedValue="false")
 // =====================================================================================
 //
@@ -2421,6 +2582,33 @@ Viking.View.Helpers.checkBox = function (model, attribute, options, checkedValue
     output += Viking.View.Helpers.checkBoxTag(name, checkedValue, checkedValue === value, options);
     
     return output;
+};
+// checkBoxGroup(model, attribute, options = {}, content = func(f))
+// ================================================================
+// 
+// Usefull for rendering an checkbox group. checkBox generates an auxiliary
+// hidden field before the very check box that has the same name to mimic an
+// unchecked box. Using checkBox within checkBoxGroup will not generate the
+// auxiliary field.
+//
+// A useful example of this is when you have an array of items to choose from.
+//
+// Examples
+// --------
+//   checkBoxGroup(account, 'roles', function (f) {
+//       return f.checkBox('admin') + "\n" + f.checkBox('agent', { class: 'agent_check' });
+//   });
+//   // => <input checked id="account_roles_admin" type="checkbox" name="account[roles][]" value="admin">
+//   // => <input checked class="agent_check" id="account_roles_agent" type="checkbox" name="account[roles][]" value="agent">
+Viking.View.Helpers.checkBoxGroup = function (model, attribute, options, content) {
+    if (typeof options === 'function') {
+        content = options;
+        options = {};
+    }
+    
+    var builder = new CheckBoxGroupBuilder(model, attribute, options);
+    
+    return content(builder);
 };
 // collectionSelect(model, attribute, collection, valueAttribute, textAttribute, options)
 // ====================================================================================
@@ -2805,6 +2993,7 @@ Viking.View.Helpers.textField = function (model, attribute, options) {
 // TODO: make this accept model string names
 
 
+
 // TODO: date_field
 // TODO: date_select
 // TODO: day_field
@@ -3128,137 +3317,6 @@ Viking.View.Helpers.mailTo = function (email, name, options) {
 
 
 
-function FormBuilder(model, options) {
-    options || (options = {});
-    
-    this.model = model;
-    this.options = options;
-}
-
-// TODO: options passed to the helpers can be made into a helper
-FormBuilder.prototype = {
-
-    checkBox: function(attribute, options, checkedValue, uncheckedValue) {
-        options || (options = {});
-        
-        if (!options.name && this.options.namespace) {
-            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
-        }
-        
-        return Viking.View.Helpers.checkBox(this.model, attribute, options, checkedValue, uncheckedValue);
-    },
-
-    collectionSelect: function(attribute, collection, valueAttribute, textAttribute, options) {
-        options || (options = {});
-        
-        if (!options.name && this.options.namespace) {
-            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
-        }
-        
-        return Viking.View.Helpers.collectionSelect(this.model, attribute, collection, valueAttribute, textAttribute, options);
-    },
-
-    hiddenField: function(attribute, options) {
-        options || (options = {});
-        
-        if (!options.name && this.options.namespace) {
-            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
-        }
-        
-        return Viking.View.Helpers.hiddenField(this.model, attribute, options);
-    },
-    
-    label: function(attribute, content, options, escape) {
-        options || (options = {});
-        
-        if (!options.name && this.options.namespace) {
-            options.for = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
-            options.for = Viking.View.sanitizeToId(options.for);
-        }
-        
-        return Viking.View.Helpers.label(this.model, attribute, content, options, escape);
-    },
-    
-    number: function(attribute, options) {
-        options || (options = {});
-        
-        if (!options.name && this.options.namespace) {
-            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
-        }
-        
-        return Viking.View.Helpers.numberField(this.model, attribute, options);
-    },
-
-    passwordField: function(attribute, options) {
-        options || (options = {});
-        
-        if (!options.name && this.options.namespace) {
-            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
-        }
-        
-        return Viking.View.Helpers.passwordField(this.model, attribute, options);
-    },
-    
-    radioButton: function(attribute, tagValue, options) {
-        options || (options = {});
-        
-        if (!options.name && this.options.namespace) {
-            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
-        }
-        
-        return Viking.View.Helpers.radioButton(this.model, attribute, tagValue, options);
-    },
-    
-    select: function(attribute, collection, options) {
-        options || (options = {});
-        
-        if (!options.name && this.options.namespace) {
-            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
-        }
-        
-        return Viking.View.Helpers.select(this.model, attribute, collection, options);
-    },
-
-    textArea: function(attribute, options) {
-        options || (options = {});
-        
-        if (!options.name && this.options.namespace) {
-            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
-        }
-        
-        return Viking.View.Helpers.textArea(this.model, attribute, options);
-    },
-
-    textField: function(attribute, options) {
-        options || (options = {});
-        
-        if (!options.name && this.options.namespace) {
-            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
-        }
-        
-        return Viking.View.Helpers.textField(this.model, attribute, options);
-    },
-    
-    fieldsFor: function(attribute, options, content) {
-        if (typeof options === 'function') {
-            content = options;
-            options = {};
-        }
-        
-        if (!options.namespace) {
-            if (this.options.namespace) {
-                options.namespace = this.options.namespace + '[' + this.model.modelName + ']';
-            } else {
-                options.namespace = this.model.modelName;
-            }
-        }
-        
-        var builder = new FormBuilder(this.model.get(attribute), options);
-    
-        return content(builder);
-    }
-    
-};
 
 
 Viking.PaginatedCollection = Viking.Collection.extend({
