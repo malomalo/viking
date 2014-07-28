@@ -1,4 +1,7 @@
-//     Viking.js 0.6.0
+(function () {
+  'use strict';
+
+  //     Viking.js 0.6.0
 //
 //     (c) 2012-2013 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -25,25 +28,25 @@ Viking.NameError.prototype = Error.prototype;
 // Calls `to_param` on all its elements and joins the result with slashes.
 // This is used by url_for in Viking Pack.
 Object.defineProperty(Array.prototype, 'toParam', {
-	value: function() {
+    value: function() {
         return _.map(this, function(e) { return e.toParam(); }).join('/');
-	},
-	writable: true,
-	configureable: true,
-	enumerable: false
+    },
+    writable: true,
+    configureable: true,
+    enumerable: false
 });
 
 
 // Converts an array into a string suitable for use as a URL query string,
 // using the given key as the param name.
 Object.defineProperty(Array.prototype, 'toQuery', {
-	value: function (key) {
-    	var prefix = key + "[]";
-    	return _.map(this, function(value) { return value === null ? escape(prefix) + '=' : value.toQuery(prefix); }).join('&');
-	},
-	writable: true,
-	configureable: true,
-	enumerable: false
+    value: function (key) {
+        var prefix = key + "[]";
+        return _.map(this, function(value) { return !value ? escape(prefix) + '=' : value.toQuery(prefix); }).join('&');
+    },
+    writable: true,
+    configureable: true,
+    enumerable: false
 });
 // Alias of to_s.
 Boolean.prototype.toParam = Boolean.prototype.toString;
@@ -385,7 +388,11 @@ Viking.config = function (obj, key, val) {
       var type = methodMap[method];
 
       // Default options, unless specified.
-      _.defaults(options || (options = {}), {
+      if (!options) {
+          options = {};
+      }
+
+      _.defaults(options, {
         emulateHTTP: Backbone.emulateHTTP,
         emulateJSON: Backbone.emulateJSON
       });
@@ -399,7 +406,7 @@ Viking.config = function (obj, key, val) {
       }
 
       // Ensure that we have the appropriate request data.
-      if (options.data == null && model && (method === 'create' || method === 'update' || method === 'patch')) {
+      if (!options.data && model && (method === 'create' || method === 'update' || method === 'patch')) {
         params.contentType = 'application/json';
         params.data = JSON.stringify(options.attrs || model.toJSON(options));
       }
@@ -414,11 +421,15 @@ Viking.config = function (obj, key, val) {
       // And an `X-HTTP-Method-Override` header.
       if (options.emulateHTTP && (type === 'PUT' || type === 'DELETE' || type === 'PATCH')) {
         params.type = 'POST';
-        if (options.emulateJSON) params.data._method = type;
+        if (options.emulateJSON) {
+            params.data._method = type;
+        }
         var beforeSend = options.beforeSend;
         options.beforeSend = function(xhr) {
           xhr.setRequestHeader('X-HTTP-Method-Override', type);
-          if (beforeSend) return beforeSend.apply(this, arguments);
+          if (beforeSend) {
+              return beforeSend.apply(this, arguments);
+          }
         };
       }
       
@@ -446,7 +457,7 @@ Viking.config = function (obj, key, val) {
 
     var noXhrPatch =
       typeof window !== 'undefined' && !!window.ActiveXObject &&
-        !(window.XMLHttpRequest && (new XMLHttpRequest).dispatchEvent);
+        !(window.XMLHttpRequest && (new XMLHttpRequest()).dispatchEvent);
 
     // Map from CRUD to HTTP for our default `Backbone.sync` implementation.
     var methodMap = {
@@ -467,7 +478,9 @@ Viking.config = function (obj, key, val) {
 //     - model: model to use
 //     - collection: collection to use
 Viking.AssociationReflection = function (macro, name, options) {
-    options || (options = {});
+    if (!options) {
+        options = {};
+    }
     
     this.name = name;
     this.macro = macro;
@@ -483,7 +496,7 @@ Viking.AssociationReflection = function (macro, name, options) {
         }
     } else if (macro === 'belongsTo' || macro === 'hasOne') {
         if (!options.polymorphic) {
-            this.modelName = options.model ? options.model : name.camelize();
+            this.modelName = options.model || name.camelize();
         }
     } else {
         throw new TypeError("Unkown Macro " + macro);
@@ -527,7 +540,10 @@ Viking.Model = Backbone.Model.extend({
     // except where there are comments
     constructor: function (attributes, options) {
         var attrs = attributes || {};
-        options || (options = {});
+        if (!options) {
+            options = {};
+        }
+
         this.cid = _.uniqueId('c');
         this.attributes = {};
         attrs = _.defaults({}, attrs, _.result(this, 'defaults'));
@@ -550,7 +566,7 @@ Viking.Model = Backbone.Model.extend({
         this.baseModel = this.constructor.baseModel;
 
         if (this.baseModel && this.inheritanceAttribute) {
-            if (this.baseModel == this.constructor && this.baseModel.descendants.length > 0) {
+            if (this.baseModel === this.constructor && this.baseModel.descendants.length > 0) {
                 attrs[this.inheritanceAttribute] = this.modelName;
             } else if (_.contains(this.baseModel.descendants, this.constructor)) {
                 attrs[this.inheritanceAttribute] = this.modelName;
@@ -592,7 +608,10 @@ Viking.Model = Backbone.Model.extend({
             staticProps = protoProps;
             protoProps = name;
         }
-        protoProps || (protoProps = {});
+
+        if (!protoProps) {
+            protoProps = {};
+        }
 
         var child = Backbone.Model.extend.call(this, protoProps, staticProps);
 
@@ -650,7 +669,7 @@ Viking.Model.find = function(id, options) {
 };
 Viking.Model.reflectOnAssociation = function(name) {
     return this.associations[name];
-}
+};
 Viking.Model.reflectOnAssociations = function(macro) {
     var associations = _.values(this.associations);
     if (macro) {
@@ -660,7 +679,7 @@ Viking.Model.reflectOnAssociations = function(macro) {
     }
 
     return associations;
-}
+};
 // Generates the `urlRoot` based off of the model name.
 Viking.Model.urlRoot = function() {
     return "/" + this.baseModel.modelName.pluralize();
@@ -674,19 +693,22 @@ Viking.Model.where = function(options) {
 Viking.Model.prototype.coerceAttributes = function(attrs) {
     
     _.each(this.associations, function(association) {
-        var polymorphic = association.options.polymorphic;
+        var Type,
+            polymorphic = association.options.polymorphic;
         
-        if (!attrs[association.name]) return;
+        if (!attrs[association.name]) {
+            return;
+        }
         
         if (polymorphic && (attrs[association.name] instanceof Viking.Model)) {
             // TODO: remove setting the id?
             attrs[association.name + '_id'] = attrs[association.name].id;
             attrs[association.name + '_type'] = attrs[association.name].modelName;
         } else if (polymorphic && attrs[association.name + '_type']) {
-            var Type = attrs[association.name + '_type'].camelize().constantize();
+            Type = attrs[association.name + '_type'].camelize().constantize();
             attrs[association.name] = new Type(attrs[association.name]);
         } else if (!(attrs[association.name] instanceof association.klass())) {
-            var Type = association.klass();
+            Type = association.klass();
             attrs[association.name] = new Type(attrs[association.name]);
         }
     });
@@ -742,7 +764,7 @@ Viking.Model.prototype.save = function(key, val, options) {
     var attrs, method, xhr, attributes = this.attributes;
 
     // Handle both `"key", value` and `{key: value}` -style arguments.
-    if (key == null || typeof key === 'object') {
+    if (!key || typeof key === 'object') {
       attrs = key;
       options = val;
     } else {
@@ -755,9 +777,13 @@ Viking.Model.prototype.save = function(key, val, options) {
     // `set(attr).save(null, opts)` with validation. Otherwise, check if
     // the model will be valid when the attributes, if any, are set.
     if (attrs && !options.wait) {
-      if (!this.set(attrs, options)) return false;
+      if (!this.set(attrs, options)) {
+          return false;
+      }
     } else {
-      if (!this._validate(attrs, options)) return false;
+      if (!this._validate(attrs, options)) {
+          return false;
+      }
     }
 
     // Set temporary attributes if `{wait: true}`.
@@ -767,18 +793,25 @@ Viking.Model.prototype.save = function(key, val, options) {
 
     // After a successful server-side save, the client is (optionally)
     // updated with the server-side state.
-    if (options.parse === void 0) options.parse = true;
+    if (typeof options.parse === 'undefined') {
+        options.parse = true;
+    }
+
     var model = this;
     var success = options.success;
     options.success = function(resp) {
       // Ensure attributes are restored during synchronous saves.
       model.attributes = attributes;
       var serverAttrs = model.parse(resp, options);
-      if (options.wait) serverAttrs = _.extend(attrs || {}, serverAttrs);
+      if (options.wait) {
+          serverAttrs = _.extend(attrs || {}, serverAttrs);
+      }
       if (_.isObject(serverAttrs) && !model.set(serverAttrs, options)) {
         return false;
       }
-      if (success) success(model, resp, options);
+      if (success) {
+          success(model, resp, options);
+      }
       model.trigger('sync', model, resp, options);
     };
 
@@ -793,20 +826,26 @@ Viking.Model.prototype.save = function(key, val, options) {
             }
             model.setErrors(errors, options);
         } else {
-            if (error) error(model, resp, options);
+            if (error) {
+                error(model, resp, options);
+            }
             model.trigger('error', model, resp, options);
         }
     };
 
     method = this.isNew() ? 'create' : (options.patch ? 'patch' : 'update');
-    if (method === 'patch') options.attrs = attrs;
+    if (method === 'patch') {
+        options.attrs = attrs;
+    }
     xhr = this.sync(method, this, options);
 
     // Restore attributes.
-    if (attrs && options.wait) this.attributes = attributes;
+    if (attrs && options.wait) {
+        this.attributes = attributes;
+    }
 
     return xhr;
-}
+};
 // select(options)
 // select(value[, options])
 //
@@ -864,7 +903,7 @@ Viking.Model.prototype.set = function (key, val, options) {
         var type = attrs[this.inheritanceAttribute].camelize().constantize();
         this.constructor = type;
         this.__proto__ = type.prototype;
-		this.modelName = type.modelName
+        this.modelName = type.modelName;
         
         // TODO: move to function, used in Model.new
         // TODO: probably move to a becomes method
@@ -907,9 +946,11 @@ Viking.Model.prototype.setErrors = function(errors, options) {
 // [Ruby on Rails](http://rubyonrails.org/) expects the attributes to be
 // namespaced
 Viking.Model.prototype.sync = function(method, model, options) {
-    options || (options = {});
+    if (!options) {
+        options = {};
+    }
 
-    if (options.data == null && (method === 'create' || method === 'update' || method === 'patch')) {
+    if (!options.data && (method === 'create' || method === 'update' || method === 'patch')) {
         options.contentType = 'application/json';
         options.data = {};
         options.data[_.result(model, 'paramRoot')] = (options.attrs || model.toJSON(options));
@@ -1011,9 +1052,12 @@ Viking.Model.prototype.toParam = function() {
 // Note that `#touch` must be used on a persisted object, or else an
 // Viking.Model.RecordError will be thrown.
 Viking.Model.prototype.touch = function(name, options) {
+    if (!options) {
+        options = {};
+    }
 
     // TODO move to extend and extend a new object so not writing to old options
-    _.defaults(options || (options = {}), {
+    _.defaults(options, {
         type: 'PUT',
         url: _.result(this, 'url') + '/touch',
     });
@@ -1040,9 +1084,12 @@ Viking.Model.prototype.updateAttribute = function (key, value, options) {
 };
 // TODO: test return
 Viking.Model.prototype.updateAttributes = function (data, options) {
-    options || (options = {});
+    if (!options) {
+        options = {};
+    }
+
     options.patch = true;
-    
+
     return this.save(data, options);
 };
 // Default URL for the model's representation on the server
@@ -1052,7 +1099,9 @@ Viking.Model.prototype.url = function() {
       _.result(this.collection, 'url') ||
       urlError();
 
-    if (this.isNew()) return base;
+    if (this.isNew()) {
+        return base;
+    }
         
     return base.replace(/([^\/])$/, '$1/') + this.toParam();
 };
@@ -1133,7 +1182,9 @@ Viking.Collection = Backbone.Collection.extend({
     // collection. If the model is already selected the `selected` event is
     // not triggered
     select: function(model, options) {
-        options || (options = {});
+        if (!options) {
+            options = {};
+        }
         
         if(!options.multiple) {
             this.clearSelected(model);
@@ -1167,7 +1218,9 @@ Viking.Collection = Backbone.Collection.extend({
     // sent they will be canceled and only the last one will finish and update
     // the collection. You won't get the collection being updated 3 times.
     fetch: function(options) {
-        options || (options = {});
+        if (!options) {
+            options = {};
+        }
         
         var complete = options.complete;
         options.complete = _.bind(function() {
@@ -1181,13 +1234,19 @@ Viking.Collection = Backbone.Collection.extend({
     
 	// TODO: testme?
     sync: function(method, model, options) {
-        if(method === 'read' && this.predicate) {
-            options.data || (options.data = {});
+        if (method === 'read' && this.predicate) {
+            if (!options.data) {
+                options.data = {};
+            }
+
             options.data.where = this.predicate.attributes;
         }
         
         if(method === 'read' && this.ordering) {
-            options.data || (options.data = {});
+            if (!options.data) {
+                options.data = {};
+            }
+
             options.data.order = this.ordering;
         }
         
@@ -1219,7 +1278,10 @@ Viking.Collection = Backbone.Collection.extend({
     // order([{size: 'asc'}, {size: 'desc'}])     => [{'size': 'asc'}, {'id': 'desc'}]
     // order({size: 'asc'}, {silent: true})     => [{'size': 'asc'}]
     order: function(order, options) {
-        options || (options = {});
+        if (!options) {
+            options = {};
+        }
+
         order = (_.isArray(order) ? order : [order]);
         
         order = _.map(order, function(o) {
@@ -1418,7 +1480,9 @@ Viking.View.Helpers = {};
 
     // TODO: move to model_helpers?
     Viking.View.tagNameForModelAttribute = function (model, attribute, options) {
-        options || (options = {});
+        if (!options) {
+            options = {};
+        }
         
         var value = model.get(attribute);
         var name;
@@ -1751,18 +1815,21 @@ Viking.View.Helpers.hiddenFieldTag = function (name, value, options) {
 Viking.View.Helpers.formTag = function (options, content) {
     var tmp, methodOverride = '';
     
-    if (typeof options === 'function' || typeof options == 'string') {
+    if (typeof options === 'function' || typeof options === 'string') {
         tmp = content;
         content = options;
         options = tmp;
     }
-    options || (options = {});
+    
+    if (!options) {
+        options = {};
+    }
     
     if (options.action && !options.method) {
         options.method = 'post';
     } else if (options.method && options.method !== 'get' && options.method !== 'post') {
         methodOverride = Viking.View.Helpers.hiddenFieldTag('_method', options.method);
-        options.method = 'post'
+        options.method = 'post';
     }
     
     if (options.multipart) {
@@ -1854,14 +1921,20 @@ Viking.View.Helpers.timeTag = function (date, content, options) {
         options = content;
         content = tmp;
     }
-    options || (options = {});
+
+    if (!options) {
+        options = {};
+    }
     
     if (!content) {
-        content = options.format ? date.strftime(format) : date.toString()
+        content = options.format ? date.strftime(options.format) : date.toString();
     }
-    if (options.format) delete options.format;
-    if (!options.datetime) options.datetime = date.toISOString();
-    
+    if (options.format) {
+        delete options.format;
+    }
+    if (!options.datetime) {
+        options.datetime = date.toISOString();
+    }
 
     return Viking.View.Helpers.contentTag('time', content, options);
 };
@@ -2346,7 +2419,9 @@ Viking.View.Helpers.textAreaTag = function (name, content, options, escape) {
 
 
 function FormBuilder(model, options) {
-    options || (options = {});
+    if (!options) {
+        options = {};
+    }
     
     this.model = model;
     this.options = options;
@@ -2356,7 +2431,9 @@ function FormBuilder(model, options) {
 FormBuilder.prototype = {
 
     checkBox: function(attribute, options, checkedValue, uncheckedValue) {
-        options || (options = {});
+        if (!options) {
+            options = {};
+        }
         
         if (!options.name && this.options.namespace) {
             options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
@@ -2366,7 +2443,9 @@ FormBuilder.prototype = {
     },
 
     collectionSelect: function(attribute, collection, valueAttribute, textAttribute, options) {
-        options || (options = {});
+        if (!options) {
+            options = {};
+        }
         
         if (!options.name && this.options.namespace) {
             options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
@@ -2376,7 +2455,9 @@ FormBuilder.prototype = {
     },
 
     hiddenField: function(attribute, options) {
-        options || (options = {});
+        if (!options) {
+            options = {};
+        }
         
         if (!options.name && this.options.namespace) {
             options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
@@ -2386,7 +2467,9 @@ FormBuilder.prototype = {
     },
     
     label: function(attribute, content, options, escape) {
-        options || (options = {});
+        if (!options) {
+            options = {};
+        }
         
         //TODO shouldn't options.name be options.for?
         if (!options.name && this.options.namespace) {
@@ -2398,7 +2481,9 @@ FormBuilder.prototype = {
     },
     
     number: function(attribute, options) {
-        options || (options = {});
+        if (!options) {
+            options = {};
+        }
         
         if (!options.name && this.options.namespace) {
             options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
@@ -2408,7 +2493,9 @@ FormBuilder.prototype = {
     },
 
     passwordField: function(attribute, options) {
-        options || (options = {});
+        if (!options) {
+            options = {};
+        }
         
         if (!options.name && this.options.namespace) {
             options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
@@ -2418,7 +2505,9 @@ FormBuilder.prototype = {
     },
     
     radioButton: function(attribute, tagValue, options) {
-        options || (options = {});
+        if (!options) {
+            options = {};
+        }
         
         if (!options.name && this.options.namespace) {
             options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
@@ -2428,7 +2517,9 @@ FormBuilder.prototype = {
     },
     
     select: function(attribute, collection, options) {
-        options || (options = {});
+        if (!options) {
+            options = {};
+        }
         
         if (!options.name && this.options.namespace) {
             options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
@@ -2438,7 +2529,9 @@ FormBuilder.prototype = {
     },
 
     textArea: function(attribute, options) {
-        options || (options = {});
+        if (!options) {
+            options = {};
+        }
         
         if (!options.name && this.options.namespace) {
             options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
@@ -2448,7 +2541,9 @@ FormBuilder.prototype = {
     },
 
     textField: function(attribute, options) {
-        options || (options = {});
+        if (!options) {
+            options = {};
+        }
         
         if (!options.name && this.options.namespace) {
             options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
@@ -2491,7 +2586,9 @@ FormBuilder.prototype = {
     
 };
 function CheckBoxGroupBuilder(model, attribute, options) {
-    options || (options = {});
+    if (!options) {
+        options = {};
+    }
     
     this.model = model;
     this.attribute = attribute;
@@ -2503,7 +2600,9 @@ CheckBoxGroupBuilder.prototype = {
 
     checkBox: function(checkedValue, options) {
         var values = this.model.get(this.attribute);
-        options || (options = {});
+        if (!options) {
+            options = {};
+        }
         
         if (!options.name && this.options.namespace) {
             options.name = Viking.View.tagNameForModelAttribute(this.model, this.attribute, {namespace: this.options.namespace});
@@ -2519,7 +2618,9 @@ CheckBoxGroupBuilder.prototype = {
     },
     
     label: function(value, content, options, escape) {
-        options || (options = {});
+        if (!options) {
+            options = {};
+        }
         
         //TODO shouldn't options.name be options.for?
         if (!options.name && !options.for) {
@@ -2530,7 +2631,7 @@ CheckBoxGroupBuilder.prototype = {
         return Viking.View.Helpers.label(this.model, this.attribute, content, options, escape);
     }
     
-}
+};
 
 
 // checkBox(model, attribute, options={}, checkedValue="true", uncheckedValue="false")
@@ -2844,7 +2945,10 @@ Viking.View.Helpers.numberField = function (model, attribute, options) {
 //   passwordField(account, 'secret', {class: "form_input", value: account.get('secret')})
 //   // => <input class="form_input" id="account_secret" name="account[secret]" type="password" value="unkown">
 Viking.View.Helpers.passwordField = function (model, attribute, options) {
-    options || (options = {});
+    if (!options) {
+        options = {};
+    }
+
     var name = options.name || Viking.View.tagNameForModelAttribute(model, attribute);
 
     if (options === undefined) { options = {}; }
@@ -3123,7 +3227,7 @@ Viking.View.Helpers.textField = function (model, attribute, options) {
 //       polymorphic_url([user, :blog, post]) # => "http://example.com/users/1/blog/posts/1"
 //       polymorphic_url(Comment) # => "http://example.com/comments"
 //
-urlFor = function (modelOrUrl, options) {
+var urlFor = function (modelOrUrl, options) {
     if (typeof modelOrUrl === 'string') {
         return modelOrUrl;
     }
@@ -3329,7 +3433,9 @@ Viking.View.Helpers.mailTo = function (email, name, options) {
     if (name === undefined) {
         name = _.escape(email);
     }
-    options || (options = {});
+    if (!options) {
+        options = {};
+    }
     
     var extras = _.map(_.pick(options, 'cc', 'bcc', 'body', 'subject'), function(value, key) {
         return key + '=' + encodeURI(value);
@@ -3379,7 +3485,10 @@ Viking.PaginatedCollection = Viking.Collection.extend({
     
     sync: function(method, model, options) {
         if(method === 'read') {
-            options.data || (options.data = {});
+            if (!options.data) {
+                options.data = {};
+            }
+
             options.data.page = model.cursor.get('page');
             options.data.per_page = model.cursor.get('per_page');
             options.data.offset = model.cursor.get('offset');
@@ -3544,3 +3653,6 @@ Viking.Router = Backbone.Router.extend({
 
 
 
+
+
+}());

@@ -19,7 +19,14 @@ file "viking.js" => FileList["lib/**/*.js"] do
   FileUtils.rm_f('./viking.js')
 
   File.open('./viking.js', "w") do |file|
-    file.write(environment['viking.js'].to_s)
+    file << <<-DOC
+(function () {
+  'use strict';
+
+  #{environment['viking.js'].source}
+
+}());
+    DOC
   end
 end
 
@@ -38,7 +45,10 @@ end
 desc "run JavaScriptLint on the source"
 task :lint do
   check 'jslint', 'JavaScript Lint', 'npm install jslint --global'
-  system "find lib -name '*.js' -exec jslint --color --predef Backbone --predef _ --predef jQuery --predef strftime --predef Viking --browser --plusplus --nomen --white --regex --vars --sloppy '{}' \\\;"
+  # system "find lib -name '*.js' -exec jslint --color --predef Backbone --predef _ --predef jQuery --predef strftime --predef Viking --browser --plusplus --nomen --white --regex --vars --sloppy '{}' \\\;"
+  system "find lib -name '*.js' -exec jslint --color --predef Backbone --predef _ --predef jQuery --predef $ --predef strftime --predef Viking --plusplus --nomen --browser --regex --white --vars --sloppy '{}' \\\;"
+
+  system "jslint --color --predef Backbone --predef _ --predef jQuery --predef $ --predef strftime --predef Viking --nomen --white --regex --plusplus --vars ./viking.js"
 end
 
 desc "Enumerate all annotations (use notes:optimize, :fixme, :todo for focus)"
@@ -61,7 +71,7 @@ task :test do
   # Add our custom Processor to turn viking.js into a list of files to include
   environment.unregister_postprocessor 'application/javascript', Sprockets::DirectiveProcessor
   environment.register_postprocessor 'application/javascript', UrlGenerator  
-    
+
   # Render the test html file
   File.open('test/index.html', 'w') do |file|
     file.write(ERB.new(File.read('test/index.html.erb')).result(binding))
