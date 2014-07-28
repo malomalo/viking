@@ -1,5 +1,7 @@
 ## Edge
 
+## 0.7.0 (July 1st, 2014)
+
 Major Changes:
 
  - added `Viking.View.Helpers::mailTo` url helper
