@@ -885,13 +885,13 @@ Viking.Model.prototype.set = function (key, val, options) {
     _.each(attrs, function(value, key) {
         var association = this.reflectOnAssociation(key);
         if (association && association.macro === 'hasMany') {
-            if (value instanceof Backbone.Collection) {
+            if (!value) {
+                this.attributes[key].set([]);
+            } else {
                 this.attributes[key].set(value.models);
                 _.each(value.models, function(model) {
                     model.collection = this.attributes[key];
                 }, this);
-            } else {
-                this.attributes[key] = value;
             }
 
             delete attrs[key];

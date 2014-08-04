@@ -10,7 +10,8 @@
         a.set('ships', [{}, {}]);
         
         a.unset('ships');
-        equal(a.get('ships'), undefined);
+        ok(a.get('ships') instanceof ShipCollection);
+        equal(0, a.get('ships').length);
 
         delete Ship;
         delete ShipCollection;
