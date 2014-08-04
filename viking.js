@@ -1428,9 +1428,9 @@ Viking.View.Helpers = {};
         var value = model.get(attribute);
         var name;
         if (options.namespace) {
-            name = options.namespace + '[' + model.modelName + '][' + attribute + ']';
+            name = options.namespace + '[' + model.baseModel.modelName + '][' + attribute + ']';
         } else {
-            name = model.modelName + '[' + attribute + ']';
+            name = model.baseModel.modelName + '[' + attribute + ']';
         }
         
          if (value instanceof Viking.Collection || _.isArray(value)) {
