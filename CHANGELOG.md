@@ -1,5 +1,9 @@
 ## Edge
 
+Minor Changes:
+
+ - `Viking.Model.unset` now allows you to unset a `hasMany` relationship
+
 ## 0.7.0 (July 1st, 2014)
 
 Major Changes:
