@@ -2483,9 +2483,9 @@ FormBuilder.prototype = {
         
         if (!options.namespace) {
             if (this.options.namespace) {
-                options.namespace = this.options.namespace + '[' + this.model.modelName + ']';
+                options.namespace = this.options.namespace + '[' + this.model.baseModel.modelName + ']';
             } else {
-                options.namespace = this.model.modelName;
+                options.namespace = this.model.baseModel.modelName;
             }
         }
         

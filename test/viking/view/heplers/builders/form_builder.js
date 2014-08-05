@@ -613,8 +613,8 @@
         Viking.View.Helpers.checkBoxGroup = old_func;
     });
     
-    // formFor()
-    // =========
+    // fieldsFor()
+    // ===========
     test("#fieldsFor() yields a FormBuilder with the namespace set", function (attribute, options, content) {
         var formBuilder = new FormBuilder(this.model);
         
@@ -628,6 +628,17 @@
         
         formBuilder.fieldsFor('key', function(f) {
             equal(f.options.namespace, 'ns[model]');
+        });
+    });
+    
+    test("#fieldsFor() works with a FormBuilder that is using an STI model", function (attribute, options, content) {
+        var Model = Viking.Model.extend('model');
+        var SubModel = Model.extend('sub_model');
+        
+        var formBuilder = new FormBuilder(new SubModel());
+        
+        formBuilder.fieldsFor('key', function(f) {
+            equal(f.options.namespace, 'model');
         });
     });
     
