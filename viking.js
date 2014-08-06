@@ -1308,6 +1308,7 @@ Viking.Coercions.JSON = {
 			});
             var model = new AnonModel(value);
             model.modelName = key;
+            model.baseModel = model;
             return model;
         }
 

@@ -11,6 +11,12 @@
     test("::load coerces {} to Viking.Model with modelName set to key", function() {
         equal(Viking.Coercions.JSON.load({}, 'key').modelName, 'key');
     });
+    
+    test("::load coerces {} to Viking.Model with baseModel set to the JSON object", function() {
+        attribute = Viking.Coercions.JSON.load({}, 'key');
+        
+        strictEqual(attribute.baseModel, attribute);
+    });
 
     test("::load thows error when can't coerce value", function() {
         expect(2);
