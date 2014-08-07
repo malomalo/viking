@@ -1,5 +1,10 @@
 ## Edge
 
+Major Changes:
+ 
+ - added `Viking.View`
+ - extending a `Viking.View` merge events together
+
 Minor Changes:
 
  - `Viking.Model.unset` now allows you to unset a `hasMany` relationship
