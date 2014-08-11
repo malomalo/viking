@@ -30,11 +30,11 @@
     
     test("checkBox(model, attribute, options)", function() {
         this.model.set('key', 'yes');
-        equal( Viking.View.Helpers.checkBox(this.model, 'key', { class: 'eula_check' }, 'yes', 'no'),
+        equal( Viking.View.Helpers.checkBox(this.model, 'key', { 'class': 'eula_check' }, 'yes', 'no'),
                '<input name="model[key]" type="hidden" value="no"><input checked class="eula_check" id="model_key" name="model[key]" type="checkbox" value="yes">');
         
         this.model.set('key', 'no');
-        equal( Viking.View.Helpers.checkBox(this.model, 'key', { class: 'eula_check' }, 'yes', 'no'),
+        equal( Viking.View.Helpers.checkBox(this.model, 'key', { 'class': 'eula_check' }, 'yes', 'no'),
                '<input name="model[key]" type="hidden" value="no"><input class="eula_check" id="model_key" name="model[key]" type="checkbox" value="yes">');
     });
     
@@ -44,7 +44,7 @@
         equal( Viking.View.Helpers.checkBox(this.model, 'eula'),
                '<input name="model[eula]" type="hidden" value="false"><input class="error" id="model_eula" name="model[eula]" type="checkbox" value="true">');
                
-       equal( Viking.View.Helpers.checkBox(this.model, 'eula', {class: 'eula'}, 'yes', 'no'),
+       equal( Viking.View.Helpers.checkBox(this.model, 'eula', {'class': 'eula'}, 'yes', 'no'),
               '<input name="model[eula]" type="hidden" value="no"><input class="eula error" id="model_eula" name="model[eula]" type="checkbox" value="yes">');
     });
     

@@ -1,0 +1,669 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset='utf8'>
+  <title>Viking Test Suite</title>
+
+  <style type="text/css" media="screen">
+    /*!
+     * QUnit 1.14.0
+     * http://qunitjs.com/
+     *
+     * Copyright 2013 jQuery Foundation and other contributors
+     * Released under the MIT license
+     * http://jquery.org/license
+     *
+     * Date: 2014-01-31T16:40Z
+     */
+
+    /** Font Family and Sizes */
+
+    #qunit-tests, #qunit-header, #qunit-banner, #qunit-testrunner-toolbar, #qunit-userAgent, #qunit-testresult {
+	font-family: "Helvetica Neue Light", "HelveticaNeue-Light", "Helvetica Neue", Calibri, Helvetica, Arial, sans-serif;
+    }
+
+    #qunit-testrunner-toolbar, #qunit-userAgent, #qunit-testresult, #qunit-tests li { font-size: small; }
+    #qunit-tests { font-size: smaller; }
+
+
+    /** Resets */
+
+    #qunit-tests, #qunit-header, #qunit-banner, #qunit-userAgent, #qunit-testresult, #qunit-modulefilter {
+	margin: 0;
+	padding: 0;
+    }
+
+
+    /** Header */
+
+    #qunit-header {
+	padding: 0.5em 0 0.5em 1em;
+
+	color: #8699A4;
+	background-color: #0D3349;
+
+	font-size: 1.5em;
+	line-height: 1em;
+	font-weight: 400;
+
+	border-radius: 5px 5px 0 0;
+    }
+
+    #qunit-header a {
+	text-decoration: none;
+	color: #C2CCD1;
+    }
+
+    #qunit-header a:hover,
+    #qunit-header a:focus {
+	color: #FFF;
+    }
+
+    #qunit-testrunner-toolbar label {
+	display: inline-block;
+	padding: 0 0.5em 0 0.1em;
+    }
+
+    #qunit-banner {
+	height: 5px;
+    }
+
+    #qunit-testrunner-toolbar {
+	padding: 0.5em 0 0.5em 2em;
+	color: #5E740B;
+	background-color: #EEE;
+	overflow: hidden;
+    }
+
+    #qunit-userAgent {
+	padding: 0.5em 0 0.5em 2.5em;
+	background-color: #2B81AF;
+	color: #FFF;
+	text-shadow: rgba(0, 0, 0, 0.5) 2px 2px 1px;
+    }
+
+    #qunit-modulefilter-container {
+	float: right;
+    }
+
+    /** Tests: Pass/Fail */
+
+    #qunit-tests {
+	list-style-position: inside;
+    }
+
+    #qunit-tests li {
+	padding: 0.4em 0.5em 0.4em 2.5em;
+	border-bottom: 1px solid #FFF;
+	list-style-position: inside;
+    }
+
+    #qunit-tests.hidepass li.pass, #qunit-tests.hidepass li.running  {
+	display: none;
+    }
+
+    #qunit-tests li strong {
+	cursor: pointer;
+    }
+
+    #qunit-tests li a {
+	padding: 0.5em;
+	color: #C2CCD1;
+	text-decoration: none;
+    }
+    #qunit-tests li a:hover,
+    #qunit-tests li a:focus {
+	color: #000;
+    }
+
+    #qunit-tests li .runtime {
+	float: right;
+	font-size: smaller;
+    }
+
+    .qunit-assert-list {
+	margin-top: 0.5em;
+	padding: 0.5em;
+
+	background-color: #FFF;
+
+	border-radius: 5px;
+    }
+
+    .qunit-collapsed {
+	display: none;
+    }
+
+    #qunit-tests table {
+	border-collapse: collapse;
+	margin-top: 0.2em;
+    }
+
+    #qunit-tests th {
+	text-align: right;
+	vertical-align: top;
+	padding: 0 0.5em 0 0;
+    }
+
+    #qunit-tests td {
+	vertical-align: top;
+    }
+
+    #qunit-tests pre {
+	margin: 0;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+    }
+
+    #qunit-tests del {
+	background-color: #E0F2BE;
+	color: #374E0C;
+	text-decoration: none;
+    }
+
+    #qunit-tests ins {
+	background-color: #FFCACA;
+	color: #500;
+	text-decoration: none;
+    }
+
+    /*** Test Counts */
+
+    #qunit-tests b.counts                       { color: #000; }
+    #qunit-tests b.passed                       { color: #5E740B; }
+    #qunit-tests b.failed                       { color: #710909; }
+
+    #qunit-tests li li {
+	padding: 5px;
+	background-color: #FFF;
+	border-bottom: none;
+	list-style-position: inside;
+    }
+
+    /*** Passing Styles */
+
+    #qunit-tests li li.pass {
+	color: #3C510C;
+	background-color: #FFF;
+	border-left: 10px solid #C6E746;
+    }
+
+    #qunit-tests .pass                          { color: #528CE0; background-color: #D2E0E6; }
+    #qunit-tests .pass .test-name               { color: #366097; }
+
+    #qunit-tests .pass .test-actual,
+    #qunit-tests .pass .test-expected           { color: #999; }
+
+    #qunit-banner.qunit-pass                    { background-color: #C6E746; }
+
+    /*** Failing Styles */
+
+    #qunit-tests li li.fail {
+	color: #710909;
+	background-color: #FFF;
+	border-left: 10px solid #EE5757;
+	white-space: pre;
+    }
+
+    #qunit-tests > li:last-child {
+	border-radius: 0 0 5px 5px;
+    }
+
+    #qunit-tests .fail                          { color: #000; background-color: #EE5757; }
+    #qunit-tests .fail .test-name,
+    #qunit-tests .fail .module-name             { color: #000; }
+
+    #qunit-tests .fail .test-actual             { color: #EE5757; }
+    #qunit-tests .fail .test-expected           { color: #008000; }
+
+    #qunit-banner.qunit-fail                    { background-color: #EE5757; }
+
+
+    /** Result */
+
+    #qunit-testresult {
+	padding: 0.5em 0.5em 0.5em 2.5em;
+
+	color: #2B81AF;
+	background-color: #D2E0E6;
+
+	border-bottom: 1px solid #FFF;
+    }
+    #qunit-testresult .module-name {
+	font-weight: 700;
+    }
+
+    /** Fixture */
+
+    #qunit-fixture {
+	position: absolute;
+	top: -10000px;
+	left: -10000px;
+	width: 1000px;
+	height: 1000px;
+    }
+  </style>
+
+  
+    
+	  <script src="/test/dependencies/es5-shim.js"></script>
+    
+  
+    
+	  <script src="/test/dependencies/es5-sham.js"></script>
+    
+  
+    
+	  <script src="/test/dependencies/jquery.1.11.1.js"></script>
+    
+  
+    
+	  <script src="/test/dependencies/strftime.js"></script>
+    
+  
+    
+	  <script src="/test/dependencies/underscore.js"></script>
+    
+  
+    
+	  <script src="/test/dependencies/underscore.inflection.js"></script>
+    
+  
+    
+	  <script src="/test/dependencies/backbone.js"></script>
+    
+  
+    
+	  <script src="/lib/viking/preamble.js"></script>
+    
+	  <script src="/lib/viking/errors.js"></script>
+    
+	  <script src="/lib/viking/support/preamble.js"></script>
+    
+	  <script src="/lib/viking/support/array.js"></script>
+    
+	  <script src="/lib/viking/support/boolean.js"></script>
+    
+	  <script src="/lib/viking/support/date.js"></script>
+    
+	  <script src="/lib/viking/support/number.js"></script>
+    
+	  <script src="/lib/viking/support/object.js"></script>
+    
+	  <script src="/lib/viking/support/string.js"></script>
+    
+	  <script src="/lib/viking/support.js"></script>
+    
+	  <script src="/lib/viking/config.js"></script>
+    
+	  <script src="/lib/viking/sync.js"></script>
+    
+	  <script src="/lib/viking/association_reflection.js"></script>
+    
+	  <script src="/lib/viking/model.js"></script>
+    
+	  <script src="/lib/viking/model/class_properties/find.js"></script>
+    
+	  <script src="/lib/viking/model/class_properties/reflect_on_association.js"></script>
+    
+	  <script src="/lib/viking/model/class_properties/reflect_on_associations.js"></script>
+    
+	  <script src="/lib/viking/model/class_properties/urlRoot.js"></script>
+    
+	  <script src="/lib/viking/model/class_properties/where.js"></script>
+    
+	  <script src="/lib/viking/model/instance_properties/coerceAttributes.js"></script>
+    
+	  <script src="/lib/viking/model/instance_properties/errorsOn.js"></script>
+    
+	  <script src="/lib/viking/model/instance_properties/paramRoot.js"></script>
+    
+	  <script src="/lib/viking/model/instance_properties/save.js"></script>
+    
+	  <script src="/lib/viking/model/instance_properties/select.js"></script>
+    
+	  <script src="/lib/viking/model/instance_properties/set.js"></script>
+    
+	  <script src="/lib/viking/model/instance_properties/setErrors.js"></script>
+    
+	  <script src="/lib/viking/model/instance_properties/sync.js"></script>
+    
+	  <script src="/lib/viking/model/instance_properties/toJSON.js"></script>
+    
+	  <script src="/lib/viking/model/instance_properties/toParam.js"></script>
+    
+	  <script src="/lib/viking/model/instance_properties/touch.js"></script>
+    
+	  <script src="/lib/viking/model/instance_properties/unselect.js"></script>
+    
+	  <script src="/lib/viking/model/instance_properties/update_attribute.js"></script>
+    
+	  <script src="/lib/viking/model/instance_properties/update_attributes.js"></script>
+    
+	  <script src="/lib/viking/model/instance_properties/url.js"></script>
+    
+	  <script src="/lib/viking/model/instance_properties/urlRoot.js"></script>
+    
+	  <script src="/lib/viking/collection.js"></script>
+    
+	  <script src="/lib/viking/coercions.js"></script>
+    
+	  <script src="/lib/viking/coercions/boolean.js"></script>
+    
+	  <script src="/lib/viking/coercions/date.js"></script>
+    
+	  <script src="/lib/viking/coercions/json.js"></script>
+    
+	  <script src="/lib/viking/coercions/number.js"></script>
+    
+	  <script src="/lib/viking/coercions/string.js"></script>
+    
+	  <script src="/lib/viking/view.js"></script>
+    
+	  <script src="/lib/viking/view/helpers.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_tag_helpers/tag.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_tag_helpers/content_tag.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_tag_helpers/button_tag.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_tag_helpers/check_box_tag.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_tag_helpers/text_field_tag.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_tag_helpers/hidden_field_tag.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_tag_helpers/form_tag.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_tag_helpers/number_field_tag.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_tag_helpers/time_tag.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_tag_helpers/label_tag.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_tag_helpers/options_for_select_tag.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_tag_helpers/options_from_collection_for_select_tag.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_tag_helpers/password_field_tag.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_tag_helpers/radio_button_tag.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_tag_helpers/select_tag.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_tag_helpers/submit_tag.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_tag_helpers/text_area_tag.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_tag_helpers.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/builders/form_builder.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/builders/check_box_group_builder.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/builders.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_helpers/check_box.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_helpers/check_box_group.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_helpers/collection_select.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_helpers/form_for.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_helpers/hidden_field.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_helpers/label.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_helpers/number_field.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_helpers/password_field.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_helpers/radio_button.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_helpers/select.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_helpers/text_area.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_helpers/text_field.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/form_helpers.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/url_helpers/url_for.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/url_helpers/link_to.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/url_helpers/mail_to.js"></script>
+    
+	  <script src="/lib/viking/view/helpers/url_helpers.js"></script>
+    
+	  <script src="/lib/viking/paginated_collection.js"></script>
+    
+	  <script src="/lib/viking/controller.js"></script>
+    
+	  <script src="/lib/viking/predicate.js"></script>
+    
+	  <script src="/lib/viking/cursor.js"></script>
+    
+	  <script src="/lib/viking/router.js"></script>
+    
+	  <script src="/lib/viking.js"></script>
+    
+  
+    
+	  <script src="/test/dependencies/qunit.js"></script>
+    
+	  <script src="/test/dependencies/sinon.js"></script>
+    
+	  <script src="/test/viking/association_reflection/collection.js"></script>
+    
+	  <script src="/test/viking/association_reflection/klass.js"></script>
+    
+	  <script src="/test/viking/association_reflection/model.js"></script>
+    
+	  <script src="/test/viking/association_reflection/new.js"></script>
+    
+	  <script src="/test/viking/coercions/boolean.js"></script>
+    
+	  <script src="/test/viking/coercions/date.js"></script>
+    
+	  <script src="/test/viking/coercions/json.js"></script>
+    
+	  <script src="/test/viking/coercions/number.js"></script>
+    
+	  <script src="/test/viking/coercions/string.js"></script>
+    
+	  <script src="/test/viking/collection.js"></script>
+    
+	  <script src="/test/viking/collection/fetch.js"></script>
+    
+	  <script src="/test/viking/collection/new.js"></script>
+    
+	  <script src="/test/viking/collection/order.js"></script>
+    
+	  <script src="/test/viking/collection/predicate.js"></script>
+    
+	  <script src="/test/viking/collection/sync.js"></script>
+    
+	  <script src="/test/viking/config.js"></script>
+    
+	  <script src="/test/viking/controller.js"></script>
+    
+	  <script src="/test/viking/cursor.js"></script>
+    
+	  <script src="/test/viking/model.js"></script>
+    
+	  <script src="/test/viking/model/class_properties/base_model.js"></script>
+    
+	  <script src="/test/viking/model/class_properties/extend.js"></script>
+    
+	  <script src="/test/viking/model/class_properties/find.js"></script>
+    
+	  <script src="/test/viking/model/class_properties/inheritance_attribute.js"></script>
+    
+	  <script src="/test/viking/model/class_properties/new.js"></script>
+    
+	  <script src="/test/viking/model/class_properties/reflect_on_association.js"></script>
+    
+	  <script src="/test/viking/model/class_properties/reflect_on_associations.js"></script>
+    
+	  <script src="/test/viking/model/class_properties/urlRoot.js"></script>
+    
+	  <script src="/test/viking/model/instance_properties/base_model.js"></script>
+    
+	  <script src="/test/viking/model/instance_properties/coerceAttributes/belongsTo.js"></script>
+    
+	  <script src="/test/viking/model/instance_properties/coerceAttributes/coercions.js"></script>
+    
+	  <script src="/test/viking/model/instance_properties/coerceAttributes/hasMany.js"></script>
+    
+	  <script src="/test/viking/model/instance_properties/inheritance_attribute.js"></script>
+    
+	  <script src="/test/viking/model/instance_properties/paramRoot.js"></script>
+    
+	  <script src="/test/viking/model/instance_properties/reflect_on_association.js"></script>
+    
+	  <script src="/test/viking/model/instance_properties/reflect_on_associations.js"></script>
+    
+	  <script src="/test/viking/model/instance_properties/save.js"></script>
+    
+	  <script src="/test/viking/model/instance_properties/select.js"></script>
+    
+	  <script src="/test/viking/model/instance_properties/set.js"></script>
+    
+	  <script src="/test/viking/model/instance_properties/set/belongsTo.js"></script>
+    
+	  <script src="/test/viking/model/instance_properties/set/coercions.js"></script>
+    
+	  <script src="/test/viking/model/instance_properties/set/hasMany.js"></script>
+    
+	  <script src="/test/viking/model/instance_properties/setErrors.js"></script>
+    
+	  <script src="/test/viking/model/instance_properties/sync.js"></script>
+    
+	  <script src="/test/viking/model/instance_properties/toJSON.js"></script>
+    
+	  <script src="/test/viking/model/instance_properties/toJSON/belongsTo.js"></script>
+    
+	  <script src="/test/viking/model/instance_properties/toJSON/hasMany.js"></script>
+    
+	  <script src="/test/viking/model/instance_properties/toParam.js"></script>
+    
+	  <script src="/test/viking/model/instance_properties/touch.js"></script>
+    
+	  <script src="/test/viking/model/instance_properties/unselect.js"></script>
+    
+	  <script src="/test/viking/model/instance_properties/unset/hasMany.js"></script>
+    
+	  <script src="/test/viking/model/instance_properties/update_attribute.js"></script>
+    
+	  <script src="/test/viking/model/instance_properties/update_attributes.js"></script>
+    
+	  <script src="/test/viking/model/instance_properties/url.js"></script>
+    
+	  <script src="/test/viking/model/instance_properties/urlRoot.js"></script>
+    
+	  <script src="/test/viking/paginated_collection.js"></script>
+    
+	  <script src="/test/viking/router.js"></script>
+    
+	  <script src="/test/viking/support/array.js"></script>
+    
+	  <script src="/test/viking/support/boolean.js"></script>
+    
+	  <script src="/test/viking/support/date.js"></script>
+    
+	  <script src="/test/viking/support/number.js"></script>
+    
+	  <script src="/test/viking/support/object.js"></script>
+    
+	  <script src="/test/viking/support/string.js"></script>
+    
+	  <script src="/test/viking/sync.js"></script>
+    
+	  <script src="/test/viking/view.js"></script>
+    
+	  <script src="/test/viking/view/helpers.js"></script>
+    
+	  <script src="/test/viking/view/helpers/builders/check_box_group_builder.js"></script>
+    
+	  <script src="/test/viking/view/helpers/builders/form_builder.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_helpers/check_box.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_helpers/check_box_group.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_helpers/collection_select.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_helpers/form_for.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_helpers/hidden_field.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_helpers/label.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_helpers/number_field.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_helpers/password_field.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_helpers/radio_button.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_helpers/select.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_helpers/text_area.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_helpers/text_field.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_tag_helpers/button_tag.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_tag_helpers/check_box_tag.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_tag_helpers/content_tag.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_tag_helpers/form_tag.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_tag_helpers/hidden_field_tag.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_tag_helpers/label_tag.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_tag_helpers/number_field_tag.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_tag_helpers/options_for_select_tag.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_tag_helpers/options_from_collection_for_select_tag.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_tag_helpers/password_field_tag.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_tag_helpers/radio_button_tag.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_tag_helpers/select_tag.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_tag_helpers/submit_tag.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_tag_helpers/tag.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_tag_helpers/text_area_tag.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_tag_helpers/text_field_tag.js"></script>
+    
+	  <script src="/test/viking/view/helpers/form_tag_helpers/time_tag.js"></script>
+    
+	  <script src="/test/viking/view/helpers/url_helpers/link_to.js"></script>
+    
+	  <script src="/test/viking/view/helpers/url_helpers/mail_to.js"></script>
+    
+	  <script src="/test/viking/view/helpers/url_helpers/url_for.js"></script>
+    
+	  <script src="/test/test.js"></script>
+    
+  
+</head>
+<body>
+  <div id="qunit"></div>
+  <div id="qunit-fixture">
+    <div id='testElement'>
+      <h1>Test</h1>
+    </div>
+  </div>
+</body>
+</html>

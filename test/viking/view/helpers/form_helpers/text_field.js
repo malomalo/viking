@@ -16,7 +16,7 @@
     });
     
     test("textField(model, attribute, options)", function() {
-        equal (Viking.View.Helpers.textField(this.model, 'name', {class: "create_input", size: 20}), '<input class="create_input" id="model_name" name="model[name]" size="20" type="text">');
+        equal (Viking.View.Helpers.textField(this.model, 'name', {'class': "create_input", size: 20}), '<input class="create_input" id="model_name" name="model[name]" size="20" type="text">');
     });
 
     test("textField(model, attribute) with error on attribute", function() {

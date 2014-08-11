@@ -58,13 +58,13 @@
     });
     
     test("optionsForSelectTag(simple_array_with_options)", function() {
-        equal( Viking.View.Helpers.optionsForSelectTag([ "Denmark", ["USA", {class: 'bold'}], "Sweden" ]),
+        equal( Viking.View.Helpers.optionsForSelectTag([ "Denmark", ["USA", {'class': 'bold'}], "Sweden" ]),
                '<option>Denmark</option>\n<option class="bold">USA</option>\n<option>Sweden</option>'
         );
     });
     
     test("optionsForSelectTag(tuple_array_with_options)", function() {
-        equal( Viking.View.Helpers.optionsForSelectTag([["Dollar", "$", {class:  'underscore'}], ["Kroner", "DKK"]]),
+        equal( Viking.View.Helpers.optionsForSelectTag([["Dollar", "$", {'class':  'underscore'}], ["Kroner", "DKK"]]),
                '<option class="underscore" value="$">Dollar</option>\n<option value="DKK">Kroner</option>'
         );
     });

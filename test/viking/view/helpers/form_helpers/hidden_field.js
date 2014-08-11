@@ -18,7 +18,7 @@
     });
     
     test("hiddenField(model, attribute, options)", function() {
-        equal( Viking.View.Helpers.hiddenField(this.model, 'key', {class: 'test'}),
+        equal( Viking.View.Helpers.hiddenField(this.model, 'key', {'class': 'test'}),
                '<input class="test" name="model[key]" type="hidden" value="">');
     });
     

@@ -24,7 +24,7 @@
     });
     
     test("textFieldTag(name, options)", function() {
-        equal( Viking.View.Helpers.textFieldTag('query', {class: 'search'}),
+        equal( Viking.View.Helpers.textFieldTag('query', {'class': 'search'}),
                '<input class="search" id="query" name="query" type="text">');
     });
     

@@ -244,7 +244,16 @@
     }
   </style>
 
-  <% ['es5-shim.js', 'dependencies.js', 'viking.js', 'test.js'].each do |file| %>
+  <% ['es5-shim.js',
+      'es5-sham.js',
+      'jquery.1.11.1.js',
+      'strftime.js',
+      'underscore.js',
+      'underscore.inflection.js',
+      'backbone.js',
+      'viking.js',
+      'test.js'
+  ].each do |file| %>
     <% environment[file].to_s.lines.each do |i| %>
 	  <script src="<%= i.sub(Dir.pwd, '').strip %>"></script>
     <% end %>

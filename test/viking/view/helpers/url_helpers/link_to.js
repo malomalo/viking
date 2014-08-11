@@ -17,21 +17,21 @@
     
     test("linkTo(content, url, options)", function() {
         equal(
-            Viking.View.Helpers.linkTo('Example', 'http://example.com', {class: 'myclass'}),
+            Viking.View.Helpers.linkTo('Example', 'http://example.com', {'class': 'myclass'}),
             '<a class="myclass" href="http://example.com">Example</a>'
         );
     });
     
     test("linkTo(contentFunc, url, options)", function() {
         equal(
-            Viking.View.Helpers.linkTo(function () { return 'Example'; }, 'http://example.com', {class: 'myclass'}),
+            Viking.View.Helpers.linkTo(function () { return 'Example'; }, 'http://example.com', {'class': 'myclass'}),
             '<a class="myclass" href="http://example.com">Example</a>'
         );
     });
     
     test("linkTo(url, options, contentFunc)", function() {
         equal(
-            Viking.View.Helpers.linkTo('http://example.com', {class: 'myclass'}, function () { return 'Example'; }),
+            Viking.View.Helpers.linkTo('http://example.com', {'class': 'myclass'}, function () { return 'Example'; }),
             '<a class="myclass" href="http://example.com">Example</a>'
         );
     });
@@ -67,7 +67,7 @@
         workshopPath = function(m) { return '/workshops/' + m.toParam(); }
         
         equal(
-            Viking.View.Helpers.linkTo(new Workshop({id: 10}), {class: 'myclass'}, function () { return 'Example'; }),
+            Viking.View.Helpers.linkTo(new Workshop({id: 10}), {'class': 'myclass'}, function () { return 'Example'; }),
             '<a class="myclass" href="'+window.location.origin + '/workshops/10'+'">Example</a>'
         );
         

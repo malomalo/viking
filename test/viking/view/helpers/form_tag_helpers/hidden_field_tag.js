@@ -12,7 +12,7 @@
     });
     
     test("hiddenFieldTag(name, value, options)", function() {
-        equal( Viking.View.Helpers.hiddenFieldTag('token', 'VUBJKB23UIVI1UU1VOBVI@', {class: 'mine'}),
+        equal( Viking.View.Helpers.hiddenFieldTag('token', 'VUBJKB23UIVI1UU1VOBVI@', {'class': 'mine'}),
                '<input class="mine" name="token" type="hidden" value="VUBJKB23UIVI1UU1VOBVI@">');
     });
 

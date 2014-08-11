@@ -16,7 +16,7 @@
     });
     
     test("checkBoxTag(name, value, checked, options)", function() {
-        equal( Viking.View.Helpers.checkBoxTag('tos', 'yes', false, {class: 'accept_tos'}), '<input class="accept_tos" id="tos" name="tos" type="checkbox" value="yes">');
+        equal( Viking.View.Helpers.checkBoxTag('tos', 'yes', false, {'class': 'accept_tos'}), '<input class="accept_tos" id="tos" name="tos" type="checkbox" value="yes">');
     });
 
 }());
