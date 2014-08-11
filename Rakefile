@@ -67,7 +67,7 @@ task :test do
     file.write(ERB.new(File.read('test/index.html.erb')).result(binding))
   end
   File.open('test/ie8.html', 'w') do |file|
-    file.write(ERB.new(File.read('test/index.html.erb')).result(binding))
+    file.write(ERB.new(File.read('test/ie8.html.erb')).result(binding))
   end
   
   FileUtils.rm_rf('test/coverage')
