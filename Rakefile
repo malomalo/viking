@@ -62,8 +62,11 @@ task :test do
   environment.unregister_postprocessor 'application/javascript', Sprockets::DirectiveProcessor
   environment.register_postprocessor 'application/javascript', UrlGenerator  
     
-  # Render the test html file
+  # Render the test html files
   File.open('test/index.html', 'w') do |file|
+    file.write(ERB.new(File.read('test/index.html.erb')).result(binding))
+  end
+  File.open('test/ie8.html', 'w') do |file|
     file.write(ERB.new(File.read('test/index.html.erb')).result(binding))
   end
   
