@@ -22,7 +22,7 @@ _.toParam = function(value, namespace) {
 
 		}).join('&');
     }
-}
+};
 
 _.toQuery = function(value, namespace) {
     if (value.toQuery) {
@@ -33,7 +33,7 @@ _.toQuery = function(value, namespace) {
     } else if (typeof value === 'object') {
         return _.toParam(value, namespace);
     }
-}
+};
 
 (function () {
 
