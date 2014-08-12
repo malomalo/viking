@@ -39,6 +39,6 @@ To use IE8 you'll need these dependencies:
 
 * [ES5 Sham](https://github.com/kriskowal/es5-shim/)
 
-* [JSON2](https://github.com/douglascrockford/JSON-js) (required be backbone.js for IE8 support)
+* [JSON2](https://github.com/douglascrockford/JSON-js) (required by backbone.js for IE8 support)
 
 * [Viking.IE8](test/dependencies/viking.ie8.js) (needs to be included after viking.js)
