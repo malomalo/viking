@@ -42,7 +42,7 @@
         
         equal(
             Viking.View.Helpers.linkTo('Model', new Workshop({id: 10})),
-            '<a href="'+window.location.origin + '/workshops/10'+'">Model</a>'
+            '<a href="'+ window.location.protocol + '//' + window.location.host + '/workshops/10'+'">Model</a>'
         );
         
         delete Workshop;
@@ -55,7 +55,7 @@
         
         equal(
             Viking.View.Helpers.linkTo(new Workshop({id: 10}), function () { return 'Example'; }),
-            '<a href="'+window.location.origin + '/workshops/10'+'">Example</a>'
+            '<a href="' + window.location.protocol + '//' + window.location.host + '/workshops/10'+'">Example</a>'
         );
         
         delete Workshop;
@@ -68,7 +68,7 @@
         
         equal(
             Viking.View.Helpers.linkTo(new Workshop({id: 10}), {'class': 'myclass'}, function () { return 'Example'; }),
-            '<a class="myclass" href="'+window.location.origin + '/workshops/10'+'">Example</a>'
+            '<a class="myclass" href="'+ window.location.protocol + '//' + window.location.host + '/workshops/10'+'">Example</a>'
         );
         
         delete Workshop;
