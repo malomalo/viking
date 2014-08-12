@@ -9,9 +9,9 @@ _.toParam = function(value, namespace) {
     if (value.toParam) {
         return value.toParam(namespace);
     } else if (_.isArray(value)) {
-        return _.map(this, function(e) { return _.toParam(e); }).join('/');
+        return _.map(value, function(e) { return _.toParam(e); }).join('/');
     } else if (typeof value === 'object') {
-		return _.map(this, function(value, key) {
+		return _.map(value, function(value, key) {
 			var namespaceWithKey = (namespace ? (namespace + "[" + key + "]") : key);
 
 			if (value !== null && value !== undefined) {
@@ -29,7 +29,7 @@ _.toQuery = function(value, namespace) {
         return value.toQuery(namespace);
     } else if (_.isArray(value)) {
 	var prefix = namespace + "[]";
-	return _.map(this, function(value) { return value === null ? escape(prefix) + '=' : _.toQuery(value, prefix); }).join('&');
+	return _.map(value, function(value) { return value === null ? escape(prefix) + '=' : _.toQuery(value, prefix); }).join('&');
     } else if (typeof value === 'object') {
         return _.toParam(value, namespace);
     }
