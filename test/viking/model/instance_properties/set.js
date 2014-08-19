@@ -23,8 +23,8 @@
         ok(!(account instanceof Agent));
         account.set({type: 'agent'});
         
-		strictEqual(Agent.modelName, account.modelName);
-		strictEqual('agent', account.modelName);
+        strictEqual(Agent.modelName, account.modelName);
+        strictEqual('agent', account.modelName);
         
         delete Account;
         delete Agent;
@@ -53,5 +53,5 @@
         
         strictEqual(Battleship.modelName, bship.modelName);
     });
-	    
+    
 }());

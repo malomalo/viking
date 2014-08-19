@@ -9,9 +9,9 @@
         var objs = [];
         var array = [];
         
-        for (var key in array) {
+        _.each(array, function(value, key){
             objs.push(key);
-        }
+        });
         
         ok(!_.include(objs, 'toParam'));
     });
@@ -24,9 +24,9 @@
         var objs = [];
         var array = [];
         
-        for (var key in array) {
+        _.each(array, function(value, key){
             objs.push(key);
-        }
+        });
         
         ok(!_.include(objs, 'toQuery'));
     });

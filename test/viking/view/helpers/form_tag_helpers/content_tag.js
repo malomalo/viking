@@ -12,11 +12,11 @@
     });
     
     test("contentTag(name, content, options)", function() {
-        equal(Viking.View.Helpers.contentTag('p', 'Hello world & all!', {class: "strong"}), '<p class="strong">Hello world &amp; all!</p>');
+        equal(Viking.View.Helpers.contentTag('p', 'Hello world & all!', {'class': "strong"}), '<p class="strong">Hello world &amp; all!</p>');
     });
     
     test("contentTag(name, content, options, escape)", function() {
-        equal(Viking.View.Helpers.contentTag('p', 'Hello world & all!', {class: "strong"}, false), '<p class="strong">Hello world & all!</p>');
+        equal(Viking.View.Helpers.contentTag('p', 'Hello world & all!', {'class': "strong"}, false), '<p class="strong">Hello world & all!</p>');
     });
     
     test("contentTag(name, block)", function() {
@@ -24,7 +24,7 @@
     });
     
     test("contentTag(name, options, block)", function() {
-        equal(Viking.View.Helpers.contentTag('p', {class: "strong"}, function() { return "Hello world&!"; }), '<p class="strong">Hello world&amp;!</p>');
+        equal(Viking.View.Helpers.contentTag('p', {'class': "strong"}, function() { return "Hello world&!"; }), '<p class="strong">Hello world&amp;!</p>');
     });
     
     test("contentTag(name, escape, block)", function() {
@@ -32,7 +32,7 @@
     });
     
     test("contentTag(name, options, escape, block)", function() {
-        equal(Viking.View.Helpers.contentTag('p', {class: "strong"}, false, function() { return "Hello world&!"; }), '<p class="strong">Hello world&!</p>');
+        equal(Viking.View.Helpers.contentTag('p', {'class': "strong"}, false, function() { return "Hello world&!"; }), '<p class="strong">Hello world&!</p>');
     });
 
 }());

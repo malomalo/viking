@@ -924,10 +924,15 @@ Viking.Model.prototype.set = function (key, val, options) {
     _.each(attrs, function(value, key) {
         var association = this.reflectOnAssociation(key);
         if (association && association.macro === 'hasMany') {
-            this.attributes[key].set(value.models);
-            _.each(value.models, function(model) {
-                model.collection = this.attributes[key];
-            }, this);
+            if (!value) {
+                this.attributes[key].set([]);
+            } else {
+                this.attributes[key].set(value.models);
+                _.each(value.models, function(model) {
+                    model.collection = this.attributes[key];
+                }, this);
+            }
+
             delete attrs[key];
         }
     }, this);
@@ -1365,6 +1370,7 @@ Viking.Coercions.JSON = {
 			});
             var model = new AnonModel(value);
             model.modelName = key;
+            model.baseModel = model;
             return model;
         }
 
@@ -1414,12 +1420,27 @@ Viking.Coercions.String = {
         return value;
     }
 };
+
+
+
 // Viking.View
 // -----------
 //
 // Viking.View is a framework fro handling view template lookup and rendering.
 // It provides view helpers that assisst when building HTML forms and more.
-Viking.View = {};
+Viking.View = Backbone.View.extend({}, {
+    
+    // Override the original extend function to support merging events
+    extend: function(protoProps, staticProps) {
+        
+        if (protoProps  && protoProps.events) {
+            _.defaults(protoProps.events, this.prototype.events);
+        }
+        
+        return Backbone.View.extend.call(this, protoProps, staticProps);
+      }
+});
+
 Viking.View.Helpers = {};
 
 
@@ -1487,9 +1508,9 @@ Viking.View.Helpers = {};
         var value = model.get(attribute);
         var name;
         if (options.namespace) {
-            name = options.namespace + '[' + model.modelName + '][' + attribute + ']';
+            name = options.namespace + '[' + model.baseModel.modelName + '][' + attribute + ']';
         } else {
-            name = model.modelName + '[' + attribute + ']';
+            name = model.baseModel.modelName + '[' + attribute + ']';
         }
         
          if (value instanceof Viking.Collection || _.isArray(value)) {
@@ -2573,9 +2594,9 @@ FormBuilder.prototype = {
         
         if (!options.namespace) {
             if (this.options.namespace) {
-                options.namespace = this.options.namespace + '[' + this.model.modelName + ']';
+                options.namespace = this.options.namespace + '[' + this.model.baseModel.modelName + ']';
             } else {
-                options.namespace = this.model.modelName;
+                options.namespace = this.model.baseModel.modelName;
             }
         }
         
@@ -3447,8 +3468,6 @@ Viking.View.Helpers.mailTo = function (email, name, options) {
 
     return Viking.View.Helpers.contentTag('a', name, options, false);
 };
-
-
 
 
 

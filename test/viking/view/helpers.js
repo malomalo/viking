@@ -86,6 +86,14 @@
         equal("model[name]", Viking.View.tagNameForModelAttribute(model, 'name'));
     });
     
+    test("tagNameForModelAttribute(STImodel, attribute)", function() {
+        var Model = Viking.Model.extend('model');
+        var SubModel = Model.extend('sub_model');
+        var submodel = new SubModel({name: "name"});
+
+        equal("model[name]", Viking.View.tagNameForModelAttribute(submodel, 'name'));
+    });
+    
     test("tagNameForModelAttribute(model, attribute, {namespace: ...})", function() {
         var Model = Viking.Model.extend('model');
         var model = new Model({name: "name"});

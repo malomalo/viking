@@ -76,6 +76,9 @@ task :test do
   File.open('test/index.html', 'w') do |file|
     file.write(ERB.new(File.read('test/index.html.erb')).result(binding))
   end
+  File.open('test/ie8.html', 'w') do |file|
+    file.write(ERB.new(File.read('test/ie8.html.erb')).result(binding))
+  end
   
   FileUtils.rm_rf('test/coverage')
   pid = spawn('java -jar /usr/local/lib/jscover-all.jar -ws --port=4321 --report-dir=test/coverage --no-instrument=/deps/ --no-instrument=/test/')

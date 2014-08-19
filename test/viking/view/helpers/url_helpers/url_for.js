@@ -9,7 +9,7 @@
 
         equal(
             urlFor(Workshop),
-            window.location.origin + '/workshops'
+            window.location.protocol + '//' + window.location.host + '/workshops'
         );
         
         delete Workshop;
@@ -24,7 +24,7 @@
 
         equal(
             urlFor(new Workshop()),
-            window.location.origin + '/workshops'
+            window.location.protocol + '//' + window.location.host + '/workshops'
         );
         
         delete Workshop;
@@ -39,7 +39,7 @@
 
         equal(
             urlFor(new Workshop({id: 10})),
-            window.location.origin + '/workshops/10'
+            window.location.protocol + '//' + window.location.host + '/workshops/10'
         );
         
         delete Workshop;
@@ -55,7 +55,7 @@
 
         equal(
             urlFor(new SantaWorkshop({id: 10})),
-            window.location.origin + '/workshops/10'
+            window.location.protocol + '//' + window.location.host + '/workshops/10'
         );
         
         delete Workshop;
@@ -69,7 +69,7 @@
 
         equal(
             urlFor(new Workshop({id: 10}), {anchor: 'location'}),
-            window.location.origin + '/workshops/10#location'
+            window.location.protocol + '//' + window.location.host + '/workshops/10#location'
         );
         
         delete Workshop;
@@ -95,7 +95,7 @@
 
         equal(
             urlFor(new Workshop({id: 10}), {trailingSlash: true}),
-            window.location.origin + '/workshops/10/'
+            window.location.protocol + '//' + window.location.host + '/workshops/10/'
         );
         
         delete Workshop;

@@ -16,7 +16,7 @@
     });
     
     test("passwordFieldTag(name, value, options)", function() {
-        equal( Viking.View.Helpers.passwordFieldTag('pin', '1234', {maxlength: 4, size: 6, class: "pin_input"}),
+        equal( Viking.View.Helpers.passwordFieldTag('pin', '1234', {maxlength: 4, size: 6, 'class': "pin_input"}),
                '<input class="pin_input" id="pin" maxlength="4" name="pin" size="6" type="password" value="1234">');
     });
     

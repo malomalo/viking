@@ -21,8 +21,24 @@ Viking's dependencies are listed below:
     To Get `strftime` working in the browser I had to comment out lines #18-23,
     and #26.
 
-For older browsers add [ES5 Shim](https://github.com/kriskowal/es5-shim/).
-
 ## Building
 
 Run `rake build` from the base directory. It will output `viking.js` in the root dir.
+
+## Browser Compatibility
+Tested and functional in Chrome 36+, Safari 7+, Firefox 29+
+
+IE10 and below does not support STI
+
+IE9 and below does not support Viking.Router because of pushstate
+
+### IE8 Support
+To use IE8 you'll need these dependencies:
+
+* [ES5 Shim](https://github.com/kriskowal/es5-shim/)
+
+* [ES5 Sham](https://github.com/kriskowal/es5-shim/)
+
+* [JSON2](https://github.com/douglascrockford/JSON-js) (required by backbone.js for IE8 support)
+
+* [Viking.IE8](test/dependencies/viking.ie8.js) (needs to be included after viking.js)

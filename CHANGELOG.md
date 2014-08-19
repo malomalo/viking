@@ -1,5 +1,17 @@
 ## Edge
 
+Major Changes:
+ 
+ - added `Viking.View`
+ - extending a `Viking.View` merge events together
+
+Minor Changes:
+
+ - `Viking.Model.unset` now allows you to unset a `hasMany` relationship
+ - `Viking.FormBuilder` now uses the baseModel for the name for use with STI models
+ - `Viking.FormBuilder#fieldsFor` now uses the baseModel for the name for use with STI models
+ - JSON data type sets the `baseModel` to itself
+
 ## 0.7.0 (July 1st, 2014)
 
 Major Changes:

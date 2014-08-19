@@ -13,7 +13,7 @@
     });
     
     test("label(model, attribute, options)", function() {
-        equal( Viking.View.Helpers.label(this.model, 'key', {class: 'options'}), '<label class="options" for="model_key">Key</label>');
+        equal( Viking.View.Helpers.label(this.model, 'key', {'class': 'options'}), '<label class="options" for="model_key">Key</label>');
     });
     
     test("label(model, attribute, content)", function() {
@@ -23,12 +23,12 @@
     });
     
     test("label(model, attribute, content, options)", function() {
-        equal( Viking.View.Helpers.label(this.model, 'title', 'A short title', {class: 'title_label'}),
+        equal( Viking.View.Helpers.label(this.model, 'title', 'A short title', {'class': 'title_label'}),
                '<label class="title_label" for="model_title">A short title</label>');
     });
     
     test("label(model, attribute, options, content)", function() {
-        equal( Viking.View.Helpers.label(this.model, 'title', {class: 'title_label'}, function() { return 'A short title'; }),
+        equal( Viking.View.Helpers.label(this.model, 'title', {'class': 'title_label'}, function() { return 'A short title'; }),
                '<label class="title_label" for="model_title">A short title</label>');
     });
     
@@ -40,11 +40,11 @@
     });
     
     test("label(model, attribute, {for: 'override'}) uses 'override' for the `for` attribute", function() {
-        equal( Viking.View.Helpers.label(this.model, 'key', {for: 'override'}), '<label for="override">Key</label>');
+        equal( Viking.View.Helpers.label(this.model, 'key', {'for': 'override'}), '<label for="override">Key</label>');
     });
     
     test("label(model, attribute, content, options, escape)", function() {
-        equal( Viking.View.Helpers.label(this.model, 'key', '<key>', {class: 'options'}, false), '<label class="options" for="model_key"><key></label>');
+        equal( Viking.View.Helpers.label(this.model, 'key', '<key>', {'class': 'options'}, false), '<label class="options" for="model_key"><key></label>');
     });
     
 }());

@@ -66,7 +66,7 @@
             strictEqual(model, m);
             strictEqual('roles', attribute);
             strictEqual(1, content);
-            deepEqual({for: 'model_roles_key'}, options);
+            deepEqual({'for': 'model_roles_key'}, options);
             strictEqual(2, escape);
         }
         form.label('key', 1, {}, 2);

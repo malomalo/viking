@@ -27,10 +27,10 @@
         var Model = Viking.Model.extend('model');
     
         var m = new Model({foo: 'bar'});
-        m.sync('patch', m, {data: {this: 'that'}});
+        m.sync('patch', m, {data: {'this': 'that'}});
         equal(this.requests[0].method, 'PATCH');
         deepEqual(this.requests[0].requestBody, {
-            this: 'that'
+            'this': 'that'
         });
     });
 
@@ -38,10 +38,10 @@
         var Model = Viking.Model.extend('model');
     
         var m = new Model({foo: 'bar'});
-        m.sync('patch', m, {attrs: {this: 'that'}});
+        m.sync('patch', m, {attrs: {'this': 'that'}});
         equal(this.requests[0].method, 'PATCH');
         deepEqual(JSON.parse(this.requests[0].requestBody), {
-            model: {this: 'that'}
+            model: {'this': 'that'}
         });
     });
     

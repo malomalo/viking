@@ -13,7 +13,7 @@
     });
     
     test("passwordField(model, attribute, options)", function() {
-        equal( Viking.View.Helpers.passwordField(this.model, 'password', {class: "form_input", value: 'secret'}),
+        equal( Viking.View.Helpers.passwordField(this.model, 'password', {'class': "form_input", value: 'secret'}),
                '<input class="form_input" id="model_password" name="model[password]" type="password" value="secret">')
     });
     
