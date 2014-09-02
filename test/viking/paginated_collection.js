@@ -80,25 +80,16 @@
         var c = new c();
     
         c.cursor.set({page: 3, per_page: 40, offset: 0}, {silent: true});
-        c.parse({"page":3, "per_page":40, "total_pages":77, "offset":0, "count": 40, "total":3049, "listings":[ {"id":2069,"type":"lease"} ] });
-        equal(77, c.cursor.get('total_pages'));
-        equal(3049, c.cursor.get('total'));
-        equal(40, c.cursor.get('count'));
-    });
-
-    test("parse doesn't set offset if not present", function() {
-        var m = Viking.Model.extend('model');
-        var c = Viking.PaginatedCollection.extend({model: m});
-        var c = new c();
-    
-        c.cursor.set({page: 3, per_page: 40, offset: 10}, {silent: true});
-        c.parse({"page":3, "per_page":40, "total_pages":77, "count": 40, "total":3049, "listings":[ {"id":2069,"type":"lease"} ] });
-        equal(10, c.cursor.get('offset'));
+        c.parse([ {"id":2069,"type":"lease"} ], { 
+            xhr: { getResponseHeader: function(key) { if(key == 'Total-Count') {return 3049;} }}
+        });
+        equal(77, c.cursor.totalPages());
+        equal(3049, c.cursor.get('total_count'));
     });
 
     // sync() --------------------------------------------------------------------
     test("sync() adds in cursor params", function() {
-        expect(3);
+        expect(2);
     
         var m = Viking.Model.extend('model');
         var c = Viking.PaginatedCollection.extend({model: m});
@@ -106,11 +97,10 @@
     
         var old = Viking.sync;
         Viking.sync = function(method, model, options) {
-            equal(1, options.data.page);
-            equal(40, options.data.per_page);
-            equal(3, options.data.offset);
+            equal(40, options.data.limit);
+            equal(40, options.data.offset);
         }
-        c.cursor.set({page: 1, per_page: 40, offset: 3});
+        c.cursor.set({page: 2, per_page: 40});
         Viking.sync = old;
     });
 

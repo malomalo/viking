@@ -25,25 +25,25 @@ Viking.NameError.prototype = Error.prototype;
 // Calls `to_param` on all its elements and joins the result with slashes.
 // This is used by url_for in Viking Pack.
 Object.defineProperty(Array.prototype, 'toParam', {
-	value: function() {
+    value: function() {
         return _.map(this, function(e) { return e.toParam(); }).join('/');
-	},
-	writable: true,
-	configureable: true,
-	enumerable: false
+    },
+    writable: true,
+    configureable: true,
+    enumerable: false
 });
 
 
 // Converts an array into a string suitable for use as a URL query string,
 // using the given key as the param name.
 Object.defineProperty(Array.prototype, 'toQuery', {
-	value: function (key) {
-    	var prefix = key + "[]";
-    	return _.map(this, function(value) { return value === null ? escape(prefix) + '=' : value.toQuery(prefix); }).join('&');
-	},
-	writable: true,
-	configureable: true,
-	enumerable: false
+    value: function (key) {
+        var prefix = key + "[]";
+        return _.map(this, function(value) { return value === null ? escape(prefix) + '=' : value.toQuery(prefix); }).join('&');
+    },
+    writable: true,
+    configureable: true,
+    enumerable: false
 });
 // Alias of to_s.
 Boolean.prototype.toParam = Boolean.prototype.toString;
@@ -142,21 +142,21 @@ Number.prototype.toQuery = function(key) {
 // The string pairs "key=value" that conform the query string are sorted
 // lexicographically in ascending order.
 Object.defineProperty(Object.prototype, 'toParam', {
-	value: function(namespace) {
-		return _.map(this, function(value, key) {
-			var namespaceWithKey = (namespace ? (namespace + "[" + key + "]") : key);
-		
-			if (value !== null) {
-				return value.toQuery(namespaceWithKey);
-			}
-            
-			return escape(namespaceWithKey) + "=";
-		
-		}).join('&');
-	},
-	writable: true,
-	configureable: true,
-	enumerable: false
+    value: function(namespace) {
+        return _.map(this, function(value, key) {
+            var namespaceWithKey = (namespace ? (namespace + "[" + key + "]") : key);
+
+            if (value !== null && value !== undefined) {
+                return value.toQuery(namespaceWithKey);
+            }
+
+            return escape(namespaceWithKey) + "=";
+
+        }).join('&');
+    },
+    writable: true,
+    configureable: true,
+    enumerable: false
 });
 
 // Converts an object into a string suitable for use as a URL query string,
@@ -165,10 +165,10 @@ Object.defineProperty(Object.prototype, 'toParam', {
 // Note: This method is defined as a default implementation for all Objects for
 // Object#toQuery to work.
 Object.defineProperty(Object.prototype, 'toQuery', {
-	value: Object.prototype.toParam,
-	writable: true,
-	configureable: true,
-	enumerable: false
+    value: Object.prototype.toParam,
+    writable: true,
+    configureable: true,
+    enumerable: false
 });
 // Converts the first character to uppercase
 String.prototype.capitalize = function() {
@@ -1065,6 +1065,12 @@ Viking.Model.prototype.url = function() {
 Viking.Model.prototype.urlRoot = function() {
     return this.constructor.urlRoot();
 };
+// Validate the model with any validations that are set.
+Viking.Model.prototype.validate = function() {
+    _.each(this.validations, function(validation, attribute) {
+        validation(this, attribute);
+    }, this);
+};
 // Viking.Collection
 // -----------------
 //
@@ -1459,10 +1465,10 @@ Viking.View.Helpers = {};
     // TODO: move to model_helpers?
     Viking.View.addErrorClassToOptions = function(model, attribute, options) {
         if (model.errorsOn(attribute)) {
-            if (options.class) {
-                options.class = options.class + ' error';
+            if (options['class']) {
+                options['class'] = options['class'] + ' error';
             } else {
-                options.class = 'error';
+                options['class'] = 'error';
             }
         }
     };
@@ -2411,8 +2417,8 @@ FormBuilder.prototype = {
         
         //TODO shouldn't options.name be options.for?
         if (!options.name && this.options.namespace) {
-            options.for = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
-            options.for = Viking.View.sanitizeToId(options.for);
+            options['for'] = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+            options['for'] = Viking.View.sanitizeToId(options['for']);
         }
         
         return Viking.View.Helpers.label(this.model, attribute, content, options, escape);
@@ -2543,9 +2549,9 @@ CheckBoxGroupBuilder.prototype = {
         options || (options = {});
         
         //TODO shouldn't options.name be options.for?
-        if (!options.name && !options.for) {
-            options.for = Viking.View.tagNameForModelAttribute(this.model, this.attribute, {namespace: this.options.namespace});
-            options.for = Viking.View.sanitizeToId(options.for) + '_' + value;
+        if (!options.name && !options['for']) {
+            options['for'] = Viking.View.tagNameForModelAttribute(this.model, this.attribute, {namespace: this.options.namespace});
+            options['for'] = Viking.View.sanitizeToId(options['for']) + '_' + value;
         }
         
         return Viking.View.Helpers.label(this.model, this.attribute, content, options, escape);
@@ -2816,9 +2822,9 @@ Viking.View.Helpers.label = function (model, attribute, content, options, escape
     if (options === undefined) { options = {}; }
     if (content === undefined) { content = attribute.humanize(); }
     if (typeof content === 'function') { content = content(); }        
-    if (!options.for) {
+    if (!options['for']) {
         var name = Viking.View.tagNameForModelAttribute(model, attribute);
-        options.for = Viking.View.sanitizeToId(name);
+        options['for'] = Viking.View.sanitizeToId(name);
     }
     
     Viking.View.addErrorClassToOptions(model, attribute, options);
@@ -3386,22 +3392,20 @@ Viking.PaginatedCollection = Viking.Collection.extend({
     },
     
     parse: function(attrs, xhr) {
-        var cursor_keys = ['page', 'per_page', 'offset', 'total', 'total_pages', 'count'];
-        var cursor_attrs = _.pick(attrs, cursor_keys);
-        _.each(cursor_attrs, function(v, k) {
-            cursor_attrs[k] = parseInt(v, 10);
+        this.cursor.set({
+            total_count: parseInt(xhr.xhr.getResponseHeader('Total-Count'))
         });
-
-        this.cursor.set(cursor_attrs);
-        return attrs[this.paramRoot()];
+        
+        return attrs;
     },
     
     sync: function(method, model, options) {
         if(method === 'read') {
             options.data || (options.data = {});
-            options.data.page = model.cursor.get('page');
-            options.data.per_page = model.cursor.get('per_page');
-            options.data.offset = model.cursor.get('offset');
+            options.data.limit = model.cursor.limit();
+            options.data.offset = model.cursor.offset();
+            options.headers || (options.headers = {});
+            options.headers['Total-Count'] = 'true';
         }
         return Viking.Collection.prototype.sync.call(this, method, model, options);
     }
@@ -3412,19 +3416,14 @@ Viking.Predicate = Backbone.Model;
 Viking.Cursor = Backbone.Model.extend({
     defaults: {
         page: 1,
-        offset: 0,
-        per_page: 25,
-        total: undefined,
-        total_pages: undefined
+        per_page: 25
     },
     
     reset: function(options) {
         this.set({
-            page: 1,
-            offset: 0,
-            total: undefined,
-            total_pages: undefined
+            page: 1
         }, {silent: true});
+        
         if(!(options && options.silent) && this.requiresRefresh()) {
             this.trigger('reset', this, options);
         }
@@ -3442,10 +3441,22 @@ Viking.Cursor = Backbone.Model.extend({
         this.set('page', pageNumber, options);
     },
     
+    limit: function() {
+        return this.get('per_page');
+    },
+    
+    offset: function () {
+        return this.get('per_page') * (this.get('page') - 1);
+    },
+    
+    totalPages: function () {
+        return Math.ceil(this.get('total_count') / this.limit());
+    },
+    
     requiresRefresh: function() {
         var changedAttributes = this.changedAttributes();
         if(changedAttributes) {
-            var triggers = ['page', 'offset', 'per_page'];
+            var triggers = ['page', 'per_page'];
             return (_.intersection(_.keys(changedAttributes), triggers).length > 0);
         }
         
@@ -3558,6 +3569,7 @@ Viking.Router = Backbone.Router.extend({
 
 
 //
+// TODO: move paginated_collection to a plugin
 
 
 

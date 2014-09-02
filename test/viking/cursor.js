@@ -5,15 +5,15 @@
     test("defaults are set", function() {
         var c = new Viking.Cursor();
 
-        deepEqual(c.attributes, {page: 1, offset: 0, per_page: 25, total: undefined, total_pages: undefined});
+        deepEqual(c.attributes, {page: 1, per_page: 25});
     });
 
     // Reset ---------------------------------------------------------------------
     test("reset resets to default values", function() {
-        var c = new Viking.Cursor({page: 21, offset: 23, per_page: 40, total: 1000, total_pages: 30});
+        var c = new Viking.Cursor({page: 21, per_page: 40});
     
         c.reset()
-        deepEqual(c.attributes, {page: 1, offset: 0, per_page: 40, total: undefined, total_pages: undefined});
+        deepEqual(c.attributes, {page: 1, per_page: 40});
     });
 
     test("reset doesn't change per_page", function() {
@@ -118,12 +118,6 @@
     test("requiresRefresh returns true if page changes", function() {
         var c = new Viking.Cursor({page: 1});
         c.set('page', 2);
-        ok(c.requiresRefresh());
-    });
-
-    test("requiresRefresh returns true if offset changes", function() {
-        var c = new Viking.Cursor({page: 1});
-        c.set('offset', 2);
         ok(c.requiresRefresh());
     });
 
