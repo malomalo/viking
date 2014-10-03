@@ -3382,39 +3382,39 @@ Viking.View.Helpers.mailTo = function (email, name, options) {
 //
 // ==== Examples
 //
-//   imageTag("icon")
-//   // => <img alt="Icon" src="/assets/icon" />
-//   imageTag("icon.png")
-//   // => <img alt="Icon" src="/assets/icon.png" />
-//   imageTag("icon.png", size: "16x10", alt: "Edit Entry")
-//   // => <img src="/assets/icon.png" width="16" height="10" alt="Edit Entry" />
+//   imageTag("/assets/icon.png")
+//   // => <img alt="Icon" src="/assets/icon.png">
+//   imageTag("/assets/icon.png", {size: "16x10", alt: "A caption"})
+//   // => <img src="/assets/icon.png" width="16" height="10" alt="A caption">
 //   imageTag("/icons/icon.gif", size: "16")
-//   // => <img src="/icons/icon.gif" width="16" height="16" alt="Icon" />
+//   // => <img src="/icons/icon.gif" width="16" height="16" alt="Icon">
 //   imageTag("/icons/icon.gif", height: '32', width: '32')
-//   // => <img alt="Icon" height="32" src="/icons/icon.gif" width="32" />
+//   // => <img alt="Icon" height="32" src="/icons/icon.gif" width="32">
 //   imageTag("/icons/icon.gif", class: "menu_icon")
-//   // => <img alt="Icon" class="menu_icon" src="/icons/icon.gif" />
+//   // => <img alt="Icon" class="menu_icon" src="/icons/icon.gif">
 
 Viking.View.Helpers.imageTag = function(source, options) {
-    var options = options || {};
-    var size;
-    var alt;
+    var separator = /x/i,
+        size,
+        alt;
 
+    options = options || {};
     options.src = source || options.src;
 
     if (options.size) {
-        size = options.size.split(/x/i);
+        size = options.size.search(separator) > 0 ? options.size.split(separator) : [options.size, options.size];
         options.width = size[0];
-        options.width = size[1];
+        options.height = size[1];
+        delete options.size;
     }
 
     if (!options.alt) {
-        alt = option.src.replace(/^.*[\\\/]/, '').split(/\./)[0];
+        alt = options.src.replace(/^.*[\\\/]/, '').split(/\./)[0];
         alt = alt.charAt(0).toUpperCase() + alt.slice(1);
         options.alt = alt;
     }
 
-    return Viking.View.Helpers.contentTag('img', options);
+    return Viking.View.Helpers.tag('img', options);
 };
 Viking.PaginatedCollection = Viking.Collection.extend({
     constructor: function(models, options) {
