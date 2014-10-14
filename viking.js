@@ -15,6 +15,13 @@ Viking.NameError = function (message) {
 };
 
 Viking.NameError.prototype = Error.prototype;
+
+Viking.ArgumentError = function (message) {
+  this.name = "Viking.ArgumentError";
+  this.message = message ? message : 'Insufficient arguments';
+};
+
+Viking.ArgumentError.prototype = Error.prototype;
 // Viking.Support
 // -------------
 //
@@ -1366,20 +1373,30 @@ Viking.Coercions.String = {
 //
 // Viking.View is a framework fro handling view template lookup and rendering.
 // It provides view helpers that assisst when building HTML forms and more.
-Viking.View = Backbone.View.extend({}, {
-    
+Viking.View = Backbone.View.extend({
+
+    template : undefined,
+
+    renderTemplate : function(locals) {
+        return Viking.View.Helpers.render(this.template, locals);
+    }
+
+}, {
+
+    templates    : {},
+
     // Override the original extend function to support merging events
     extend: function(protoProps, staticProps) {
-        
         if (protoProps  && protoProps.events) {
             _.defaults(protoProps.events, this.prototype.events);
         }
-        
+
         return Backbone.View.extend.call(this, protoProps, staticProps);
-      }
+    }
 });
 
 Viking.View.Helpers = {};
+
 
 
 
@@ -3420,6 +3437,19 @@ Viking.View.Helpers.imageTag = function(source, options) {
     }
 
     return Viking.View.Helpers.tag('img', options);
+};
+Viking.View.Helpers.render = function (templatePath, locals) {
+    var template = Viking.View.templates[templatePath];
+
+    if (!locals) {
+        locals = {};
+    }
+
+    if (template) {
+        return template(_.extend(locals, Viking.View.Helpers));
+    } else {
+        throw new Error('Template does not exist: ' + templatePath);
+    }
 };
 Viking.PaginatedCollection = Viking.Collection.extend({
     constructor: function(models, options) {
