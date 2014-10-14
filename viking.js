@@ -1375,7 +1375,7 @@ Viking.Coercions.String = {
 // It provides view helpers that assisst when building HTML forms and more.
 Viking.View = Backbone.View.extend({
 
-    template : null,
+    template : undefined,
 
     renderTemplate : function(locals) {
         return Viking.View.Helpers.render(this.template, locals);
@@ -1384,7 +1384,6 @@ Viking.View = Backbone.View.extend({
 }, {
 
     templates    : {},
-    templateRoot : "",
 
     // Override the original extend function to support merging events
     extend: function(protoProps, staticProps) {
@@ -3440,22 +3439,16 @@ Viking.View.Helpers.imageTag = function(source, options) {
     return Viking.View.Helpers.tag('img', options);
 };
 Viking.View.Helpers.render = function (templatePath, locals) {
-    var template;
+    var template = Viking.View.templates[templatePath];
 
-    if (templatePath) {
-        template = Viking.View.templates[Viking.View.templateRoot + templatePath];
+    if (!locals) {
+        locals = {};
+    }
 
-        if (!locals) {
-            locals = {};
-        }
-
-        if (template) {
-            return template(_.extend(locals, Viking.View.Helpers));
-        } else {
-            throw new Error('Template does not exist: ' + templatePath);
-        }
+    if (template) {
+        return template(_.extend(locals, Viking.View.Helpers));
     } else {
-        throw new Viking.ArgumentError('Cannot render without template provided');
+        throw new Error('Template does not exist: ' + templatePath);
     }
 };
 Viking.PaginatedCollection = Viking.Collection.extend({

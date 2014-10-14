@@ -4,6 +4,7 @@ Major Changes:
  
  - added `Viking.View`
  - extending a `Viking.View` merge events together
+ - added template support to `Viking.View` via `renderTemplate`
 
 Minor Changes:
 
@@ -11,6 +12,8 @@ Minor Changes:
  - `Viking.FormBuilder` now uses the baseModel for the name for use with STI models
  - `Viking.FormBuilder#fieldsFor` now uses the baseModel for the name for use with STI models
  - JSON data type sets the `baseModel` to itself
+ - added `imageTag` to `Viking.View` helpers
+ - added `render` to `Viking.View` helpers
 
 ## 0.7.0 (July 1st, 2014)
 

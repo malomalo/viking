@@ -56,9 +56,8 @@
     });
 
     test('renderTemplate with template set on view', function () {
-        var template = 'a/template/path';
         var View = Viking.View.extend({
-            'template' : template
+            'template' : 'a/template/path'
         });
 
         equal(
