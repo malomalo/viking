@@ -1,5 +1,9 @@
 (function () {
-    module("Viking.View");
+    module("Viking.View", {
+        setup : function() {
+            Viking.View.templates = JST;
+        }
+    });
     
     test("inherits events", function() {
         var View = Viking.View.extend({
@@ -49,6 +53,31 @@
         
         Viking.View.extend();
         Backbone.View.extend = originalFunction;
+    });
+
+    test('renderTemplate with template set on view', function () {
+        var template = 'a/template/path';
+        var View = Viking.View.extend({
+            'template' : template
+        });
+
+        equal(
+            new View().renderTemplate(),
+            '<h1>Some Title</h1>'
+        );
+    });
+    test('renderTemplate without template set on view', function () {
+        var template = undefined;
+        var View = Viking.View.extend({
+            'template' : template
+        });
+
+        throws(
+            function() {
+                new View().renderTemplate();
+            },
+            new Error('Template does not exist: ' + template)
+        );
     });
     
 }());

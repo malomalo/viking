@@ -1,10 +1,4 @@
 (function () {
-    // TODO: Put somewhere else
-    var JST = {
-        'a/template/path'               : _.template('<h1>Some Title</h1>'),
-        'a/template/path/with/locals'   : _.template('<p><%= text %></p>')
-    };
-
     module('Viking.View.Helpers#render', {
         setup : function() {
             Viking.View.templates = JST;
@@ -12,11 +6,12 @@
     });
 
     test('rendering without template', function() {
+        var template = undefined;
         throws(
             function() {
                 Viking.View.Helpers.render();
             },
-            new Viking.ArgumentError('Cannot render without template provided')
+            new Error('Template does not exist: ' + template)
         );
     });
 
