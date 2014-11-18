@@ -19,6 +19,7 @@ Minor Changes:
 Bugfixes:
 
  -  Fixed issue with custom name attribute on `Viking.View.Helpers.textField`
+ -  Fixed issue with custom name attribute on `Viking.View.Helpers.select`
  
 ## 0.7.0 (July 1st, 2014)
 

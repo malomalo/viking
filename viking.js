@@ -3019,7 +3019,7 @@ Viking.View.Helpers.radioButton = function (model, attribute, tag_value, options
 Viking.View.Helpers.select = function (model, attribute, collection, options) {
     if (options === undefined) { options = {}; }
 
-    var name = Viking.View.tagNameForModelAttribute(model, attribute);
+    var name = options['name'] || Viking.View.tagNameForModelAttribute(model, attribute);
     var optionOptions = _.pick(options, 'selected');
     var selectOptions = _.omit(options, 'selected');
     if (model.get(attribute) && optionOptions.selected === undefined) {

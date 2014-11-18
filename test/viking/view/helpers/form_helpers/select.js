@@ -111,4 +111,13 @@
     //
     // In case if you don't want the helper to generate this hidden field you can
     // specify `include_hidden: false` option.
+        
+    test("select(model, attribute, simple_array, {name: 'custom'})", function () {
+        this.model.set("key", "value");
+        
+        equal(
+            '<select id="custom" name="custom"><option selected>value</option>\n<option>another_value</option></select>',
+            Viking.View.Helpers.select(this.model, 'key', ['value', 'another_value'], {"name": 'custom'})
+        );
+    });
 }());
