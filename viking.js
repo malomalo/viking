@@ -3081,10 +3081,10 @@ Viking.View.Helpers.textArea = function (model, attribute, options) {
 //   text_field(post, "title", {class: "create_input"})
 //   // => <input class="create_input" id="post_title" name="post[title]" type="text" value="title">
 Viking.View.Helpers.textField = function (model, attribute, options) {
-    var name = Viking.View.tagNameForModelAttribute(model, attribute);
-    
     if (options === undefined) { options = {}; }
     Viking.View.addErrorClassToOptions(model, attribute, options);
+
+    var name = options['name'] || Viking.View.tagNameForModelAttribute(model, attribute);
     
     return Viking.View.Helpers.textFieldTag(name, model.get(attribute), options);
 };

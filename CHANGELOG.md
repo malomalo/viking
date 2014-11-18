@@ -16,6 +16,10 @@ Minor Changes:
  - added `imageTag` to `Viking.View` helpers
  - added `render` to `Viking.View` helpers
 
+Bugfixes:
+
+ -  Fixed issue with custom name attribute on `Viking.View.Helpers.textField`
+ 
 ## 0.7.0 (July 1st, 2014)
 
 Major Changes:

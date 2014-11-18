@@ -26,4 +26,8 @@
                '<input class="error" id="model_notes" name="model[notes]" type="text">');
     });
     
+    test("textField(model, attribute, {name: 'custom'})", function () {
+        equal (Viking.View.Helpers.textField(this.model, 'name', {"name": 'custom'}), '<input id="custom" name="custom" type="text">');
+    });
+    
 }());

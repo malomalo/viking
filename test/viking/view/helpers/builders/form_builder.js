@@ -652,8 +652,8 @@
 
         var html = [
             '<input name="ship[ships]['+a.get('ships').models[0].cid+'][id]" type="hidden" value="10">',
-            '<input id="ship_name" name="ship[ships]['+a.get('ships').models[0].cid+'][name]" type="text" value="Billabong">',
-            '<input id="ship_name" name="ship[ships]['+a.get('ships').models[1].cid+'][name]" type="text" value="Wipple">'
+            '<input id="ship_ships_'+a.get('ships').models[0].cid+'_name" name="ship[ships]['+a.get('ships').models[0].cid+'][name]" type="text" value="Billabong">',
+            '<input id="ship_ships_'+a.get('ships').models[1].cid+'_name" name="ship[ships]['+a.get('ships').models[1].cid+'][name]" type="text" value="Wipple">'
         ];
         
         equal(formBuilder.fieldsFor('ships', function(f) {
