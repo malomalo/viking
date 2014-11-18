@@ -644,16 +644,17 @@
     });
     
     test("#fieldsFor() works with a hasMany relationship", function (attribute, options, content) {
-        Ship = Viking.Model.extend('ship', { hasMany: ['ships'] });
+        Fleet = Viking.Model.extend('fleet', { hasMany: ['ships']});
+        Ship = Viking.Model.extend('ship', {});
         ShipCollection = Viking.Collection.extend({ model: Ship });
 
-        var a = new Ship({'ships': [{'id': 10, 'name': 'Billabong'}, {'name': 'Wipple'}] });
+        var a = new Fleet({'ships': [{'id': 10, 'name': 'Billabong'}, {'name': 'Wipple'}] });
         var formBuilder = new FormBuilder(a);
 
         var html = [
-            '<input name="ship[ships]['+a.get('ships').models[0].cid+'][id]" type="hidden" value="10">',
-            '<input id="ship_ships_'+a.get('ships').models[0].cid+'_name" name="ship[ships]['+a.get('ships').models[0].cid+'][name]" type="text" value="Billabong">',
-            '<input id="ship_ships_'+a.get('ships').models[1].cid+'_name" name="ship[ships]['+a.get('ships').models[1].cid+'][name]" type="text" value="Wipple">'
+            '<input name="fleet[ships]['+a.get('ships').models[0].cid+'][id]" type="hidden" value="10">',
+            '<input id="fleet_ships_'+a.get('ships').models[0].cid+'_name" name="fleet[ships]['+a.get('ships').models[0].cid+'][name]" type="text" value="Billabong">',
+            '<input id="fleet_ships_'+a.get('ships').models[1].cid+'_name" name="fleet[ships]['+a.get('ships').models[1].cid+'][name]" type="text" value="Wipple">'
         ];
         
         equal(formBuilder.fieldsFor('ships', function(f) {
@@ -662,6 +663,7 @@
             
         delete Ship;
         delete ShipCollection;
+        delete Fleet;
     });
     
 }());
