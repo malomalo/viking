@@ -1383,7 +1383,10 @@ Viking.View = Backbone.View.extend({
 
 }, {
 
-    templates    : {},
+    // `Viking.View.templates` is used for storing templates. 
+    // `Viking.View.Helpers.render` looks up templates in this
+    // variable
+    templates: {},
 
     // Override the original extend function to support merging events
     extend: function(protoProps, staticProps) {
@@ -1461,8 +1464,13 @@ Viking.View.Helpers = {};
         
         var value = model.get(attribute);
         var name;
+
         if (options.namespace) {
-            name = options.namespace + '[' + model.baseModel.modelName + '][' + attribute + ']';
+            if (!options.namespace.match(/\[\w+\]$/)) {
+                name = options.namespace + '[' + model.baseModel.modelName + '][' + attribute + ']';
+            } else {
+                name = options.namespace + '[' + attribute + ']';
+            }
         } else {
             name = model.baseModel.modelName + '[' + attribute + ']';
         }
@@ -2385,7 +2393,7 @@ Viking.View.Helpers.textAreaTag = function (name, content, options, escape) {
 
 
 function FormBuilder(model, options) {
-    options || (options = {});
+    options = _.extend({}, options);
     
     this.model = model;
     this.options = options;
@@ -2428,7 +2436,7 @@ FormBuilder.prototype = {
         options || (options = {});
         
         //TODO shouldn't options.name be options.for?
-        if (!options.name && this.options.namespace) {
+        if (!options['for'] && !options.name && this.options.namespace) {
             options['for'] = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
             options['for'] = Viking.View.sanitizeToId(options['for']);
         }
@@ -2510,22 +2518,46 @@ FormBuilder.prototype = {
     },
     
     fieldsFor: function(attribute, options, content) {
+        var builder, modelName;
+        
         if (typeof options === 'function') {
             content = options;
             options = {};
         }
         
-        if (!options.namespace) {
-            if (this.options.namespace) {
-                options.namespace = this.options.namespace + '[' + this.model.baseModel.modelName + ']';
-            } else {
-                options.namespace = this.model.baseModel.modelName;
+        if (this.model.get(attribute) instanceof Viking.Collection) {
+            var superOptions = this.options;
+            return this.model.get(attribute).map(function(model) {
+                var localOptions = _.extend({}, options);
+                if (!options.namespace) {
+                    if (superOptions.namespace) {
+                        localOptions.namespace = superOptions.namespace + '[' + attribute + '][' + model.cid + ']';
+                    } else {
+                        localOptions.namespace = model.baseModel.modelName + '[' + attribute + '][' + model.cid + ']';
+                    }
+                }
+                
+                builder = new FormBuilder(model, localOptions);
+                
+                if (model.id) {
+                    return builder.hiddenField('id') + content(builder);
+                } else {
+                    return content(builder);
+                }
+            }).join('');
+        } else {
+            if (!options.namespace) {
+                if (this.options.namespace) {
+                    options.namespace = this.options.namespace + '[' + this.model.baseModel.modelName + ']';
+                } else {
+                    options.namespace = this.model.baseModel.modelName;
+                }
             }
+            
+            builder = new FormBuilder(this.model.get(attribute), options);
+            return content(builder);
         }
-        
-        var builder = new FormBuilder(this.model.get(attribute), options);
-    
-        return content(builder);
+
     }
     
 };

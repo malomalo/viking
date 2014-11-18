@@ -5,6 +5,7 @@ Major Changes:
  - added `Viking.View`
  - extending a `Viking.View` merge events together
  - added template support to `Viking.View` via `renderTemplate`
+ - added support for `hasMany` relationships in `FormBuilder.fieldsFor`
 
 Minor Changes:
 

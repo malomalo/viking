@@ -19,7 +19,7 @@
         var form = new FormBuilder(this.model, options);
 
         equal(form.model, this.model);
-        equal(form.options, options);
+        deepEqual(_.pick(form.options, 'key', 'foo'), options);
     });
 
     // checkBox()
@@ -615,7 +615,8 @@
     
     // fieldsFor()
     // ===========
-    test("#fieldsFor() yields a FormBuilder with the namespace set", function (attribute, options, content) {
+    test("#fieldsFor() yields a FormBuilder with the namespace set", function () {
+        this.model.set('key', new this.Model());
         var formBuilder = new FormBuilder(this.model);
         
         formBuilder.fieldsFor('key', function(f) {
@@ -623,7 +624,7 @@
         });
     });
     
-    test("#fieldsFor() works with a FormBuilder that already has a namespace", function (attribute, options, content) {
+    test("#fieldsFor() works with a FormBuilder that already has a namespace", function () {
         var formBuilder = new FormBuilder(this.model, {namespace: 'ns'});
         
         formBuilder.fieldsFor('key', function(f) {
@@ -631,7 +632,7 @@
         });
     });
     
-    test("#fieldsFor() works with a FormBuilder that is using an STI model", function (attribute, options, content) {
+    test("#fieldsFor() works with a FormBuilder that is using an STI model", function () {
         var Model = Viking.Model.extend('model');
         var SubModel = Model.extend('sub_model');
         
@@ -640,6 +641,27 @@
         formBuilder.fieldsFor('key', function(f) {
             equal(f.options.namespace, 'model');
         });
+    });
+    
+    test("#fieldsFor() works with a hasMany relationship", function (attribute, options, content) {
+        Ship = Viking.Model.extend('ship', { hasMany: ['ships'] });
+        ShipCollection = Viking.Collection.extend({ model: Ship });
+
+        var a = new Ship({'ships': [{'id': 10, 'name': 'Billabong'}, {'name': 'Wipple'}] });
+        var formBuilder = new FormBuilder(a);
+
+        var html = [
+            '<input name="ship[ships]['+a.get('ships').models[0].cid+'][id]" type="hidden" value="10">',
+            '<input id="ship_name" name="ship[ships]['+a.get('ships').models[0].cid+'][name]" type="text" value="Billabong">',
+            '<input id="ship_name" name="ship[ships]['+a.get('ships').models[1].cid+'][name]" type="text" value="Wipple">'
+        ];
+        
+        equal(formBuilder.fieldsFor('ships', function(f) {
+            return f.textField('name');
+        }), html.join(''));
+            
+        delete Ship;
+        delete ShipCollection;
     });
     
 }());
