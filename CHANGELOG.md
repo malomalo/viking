@@ -20,6 +20,7 @@ Bugfixes:
 
  -  Fixed issue with custom name attribute on `Viking.View.Helpers.textField`
  -  Fixed issue with custom name attribute on `Viking.View.Helpers.select`
+ -  Fixed checkBox not having an escape option
  
 ## 0.7.0 (July 1st, 2014)
 
