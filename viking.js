@@ -2517,9 +2517,19 @@ FormBuilder.prototype = {
         return Viking.View.Helpers.checkBoxGroup(this.model, attribute, options, content);
     },
     
-    fieldsFor: function(attribute, options, content) {
+    fieldsFor: function(attribute, records, options, content) {
         var builder, modelName;
         
+        if (records instanceof Viking.Model) {
+            records = [records];
+        }
+
+        if (!_.isArray(records) && !(records instanceof Viking.Collection)) {
+            content = options;
+            options = records;
+            records = undefined;
+        }
+
         if (typeof options === 'function') {
             content = options;
             options = {};
@@ -2528,7 +2538,13 @@ FormBuilder.prototype = {
         if (this.model.get(attribute) instanceof Viking.Collection) {
             var superOptions = this.options;
             var parentModel = this.model;
-            return this.model.get(attribute).map(function(model) {
+            records || (records = this.model.get(attribute));
+            if (records instanceof Viking.Collection) {
+                records = records.models;
+            }
+
+            return _.map(records, function(model) {
+                console.log(model);
                 var localOptions = _.extend({}, options);
                 if (!options.namespace) {
                     if (superOptions.namespace) {

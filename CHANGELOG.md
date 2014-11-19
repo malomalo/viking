@@ -15,6 +15,7 @@ Minor Changes:
  - JSON data type sets the `baseModel` to itself
  - added `imageTag` to `Viking.View` helpers
  - added `render` to `Viking.View` helpers
+ - `FormBuilder.fieldsFor` accepts a model, collection, or array of records
 
 Bugfixes:
 
