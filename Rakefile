@@ -73,6 +73,7 @@ task :test do
   FileUtils.rm_rf('test/coverage')
   pid = spawn('java -jar /usr/local/lib/jscover-all.jar -ws --port=4321 --report-dir=test/coverage --no-instrument=/deps/ --no-instrument=/test/')
   result = system "npm test"
+  sleep(10000000)
   Process.kill(:SIGINT, pid)
 
   fail unless result

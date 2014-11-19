@@ -1670,7 +1670,7 @@ Viking.View.Helpers.buttonTag = function (content, options) {
 //   
 //   checkBoxTag('eula', 'accepted', false, disabled: true)
 //   // => <input disabled="disabled" name="eula" type="checkbox" value="accepted" />
-Viking.View.Helpers.checkBoxTag = function (name, value, checked, options) {
+Viking.View.Helpers.checkBoxTag = function (name, value, checked, options, escape) {
     if (value === undefined) { value = "1"; }
     if (options === undefined) { options = {}; }
     if (checked === true) { options.checked = true; }
@@ -1682,7 +1682,7 @@ Viking.View.Helpers.checkBoxTag = function (name, value, checked, options) {
         name: name
     });
 
-    return Viking.View.Helpers.tag("input", options);
+    return Viking.View.Helpers.tag("input", options, escape);
 };
 // textFieldTag(name, [value], [options])
 // ======================================
@@ -1728,7 +1728,7 @@ Viking.View.Helpers.checkBoxTag = function (name, value, checked, options) {
 //   
 //   textFieldTag('ip', '0.0.0.0', {maxlength: 15, size: 20, class: "ip-input"})
 //   // => <input class="ip-input" maxlength="15" name="ip" size="20" value="0.0.0.0" type="text" />
-Viking.View.Helpers.textFieldTag = function (name, value, options) {
+Viking.View.Helpers.textFieldTag = function (name, value, options, escape) {
 
     // Handle both `name, value` && `name, options` style arguments
     if (value !== null && typeof value === 'object' && !(value instanceof Backbone.Model)) {
@@ -1741,7 +1741,7 @@ Viking.View.Helpers.textFieldTag = function (name, value, options) {
         id: Viking.View.sanitizeToId(name),
         name:  name,
         value: value
-    }, options));
+    }, options), escape);
 };
 // hiddenFieldTag(name, value = nil, options = {})
 // ===============================================
@@ -1760,11 +1760,11 @@ Viking.View.Helpers.textFieldTag = function (name, value, options) {
 //   
 //   hiddenFieldTag('token', 'VUBJKB23UIVI1UU1VOBVI@')
 //   // => <input name="token" type="hidden" value="VUBJKB23UIVI1UU1VOBVI@">
-Viking.View.Helpers.hiddenFieldTag = function (name, value, options) {
+Viking.View.Helpers.hiddenFieldTag = function (name, value, options, escape) {
     if (options === undefined) { options = {}; }
     _.defaults(options, {type: "hidden", id: null});
-
-    return Viking.View.Helpers.textFieldTag(name, value, options);
+    
+    return Viking.View.Helpers.textFieldTag(name, value, options, escape);
 };
 // formTag([options], [content])
 // formTag([content], [options])
@@ -2402,14 +2402,14 @@ function FormBuilder(model, options) {
 // TODO: options passed to the helpers can be made into a helper
 FormBuilder.prototype = {
 
-    checkBox: function(attribute, options, checkedValue, uncheckedValue) {
+    checkBox: function(attribute, options, checkedValue, uncheckedValue, escape) {
         options || (options = {});
         
         if (!options.name && this.options.namespace) {
             options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
         }
         
-        return Viking.View.Helpers.checkBox(this.model, attribute, options, checkedValue, uncheckedValue);
+        return Viking.View.Helpers.checkBox(this.model, attribute, options, checkedValue, uncheckedValue, escape);
     },
 
     collectionSelect: function(attribute, collection, valueAttribute, textAttribute, options) {
@@ -2667,7 +2667,7 @@ CheckBoxGroupBuilder.prototype = {
 //   checkBox("eula", "accepted", { class: 'eula_check' }, "yes", "no")
 //   // => <input name="eula[accepted]" type="hidden" value="no">
 //   //    <input type="checkbox" class="eula_check" name="eula[accepted]" value="yes">
-Viking.View.Helpers.checkBox = function (model, attribute, options, checkedValue, uncheckedValue) {
+Viking.View.Helpers.checkBox = function (model, attribute, options, checkedValue, uncheckedValue, escape) {
     var output = '';
     var value = model.get(attribute);
 
@@ -2677,8 +2677,8 @@ Viking.View.Helpers.checkBox = function (model, attribute, options, checkedValue
     Viking.View.addErrorClassToOptions(model, attribute, options);
 
     var name = options.name || Viking.View.tagNameForModelAttribute(model, attribute);    
-    output += Viking.View.Helpers.hiddenFieldTag(name, uncheckedValue);
-    output += Viking.View.Helpers.checkBoxTag(name, checkedValue, checkedValue === value, options);
+    output += Viking.View.Helpers.hiddenFieldTag(name, uncheckedValue, undefined, escape);
+    output += Viking.View.Helpers.checkBoxTag(name, checkedValue, checkedValue === value, options, escape);
     
     return output;
 };

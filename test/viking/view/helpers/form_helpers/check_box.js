@@ -54,4 +54,10 @@
                '<input name="eula_yes" type="hidden" value="no"><input checked id="eula_yes" name="eula_yes" type="checkbox" value="yes">');
     });
     
+    test("checkBox(model, attribute, options, yes_value, no_value, escape) passes along escape", function() {
+        this.model.set('key', 'yes');
+        equal( Viking.View.Helpers.checkBox(this.model, 'key', { "data-icon": "&#xf123;" }, 'yes', 'no', false),
+               '<input name="model[key]" type="hidden" value="no"><input checked data-icon="&#xf123;" id="model_key" name="model[key]" type="checkbox" value="yes">');
+    });
+    
 }());

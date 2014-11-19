@@ -81,6 +81,21 @@
         Viking.View.Helpers.checkBox = old_func;
     });
     
+    test("#checkBox() passes along escape", function () {
+        expect(1);
+        
+        var model = this.model;
+        var form = new FormBuilder(this.model, {namespace: 'ns'})
+        var old_func = Viking.View.Helpers.checkBox
+        
+        Viking.View.Helpers.checkBox = function(m, attribute, options, checkedValue, uncheckedValue, escape) {
+            strictEqual(escape, true);
+        }
+        form.checkBox('key', {name: 'overridden'}, 2, 3, true);
+        
+        Viking.View.Helpers.checkBox = old_func;
+    });
+    
     // collectionSelect()
     // ==================
     test("#collectionSelect() passes to Viking.View.Helpers.collectionSelect", function () {
