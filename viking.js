@@ -18,7 +18,7 @@ Viking.NameError.prototype = Error.prototype;
 
 Viking.ArgumentError = function (message) {
   this.name = "Viking.ArgumentError";
-  this.message = message ? message : 'Insufficient arguments';
+  this.message = message || 'Insufficient arguments';
 };
 
 Viking.ArgumentError.prototype = Error.prototype;
@@ -78,17 +78,17 @@ Date.prototype.strftime = function(fmt) {
             
             if(match[1]){
                 day = match[1].split(/\D/);
-                for( i= 0; i < day.length; i++) {
+                for( i = 0; i < day.length; i++ ) {
                     day[i] = parseInt(day[i], 10) || 0;
                 }
                 day[1] -= 1;
                 day = new Date(Date.UTC.apply(Date, day));
                 if(!day.getDate()) { return NaN; }
                 if(match[5]){
-                    tz = (parseInt(match[5], 10)*60);
+                    tz = (parseInt(match[5], 10) * 60);
                     if(match[6]) { tz += parseInt(match[6], 10); }
-                    if(match[4] === '+') { tz*= -1; }
-                    if(tz) { day.setUTCMinutes(day.getUTCMinutes()+ tz); }
+                    if(match[4] === '+') { tz *= -1; }
+                    if(tz) { day.setUTCMinutes(day.getUTCMinutes() + tz); }
                 }
                 return day;
             }
@@ -218,7 +218,7 @@ String.prototype.underscore = function() {
     var result = this.replace('::', '/');
     result = result.replace(/([A-Z\d]+)([A-Z][a-z])/g, "$1_$2");
     result = result.replace(/([a-z\d])([A-Z])/g, "$1_$2");
-    return result.replace('-','_').toLowerCase();
+    return result.replace('-', '_').toLowerCase();
 };
 
 // By default, #camelize converts strings to UpperCamelCase. If the argument
@@ -267,7 +267,7 @@ String.prototype.booleanize = function(defaultTo) {
 //
 //     "puni_puni"  // => "puni-puni"
 String.prototype.dasherize = function() {
-    return this.replace('_','-');
+    return this.replace('_', '-');
 };
 
 // Replaces special characters in a string so that it may be used as part of
@@ -304,7 +304,7 @@ String.prototype.constantize = function(context) {
 	
 	return _.reduce(this.split('.'), function(context, name){
 		var v = context[name];
-		if (!v) { throw new Viking.NameError("uninitialized variable "+name); }
+		if (!v) { throw new Viking.NameError("uninitialized variable " + name); }
 		return v;
 	}, context);	
 };
@@ -421,11 +421,11 @@ Viking.config = function (obj, key, val) {
       // And an `X-HTTP-Method-Override` header.
       if (options.emulateHTTP && (type === 'PUT' || type === 'DELETE' || type === 'PATCH')) {
         params.type = 'POST';
-        if (options.emulateJSON) params.data._method = type;
+        if (options.emulateJSON) { params.data._method = type; }
         var beforeSend = options.beforeSend;
         options.beforeSend = function(xhr) {
           xhr.setRequestHeader('X-HTTP-Method-Override', type);
-          if (beforeSend) return beforeSend.apply(this, arguments);
+          if (beforeSend) { return beforeSend.apply(this, arguments); }
         };
       }
       
@@ -474,7 +474,7 @@ Viking.config = function (obj, key, val) {
 //     - model: model to use
 //     - collection: collection to use
 Viking.AssociationReflection = function (macro, name, options) {
-    options || (options = {});
+    options = _.extend({}, options);
     
     this.name = name;
     this.macro = macro;
@@ -490,7 +490,7 @@ Viking.AssociationReflection = function (macro, name, options) {
         }
     } else if (macro === 'belongsTo' || macro === 'hasOne') {
         if (!options.polymorphic) {
-            this.modelName = options.model ? options.model : name.camelize();
+            this.modelName = options.model || name.camelize();
         }
     } else {
         throw new TypeError("Unkown Macro " + macro);
@@ -557,7 +557,7 @@ Viking.Model = Backbone.Model.extend({
         this.baseModel = this.constructor.baseModel;
 
         if (this.baseModel && this.inheritanceAttribute) {
-            if (this.baseModel == this.constructor && this.baseModel.descendants.length > 0) {
+            if (this.baseModel === this.constructor && this.baseModel.descendants.length > 0) {
                 attrs[this.inheritanceAttribute] = this.modelName;
             } else if (_.contains(this.baseModel.descendants, this.constructor)) {
                 attrs[this.inheritanceAttribute] = this.modelName;
@@ -657,7 +657,7 @@ Viking.Model.find = function(id, options) {
 };
 Viking.Model.reflectOnAssociation = function(name) {
     return this.associations[name];
-}
+};
 Viking.Model.reflectOnAssociations = function(macro) {
     var associations = _.values(this.associations);
     if (macro) {
@@ -667,7 +667,7 @@ Viking.Model.reflectOnAssociations = function(macro) {
     }
 
     return associations;
-}
+};
 // Generates the `urlRoot` based off of the model name.
 Viking.Model.urlRoot = function() {
     return "/" + this.baseModel.modelName.pluralize();
@@ -681,19 +681,20 @@ Viking.Model.where = function(options) {
 Viking.Model.prototype.coerceAttributes = function(attrs) {
     
     _.each(this.associations, function(association) {
+        var Type;
         var polymorphic = association.options.polymorphic;
         
-        if (!attrs[association.name]) return;
+        if (!attrs[association.name]) { return; }
         
         if (polymorphic && (attrs[association.name] instanceof Viking.Model)) {
             // TODO: remove setting the id?
             attrs[association.name + '_id'] = attrs[association.name].id;
             attrs[association.name + '_type'] = attrs[association.name].modelName;
         } else if (polymorphic && attrs[association.name + '_type']) {
-            var Type = attrs[association.name + '_type'].camelize().constantize();
+            Type = attrs[association.name + '_type'].camelize().constantize();
             attrs[association.name] = new Type(attrs[association.name]);
         } else if (!(attrs[association.name] instanceof association.klass())) {
-            var Type = association.klass();
+            Type = association.klass();
             attrs[association.name] = new Type(attrs[association.name]);
         }
     });
@@ -762,9 +763,9 @@ Viking.Model.prototype.save = function(key, val, options) {
     // `set(attr).save(null, opts)` with validation. Otherwise, check if
     // the model will be valid when the attributes, if any, are set.
     if (attrs && !options.wait) {
-      if (!this.set(attrs, options)) return false;
+      if (!this.set(attrs, options)) { return false; }
     } else {
-      if (!this._validate(attrs, options)) return false;
+      if (!this._validate(attrs, options)) { return false; }
     }
 
     // Set temporary attributes if `{wait: true}`.
@@ -774,18 +775,18 @@ Viking.Model.prototype.save = function(key, val, options) {
 
     // After a successful server-side save, the client is (optionally)
     // updated with the server-side state.
-    if (options.parse === void 0) options.parse = true;
+    if (options.parse === void 0) { options.parse = true; }
     var model = this;
     var success = options.success;
     options.success = function(resp) {
       // Ensure attributes are restored during synchronous saves.
       model.attributes = attributes;
       var serverAttrs = model.parse(resp, options);
-      if (options.wait) serverAttrs = _.extend(attrs || {}, serverAttrs);
+      if (options.wait) { serverAttrs = _.extend(attrs || {}, serverAttrs); }
       if (_.isObject(serverAttrs) && !model.set(serverAttrs, options)) {
         return false;
       }
-      if (success) success(model, resp, options);
+      if (success) { success(model, resp, options); }
       model.trigger('sync', model, resp, options);
     };
 
@@ -800,20 +801,20 @@ Viking.Model.prototype.save = function(key, val, options) {
             }
             model.setErrors(errors, options);
         } else {
-            if (error) error(model, resp, options);
+            if (error) { error(model, resp, options); }
             model.trigger('error', model, resp, options);
         }
     };
 
     method = this.isNew() ? 'create' : (options.patch ? 'patch' : 'update');
-    if (method === 'patch') options.attrs = attrs;
+    if (method === 'patch') { options.attrs = attrs; }
     xhr = this.sync(method, this, options);
 
     // Restore attributes.
-    if (attrs && options.wait) this.attributes = attributes;
+    if (attrs && options.wait) { this.attributes = attributes; }
 
     return xhr;
-}
+};
 // select(options)
 // select(value[, options])
 //
@@ -871,7 +872,7 @@ Viking.Model.prototype.set = function (key, val, options) {
         var type = attrs[this.inheritanceAttribute].camelize().constantize();
         this.constructor = type;
         this.__proto__ = type.prototype;
-		this.modelName = type.modelName
+		this.modelName = type.modelName;
         
         // TODO: move to function, used in Model.new
         // TODO: probably move to a becomes method
@@ -957,10 +958,10 @@ Viking.Model.prototype.toJSON = function (options) {
             delete data[association.name];
         } else if (association.macro === 'belongsTo' || association.macro === 'hasOne') {
             if (data[association.name]) {
-                data[association.name+'_attributes'] = data[association.name].toJSON(options.include[association.name]);
+                data[association.name + '_attributes'] = data[association.name].toJSON(options.include[association.name]);
                 delete data[association.name];
             } else if (data[association.name] === null) {
-                data[association.name+'_attributes'] = null;
+                data[association.name + '_attributes'] = null;
                 delete data[association.name];
             }
         } else if (association.macro === 'hasMany') {
@@ -1027,7 +1028,7 @@ Viking.Model.prototype.touch = function(name, options) {
     // TODO move to extend and extend a new object so not writing to old options
     _.defaults(options || (options = {}), {
         type: 'PUT',
-        url: _.result(this, 'url') + '/touch',
+        url: _.result(this, 'url') + '/touch'
     });
     
     if (name) {
@@ -1236,16 +1237,16 @@ Viking.Collection = Backbone.Collection.extend({
         order = (_.isArray(order) ? order : [order]);
         
         order = _.map(order, function(o) {
-            var normalized_order;
+            var normalizedOrder;
             
             if(typeof o === 'string') {
-                normalized_order = {};
-                normalized_order[o] = 'asc';
+                normalizedOrder = {};
+                normalizedOrder[o] = 'asc';
             } else {
-                normalized_order = o;
+                normalizedOrder = o;
             }
             
-            return normalized_order;
+            return normalizedOrder;
         });
         
         if (order.length === 1 && !order[0]) {
@@ -1376,12 +1377,13 @@ Viking.Coercions.String = {
 // It provides view helpers that assisst when building HTML forms and more.
 Viking.View = Backbone.View.extend({
 
-    template : undefined,
+    template: undefined,
 
-    renderTemplate : function(locals) {
+    renderTemplate: function(locals) {
         return Viking.View.Helpers.render(this.template, locals);
     }
 
+    //TODO: Default render can just render template
 }, {
 
     // `Viking.View.templates` is used for storing templates. 
@@ -1391,7 +1393,7 @@ Viking.View = Backbone.View.extend({
 
     // Override the original extend function to support merging events
     extend: function(protoProps, staticProps) {
-        if (protoProps  && protoProps.events) {
+        if (protoProps && protoProps.events) {
             _.defaults(protoProps.events, this.prototype.events);
         }
 
@@ -1734,11 +1736,12 @@ Viking.View.Helpers.textFieldTag = function (name, value, options, escape) {
     }
 
     return Viking.View.Helpers.tag('input', _.extend({
-        type:  'text',
-        id: Viking.View.sanitizeToId(name),
-        name:  name,
-        value: value
+        "type": 'text',
+        "id": Viking.View.sanitizeToId(name),
+        "name": name,
+        "value": value
     }, options), escape);
+    
 };
 // hiddenFieldTag(name, value = nil, options = {})
 // ===============================================
@@ -1795,7 +1798,7 @@ Viking.View.Helpers.hiddenFieldTag = function (name, value, options, escape) {
 Viking.View.Helpers.formTag = function (options, content) {
     var tmp, methodOverride = '';
     
-    if (typeof options === 'function' || typeof options == 'string') {
+    if (typeof options === 'function' || typeof options === 'string') {
         tmp = content;
         content = options;
         options = tmp;
@@ -1806,16 +1809,16 @@ Viking.View.Helpers.formTag = function (options, content) {
         options.method = 'post';
     } else if (options.method && options.method !== 'get' && options.method !== 'post') {
         methodOverride = Viking.View.Helpers.hiddenFieldTag('_method', options.method);
-        options.method = 'post'
+        options.method = 'post';
     }
     
     if (options.multipart) {
-        options.enctype="multipart/form-data";
+        options.enctype = "multipart/form-data";
         delete options.multipart;
     }
     
 
-    if(typeof content !== "undefined") {
+    if(content !== undefined) {
         content = methodOverride + (typeof content === 'function' ? content() : content);
 
         return Viking.View.Helpers.contentTag('form', content, options, false);
@@ -1901,10 +1904,10 @@ Viking.View.Helpers.timeTag = function (date, content, options) {
     options || (options = {});
     
     if (!content) {
-        content = options.format ? date.strftime(format) : date.toString()
+        content = options.format ? date.strftime(options.format) : date.toString();
     }
-    if (options.format) delete options.format;
-    if (!options.datetime) options.datetime = date.toISOString();
+    if (options.format) { delete options.format; }
+    if (!options.datetime) { options.datetime = date.toISOString(); }
     
 
     return Viking.View.Helpers.contentTag('time', content, options);
@@ -2198,8 +2201,8 @@ Viking.View.Helpers.radioButtonTag = function (name, value, checked, options) {
 
     return Viking.View.Helpers.tag("input", options);
 };
-// selectTag(name, option_tags, options)
-// ======================================
+// selectTag(name, optionTags, options)
+// ====================================
 //
 // Creates a dropdown selection box, or if the :multiple option is set to true,
 // a multiple choice selection box.
@@ -2246,27 +2249,27 @@ Viking.View.Helpers.radioButtonTag = function (name, value, checked, options) {
 //   
 //   selectTag("credit_card", options_for_select([ "VISA", "MasterCard" ], "MasterCard"))
 //   // => <select name="credit_card"><option>VISA</option><option selected>MasterCard</option></select>
-Viking.View.Helpers.selectTag = function (name, option_tags, options) {
-    var tag_name = name;
+Viking.View.Helpers.selectTag = function (name, optionTags, options) {
+    var tagName = name;
     if (options === undefined) { options = {}; }
-    if (options.multiple && tag_name.slice(-2) !== "[]") { tag_name = tag_name + "[]"; }
+    if (options.multiple && tagName.slice(-2) !== "[]") { tagName = tagName + "[]"; }
     _.defaults(options, {
         id: Viking.View.sanitizeToId(name),
-        name: tag_name
+        name: tagName
     });
 
     if (options.includeBlank) {
-        option_tags = Viking.View.Helpers.contentTag('option', '', {value: ''}) + option_tags;
+        optionTags = Viking.View.Helpers.contentTag('option', '', {value: ''}) + optionTags;
         delete options.includeBlank;
     }
 
     if (options.prompt) {
         if (options.prompt === true) { options.prompt = 'Select'; }
-        option_tags = Viking.View.Helpers.contentTag('option', options.prompt, {value: ''}) + option_tags;
+        optionTags = Viking.View.Helpers.contentTag('option', options.prompt, {value: ''}) + optionTags;
         delete options.prompt;
     }
 
-    return Viking.View.Helpers.contentTag('select', option_tags, options, false);
+    return Viking.View.Helpers.contentTag('select', optionTags, options, false);
 };
 // submitTag(value="Save", options)
 // =================================
@@ -2632,7 +2635,7 @@ CheckBoxGroupBuilder.prototype = {
         return Viking.View.Helpers.label(this.model, this.attribute, content, options, escape);
     }
     
-}
+};
 
 
 // checkBox(model, attribute, options={}, checkedValue="true", uncheckedValue="false")
@@ -2954,11 +2957,11 @@ Viking.View.Helpers.passwordField = function (model, attribute, options) {
     
     return Viking.View.Helpers.passwordFieldTag(name, undefined, options);
 };
-// radioButton(model, attribute, tag_value, options)
+// radioButton(model, attribute, tagValue, options)
 // ==================================================
 //
 // Returns a radio button tag for accessing a specified attribute on a model.
-// If the current value of attribute is tag_value the radio button will be checked.
+// If the current value of attribute is tagValue the radio button will be checked.
 //
 // To force the radio button to be checked pass checked: true in the options hash.
 // You may pass HTML options there as well.
@@ -2973,21 +2976,21 @@ Viking.View.Helpers.passwordField = function (model, attribute, options) {
 //   radioButton("user", "receive_newsletter", "no")
 //   // => <input type="radio" id="user_receive_newsletter_yes" name="user[receive_newsletter]" value="yes">
 //   //    <input type="radio" id="user_receive_newsletter_no" name="user[receive_newsletter]" value="no" checked>
-Viking.View.Helpers.radioButton = function (model, attribute, tag_value, options) {
+Viking.View.Helpers.radioButton = function (model, attribute, tagValue, options) {
     if (options === undefined) { options = {}; }
     var name = options.name || Viking.View.tagNameForModelAttribute(model, attribute);
 
     _.defaults(options, {
-        id: Viking.View.sanitizeToId(name + "_" + tag_value)
+        id: Viking.View.sanitizeToId(name + "_" + tagValue)
     });
     Viking.View.addErrorClassToOptions(model, attribute, options);
     
-    var value = tag_value;
+    var value = tagValue;
     if (value === undefined || value === null) {
         value = "";
     }
     
-    return Viking.View.Helpers.radioButtonTag(name, value, tag_value === model.get(attribute), options);
+    return Viking.View.Helpers.radioButtonTag(name, value, tagValue === model.get(attribute), options);
 };
 // Create a select tag and a series of contained option tags for the provided
 // object and method. The option currently held by the object will be selected,
@@ -3236,7 +3239,7 @@ urlFor = function (modelOrUrl, options) {
         host: window.location.hostname,
         port: window.location.port,
         scriptName: '',
-        protocol: window.location.protocol.replace(':','')
+        protocol: window.location.protocol.replace(':', '')
     }, options);
     
     var route;
@@ -3510,9 +3513,9 @@ Viking.View.Helpers.render = function (templatePath, locals) {
 
     if (template) {
         return template(_.extend(locals, Viking.View.Helpers));
-    } else {
-        throw new Error('Template does not exist: ' + templatePath);
     }
+
+    throw new Error('Template does not exist: ' + templatePath);
 };
 Viking.PaginatedCollection = Viking.Collection.extend({
     constructor: function(models, options) {
@@ -3558,8 +3561,8 @@ Viking.Controller = Backbone.Model;
 Viking.Predicate = Backbone.Model;
 Viking.Cursor = Backbone.Model.extend({
     defaults: {
-        page: 1,
-        per_page: 25
+        "page": 1,
+        "per_page": 25
     },
     
     reset: function(options) {

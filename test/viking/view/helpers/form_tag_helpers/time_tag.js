@@ -1,5 +1,5 @@
 (function () {
-    module("Viking.View.Helpers#time_tag");
+    module("Viking.View.Helpers#timeTag");
 
     // // timeTag(date, [options], [value])
     // // =================================
@@ -31,6 +31,12 @@
         var date = new Date(1395441025655);
         
         equal(Viking.View.Helpers.timeTag(date, {datetime: 'myvalue'}), '<time datetime="myvalue">'+date.toString()+'</time>');
+    });
+
+    test("timeTag(date, options, content{format: 'myformat'})", function() {
+        var date = new Date(1395441025655);
+
+        equal(Viking.View.Helpers.timeTag(date, {format: '%Y %m %d'}), '<time datetime="2014-03-21T22:30:25.655Z">2014 03 21</time>');
     });
     
     test("timeTag(date, contentFunc)", function() {
