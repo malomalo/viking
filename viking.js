@@ -1123,6 +1123,7 @@ Viking.Collection = Backbone.Collection.extend({
                 predicate = new Viking.Predicate(predicate);
             }
             this.predicate = predicate;
+            this.trigger('change:predicate', this.predicate);
             this.listenTo(predicate, 'change', this.predicateChanged);
             if(!(options && options.silent)) { this.predicateChanged(); }
         } else if (this.predicate) {
