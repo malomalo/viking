@@ -84,7 +84,7 @@ namespace :coveralls do
     payload = {
       :service_name => 'semaphore',
       :repo_token => ENV['COVERALLS_REPO_TOKEN'],
-      :service_job_id => ENV['SEMAPHORE_BUILD_NUMBER'],
+      :service_job_id => ENV['CIRCLE_BUILD_NUM'],
       :source_files => [],
       :git => git_info
     }
