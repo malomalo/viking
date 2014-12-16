@@ -46,36 +46,59 @@ task :notes do
   SourceAnnotationExtractor.enumerate "OPTIMIZE|FIXME|TODO", tag: true
 end
 
-task :test do
-  # Checks
-  check 'npm', 'npm', 'http://nodejs.org/'
-  #check 'jscover', 'jscover', 'http://tntim96.github.io/JSCover/'
-  #
-  # Installation for jscover:
-  # mkdir -p jscover
-  # wget --trust-server-name --output-document=jscover/jscover.zip "http://downloads.sourceforge.net/project/jscover/JSCover-1.0.6.zip?r=http%3A%2F%2Ftntim96.github.io%2FJSCover%2F&ts=1366915691&use_mirror=hivelocity"
-  # unzip -d jscover/jscover jscover/jscover.zip
-  # mv jscover/jscover/target/dist/JSCover-all.jar /usr/local/lib/jscover-all.jar
-  # rm -rf jscover
+task :test => 'test:browser'
 
-  # Add our custom Processor to turn viking.js into a list of files to include
-  environment.unregister_postprocessor 'application/javascript', Sprockets::DirectiveProcessor
-  environment.register_postprocessor 'application/javascript', UrlGenerator  
-    
-  # Render the test html files
-  File.open('test/index.html', 'w') do |file|
-    file.write(ERB.new(File.read('test/index.html.erb')).result(binding))
-  end
-  File.open('test/ie8.html', 'w') do |file|
-    file.write(ERB.new(File.read('test/ie8.html.erb')).result(binding))
-  end
-  
-  FileUtils.rm_rf('test/coverage')
-  pid = spawn('java -jar /usr/local/lib/jscover-all.jar -ws --port=4321 --report-dir=test/coverage --no-instrument=/deps/ --no-instrument=/test/')
-  result = system "npm test"
-  Process.kill(:SIGINT, pid)
+namespace :test do
 
-  fail unless result
+  desc "Run the test in your browswer"
+  task :browser do
+    # Add our custom Processor to turn viking.js into a list of files to include
+    environment.unregister_postprocessor 'application/javascript', Sprockets::DirectiveProcessor
+    environment.register_postprocessor 'application/javascript', LocalUrlGenerator
+
+    # Render the test html files
+    File.open('test/index.html', 'w') do |file|
+      file.write(ERB.new(File.read('test/index.html.erb')).result(binding))
+    end
+    File.open('test/ie8.html', 'w') do |file|
+      file.write(ERB.new(File.read('test/ie8.html.erb')).result(binding))
+    end
+
+    system("open test/index.html")
+  end
+
+  desc "Run the test in a headless browswer and report coverage"
+  task :headless do
+    # Checks
+    check 'npm', 'npm', 'http://nodejs.org/'
+    #check 'jscover', 'jscover', 'http://tntim96.github.io/JSCover/'
+    #
+    # Installation for jscover:
+    # mkdir -p jscover
+    # wget --trust-server-name --output-document=jscover/jscover.zip "http://downloads.sourceforge.net/project/jscover/JSCover-1.0.6.zip?r=http%3A%2F%2Ftntim96.github.io%2FJSCover%2F&ts=1366915691&use_mirror=hivelocity"
+    # unzip -d jscover/jscover jscover/jscover.zip
+    # mv jscover/jscover/target/dist/JSCover-all.jar /usr/local/lib/jscover-all.jar
+    # rm -rf jscover
+
+    # Add our custom Processor to turn viking.js into a list of files to include
+    environment.unregister_postprocessor 'application/javascript', Sprockets::DirectiveProcessor
+    environment.register_postprocessor 'application/javascript', UrlGenerator
+
+    # Render the test html files
+    File.open('test/index.html', 'w') do |file|
+      file.write(ERB.new(File.read('test/index.html.erb')).result(binding))
+    end
+    File.open('test/ie8.html', 'w') do |file|
+      file.write(ERB.new(File.read('test/ie8.html.erb')).result(binding))
+    end
+
+    FileUtils.rm_rf('test/coverage')
+    pid = spawn('java -jar /usr/local/lib/jscover-all.jar -ws --port=4321 --report-dir=test/coverage --no-instrument=/deps/ --no-instrument=/test/')
+    result = system "npm test"
+    Process.kill(:SIGINT, pid)
+
+    fail unless result
+  end
 end
 
 namespace :coveralls do
@@ -125,6 +148,16 @@ class UrlGenerator < Sprockets::DirectiveProcessor
   protected
     def process_source
       @result << @pathname.to_s << "\n" unless @has_written_body
+    end
+end
+
+class LocalUrlGenerator < Sprockets::DirectiveProcessor
+  protected
+    def process_source
+      lib_file = File.expand_path("../#{@pathname.to_s.gsub('test/','lib/')}", __FILE__)
+      test_file = File.expand_path("../#{@pathname}", __FILE__)
+
+      @result << (File.exists?(lib_file) ? lib_file : test_file) << "\n" unless @has_written_body
     end
 end
 
