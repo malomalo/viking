@@ -2545,7 +2545,6 @@ FormBuilder.prototype = {
             }
 
             return _.map(records, function(model) {
-                console.log(model);
                 var localOptions = _.extend({}, options);
                 if (!options.namespace) {
                     if (superOptions.namespace) {

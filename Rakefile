@@ -70,7 +70,26 @@ namespace :test do
   desc "Run the test in a headless browswer and report coverage"
   task :headless do
     # Checks
-    check 'npm', 'npm', 'http://nodejs.org/'
+    check 'phantomjs', 'PhantomJS', 'http://phantomjs.org/'
+
+    # Add our custom Processor to turn viking.js into a list of files to include
+    environment.unregister_postprocessor 'application/javascript', Sprockets::DirectiveProcessor
+    environment.register_postprocessor 'application/javascript', LocalUrlGenerator
+
+    # Render the test html files
+    File.open('test/index.html', 'w') do |file|
+      file.write(ERB.new(File.read('test/index.html.erb')).result(binding))
+    end
+    File.open('test/ie8.html', 'w') do |file|
+      file.write(ERB.new(File.read('test/ie8.html.erb')).result(binding))
+    end
+    
+    fail unless system("phantomjs test/runner.js test/index.html")
+  end
+  
+  task :coverage do
+    # Checks
+    check 'phantomjs', 'PhantomJS', 'http://phantomjs.org/'
     #check 'jscover', 'jscover', 'http://tntim96.github.io/JSCover/'
     #
     # Installation for jscover:
@@ -93,12 +112,13 @@ namespace :test do
     end
 
     FileUtils.rm_rf('test/coverage')
-    pid = spawn('java -jar /usr/local/lib/jscover-all.jar -ws --port=4321 --report-dir=test/coverage --no-instrument=/deps/ --no-instrument=/test/')
-    result = system "npm test"
+    pid = spawn('java -jar /usr/local/lib/jscover-all.jar -ws --port=4321 --report-dir=test/coverage --no-instrument=/test/')
+    result = system("phantomjs test/runner.js http://127.0.0.1:4321/test/index.html")
     Process.kill(:SIGINT, pid)
 
     fail unless result
   end
+  
 end
 
 namespace :coveralls do
