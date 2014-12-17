@@ -113,6 +113,8 @@ namespace :test do
 
     FileUtils.rm_rf('test/coverage')
     pid = spawn('java -jar /usr/local/lib/jscover-all.jar -ws --port=4321 --report-dir=test/coverage --no-instrument=/test/')
+    
+    sleep(1) if ENV['CIRCLECI'] # sometimes java hasn't bound to the soket yet on circleci
     result = system("phantomjs test/runner.js http://127.0.0.1:4321/test/index.html")
     Process.kill(:SIGINT, pid)
 
