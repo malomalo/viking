@@ -6,7 +6,7 @@
     test("timeTag(date)", function() {
         var date = new Date(1395441025655);
         
-        equal(Viking.View.Helpers.timeTag(date), '<time datetime="2014-03-21T22:30:25.655Z">Fri Mar 21 2014 15:30:25 GMT-0700 (PDT)</time>');
+        equal(Viking.View.Helpers.timeTag(date), '<time datetime="2014-03-21T22:30:25.655Z">'+date.toString()+'</time>');
     });
     
     test("timeTag(date, content)", function() {
@@ -24,13 +24,13 @@
     test("timeTag(date, {pubdate: true})", function() {
         var date = new Date(1395441025655);
         
-        equal(Viking.View.Helpers.timeTag(date, {pubdate: true}), '<time datetime="2014-03-21T22:30:25.655Z" pubdate>Fri Mar 21 2014 15:30:25 GMT-0700 (PDT)</time>');
+        equal(Viking.View.Helpers.timeTag(date, {pubdate: true}), '<time datetime="2014-03-21T22:30:25.655Z" pubdate>'+date.toString()+'</time>');
     });
     
     test("timeTag(date, {datetime: 'myvalue'})", function() {
         var date = new Date(1395441025655);
         
-        equal(Viking.View.Helpers.timeTag(date, {datetime: 'myvalue'}), '<time datetime="myvalue">Fri Mar 21 2014 15:30:25 GMT-0700 (PDT)</time>');
+        equal(Viking.View.Helpers.timeTag(date, {datetime: 'myvalue'}), '<time datetime="myvalue">'+date.toString()+'</time>');
     });
     
     test("timeTag(date, contentFunc)", function() {
