@@ -21,7 +21,7 @@
 
         equal(form.model, this.model);
         equal(form.attribute, 'key');
-        equal(form.options, options);
+        deepEqual(form.options, _.extend({namespace:'model'},options));
     });
     
     // checkBox(value, options)

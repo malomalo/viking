@@ -98,7 +98,7 @@
         var Model = Viking.Model.extend('model');
         var model = new Model({name: "name"});
 
-        equal("key[model][name]", Viking.View.tagNameForModelAttribute(model, 'name', {namespace: 'key'}));
+        equal("key[model][name]", Viking.View.tagNameForModelAttribute(model, 'name', {namespace: 'key[model]'}));
     });
     
     test("tagNameForModelAttribute(model, arrayAttribute)", function() {
@@ -112,7 +112,7 @@
         var Model = Viking.Model.extend('model');
         var model = new Model({names: ["name"]});
 
-        equal("key[model][names][]", Viking.View.tagNameForModelAttribute(model, 'names', {namespace: 'key'}));
+        equal("key[model][names][]", Viking.View.tagNameForModelAttribute(model, 'names', {namespace: 'key[model]'}));
     });
     
     test("tagNameForModelAttribute(model, vikingCollectionAttribute)", function() {
@@ -128,7 +128,7 @@
         var ModelCollection = Viking.Collection.extend({model: Model});
         var model = new Model({models: new ModelCollection()});
 
-        equal("key[model][models][]", Viking.View.tagNameForModelAttribute(model, 'models', {namespace: 'key'}));
+        equal("key[model][models][]", Viking.View.tagNameForModelAttribute(model, 'models', {namespace: 'key[model]'}));
     });
     
     // addErrorClassToOptions(model, attribute, options)

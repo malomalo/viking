@@ -34,7 +34,7 @@
         Viking.View.Helpers.checkBox = function(m, attribute, options, checkedValue, uncheckedValue) {
             strictEqual(model, m);
             strictEqual('key', attribute);
-            deepEqual({}, options);
+            deepEqual({name: 'model[key]'}, options);
             strictEqual(2, checkedValue);
             strictEqual(3, uncheckedValue);
         }
@@ -111,7 +111,7 @@
             strictEqual(1, collection);
             strictEqual(2, valueAttribute);
             strictEqual(3, textAttribute);
-            deepEqual({}, options);
+            deepEqual({'name': 'model[key]'}, options);
         }
         form.collectionSelect('key', 1, 2, 3, {});
         
@@ -170,7 +170,7 @@
         Viking.View.Helpers.hiddenField = function(m, attribute, options) {
             strictEqual(model, m);
             strictEqual('key', attribute);
-            deepEqual({}, options);
+            deepEqual({name: 'model[key]'}, options);
         }
         form.hiddenField('key', {});
         
@@ -224,7 +224,7 @@
             strictEqual(model, m);
             strictEqual('key', attribute);
             strictEqual(1, content);
-            deepEqual({}, options);
+            deepEqual({"for": 'model_key'}, options);
         }
         form.label('key', 1, {});
         
@@ -279,7 +279,7 @@
         Viking.View.Helpers.numberField = function(m, attribute, options) {
             strictEqual(model, m);
             strictEqual('key', attribute);
-            deepEqual({}, options);
+            deepEqual({name: 'model[key]'}, options);
         }
         form.number('key', {});
         
@@ -313,7 +313,7 @@
         Viking.View.Helpers.numberField = function(m, attribute, options) {
             strictEqual(model, m);
             strictEqual('key', attribute);
-            deepEqual({'for': 'me'}, options);
+            deepEqual({'for': 'me', 'name': 'model[key]'}, options);
         }
         form.number('key', {'for': 'me'});
         
@@ -332,7 +332,7 @@
         Viking.View.Helpers.passwordField = function(m, attribute, options) {
             strictEqual(model, m);
             strictEqual('key', attribute);
-            deepEqual({}, options);
+            deepEqual({name: 'model[key]'}, options);
         }
         form.passwordField('key', {});
         
@@ -386,7 +386,7 @@
             strictEqual(model, m);
             strictEqual('key', attribute);
             strictEqual(1, tagValue);
-            deepEqual({}, options);
+            deepEqual({name: 'model[key]'}, options);
         }
         form.radioButton('key', 1, {});
         
@@ -442,7 +442,7 @@
             strictEqual(model, m);
             strictEqual('key', attribute);
             strictEqual(1, collection);
-            deepEqual({}, options);
+            deepEqual({'name': 'model[key]'}, options);
         }
         form.select('key', 1, {});
         
@@ -497,7 +497,7 @@
         Viking.View.Helpers.textArea = function(m, attribute, options) {
             strictEqual(model, m);
             strictEqual('key', attribute);
-            deepEqual({}, options);
+            deepEqual({'name': 'model[key]'}, options);
         }
         form.textArea('key', {});
         
@@ -550,7 +550,7 @@
         Viking.View.Helpers.textField = function(m, attribute, options) {
             strictEqual(model, m);
             strictEqual('key', attribute);
-            deepEqual({}, options);
+            deepEqual({'name': 'model[key]'}, options);
         }
         form.textField('key', {});
         
@@ -602,7 +602,7 @@
         Viking.View.Helpers.checkBoxGroup = function(m, attribute, options, content) {
             strictEqual(model, m);
             strictEqual('key', attribute);
-            deepEqual({}, options);
+            deepEqual({'namespace': 'model'}, options);
             strictEqual(2, content);
         }
         form.checkBoxGroup('key', {}, 2);
@@ -620,7 +620,7 @@
         Viking.View.Helpers.checkBoxGroup = function(m, attribute, options, content) {
             strictEqual(model, m);
             strictEqual('key', attribute);
-            deepEqual({'namespace': 'ns'}, options);
+            deepEqual({'namespace': 'ns[model]'}, options);
             strictEqual(2, content);
         }
         form.checkBoxGroup('key', {}, 2);
@@ -635,15 +635,16 @@
         var formBuilder = new FormBuilder(this.model);
         
         formBuilder.fieldsFor('key', function(f) {
-            equal(f.options.namespace, 'model');
+            equal(f.options.namespace, 'model[key]');
         });
     });
     
     test("#fieldsFor() works with a FormBuilder that already has a namespace", function () {
+        this.model.set('key', new this.Model());
         var formBuilder = new FormBuilder(this.model, {namespace: 'ns'});
         
         formBuilder.fieldsFor('key', function(f) {
-            equal(f.options.namespace, 'ns[model]');
+            equal(f.options.namespace, 'ns[model][key]');
         });
     });
     
@@ -654,7 +655,7 @@
         var formBuilder = new FormBuilder(new SubModel());
         
         formBuilder.fieldsFor('key', function(f) {
-            equal(f.options.namespace, 'model');
+            equal(f.options.namespace, 'model[key]');
         });
     });
     
@@ -676,6 +677,31 @@
             return f.textField('name');
         }), html.join(''));
             
+        delete Ship;
+        delete ShipCollection;
+        delete Fleet;
+    });
+
+    test("#fieldsFor() works nested in another #fieldsFor()", function () {
+        Fleet = Viking.Model.extend('fleet', { hasMany: ['ships']});
+        Ship = Viking.Model.extend('ship', { coercions: { "amenities": "JSON" } });
+        ShipCollection = Viking.Collection.extend({ model: Ship });
+
+        var a = new Fleet({'ships': [{'id': 10, 'name': 'Billabong', 'amenities': {key: 1}}, {'name': 'Wipple', 'amenities': {key: 2}}] });
+        var formBuilder = new FormBuilder(a);
+
+        var html = [
+            '<input name="fleet[ships]['+a.get('ships').models[0].cid+'][id]" type="hidden" value="10">',
+            '<input id="fleet_ships_'+a.get('ships').models[0].cid+'_amenities_key_true" name="fleet[ships]['+a.get('ships').models[0].cid+'][amenities][key]" type="radio" value="true">',
+            '<input id="fleet_ships_'+a.get('ships').models[1].cid+'_amenities_key_true" name="fleet[ships]['+a.get('ships').models[1].cid+'][amenities][key]" type="radio" value="true">'
+        ];
+
+        equal(formBuilder.fieldsFor('ships', function (f) {
+            return f.fieldsFor('amenities', function (f) {
+                return f.radioButton('key', true);
+            });
+        }), html.join(''));
+
         delete Ship;
         delete ShipCollection;
         delete Fleet;

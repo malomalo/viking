@@ -1467,11 +1467,7 @@ Viking.View.Helpers = {};
         var name;
 
         if (options.namespace) {
-            if (!options.namespace.match(/\[\w+\]$/)) {
-                name = options.namespace + '[' + model.baseModel.modelName + '][' + attribute + ']';
-            } else {
-                name = options.namespace + '[' + attribute + ']';
-            }
+            name = options.namespace + '[' + attribute + ']';
         } else {
             name = model.baseModel.modelName + '[' + attribute + ']';
         }
@@ -2394,10 +2390,21 @@ Viking.View.Helpers.textAreaTag = function (name, content, options, escape) {
 
 
 function FormBuilder(model, options) {
+    var modelName;
+
     options = _.extend({}, options);
     
     this.model = model;
     this.options = options;
+
+    modelName = _.has(options, 'as') ? options.as : this.model.baseModel.modelName;
+    if (options.namespace) {
+        if (options.as !== null) {
+            this.options.namespace = options.namespace + '[' + modelName + ']';
+        }
+    } else {
+        this.options.namespace = modelName;
+    }
 }
 
 // TODO: options passed to the helpers can be made into a helper
@@ -2405,7 +2412,7 @@ FormBuilder.prototype = {
 
     checkBox: function(attribute, options, checkedValue, uncheckedValue, escape) {
         options || (options = {});
-        
+
         if (!options.name && this.options.namespace) {
             options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
         }
@@ -2545,7 +2552,7 @@ FormBuilder.prototype = {
             }
 
             return _.map(records, function(model) {
-                var localOptions = _.extend({}, options);
+                var localOptions = _.extend({'as': null}, options);
                 if (!options.namespace) {
                     if (superOptions.namespace) {
                         localOptions.namespace = superOptions.namespace + '[' + attribute + '][' + model.cid + ']';
@@ -2563,14 +2570,11 @@ FormBuilder.prototype = {
                 }
             }).join('');
         } else {
-            if (!options.namespace) {
-                if (this.options.namespace) {
-                    options.namespace = this.options.namespace + '[' + this.model.baseModel.modelName + ']';
-                } else {
-                    options.namespace = this.model.baseModel.modelName;
-                }
+            if (!options.namespace && this.options.namespace) {
+                options.namespace = this.options.namespace;
             }
-            
+            options.as = attribute;
+
             builder = new FormBuilder(this.model.get(attribute), options);
             return content(builder);
         }
@@ -2579,11 +2583,21 @@ FormBuilder.prototype = {
     
 };
 function CheckBoxGroupBuilder(model, attribute, options) {
-    options || (options = {});
+    var modelName;
+    options = _.extend({}, options);
     
     this.model = model;
     this.attribute = attribute;
     this.options = options;
+
+    modelName = _.has(options, 'as') ? options.as : this.model.baseModel.modelName;
+    if (options.namespace) {
+        if (options.as !== null) {
+            this.options.namespace = options.namespace + '[' + modelName + ']';
+        }
+    } else {
+        this.options.namespace = modelName;
+    }
 }
 
 // TODO: options passed to the helpers can be made into a helper
