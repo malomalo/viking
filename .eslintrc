@@ -1,0 +1,23 @@
+{
+    'env': {
+        'browser': true
+    },
+    'globals': {
+        '_': true,
+        'Viking': true,
+        'Backbone': true,
+        'escape': true
+    },
+    'rules': {
+        'eol-last': false,
+        'quotes':   false,
+        'global-strict': [2, 'never'],
+        'no-trailing-spaces': false,
+
+        'no-underscore-dangle': false,
+        'strict': false,
+        'no-trailing-spaces': false,
+        'no-extend-native': false,
+        'key-spacing': false
+    }
+}

@@ -37,8 +37,14 @@ end
 
 desc "run JavaScriptLint on the source"
 task :lint do
-  check 'jslint', 'JavaScript Lint', 'npm install jslint --global'
-  system "find lib -name '*.js' -exec jslint --color --predef Backbone --predef _ --predef jQuery --predef strftime --predef Viking --browser --plusplus --nomen --white --regex --vars --sloppy '{}' \\\;"
+  check 'eslint', 'JavaScript Lint', 'npm install eslint --global'
+
+  Dir.glob(File.join(File.dirname(__FILE__), 'lib', '**', '*.js')).each do |file|
+    puts ""
+    print '%-75s ' % file
+    system("eslint -c .eslintrc #{file}")
+    # system "find lib -name '*.js' -exec jslint --color --predef Backbone --predef _ --predef jQuery --predef strftime --predef Viking --browser --plusplus --nomen --white --regex --vars --sloppy '{}' \\\;"
+  end
 end
 
 desc "Enumerate all annotations (use notes:optimize, :fixme, :todo for focus)"
