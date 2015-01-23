@@ -1,0 +1,12 @@
+language: javascript
+
+before_install:
+  - npm install jslint --global
+  - gem install sprockets rest_client
+  - mkdir -p jscover
+  - wget --trust-server-name --output-document=jscover/jscover.zip "http://gemini.42floors.com/jscover.zip"
+  - unzip -d jscover/jscover jscover/jscover.zip
+  - sudo mv jscover/jscover/target/dist/JSCover-all.jar /usr/local/lib/jscover-all.jar
+  - rm -rf jscover
+
+script: rake test:headless
