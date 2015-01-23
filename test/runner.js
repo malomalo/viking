@@ -37,6 +37,11 @@
 		page.evaluate(addLogging);
 	};
 
+    function phantomExit (exitCode) {
+        page.close();
+        setTimeout(function() { phantom.exit(exitCode); }, 0);
+    };
+    
 	page.onCallback = function(message) {
 		var result,
 			failed;
@@ -46,22 +51,22 @@
 				result = message.data;
 				failed = !result || result.failed;
 
-				phantom.exit(failed ? 1 : 0);
+				phantomExit(failed ? 1 : 0);
 			}
 		}
 	};
-
+    
 	page.open(url, function(status) {
 		if (status !== 'success') {
 			console.error('Unable to access network: ' + status);
-			phantom.exit(1);
+			phantomExit(1);
 		} else {
 			// Cannot do this verification with the 'DOMContentLoaded' handler because it
 			// will be too late to attach it if a page does not have any script tags.
 			var qunitMissing = page.evaluate(function() { return (typeof QUnit === 'undefined' || !QUnit); });
 			if (qunitMissing) {
 				console.error('The `QUnit` object is not present on this page.');
-				phantom.exit(1);
+				phantomExit(1);
 			}
 
 			// Do nothing... the callback mechanism will handle everything!
