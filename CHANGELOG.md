@@ -16,6 +16,7 @@ Minor Changes:
  - added `imageTag` to `Viking.View` helpers
  - added `render` to `Viking.View` helpers
  - `FormBuilder.fieldsFor` accepts a model, collection, or array of records
+ - `Viking.Controller` now has `controllerName`
 
 Bugfixes:
 
