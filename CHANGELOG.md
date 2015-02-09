@@ -6,6 +6,7 @@ Major Changes:
  - extending a `Viking.View` merge events together
  - added template support to `Viking.View` via `renderTemplate`
  - added support for `hasMany` relationships in `FormBuilder.fieldsFor`
+ - setting a `belongsTo` relation ship set/unsets the corresponding foreign_key
 
 Minor Changes:
 

@@ -21,6 +21,45 @@
     
         delete Ship;
     });
+
+    test("#set(key, val) sets relation id", function() {
+        Ship = Viking.Model.extend({ belongsTo: ['ship'] });
+        var a = new Ship();
+        
+        a.set('ship', {id: 12});
+        equal(12, a.get('ship_id'));
+        
+        a.set('ship', {});
+        equal(null, a.get('ship_id'));
+    
+        delete Ship;
+    });
+
+    test("#set({key, val}) sets relation id", function() {
+        Ship = Viking.Model.extend({ belongsTo: ['ship'] });
+        var a = new Ship();
+        
+        a.set({ship: {id: 12}})
+        equal(12, a.get('ship_id'));
+        
+        a.set({ship: {}});
+        equal(null, a.get('ship_id'));
+        
+        delete Ship;
+    });
+    
+    test("#unset(key) unsets relation id", function() {
+        Ship = Viking.Model.extend({ belongsTo: ['ship'] });
+        var a = new Ship();
+        
+        a.set('ship', {id: 12});
+        equal(12, a.get('ship_id'));
+        
+        a.unset('ship');
+        equal(null, a.get('ship_id'));
+    
+        delete Ship;
+    });
     
     test("::set(key, val) sets polymorphic belongsTo relation & sets appropriate keys", function () {
         Account = Viking.Model.extend('account');
