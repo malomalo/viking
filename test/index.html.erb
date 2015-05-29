@@ -245,7 +245,7 @@
   </style>
   
   <% ['dependencies.js', 'viking.js', 'test.js'].each do |file| %>
-    <% environment[file].to_s.lines.each do |i| %>
+    <% asset_pipeline[file].to_s.lines.each do |i| %>
   	  <script src="<%= i.sub(Dir.pwd, '').strip %>"></script>
     <% end %>
   <% end %>

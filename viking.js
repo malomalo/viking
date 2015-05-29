@@ -1,6 +1,6 @@
-//     Viking.js 0.7.0
+//     Viking.js 0.7.0 (sha:2cce43d)
 //
-//     (c) 2012-2013 Jonathan Bracy, 42Floors Inc.
+//     (c) 2012-2015 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
 //     http://vikingjs.com
 
@@ -3132,8 +3132,9 @@ Viking.View.Helpers.textField = function (model, attribute, options) {
     Viking.View.addErrorClassToOptions(model, attribute, options);
 
     var name = options['name'] || Viking.View.tagNameForModelAttribute(model, attribute);
-    
-    return Viking.View.Helpers.textFieldTag(name, model.get(attribute), options);
+    var value = model.get(attribute)
+    var value = value && typeof value === 'object' ? value.toString() : value
+    return Viking.View.Helpers.textFieldTag(name, value, options);
 };
 // TODO: make this accept model string names
 
