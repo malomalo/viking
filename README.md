@@ -18,9 +18,6 @@ Viking's dependencies are listed below:
 
 * [strftime](https://github.com/samsonjs/strftime)
 
-    To Get `strftime` working in the browser I had to comment out lines #18-23,
-    and #26.
-
 ## Building
 
 Run `rake build` from the base directory. It will output `viking.js` in the root dir.
