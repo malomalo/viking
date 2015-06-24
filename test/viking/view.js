@@ -65,6 +65,7 @@
             '<h1>Some Title</h1>'
         );
     });
+    
     test('renderTemplate without template set on view', function () {
         var template = undefined;
         var View = Viking.View.extend({

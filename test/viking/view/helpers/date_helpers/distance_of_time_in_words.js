@@ -1,23 +1,6 @@
 (function () {
     module("Viking.View.Helpers#distanceOfTimeInWords");
     
-    function testRange(from, expectFrom, to, expectTo, options) {
-        var fromTime = new Date();
-        var toTime = new Date();
-
-        toTime.setTime(fromTime.getTime() + from * 1000);
-        equal(
-            Viking.View.Helpers.distanceOfTimeInWords(fromTime, toTime, options),
-            expectFrom
-        );
-        
-        toTime.setTime(fromTime.getTime() + to * 1000);
-        equal(
-            Viking.View.Helpers.distanceOfTimeInWords(fromTime, toTime, options),
-            expectTo
-        );
-    }
-
     // Test each type of function call
     test("distanceOfTimeInWords(now - 5 seconds)", function() {
         var from = new Date();

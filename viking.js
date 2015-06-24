@@ -1,4 +1,4 @@
-//     Viking.js 0.7.0 (sha:cf42096)
+//     Viking.js 0.7.0 (sha:7dea43b)
 //
 //     (c) 2012-2015 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -108,6 +108,20 @@ Date.prototype.toParam = Date.prototype.toJSON;
 Date.prototype.toQuery = function(key) {
 	return escape(key.toParam()) + "=" + escape(this.toParam());
 };
+
+
+
+Date.prototype.today = function() {
+    return new Date();
+};
+    
+Date.prototype.isToday = function() {
+    return (this > (1).day().ago());
+};
+
+Date.prototype.isThisYear = function() {
+    return (this.getUTCFullYear() == (new Date()).getUTCFullYear());
+};
 // ordinalize returns the ordinal string corresponding to integer:
 //
 //     (1).ordinalize()    // => '1st'
@@ -157,6 +171,16 @@ Number.prototype.day = function() {
     return this * 86400000;
 };
 Number.prototype.days = Number.prototype.day;
+
+Number.prototype.week = function() {
+    return this * 7 * 86400000;
+};
+Number.prototype.weeks = Number.prototype.week;
+
+
+Number.prototype.ago = function() {
+    return new Date((new Date()).getTime() - this);
+};
 // Returns a string representation of the receiver suitable for use as a URL
 // query string:
 // 
@@ -1415,8 +1439,48 @@ Viking.View = Backbone.View.extend({
 
     renderTemplate: function(locals) {
         return Viking.View.Helpers.render(this.template, locals);
-    }
+    },
 
+    //Copied constructor from Backbone View
+    constructor: function (options) {
+        this.cid = _.uniqueId('view');
+        options || (options = {});
+        _.extend(this, _.pick(options, ['model', 'collection', 'el', 'id', 'attributes', 'className', 'tagName', 'events']));
+        this._ensureElement();
+        
+        // Add an array for storing subView attached to this view so we can remove then
+        this.subViews = [];
+        
+        this.initialize.apply(this, arguments);
+        this.delegateEvents();
+    },
+    
+    // A helper method that constructs a view and adds it to the subView array
+    subView: function (SubView, options) {
+        var view = new SubView(options);
+        this.subViews.push(view);
+        return view;
+    },
+    
+    // Removes the subview from the array and stop listening to it, and calls
+    // #remove on the subview.
+    removeSubView: function (view) {
+        this.subViews = _.without(this.subViews, view);
+        this.stopListening(view);
+        view.remove();
+    },
+    
+    // Remove all subviews when remove this view. We don't call stopListening
+    // here because this view is being removed anyways so those will get cleaned
+    // up by Backbone.
+    remove: function () {
+        while (this.subViews.length > 0){
+            this.subViews.pop().remove();
+        }
+
+        Backbone.View.prototype.remove.apply(this, arguments);
+    }
+    
     //TODO: Default render can just render template
 }, {
 

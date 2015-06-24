@@ -1,4 +1,4 @@
-<a href="vikingjs.org">![Viking.js](/logo.jpg)</a>
+<a href="http://vikingjs.org/">![Viking.js](/logo.jpg)</a>
 
 ## Installation [![Circle CI](https://circleci.com/gh/malomalo/viking/tree/master.svg?style=svg)](https://circleci.com/gh/malomalo/viking/tree/master)&nbsp;[![Coverage Status](https://coveralls.io/repos/malomalo/viking/badge.png?branch=master)](https://coveralls.io/r/malomalo/viking)
 
