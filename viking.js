@@ -1,4 +1,4 @@
-//     Viking.js 0.7.0 (sha:f2f5d45)
+//     Viking.js 0.7.0 (sha:357414e)
 //
 //     (c) 2012-2015 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -1459,6 +1459,7 @@ Viking.View = Backbone.View.extend({
     subView: function (SubView, options) {
         var view = new SubView(options);
         this.subViews.push(view);
+        this.listenTo(view, 'remove', this.removeSubView);
         return view;
     },
     

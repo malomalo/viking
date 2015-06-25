@@ -56,4 +56,12 @@
         view.remove();
     });
     
+    test("subview#remove() removes itself from the parent subViews", function () {
+        var view = new Viking.View();
+        var mysubview = view.subView(Viking.View);
+        
+        mysubview.remove();
+        deepEqual([], view.subViews);
+    });
+    
 }());
