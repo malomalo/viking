@@ -80,4 +80,14 @@
         );
     });
     
+    test("#remove() triggers a 'remove' event on the view", function() {
+        expect(1);
+    
+        var view = new Viking.View();
+        view.on('remove', function() { ok(true); });
+        view.remove();
+        view.off('remmove');
+    });
+
+    
 }());
