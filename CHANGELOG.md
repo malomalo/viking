@@ -7,6 +7,7 @@ Major Changes:
  - added template support to `Viking.View` via `renderTemplate`
  - added support for `hasMany` relationships in `FormBuilder.fieldsFor`
  - setting a `belongsTo` relation ship set/unsets the corresponding foreign_key
+ - added `Viking.Model.create` and `Viking.Model.findOrCreateBy`
 
 Minor Changes:
 

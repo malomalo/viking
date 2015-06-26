@@ -1,4 +1,4 @@
-//     Viking.js 0.7.0 (sha:357414e)
+//     Viking.js 0.7.0 (sha:202365c)
 //
 //     (c) 2012-2015 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -689,6 +689,13 @@ Viking.Model = Backbone.Model.extend({
     }
 
 });
+// Create a model with +attributes+. Options are the 
+// same as Viking.Model#save
+Viking.Model.create = function(attributes, options) {
+    var model = new this(attributes);
+    model.save(options);
+    return model;
+};
 // Find model by id. Accepts success and error callbacks in the options
 // hash, which are both passed (model, response, options) as arguments.
 //
@@ -700,6 +707,25 @@ Viking.Model.find = function(id, options) {
 	model.fetch(options);
 	return model;
 };
+// Find or create model by attributes. Accepts success callbacks in the
+// options hash, which is passed (model) as arguments.
+//
+// findOrCreateBy returns the model, however it most likely won't have fetched
+// the data	from the server if you immediately try to use attributes of the
+// model.
+Viking.Model.findOrCreateBy = function(attributes, options) {
+    var klass = this;
+    klass.where(attributes).fetch({
+        success: function (modelCollection) {
+            var model = modelCollection.models[0];
+            if (model) {
+                if (options && options.success) options.success(model);
+            } else {
+                klass.create(attributes, options);
+            }
+        }
+    });
+}
 Viking.Model.reflectOnAssociation = function(name) {
     return this.associations[name];
 };
