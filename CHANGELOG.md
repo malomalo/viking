@@ -2,6 +2,14 @@
 
 Major Changes:
  
+Minor Changes:
+
+Bugfixes:
+
+## 0.8.0 (July 13th, 2015)
+
+Major Changes:
+ 
  - added `Viking.View`
  - extending a `Viking.View` merge events together
  - added template support to `Viking.View` via `renderTemplate`
