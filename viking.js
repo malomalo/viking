@@ -1,4 +1,4 @@
-//     Viking.js 0.8.0 (sha:63a5fff)
+//     Viking.js 0.8.0 (sha:109ffae)
 //
 //     (c) 2012-2015 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -180,6 +180,10 @@ Number.prototype.weeks = Number.prototype.week;
 
 Number.prototype.ago = function() {
     return new Date((new Date()).getTime() - this);
+};
+
+Number.prototype.fromNow = function() {
+    return new Date((new Date()).getTime() + this);
 };
 // Returns a string representation of the receiver suitable for use as a URL
 // query string:
@@ -2832,7 +2836,7 @@ Viking.View.Helpers.distanceOfTimeInWords = function (fromTime, toTime, options)
     if ( fromTime > toTime ) {
         tmp = fromTime;
         fromTime = toTime;
-        toTime = fromTime;
+        toTime = tmp;
     }
     
     distance_in_seconds = Math.round((toTime.getTime() - fromTime.getTime()) / 1000);

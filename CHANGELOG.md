@@ -6,6 +6,8 @@ Minor Changes:
 
 Bugfixes:
 
+ -  Fixed issue with `Viking.View.Helpers.distanceOfTimeInWords` and future dates
+
 ## 0.8.0 (July 13th, 2015)
 
 Major Changes:

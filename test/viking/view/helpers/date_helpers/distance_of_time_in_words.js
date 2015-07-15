@@ -12,6 +12,16 @@
         );
     });
     
+    test("distanceOfTimeInWords(now + 1 day)", function() {
+        var from = new Date();
+        from.setTime(from.getTime() + (1).day());
+        
+        equal(
+            Viking.View.Helpers.distanceOfTimeInWords(from),
+            'a day'
+        );
+    });
+    
     test("distanceOfTimeInWords(fromTime, {includeSeconds: true})", function() {
         var from = new Date();
         var to = new Date();
