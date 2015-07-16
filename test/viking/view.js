@@ -88,6 +88,40 @@
         view.remove();
         view.off('remmove');
     });
+    
+    test('#bindEl() with a model', function() {
+        expect(2);
+        
+        var model = new Viking.Model();
+        var view = new Viking.View({model: model});
+        
+        view.$ = function (selector) {
+            equal(selector, '.name')
+            return {
+                html: function (html) { equal(html, 'Dr. DJ'); }
+            };
+        }
+        
+        view.bindEl('name', '.name')
+        model.set('name', 'Dr. DJ');
+    });
+    
+    test('#bindEl() with a model with custom render', function() {
+        expect(2);
+        
+        var model = new Viking.Model();
+        var view = new Viking.View({model: model});
+        
+        view.$ = function (selector) {
+            equal(selector, '.name')
+            return {
+                html: function (html) { equal(html, 'Name: Dr. DJ'); }
+            };
+        }
+        
+        view.bindEl('name', '.name', function(model) { return 'Name: ' + model.get('name'); })
+        model.set('name', 'Dr. DJ');
+    });
 
     
 }());

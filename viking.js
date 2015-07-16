@@ -1,4 +1,4 @@
-//     Viking.js 0.8.0 (sha:109ffae)
+//     Viking.js 0.8.0 (sha:3514bd8)
 //
 //     (c) 2012-2015 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -116,12 +116,21 @@ Date.prototype.today = function() {
 };
     
 Date.prototype.isToday = function() {
-    return (this > (1).day().ago());
+    return (this.getUTCFullYear() == (new Date()).getUTCFullYear() && this.getUTCMonth() == (new Date()).getUTCMonth() && this.getUTCDate() == (new Date()).getUTCDate());
 };
+
+Date.prototype.isThisMonth = function () {
+    return (this.getUTCFullYear() == (new Date()).getUTCFullYear() && this.getUTCMonth() == (new Date()).getUTCMonth());
+}
 
 Date.prototype.isThisYear = function() {
     return (this.getUTCFullYear() == (new Date()).getUTCFullYear());
 };
+
+
+Date.prototype.past = function () {
+    return (this < (new Date()));
+}
 // ordinalize returns the ordinal string corresponding to integer:
 //
 //     (1).ordinalize()    // => '1st'
@@ -1514,6 +1523,24 @@ Viking.View = Backbone.View.extend({
         this.trigger('remove', this);
 
         Backbone.View.prototype.remove.apply(this, arguments);
+    },
+    
+    // Listens to attribute(s) of the model of the view, on change
+    // renders the new value to el. Optionally, pass render function to render 
+    // something different, model is passed as an arg
+    // TODO: document me
+    bindEl: function (attributes, selector, render) {
+        var view = this;
+        render || (render = function (model) { return model.get(attributes); } );
+        if (!_.isArray(attributes)) { attributes = [attributes]; }
+        
+        //TODO: might want to Debounce because of some inputs being very rapid
+        // but maybe that should be left up to the user changes (ie textareas like description)
+        _.each(attributes, function (attribute) {
+            view.listenTo(view.model, 'change:' + attribute, function (model) {
+                view.$(selector).html( render(model) );
+            });
+        });
     }
     
     //TODO: Default render can just render template

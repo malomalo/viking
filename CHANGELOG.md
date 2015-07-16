@@ -1,7 +1,9 @@
 ## Edge
 
 Major Changes:
- 
+
+ - added `Viking.View.bindEl`
+  
 Minor Changes:
 
 Bugfixes:
