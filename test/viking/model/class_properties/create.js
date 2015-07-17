@@ -22,7 +22,7 @@
     test("::create calls save with options", function() {
         var Model = Viking.Model.extend('model');
         
-        Model.prototype.save = function (options) {
+        Model.prototype.save = function (attributes, options) {
             deepEqual(options, {option: 1});
         };
         

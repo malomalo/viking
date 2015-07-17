@@ -6,6 +6,8 @@ Major Changes:
   
 Minor Changes:
 
+ - `Viking.Model.create` now passes options correctly to save
+
 Bugfixes:
 
  -  Fixed issue with `Viking.View.Helpers.distanceOfTimeInWords` and future dates

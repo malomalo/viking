@@ -1,4 +1,4 @@
-//     Viking.js 0.8.0 (sha:3514bd8)
+//     Viking.js 0.8.0 (sha:e8f8613)
 //
 //     (c) 2012-2015 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -706,7 +706,7 @@ Viking.Model = Backbone.Model.extend({
 // same as Viking.Model#save
 Viking.Model.create = function(attributes, options) {
     var model = new this(attributes);
-    model.save(options);
+    model.save(null, options);
     return model;
 };
 // Find model by id. Accepts success and error callbacks in the options
