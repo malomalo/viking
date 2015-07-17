@@ -1,4 +1,4 @@
-//     Viking.js 0.8.0 (sha:e8f8613)
+//     Viking.js 0.8.0 (sha:23e0fb8)
 //
 //     (c) 2012-2015 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -414,6 +414,8 @@ String.prototype.toQuery = function(key) {
 	return escape(key.toParam()) + "=" + escape(this.toParam());
 };
 
+String.prototype.downcase = String.prototype.toLowerCase;
+
 
 
 
@@ -754,7 +756,13 @@ Viking.Model.reflectOnAssociations = function(macro) {
 };
 // Generates the `urlRoot` based off of the model name.
 Viking.Model.urlRoot = function() {
-    return "/" + this.baseModel.modelName.pluralize();
+    if (this.prototype.hasOwnProperty('urlRoot')) {
+        return _.result(this.prototype, 'urlRoot')
+    } else if (this.baseModel.prototype.hasOwnProperty('urlRoot')) {
+        return _.result(this.baseModel.prototype, 'urlRoot')
+    } else {
+        return "/" + this.baseModel.modelName.pluralize();
+    }
 };
 // Returns a unfetched collection with the predicate set to the query
 Viking.Model.where = function(options) {
@@ -936,10 +944,10 @@ Viking.Model.prototype.select = function(value, options) {
     }
 };
 Viking.Model.prototype.set = function (key, val, options) {
-    var attrs;
     if (key === null) { return this; }
 
     // Handle both `"key", value` and `{key: value}` -style arguments.
+    var attrs;
     if (typeof key === 'object') {
         attrs = key;
         options = val;
@@ -947,7 +955,7 @@ Viking.Model.prototype.set = function (key, val, options) {
         (attrs = {})[key] = val;
     }
     
-     options || (options = {});
+    options || (options = {});
 
     if (this.inheritanceAttribute && attrs[this.inheritanceAttribute] && this.constructor.modelName !== attrs.type) {
         // OPTIMIZE:  Mutating the [[Prototype]] of an object, no matter how

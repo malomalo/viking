@@ -11,6 +11,7 @@ Minor Changes:
 Bugfixes:
 
  -  Fixed issue with `Viking.View.Helpers.distanceOfTimeInWords` and future dates
+ - `Viking.Model::urlRoot` now obeys custom `urlRoot`s set in a Model
 
 ## 0.8.0 (July 13th, 2015)
 
