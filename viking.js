@@ -1,4 +1,4 @@
-//     Viking.js 0.8.0 (sha:23e0fb8)
+//     Viking.js 0.8.0 (sha:8f21ab8)
 //
 //     (c) 2012-2015 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -766,7 +766,7 @@ Viking.Model.urlRoot = function() {
 };
 // Returns a unfetched collection with the predicate set to the query
 Viking.Model.where = function(options) {
-    var Collection = (this.modelName.capitalize() + 'Collection').constantize();
+    var Collection = (this.modelName.camelize() + 'Collection').constantize();
     
     return new Collection(undefined, {predicate: options});
 };
