@@ -4,6 +4,7 @@ Major Changes:
 
  - added `Viking.View.bindEl`
  - abstract models for `Viking.Model` can now be created
+ - `connection` can be set to route ajax calls to a specific server
   
 Minor Changes:
 

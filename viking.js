@@ -1,4 +1,4 @@
-//     Viking.js 0.8.0 (sha:8f21ab8)
+//     Viking.js 0.8.0 (sha:90acfeb)
 //
 //     (c) 2012-2015 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -496,17 +496,8 @@ Viking.config = function (obj, key, val) {
         options.data = options.data.toParam();
       }
 
-      // If we're sending a `PATCH` request, and we're in an old Internet Explorer
-      // that still has ActiveX enabled by default, override jQuery to use that
-      // for XHR instead. Remove this line when jQuery supports `PATCH` on IE8.
-      if (params.type === 'PATCH' && noXhrPatch) {
-        params.xhr = function() {
-          return new ActiveXObject("Microsoft.XMLHTTP");
-        };
-      }
-
       // Make the request, allowing the user to override any Ajax options.
-      var xhr = options.xhr = Backbone.ajax(_.extend(params, options));
+      var xhr = options.xhr = Viking.ajax(model, _.extend(params, options));
       model.trigger('request', model, xhr, options);
       return xhr;
     };
@@ -523,6 +514,27 @@ Viking.config = function (obj, key, val) {
       'delete': 'DELETE',
       'read':   'GET'
     };
+
+    Viking.ajax = function(model, options) {
+        if (model instanceof Viking.Collection) {
+            model = model.model.prototype;
+        }
+        
+        if(model.connection) {
+            options.url = model.connection.host + options.url;
+            if (model.connection.withCredentials) {
+                options.xhrFields = { withCredentials: true };
+            }
+
+            if (options.headers) {
+                _.defaults(options.headers, model.connection.headers);
+            } else {
+                options.headers = model.connection.headers;
+            }
+        }
+
+        return jQuery.ajax(options);
+    }
 
 }());
 // Used internally by Viking to translate relation arguments to key and
@@ -586,6 +598,8 @@ Viking.AssociationReflection.prototype = {
 // It adds naming, relationships, data type coerions, selection, and modifies
 // sync to work with [Ruby on Rails](http://rubyonrails.org/) out of the box.
 Viking.Model = Backbone.Model.extend({
+
+    abstract: true,
 
     // inheritanceAttribute is the attirbutes used for STI
     inheritanceAttribute: 'type',
@@ -669,7 +683,7 @@ Viking.Model = Backbone.Model.extend({
         child.descendants = [];
         child.inheritanceAttribute = (protoProps.inheritanceAttribute === undefined) ? this.prototype.inheritanceAttribute : protoProps.inheritanceAttribute;
         
-        if (child.inheritanceAttribute === false || this === Viking.Model) {
+        if (child.inheritanceAttribute === false || (this.prototype.hasOwnProperty('abstract') && this.prototype.abstract)) {
             child.baseModel = child;
         } else {
             child.baseModel.descendants.push(child);
