@@ -8,6 +8,17 @@
         strictEqual(Ship, ship.baseModel);
     });
     
+    test("#baseModel get's set to self when extending an abstract Viking.Model", function() {
+        var RussianShip = Viking.Model.extend({
+            abstract: true
+        });
+        var Ship = RussianShip.extend();
+
+        var ship = new Ship();
+
+        strictEqual(Ship, ship.baseModel);
+    });
+
     test("#baseModel get's set to parent Model when extending a Viking.Model", function() {
         var Ship = Viking.Model.extend();
         var Carrier = Ship.extend();

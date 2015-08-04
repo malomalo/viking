@@ -3,6 +3,7 @@
 Major Changes:
 
  - added `Viking.View.bindEl`
+ - abstract models for `Viking.Model` can now be created
   
 Minor Changes:
 

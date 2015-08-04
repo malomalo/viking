@@ -6,6 +6,15 @@
     
         strictEqual(Ship, Ship.baseModel);
     });
+
+    test("::baseModel get's set to self when extending an abstract Viking.Model", function() {
+        var RussianShip = Viking.Model.extend({
+            abstract: true
+        });
+        var Ship = RussianShip.extend();
+
+        strictEqual(Ship, Ship.baseModel);
+    });
     
     test("::baseModel get's set to parent Model when extending a Viking.Model", function() {
         var Ship = Viking.Model.extend();
