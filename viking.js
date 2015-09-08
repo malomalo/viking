@@ -1,4 +1,4 @@
-//     Viking.js 0.8.0 (sha:90acfeb)
+//     Viking.js 0.8.0 (sha:91e1c81)
 //
 //     (c) 2012-2015 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -531,6 +531,15 @@ Viking.config = function (obj, key, val) {
             } else {
                 options.headers = model.connection.headers;
             }
+        }
+
+        // We only speak json
+        if (options.headers) {
+            _.defaults(options.headers, {
+                'Accept': 'application/json'
+            });
+        } else {
+            options.headers = {'Accept': 'application/json'};
         }
 
         return jQuery.ajax(options);
