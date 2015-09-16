@@ -1,4 +1,4 @@
-//     Viking.js 0.8.0 (sha:91e1c81)
+//     Viking.js 0.8.0 (sha:0497a8c)
 //
 //     (c) 2012-2015 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -1138,35 +1138,34 @@ Viking.Model.prototype.toJSON = function (options) {
 Viking.Model.prototype.toParam = function() {
     return this.isNew() ? null : this.get('id');
 };
-// PUTs to `/models/:id/touch` with the intention that the server sets the
-// updated_at/on attributes to the current time.
+// Saves the record with the updated_at and any attributes passed in to the
+// current time.
 //
 // The JSON response is expected to return an JSON object with the attribute
 // name and the new time. Any other attributes returned in the JSON will be
 // updated on the Model as well
 //
-// If name is passed as an option it is passed as `name` paramater in the
-// request
-//
 // TODO:
 // Note that `#touch` must be used on a persisted object, or else an
 // Viking.Model.RecordError will be thrown.
-Viking.Model.prototype.touch = function(name, options) {
-
-    // TODO move to extend and extend a new object so not writing to old options
-    _.defaults(options || (options = {}), {
-        type: 'PUT',
-        url: _.result(this, 'url') + '/touch'
-    });
+Viking.Model.prototype.touch = function(columns, options) {
+    var now = new Date();
     
-    if (name) {
-        options.contentType = 'application/json';
-        options.data = JSON.stringify({name: name});
-    } else {
-        options.data = '';
+    var attrs = {
+        updated_at: now
+    }
+
+    options = _.extend({patch: true}, options);
+    
+    if (_.isArray(columns)) {
+        _.each(columns, function (column) {
+            attrs[column] = now;
+        });
+    } else if (columns) {
+        attrs[columns] = now;
     }
     
-    return this.save(null, options);
+    return this.save(attrs, options);
 };
 // Opposite of #select. Triggers the `unselected` event.
 Viking.Model.prototype.unselect = function(options) {
