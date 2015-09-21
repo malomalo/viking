@@ -1,4 +1,4 @@
-//     Viking.js 0.8.0 (sha:0497a8c)
+//     Viking.js 0.8.0 (sha:3270a4d)
 //
 //     (c) 2012-2015 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -211,11 +211,11 @@ Object.defineProperty(Object.prototype, 'toParam', {
         return _.map(this, function(value, key) {
             var namespaceWithKey = (namespace ? (namespace + "[" + key + "]") : key);
 
-            if (value !== null && value !== undefined) {
+            if (value === null || value === undefined) {
+                return escape(namespaceWithKey);
+            } else {
                 return value.toQuery(namespaceWithKey);
             }
-
-            return escape(namespaceWithKey) + "=";
 
         }).join('&');
     },

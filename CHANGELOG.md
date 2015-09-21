@@ -10,6 +10,7 @@ Major Changes:
   
 Minor Changes:
 
+ - `Viking.Support#toParam` now support passing `null`
  - `Viking.Model.create` now passes options correctly to save
 
 Bugfixes:
