@@ -1,4 +1,4 @@
-//     Viking.js 0.8.0 (sha:3270a4d)
+//     Viking.js 0.8.0 (sha:bcc6b1e)
 //
 //     (c) 2012-2015 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -546,55 +546,8 @@ Viking.config = function (obj, key, val) {
     }
 
 }());
-// Used internally by Viking to translate relation arguments to key and
-// Model
-//
-// - macro: either 'hasMany', 'belongsTo', or 'hasOne'
-// - :name =>  the name of the assoication
-// - options (optional):
-//     - model: model to use
-//     - collection: collection to use
-Viking.AssociationReflection = function (macro, name, options) {
-    options = _.extend({}, options);
-    
-    this.name = name;
-    this.macro = macro;
-    this.options = options;
 
-    if(macro === 'hasMany') {
-        if (options.collection) {
-            this.collectionName = options.collection;
-        } else if (options.model) {
-            this.collectionName = (options.model + 'Collection');
-        } else {
-            this.collectionName = (this.name.singularize().camelize() + 'Collection');
-        }
-    } else if (macro === 'belongsTo' || macro === 'hasOne') {
-        if (!options.polymorphic) {
-            this.modelName = options.model || name.camelize();
-        }
-    } else {
-        throw new TypeError("Unkown Macro " + macro);
-    }
-};
 
-Viking.AssociationReflection.prototype = {
-    klass: function() {
-        if (this.macro === 'hasMany') {
-            return this.collection();
-        }
-        
-        return this.model();
-    },
-    
-    model: function() {
-        return this.modelName.constantize();
-    },
-    
-    collection: function() {
-        return this.collectionName.constantize();
-    }
-};
 
 
 
@@ -698,7 +651,7 @@ Viking.Model = Backbone.Model.extend({
             child.baseModel.descendants.push(child);
         }
         
-        _.each(['hasMany', 'belongsTo'], function(macro) {
+        _.each(['belongsTo', 'hasOne', 'hasMany', 'hasAndBelongsToMany'], function(macro) {
             _.each((protoProps[macro] || []).concat(this[macro] || []), function(name) {
                 var options;
 
@@ -709,7 +662,15 @@ Viking.Model = Backbone.Model.extend({
                 }
 
                 if (!child.associations[name]) {
-                    child.associations[name] = new Viking.AssociationReflection(macro, name, options);
+                    var reflectionClass = {
+                        'belongsTo': Viking.Model.BelongsToReflection,
+                        'hasOne': Viking.Model.HasOneReflection,
+                        'hasMany': Viking.Model.HasManyReflection,
+                        'hasAndBelongsToMany': Viking.Model.HasAndBelongsToManyReflection
+                    }
+                    reflectionClass = reflectionClass[macro];
+
+                    child.associations[name] = new reflectionClass(name, options);
                 }
             });
         }, this.prototype);
@@ -726,6 +687,85 @@ Viking.Model = Backbone.Model.extend({
         return child;
     }
 
+});
+Viking.Model.Reflection = function () { };
+_.extend(Viking.Model.Reflection.prototype, {
+    klass: function() {
+        if (this.macro === 'hasMany') {
+            return this.collection();
+        }
+        
+        return this.model();
+    },
+    
+    model: function() {
+        return this.modelName.constantize();
+    },
+    
+    collection: function() {
+        return this.collectionName.constantize();
+    }
+});
+Viking.Model.Reflection.extend = Backbone.Model.extend;
+Viking.Model.BelongsToReflection = Viking.Model.Reflection.extend({
+    
+    constructor: function (name, options) {
+        this.name = name;
+        this.macro = 'belongsTo';
+        this.options = _.extend({}, options);
+    
+        if (!this.options.polymorphic) {
+            this.modelName = this.options.model || name.camelize();
+        }
+    }
+    
+});
+Viking.Model.HasAndBelongsToManyReflection = Viking.Model.Reflection.extend({
+
+    constructor: function (name, options) {
+        this.name = name;
+        this.macro = 'hasAndBelongsToMany';
+        this.options = _.extend({}, options);
+    
+        if (this.options.collection) {
+            this.collectionName = this.options.collection;
+        } else if (this.options.model) {
+            this.collectionName = (this.options.model + 'Collection');
+        } else {
+            this.collectionName = (this.name.singularize().camelize() + 'Collection');
+        }
+    }
+    
+});
+Viking.Model.HasManyReflection = Viking.Model.Reflection.extend({
+    
+    constructor: function (name, options) {
+        this.name = name;
+        this.macro = 'hasMany';
+        this.options = _.extend({}, options);
+    
+        if (this.options.collection) {
+            this.collectionName = options.collection;
+        } else if (this.options.model) {
+            this.collectionName = (this.options.model + 'Collection');
+        } else {
+            this.collectionName = (this.name.singularize().camelize() + 'Collection');
+        }
+    }
+    
+});
+Viking.Model.HasOneReflection = Viking.Model.Reflection.extend({
+    
+    constructor: function (name, options) {
+        this.name = name;
+        this.macro = 'hasOne';
+        this.options = _.extend({}, options);
+    
+        if (!this.options.polymorphic) {
+            this.modelName = this.options.model || name.camelize();
+        }
+    }
+    
 });
 // Create a model with +attributes+. Options are the 
 // same as Viking.Model#save
@@ -4067,7 +4107,6 @@ Viking.Router = Backbone.Router.extend({
     }
 
 });
-
 
 
 

@@ -2,6 +2,9 @@
 
 Major Changes:
 
+ - moved `Viking.AssociationReflection` to `Viking.Model.Reflection` and
+   friends
+ - Added `Viking.Model.HasAndBelongsToManyReflection`
  - added `Viking.View.bindEl`
  - abstract models for `Viking.Model` can now be created
  - `connection` can be set to route ajax calls to a specific server
