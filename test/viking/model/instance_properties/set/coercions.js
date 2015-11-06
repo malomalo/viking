@@ -2,7 +2,9 @@
     module("Viking.Model#set - coercions");
 
     test("#set(key, val) does coercions", function() {
-        Model = Viking.Model.extend({ coercions: {date: 'Date'} });
+        Model = Viking.Model.extend({ schema: {
+            date: {type: 'date'}
+        }});
     
         var a = new Model();
         a.set('date', "2013-04-10T21:24:28+00:00");
@@ -12,7 +14,9 @@
     });
 
     test("#set({key, val}) does coercions", function() {
-        Model = Viking.Model.extend({ coercions: {date: 'Date'} });
+        Model = Viking.Model.extend({ schema: {
+            date: {type: 'date'}
+        }});
     
         var a = new Model();
         a.set({date: "2013-04-10T21:24:28+00:00"});

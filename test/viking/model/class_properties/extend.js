@@ -99,17 +99,22 @@
         delete Agent;
     });
     
-    test("::extend a Viking.Model unions the coercions", function () {
-        Account = Viking.Model.extend('account', { coercions: {
-            created_at: 'Date'
+    test("::extend a Viking.Model unions the schema", function () {
+        Account = Viking.Model.extend('account', { schema: {
+            created_at: {type: 'date'}
         }});
         
-        Agent   = Account.extend('agent', { coercions: {
-            name: 'String'
+        Agent   = Account.extend('agent', { schema: {
+            name: {type: 'string'}
         }});
         
-        deepEqual(Account.prototype.coercions, {created_at: 'Date'});
-        deepEqual(Agent.prototype.coercions, {created_at: 'Date', name: 'String'});
+        deepEqual(Account.prototype.schema, {
+            created_at: {type: 'date'}
+        });
+        deepEqual(Agent.prototype.schema, {
+            created_at: {type: 'date'},
+            name: {type: 'string'}
+        });
         
         delete Account;
         delete Agent;

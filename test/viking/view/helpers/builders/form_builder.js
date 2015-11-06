@@ -684,7 +684,9 @@
 
     test("#fieldsFor() works nested in another #fieldsFor()", function () {
         Fleet = Viking.Model.extend('fleet', { hasMany: ['ships']});
-        Ship = Viking.Model.extend('ship', { coercions: { "amenities": "JSON" } });
+        Ship = Viking.Model.extend('ship', { schema: { 
+            "amenities": {type: 'json'}
+        }});
         ShipCollection = Viking.Collection.extend({ model: Ship });
 
         var a = new Fleet({'ships': [{'id': 10, 'name': 'Billabong', 'amenities': {key: 1}}, {'name': 'Wipple', 'amenities': {key: 2}}] });

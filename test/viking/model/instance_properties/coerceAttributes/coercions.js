@@ -3,7 +3,9 @@
 
     // coerceAttributes modifies the object passed in ----------------------------
     test("#coerceAttributes modifies the object passed in", function() {
-        Model = Viking.Model.extend({ coercions: {date: 'Date'} });
+        Model = Viking.Model.extend({ schema: {
+            date: { type: 'date'}
+        }});
         var a = new Model();
         var attrs = {date: "2013-04-10T21:24:28+00:00"};
         a.coerceAttributes(attrs);
@@ -18,7 +20,9 @@
     test("#coerceAttributes thows error when can't coerce value", function() {
         expect(2);
 
-        Model = Viking.Model.extend({ coercions: {date: 'Unkown'} });
+        Model = Viking.Model.extend({ schema: {
+            date: {type: 'Unkown'}
+        }});
         var a = new Model();
 
         throws(function() { a.coerceAttributes({date: true}) }, TypeError);
@@ -34,7 +38,9 @@
 
     // coercing dates ---------------------------------------------------------
     test("#coerceAttributes coerces iso8601 string to date", function() {
-        Model = Viking.Model.extend({ coercions: {date: 'Date'} });
+        Model = Viking.Model.extend({ schema: {
+            date: {type: 'date'}
+        }});
         var a = new Model();
     
         deepEqual(
@@ -47,7 +53,9 @@
     });
 
     test("#coerceAttributes coerces int(milliseconds since epoch) to date", function() {
-        Model = Viking.Model.extend({ coercions: {date: 'Date'} });
+        Model = Viking.Model.extend({ schema: {
+            date: {type: 'date'}
+        }});
         var a = new Model();
     
         deepEqual(
@@ -61,7 +69,9 @@
     
     // coercing strings -------------------------------------------------------
     test("#coerceAttributes coerces boolean to string", function() {
-        Model = Viking.Model.extend({ coercions: {key: 'String'} });
+        Model = Viking.Model.extend({ schema: {
+            key: {type: 'string'}
+        }});
         var a = new Model();
     
         equal(a.coerceAttributes({key: true}).key, 'true');
@@ -71,7 +81,9 @@
     });
     
     test("#coerceAttributes coerces number to string", function() {
-        Model = Viking.Model.extend({ coercions: {key: 'String'} });
+        Model = Viking.Model.extend({ schema: {
+            key: {type: 'string'}
+        }});
         var a = new Model();
     
         equal(a.coerceAttributes({key: 10}).key, '10');
@@ -81,7 +93,9 @@
     });
     
     test("#coerceAttributes coerces null to string", function() {
-        Model = Viking.Model.extend({ coercions: {key: 'String'} });
+        Model = Viking.Model.extend({ schema: {
+            key: {type: 'string'}
+        }});
         var a = new Model();
     
         equal(a.coerceAttributes({key: null}).key, null);
@@ -90,7 +104,9 @@
     
     // coercing numbers -------------------------------------------------------
     test("#coerceAttributes coerces string to number", function() {
-        Model = Viking.Model.extend({ coercions: {key: 'Number'} });
+        Model = Viking.Model.extend({ schema: {
+            key: {type: 'number'}
+        }});
         var a = new Model();
     
         equal(a.coerceAttributes({key: '10.5'}).key, 10.50);
@@ -101,7 +117,9 @@
 
     // coercing JSON ----------------------------------------------------------
     test("#coerceAttributes coerces {} to Viking.Model", function() {
-        Model = Viking.Model.extend({ coercions: {key: 'JSON'} });
+        Model = Viking.Model.extend({ schema: {
+            key: {type: 'json'}
+        }});
         var a = new Model();
 
         ok(a.coerceAttributes({key: {}}).key instanceof Viking.Model);
@@ -112,7 +130,9 @@
     });
 
     test("#coerceAttributes coerces {} to Viking.Model and sets the modelName", function() {
-        Model = Viking.Model.extend({ coercions: {key: 'JSON'} });
+        Model = Viking.Model.extend({ schema: {
+            key: {type: 'json'}
+        }});
         var a = new Model();
 
         deepEqual(a.coerceAttributes({key: {}}).key.modelName, 'key');
@@ -124,7 +144,9 @@
     test("#coerceAttributes thows error when can't coerce value", function() {
         expect(2);
     
-        Model = Viking.Model.extend({ coercions: {date: 'Date'} });
+        Model = Viking.Model.extend({ schema: {
+            date: {type: 'date'}
+        }});
         var a = new Model();
     
         throws(function() { a.coerceAttributes({date: true}) }, TypeError);
@@ -140,7 +162,9 @@
     
     // Array support
     test("#coerceAttributes support array coercion", function() {
-        Model = Viking.Model.extend({ coercions: {key: ['Number', {array: true}]} });
+        Model = Viking.Model.extend({ schema: {
+            key: {type: 'number', array: true}
+        }});
         var a = new Model();
         
         deepEqual(a.coerceAttributes({key: [10, '10.5']}).key, [10, 10.5]);

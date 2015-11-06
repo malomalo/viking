@@ -52,7 +52,10 @@
     });
     
     test("updates the attributes from the response", function() {
-        var Model = Viking.Model.extend('model', { coercions: {updated_at: 'Date', read_at: 'Date'} });
+        var Model = Viking.Model.extend('model', { schema: {
+            updated_at: {type: 'date'},
+            read_at: {type: 'date'}
+        } });
     
         var m = new Model({id: 2, updated_at: null, read_at: null});
         

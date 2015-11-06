@@ -2,6 +2,7 @@
 
 Major Changes:
 
+ - `Model::coercions` and `Model::defaults` is now `Model::schema`
  - moved `Viking.AssociationReflection` to `Viking.Model.Reflection` and
    friends
  - Added `Viking.Model.HasAndBelongsToManyReflection`

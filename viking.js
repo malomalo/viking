@@ -1,4 +1,4 @@
-//     Viking.js 0.8.0 (sha:bcc6b1e)
+//     Viking.js 0.8.0 (sha:1075a4a)
 //
 //     (c) 2012-2015 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -422,26 +422,6 @@ String.prototype.downcase = String.prototype.toLowerCase;
 
 
 
-// Viking.config
-// -------------
-//
-// Helper method to configure defatults on an Viking Object.
-//
-// Example:
-//
-//     Viking.configure(Viking.Cursor, {per_page: 40});
-//     Viking.configure(Viking.Cursor, 'per_page', 5); // per_page is 5 by defatult
-Viking.config = function (obj, key, val) {
-    var attrs;
-    
-    if (typeof key === 'object') {
-        attrs = key;
-    } else {
-        (attrs = {})[key] = val;
-    }
-    
-    return _.extend(obj.prototype.defaults, attrs);
-};
 // Viking.sync
 // -------------
 // Override Backbone.sync to process data for the ajax request with 
@@ -553,6 +533,9 @@ Viking.config = function (obj, key, val) {
 
 
 
+
+
+
 // Viking.Model
 // ------------
 //
@@ -566,6 +549,18 @@ Viking.Model = Backbone.Model.extend({
     // inheritanceAttribute is the attirbutes used for STI
     inheritanceAttribute: 'type',
     
+    defaults: function () {
+        dflts = {};
+        
+        _.each(this.schema, function(options, key) {
+            if(options['default']) {
+                dflts[key] = options['default'];
+            }
+        });
+
+        return dflts;
+    },
+    
     // Below is the same code from the Backbone.Model function
     // except where there are comments
     constructor: function (attributes, options) {
@@ -573,6 +568,7 @@ Viking.Model = Backbone.Model.extend({
         options || (options = {});
         this.cid = _.uniqueId('c');
         this.attributes = {};
+        
         attrs = _.defaults({}, attrs, _.result(this, 'defaults'));
         
         if (this.inheritanceAttribute) {
@@ -675,10 +671,10 @@ Viking.Model = Backbone.Model.extend({
             });
         }, this.prototype);
         
-        if (this.prototype.coercions && protoProps.coercions) {
-            _.each(this.prototype.coercions, function(value, key) {
-                if(!child.prototype.coercions[key]) {
-                    child.prototype.coercions[key] = value;
+        if (this.prototype.schema && protoProps.schema) {
+            _.each(this.prototype.schema, function(value, key) {
+                if(!child.prototype.schema[key]) {
+                    child.prototype.schema[key] = value;
                 }
             });
         }
@@ -854,21 +850,14 @@ Viking.Model.prototype.coerceAttributes = function(attrs) {
         }
     });
 
-    _.each(this.coercions, function (type, key) {
+    _.each(this.schema, function (options, key) {
         if (attrs[key] || attrs[key] === false) {
-            var tmp, klass, options;
+            var tmp, klass;
             
-            if (_.isArray(type)) {
-                options = type[1];
-                type = type[0];
-            } else {
-                options = {};
-            }
-            
-            klass = Viking.Coercions[type];
+            klass = Viking.Model.Type.registry[options['type']];
             
             if (klass) {
-                if (options.array) {
+                if (options['array']) {
                     tmp = [];
                     _.each(attrs[key], function(value) {
                         tmp.push(klass.load(value, key));
@@ -878,7 +867,7 @@ Viking.Model.prototype.coerceAttributes = function(attrs) {
                     attrs[key] = klass.load(attrs[key], key);
                 }
             } else {
-                throw new TypeError("Coercion of " + type + " unsupported");
+                throw new TypeError("Coercion of " + options['type'] + " unsupported");
             }
         }
     });
@@ -1140,20 +1129,11 @@ Viking.Model.prototype.toJSON = function (options) {
         }
     });
 
-    _.each(this.coercions, function (type, key) {
+    _.each(this.schema, function (options, key) {
         if (data[key] || data[key] === false) {
-            var tmp, klass, options;
+            var tmp, klass;
             
-            // TODO: this and coercison.js do the same transformation, run at
-            // inital load like relations?
-            if (_.isArray(type)) {
-                options = type[1];
-                type = type[0];
-            } else {
-                options = {};
-            }
-            
-            klass = Viking.Coercions[type];
+            klass = Viking.Model.Type.registry[options.type];
 
             if (klass) {
                 if (options.array) {
@@ -1166,7 +1146,7 @@ Viking.Model.prototype.toJSON = function (options) {
                     data[key] = klass.dump(data[key], key);
                 }
             } else {
-                throw new TypeError("Coercion of " + type + " unsupported");
+                throw new TypeError("Coercion of " + column.options.type + " unsupported");
             }
         }
     });
@@ -1239,6 +1219,99 @@ Viking.Model.prototype.url = function() {
 // Alias for `::urlRoot`
 Viking.Model.prototype.urlRoot = function() {
     return this.constructor.urlRoot();
+};
+Viking.Model.Type = {
+    'registry': {}
+}
+
+Viking.Model.Type.registry['boolean'] = Viking.Model.Type.Boolean = {
+    load: function(value) {
+        if (typeof value === 'string') {
+            value = (value === 'true');
+        }
+
+        return !!value;
+    },
+
+    dump: function(value) {
+        return value;
+    }
+};
+Viking.Model.Type.registry['date'] = Viking.Model.Type.Date = {
+    load: function(value) {
+        if (typeof value === 'string' || typeof value === 'number') {
+            return Date.fromISO(value);
+        }
+
+        if (!(value instanceof Date)) {
+            throw new TypeError(typeof value + " can't be coerced into Date");
+        }
+
+        return value;
+    },
+
+    dump: function(value) {
+        return value.toISOString();
+    }
+};
+Viking.Model.Type.registry['json'] = Viking.Model.Type.JSON = {
+
+    load: function(value, key) {
+        if (typeof value === 'object') {
+			var AnonModel = Viking.Model.extend({
+				inheritanceAttribute: false
+			});
+            var model = new AnonModel(value);
+            model.modelName = key;
+            model.baseModel = model;
+            return model;
+        }
+
+        throw new TypeError(typeof value + " can't be coerced into JSON");
+    },
+
+    dump: function(value) {
+        if (value instanceof Viking.Model) {
+            return value.toJSON();
+        }
+
+        return value;
+    }
+
+};
+Viking.Model.Type.registry['number'] = Viking.Model.Type.Number = {
+    load: function(value) {
+        if (typeof value === 'string') {
+            value = value.replace(/\,/g, '');
+			
+			if (value.trim() === '') {
+				return null;
+			}
+        }
+
+        return Number(value);
+    },
+
+    dump: function(value) {
+		return value;
+    }
+};
+Viking.Model.Type.registry['string'] = Viking.Model.Type.String = {
+    load: function(value) {
+        if (typeof value !== 'string' && value !== undefined && value !== null) {
+            return String(value);
+        }
+
+        return value;
+    },
+
+    dump: function(value) {
+        if (typeof value !== 'string' && value !== undefined && value !== null) {
+            return String(value);
+        }
+
+        return value;
+    }
 };
 // Viking.Collection
 // -----------------
@@ -1444,96 +1517,6 @@ Viking.Collection = Backbone.Collection.extend({
     }
     
 });
-Viking.Coercions = {};
-Viking.Coercions.Boolean = {
-    load: function(value) {
-        if (typeof value === 'string') {
-            value = (value === 'true');
-        }
-
-        return !!value;
-    },
-
-    dump: function(value) {
-        return value;
-    }
-};
-Viking.Coercions.Date = {
-    load: function(value) {
-        if (typeof value === 'string' || typeof value === 'number') {
-            return Date.fromISO(value);
-        }
-
-        if (!(value instanceof Date)) {
-            throw new TypeError(typeof value + " can't be coerced into Date");
-        }
-
-        return value;
-    },
-
-    dump: function(value) {
-        return value.toISOString();
-    }
-};
-Viking.Coercions.JSON = {
-
-    load: function(value, key) {
-        if (typeof value === 'object') {
-			var AnonModel = Viking.Model.extend({
-				inheritanceAttribute: false
-			});
-            var model = new AnonModel(value);
-            model.modelName = key;
-            model.baseModel = model;
-            return model;
-        }
-
-        throw new TypeError(typeof value + " can't be coerced into JSON");
-    },
-
-    dump: function(value) {
-        if (value instanceof Viking.Model) {
-            return value.toJSON();
-        }
-
-        return value;
-    }
-
-};
-Viking.Coercions.Number = {
-    load: function(value) {
-        if (typeof value === 'string') {
-            value = value.replace(/\,/g, '');
-			
-			if (value.trim() === '') {
-				return null;
-			}
-        }
-
-        return Number(value);
-    },
-
-    dump: function(value) {
-		return value;
-    }
-};
-Viking.Coercions.String = {
-    load: function(value) {
-        if (typeof value !== 'string' && value !== undefined && value !== null) {
-            return String(value);
-        }
-
-        return value;
-    },
-
-    dump: function(value) {
-        if (typeof value !== 'string' && value !== undefined && value !== null) {
-            return String(value);
-        }
-
-        return value;
-    }
-};
 
 
 
@@ -4107,13 +4090,6 @@ Viking.Router = Backbone.Router.extend({
     }
 
 });
-
-
-
-
-
-
-
 
 
 

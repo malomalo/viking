@@ -4,7 +4,9 @@
             Ship = Viking.Model.extend({
                 hasMany: ['ships'],
                 belongsTo: ['ship'],
-                coercions: {date: 'Date'}
+                schema: {
+                    date: {type: 'date'}
+                }
             });
             ShipCollection = Viking.Collection.extend({
                 model: Ship
