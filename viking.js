@@ -1,6 +1,6 @@
-//     Viking.js 0.8.0 (sha:1075a4a)
+//     Viking.js 0.8.0 (sha:2f87adc)
 //
-//     (c) 2012-2015 Jonathan Bracy, 42Floors Inc.
+//     (c) 2012-2016 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
 //     http://vikingjs.com
 
@@ -2425,7 +2425,7 @@ Viking.View.Helpers.radioButtonTag = function (name, value, checked, options) {
 // -------
 //    - multiple:      If set to true the selection will allow multiple choices.
 //    - disabled:      If set to true, the user will not be able to use this input.
-//    - includeBlank: If set to true, an empty option will be created.
+//    - includeBlank:  If set to true, an empty option will be created, can pass a string to use as empty option content
 //    - prompt:        Create a prompt option with blank value and the text asking user to select something
 //    - Any other key creates standard HTML attributes for the tag.
 //
@@ -2473,7 +2473,8 @@ Viking.View.Helpers.selectTag = function (name, optionTags, options) {
     });
 
     if (options.includeBlank) {
-        optionTags = Viking.View.Helpers.contentTag('option', '', {value: ''}) + optionTags;
+        var content = typeof options.includeBlank == "string" ? options.includeBlank : "";
+        optionTags = Viking.View.Helpers.contentTag('option', content, {value: ''}) + optionTags;
         delete options.includeBlank;
     }
 
