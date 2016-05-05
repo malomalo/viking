@@ -1,4 +1,4 @@
-//     Viking.js 0.8.0 (sha:2f87adc)
+//     Viking.js 0.8.1 (sha:af2905f)
 //
 //     (c) 2012-2016 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -261,19 +261,19 @@ String.prototype.humanize = function() {
 
 // Makes an underscored, lowercase form from the expression in the string.
 //
-// Changes '::' to '/' to convert namespaces to paths.
+// Changes '.' to '/' to convert namespaces to paths.
 //
 // Examples:
 // 
 //     "ActiveModel".underscore         # => "active_model"
-//     "ActiveModel::Errors".underscore # => "active_model/errors"
+//     "ActiveModel.Errors".underscore # => "active_model/errors"
 //
 // As a rule of thumb you can think of underscore as the inverse of camelize,
 // though there are cases where that does not hold:
 //
 //     "SSLError".underscore().camelize() # => "SslError"
 String.prototype.underscore = function() {
-    var result = this.replace('::', '/');
+    var result = this.replace('.', '/');
     result = result.replace(/([A-Z\d]+)([A-Z][a-z])/g, "$1_$2");
     result = result.replace(/([a-z\d])([A-Z])/g, "$1_$2");
     return result.replace('-', '_').toLowerCase();
@@ -282,7 +282,7 @@ String.prototype.underscore = function() {
 // By default, #camelize converts strings to UpperCamelCase. If the argument
 // to camelize is set to `false` then #camelize produces lowerCamelCase.
 //
-// \#camelize will also convert "/" to "::" which is useful for converting
+// \#camelize will also convert "/" to "." which is useful for converting
 // paths to namespaces.
 //
 // Examples:
@@ -290,8 +290,8 @@ String.prototype.underscore = function() {
 //     "active_model".camelize               // => "ActiveModel"
 //     "active_model".camelize(true)         // => "ActiveModel"
 //     "active_model".camelize(false)        // => "activeModel"
-//     "active_model/errors".camelize        // => "ActiveModel::Errors"
-//     "active_model/errors".camelize(false) // => "activeModel::Errors"
+//     "active_model/errors".camelize        // => "ActiveModel.Errors"
+//     "active_model/errors".camelize(false) // => "activeModel.Errors"
 //
 // As a rule of thumb you can think of camelize as the inverse of underscore,
 // though there are cases where that does not hold:
@@ -300,7 +300,7 @@ String.prototype.underscore = function() {
 String.prototype.camelize = function(uppercase_first_letter) {
     var result = uppercase_first_letter === undefined || uppercase_first_letter ? this.capitalize() : this.anticapitalize();
     result = result.replace(/(_|(\/))([a-z\d]*)/g, function(_a, _b, first, rest) { return (first || '') + rest.capitalize(); });
-    return result.replace('/', '::');
+    return result.replace('/', '.');
 };
 
 // Convert a string to a boolean value. If the argument to #booleanize is
