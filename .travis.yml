@@ -9,4 +9,4 @@ before_install:
   - sudo mv jscover/jscover/target/dist/JSCover-all.jar /usr/local/lib/jscover-all.jar
   - rm -rf jscover
 
-script: rake test:headless
+script: bundle exec rake test:headless
