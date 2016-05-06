@@ -6,6 +6,10 @@
         var model = new Model();
     
         equal(model.paramRoot(), 'model');
+
+        Model = Viking.Model.extend('namespaced/model');
+        model = new Model();
+        equal(model.paramRoot(), 'model');
     });
     
     test("instance.paramRoot returns underscored baseModel.modelName when used as STI", function() {

@@ -1,4 +1,4 @@
-//     Viking.js 0.8.1 (sha:af2905f)
+//     Viking.js 0.8.1 (sha:2ca51ce)
 //
 //     (c) 2012-2016 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -298,8 +298,18 @@ String.prototype.underscore = function() {
 //
 //     "SSLError".underscore().camelize()   // => "SslError"
 String.prototype.camelize = function(uppercase_first_letter) {
-    var result = uppercase_first_letter === undefined || uppercase_first_letter ? this.capitalize() : this.anticapitalize();
-    result = result.replace(/(_|(\/))([a-z\d]*)/g, function(_a, _b, first, rest) { return (first || '') + rest.capitalize(); });
+    var result;
+
+    if (uppercase_first_letter === undefined || uppercase_first_letter) {
+        result = this.capitalize();
+    } else {
+        result = this.anticapitalize();
+    }
+
+    result = result.replace(/(_|(\/))([a-z\d]*)/g, function(_a, _b, first, rest) {
+        return (first || '') + rest.capitalize();
+    });
+
     return result.replace('/', '.');
 };
 
@@ -366,6 +376,26 @@ String.prototype.constantize = function(context) {
 		return v;
 	}, context);	
 };
+
+// Removes the module part from the expression in the string.
+//
+// Examples:
+//     'Namespaced.Module'.demodulize() # => 'Module'
+//     'Module'.demodulize() # => 'Module'
+//     ''.demodulize() # => ''
+String.prototype.demodulize = function (seperator) {
+    if (!seperator) {
+        seperator = '.';
+    }
+
+    var index = this.lastIndexOf(seperator);
+
+    if (index === -1) {
+        return String(this);
+    } else {
+        return this.slice(index + 1);
+    }
+}
 
 // If `length` is greater than the length of the string, returns a new String
 // of length `length` with the string right justified and padded with padString;
@@ -540,7 +570,7 @@ String.prototype.downcase = String.prototype.toLowerCase;
 // ------------
 //
 // Viking.Model is an extension of [Backbone.Model](http://backbonejs.org/#Model).
-// It adds naming, relationships, data type coerions, selection, and modifies
+// It adds naming, relationships, data type coercions, selection, and modifies
 // sync to work with [Ruby on Rails](http://rubyonrails.org/) out of the box.
 Viking.Model = Backbone.Model.extend({
 
@@ -548,7 +578,7 @@ Viking.Model = Backbone.Model.extend({
 
     // inheritanceAttribute is the attirbutes used for STI
     inheritanceAttribute: 'type',
-    
+
     defaults: function () {
         dflts = {};
         
@@ -886,7 +916,7 @@ Viking.Model.prototype.errorsOn = function(attribute) {
 // Returns string to use for params names. This is the key attributes from
 // the model will be namespaced under when saving to the server
 Viking.Model.prototype.paramRoot = function() {
-    return this.baseModel.modelName.underscore();
+    return this.baseModel.modelName.demodulize().underscore();
 };
 // Overwrite Backbone.Model#save so that we can catch errors when a save
 // fails.
