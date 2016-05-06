@@ -5,7 +5,13 @@
         var Model = Viking.Model.extend('model');
         var model = new Model();
     
-        equal(model.modelName, 'model');
+        deepEqual(model.modelName, {
+            className: 'Model',
+            paramKey:  'model',
+            plural:    'models',
+            routeKey:  'models',
+            singular:  'model'
+        });
     });
     
     test("::where() returns ModelCollection without a predicate", function() {

@@ -24,7 +24,13 @@
         account.set({type: 'agent'});
         
         strictEqual(Agent.modelName, account.modelName);
-        strictEqual('agent', account.modelName);
+        deepEqual(account.modelName, {
+            className: 'Agent',
+            paramKey:  'agent',
+            plural:    'agents',
+            routeKey:  'agents',
+            singular:  'agent'
+        });
         
         delete Account;
         delete Agent;

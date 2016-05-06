@@ -4,7 +4,13 @@
     test("::new sets modelName on the instance", function() {
         var Ship = Viking.Model.extend('ship');
         
-        equal((new Ship).modelName, 'ship');
+        deepEqual((new Ship).modelName, {
+            className: 'Ship',
+            paramKey:  'ship',
+            plural:    'ships',
+            routeKey:  'ships',
+            singular:  'ship'
+        });
     });
     
     test("::new sets associations on the instance as a refernce to the associations on the Class", function() {
@@ -69,7 +75,7 @@
         Agent = Account.extend('agent');
         
         var agent = new Agent();
-        equal('agent', agent.get('type'));
+        equal('Agent', agent.get('type'));
         
         delete Account;
         delete Agent;
@@ -80,7 +86,7 @@
         Agent = Account.extend('agent');
         
         var account = new Account();
-        equal('account', account.get('type'));
+        equal('Account', account.get('type'));
         
         delete Account;
         delete Agent;

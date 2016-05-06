@@ -12,8 +12,20 @@
     test("::extend with modelName", function() {
         var Model = Viking.Model.extend('model');
     
-        equal(Model.modelName, 'model');
-        equal((new Model()).modelName, 'model');
+        deepEqual(Model.modelName, {
+            className: 'Model',
+            paramKey:  'model',
+            plural:    'models',
+            routeKey:  'models',
+            singular:  'model'
+        });
+        deepEqual((new Model()).modelName, {
+            className: 'Model',
+            paramKey:  'model',
+            plural:    'models',
+            routeKey:  'models',
+            singular:  'model'
+        });
     });
     
     test("::extend initalizes the assocations", function() {
@@ -50,7 +62,13 @@
         equal(Ship.associations['ship'].name, 'ship');
         equal(Ship.associations['ship'].macro, 'belongsTo');
         deepEqual(Ship.associations['ship'].options, {});
-        equal(Ship.associations['ship'].modelName, 'Ship');
+        deepEqual(Ship.associations['ship'].modelName, {
+            className: 'Ship',
+            paramKey:  'ship',
+            plural:    'ships',
+            routeKey:  'ships',
+            singular:  'ship'
+        });
         
         delete Ship;
     });

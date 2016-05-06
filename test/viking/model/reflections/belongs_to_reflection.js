@@ -10,7 +10,13 @@
         equal(assocation.name, 'parent');
         equal(assocation.macro, 'belongsTo');
         deepEqual(assocation.options, {});
-        equal(assocation.modelName, 'Parent');
+        deepEqual(assocation.modelName, {
+            className: 'Parent',
+            paramKey:  'parent',
+            plural:    'parents',
+            routeKey:  'parents',
+            singular:  'parent'
+        });
         
         delete Parent;
     });
