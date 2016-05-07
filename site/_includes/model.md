@@ -84,13 +84,13 @@ Also accepts arguments in the format of: `getRelationshipDetails(relation, [key,
 {% highlight bash %}
 Viking.Model.getRelationshipDetails('belongsTo', 'user') // => {key: 'user', type: User}
 
-Viking.Model.getRelationshipDetails('belongsTo', 'user', {model: 'Account'}) // => {key: 'user', type: Account}
+Viking.Model.getRelationshipDetails('belongsTo', 'user', { modelName: 'Account' }) // => {key: 'user', type: Account}
 
-Viking.Model.getRelationshipDetails('belongsTo', ['user', {model: 'Account'}]) // => {key: 'user', type: Account}
+Viking.Model.getRelationshipDetails('belongsTo', ['user', { modelName: 'Account' }]) // => {key: 'user', type: Account}
 
 Viking.Model.getRelationshipDetails('hasMany', 'carriers') // => {key: 'carriers', type: CarrierCollection}
 
-Viking.Model.getRelationshipDetails('hasMany', 'carriers', {model: 'Ship'}) // => {key: 'carriers', type: ShipCollection}
+Viking.Model.getRelationshipDetails('hasMany', 'carriers', { modelName: 'Ship' }) // => {key: 'carriers', type: ShipCollection}
 {% endhighlight %}
 
 <div id="Model-initialize"></div>

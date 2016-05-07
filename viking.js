@@ -1,4 +1,4 @@
-//     Viking.js 0.8.1 (sha:2ca51ce)
+//     Viking.js 0.8.1 (sha:c9b75d3)
 //
 //     (c) 2012-2016 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -565,7 +565,6 @@ String.prototype.downcase = String.prototype.toLowerCase;
 
 
 
-
 // Viking.Model
 // ------------
 //
@@ -602,7 +601,7 @@ Viking.Model = Backbone.Model.extend({
         attrs = _.defaults({}, attrs, _.result(this, 'defaults'));
         
         if (this.inheritanceAttribute) {
-            if (attrs[this.inheritanceAttribute] && this.constructor.modelName !== attrs[this.inheritanceAttribute]) {
+            if (attrs[this.inheritanceAttribute] && this.constructor.modelName.name !== attrs[this.inheritanceAttribute]) {
                 // OPTIMIZE:  Mutating the [[Prototype]] of an object, no matter how
                 // this is accomplished, is strongly discouraged, because it is very
                 // slow and unavoidably slows down subsequent execution in modern
@@ -618,11 +617,11 @@ Viking.Model = Backbone.Model.extend({
         this.modelName = this.constructor.modelName;
         this.baseModel = this.constructor.baseModel;
 
-        if (this.baseModel && this.inheritanceAttribute) {
+        if (this.baseModel && this.modelName && this.inheritanceAttribute) {
             if (this.baseModel === this.constructor && this.baseModel.descendants.length > 0) {
-                attrs[this.inheritanceAttribute] = this.modelName;
+                attrs[this.inheritanceAttribute] = this.modelName.name;
             } else if (_.contains(this.baseModel.descendants, this.constructor)) {
-                attrs[this.inheritanceAttribute] = this.modelName;
+                attrs[this.inheritanceAttribute] = this.modelName.name;
             }
         }
 
@@ -665,7 +664,9 @@ Viking.Model = Backbone.Model.extend({
 
         var child = Backbone.Model.extend.call(this, protoProps, staticProps);
 
-        if(typeof name === 'string') { child.modelName = name; }
+        if(typeof name === 'string') {
+            child.modelName = new Viking.Model.Name(name);
+        }
 
         child.associations = {};
         child.descendants = [];
@@ -714,6 +715,19 @@ Viking.Model = Backbone.Model.extend({
     }
 
 });
+Viking.Model.Name = function (name) {
+    var class_name = name.camelize(); // Namespaced.Name
+
+    this.name = class_name;
+    this.singular = class_name.underscore().replace(/\//g, '_'); // namespaced_name
+    this.plural = this.singular.pluralize(); // namespaced_names
+    this.human = class_name.demodulize().humanize(); // Name
+    this.collection = this.singular.pluralize(); // namespaced/names
+    this.paramKey = this.singular;
+    this.routeKey = this.plural;
+    this.element = class_name.demodulize().underscore();
+
+};
 Viking.Model.Reflection = function () { };
 _.extend(Viking.Model.Reflection.prototype, {
     klass: function() {
@@ -725,7 +739,7 @@ _.extend(Viking.Model.Reflection.prototype, {
     },
     
     model: function() {
-        return this.modelName.constantize();
+        return this.modelName.name.constantize();
     },
     
     collection: function() {
@@ -741,7 +755,11 @@ Viking.Model.BelongsToReflection = Viking.Model.Reflection.extend({
         this.options = _.extend({}, options);
     
         if (!this.options.polymorphic) {
-            this.modelName = this.options.model || name.camelize();
+            if (typeof(this.options.modelName) === 'string') {
+                this.modelName = new Viking.Model.Name(this.options.modelName);
+            } else {
+                this.modelName = new Viking.Model.Name(name);
+            }
         }
     }
     
@@ -788,7 +806,11 @@ Viking.Model.HasOneReflection = Viking.Model.Reflection.extend({
         this.options = _.extend({}, options);
     
         if (!this.options.polymorphic) {
-            this.modelName = this.options.model || name.camelize();
+            if (typeof(this.options.modelName) === 'string') {
+                this.modelName = new Viking.Model.Name(this.options.modelName);
+            } else {
+                this.modelName = new Viking.Model.Name(name);
+            }
         }
     }
     
@@ -850,12 +872,13 @@ Viking.Model.urlRoot = function() {
     } else if (this.baseModel.prototype.hasOwnProperty('urlRoot')) {
         return _.result(this.baseModel.prototype, 'urlRoot')
     } else {
-        return "/" + this.baseModel.modelName.pluralize();
+        return "/" + this.baseModel.modelName.plural;
     }
 };
 // Returns a unfetched collection with the predicate set to the query
 Viking.Model.where = function(options) {
-    var Collection = (this.modelName.camelize() + 'Collection').constantize();
+    // TODO: Move to modelName as well?
+    var Collection = (this.modelName.name + 'Collection').constantize();
     
     return new Collection(undefined, {predicate: options});
 };
@@ -870,7 +893,7 @@ Viking.Model.prototype.coerceAttributes = function(attrs) {
         if (polymorphic && (attrs[association.name] instanceof Viking.Model)) {
             // TODO: remove setting the id?
             attrs[association.name + '_id'] = attrs[association.name].id;
-            attrs[association.name + '_type'] = attrs[association.name].modelName;
+            attrs[association.name + '_type'] = attrs[association.name].modelName.name;
         } else if (polymorphic && attrs[association.name + '_type']) {
             Type = attrs[association.name + '_type'].camelize().constantize();
             attrs[association.name] = new Type(attrs[association.name]);
@@ -916,7 +939,7 @@ Viking.Model.prototype.errorsOn = function(attribute) {
 // Returns string to use for params names. This is the key attributes from
 // the model will be namespaced under when saving to the server
 Viking.Model.prototype.paramRoot = function() {
-    return this.baseModel.modelName.demodulize().underscore();
+    return this.baseModel.modelName.paramKey;
 };
 // Overwrite Backbone.Model#save so that we can catch errors when a save
 // fails.
@@ -1039,7 +1062,7 @@ Viking.Model.prototype.set = function (key, val, options) {
     
     options || (options = {});
 
-    if (this.inheritanceAttribute && attrs[this.inheritanceAttribute] && this.constructor.modelName !== attrs.type) {
+    if (this.inheritanceAttribute && attrs[this.inheritanceAttribute] && this.constructor.modelName.name !== attrs.type) {
         // OPTIMIZE:  Mutating the [[Prototype]] of an object, no matter how
         // this is accomplished, is strongly discouraged, because it is very
         // slow and unavoidably slows down subsequent execution in modern
@@ -1288,9 +1311,9 @@ Viking.Model.Type.registry['json'] = Viking.Model.Type.JSON = {
 
     load: function(value, key) {
         if (typeof value === 'object') {
-			var AnonModel = Viking.Model.extend({
-				inheritanceAttribute: false
-			});
+            var AnonModel = Viking.Model.extend({
+                inheritanceAttribute: false
+            });
             var model = new AnonModel(value);
             model.modelName = key;
             model.baseModel = model;
@@ -1367,10 +1390,10 @@ Viking.Collection = Backbone.Collection.extend({
     },
     
     url: function() {
-        return "/" + this.model.modelName.underscore().pluralize();
+        return "/" + this.model.modelName.plural;
     },
     paramRoot: function() {
-        return this.model.modelName.underscore().pluralize();
+        return this.model.modelName.plural;
     },
     
     // If a predicate is set it's paramaters will be passed under the
@@ -1715,7 +1738,7 @@ Viking.View.Helpers = {};
         if (options.namespace) {
             name = options.namespace + '[' + attribute + ']';
         } else {
-            name = model.baseModel.modelName + '[' + attribute + ']';
+            name = model.baseModel.modelName.paramKey + '[' + attribute + ']';
         }
         
          if (value instanceof Viking.Collection || _.isArray(value)) {
@@ -2645,7 +2668,7 @@ function FormBuilder(model, options) {
     this.model = model;
     this.options = options;
 
-    modelName = _.has(options, 'as') ? options.as : this.model.baseModel.modelName;
+    modelName = _.has(options, 'as') ? options.as : this.model.baseModel.modelName.paramKey;
     if (options.namespace) {
         if (options.as !== null) {
             this.options.namespace = options.namespace + '[' + modelName + ']';
@@ -2805,7 +2828,7 @@ FormBuilder.prototype = {
                     if (superOptions.namespace) {
                         localOptions.namespace = superOptions.namespace + '[' + attribute + '][' + model.cid + ']';
                     } else {
-                        localOptions.namespace = parentModel.baseModel.modelName + '[' + attribute + '][' + model.cid + ']';
+                        localOptions.namespace = parentModel.baseModel.modelName.paramKey + '[' + attribute + '][' + model.cid + ']';
                     }
                 }
                 
@@ -2838,7 +2861,7 @@ function CheckBoxGroupBuilder(model, attribute, options) {
     this.attribute = attribute;
     this.options = options;
 
-    modelName = _.has(options, 'as') ? options.as : this.model.baseModel.modelName;
+    modelName = _.has(options, 'as') ? options.as : this.model.baseModel.modelName.paramKey;
     if (options.namespace) {
         if (options.as !== null) {
             this.options.namespace = options.namespace + '[' + modelName + ']';
@@ -3619,17 +3642,17 @@ urlFor = function (modelOrUrl, options) {
     }, options);
     
     var route;
-    var klass = modelOrUrl.baseModel.modelName.camelize().constantize();
+    var klass = modelOrUrl.baseModel.modelName.name.constantize();
     if (modelOrUrl instanceof klass) {
         if (modelOrUrl.isNew()) {
-            route = (klass.baseModel.modelName.pluralize() + 'Path').constantize();
+            route = (klass.baseModel.modelName.plural + 'Path').constantize();
             route = route();
         } else {
-            route = (klass.baseModel.modelName + 'Path').constantize();
+            route = (klass.baseModel.modelName.singular + 'Path').constantize();
             route = route(modelOrUrl);
         }
     } else {
-        route = (modelOrUrl.baseModel.modelName.pluralize() + 'Path').constantize();
+        route = (modelOrUrl.baseModel.modelName.plural + 'Path').constantize();
         route = route();
     }
     

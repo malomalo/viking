@@ -4,13 +4,16 @@
     test("instance.modelName is set on instantiation", function() {
         var Model = Viking.Model.extend('model');
         var model = new Model();
-    
-        deepEqual(model.modelName, {
-            className: 'Model',
-            paramKey:  'model',
-            plural:    'models',
-            routeKey:  'models',
-            singular:  'model'
+
+        propEqual(model.modelName, {
+            name: 'Model',
+            element: 'model',
+            human: 'Model',
+            paramKey: 'model',
+            plural: 'models',
+            routeKey: 'models',
+            singular: 'model',
+            collection: 'models'
         });
     });
     

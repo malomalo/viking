@@ -12,19 +12,25 @@
     test("::extend with modelName", function() {
         var Model = Viking.Model.extend('model');
     
-        deepEqual(Model.modelName, {
-            className: 'Model',
-            paramKey:  'model',
-            plural:    'models',
-            routeKey:  'models',
-            singular:  'model'
+        propEqual(Model.modelName, {
+            name: 'Model',
+            element: 'model',
+            human: 'Model',
+            paramKey: 'model',
+            plural: 'models',
+            routeKey: 'models',
+            singular: 'model',
+            collection: 'models'
         });
-        deepEqual((new Model()).modelName, {
-            className: 'Model',
-            paramKey:  'model',
-            plural:    'models',
-            routeKey:  'models',
-            singular:  'model'
+        propEqual((new Model()).modelName, {
+            name: 'Model',
+            element: 'model',
+            human: 'Model',
+            paramKey: 'model',
+            plural: 'models',
+            routeKey: 'models',
+            singular: 'model',
+            collection: 'models'
         });
     });
     
@@ -62,24 +68,27 @@
         equal(Ship.associations['ship'].name, 'ship');
         equal(Ship.associations['ship'].macro, 'belongsTo');
         deepEqual(Ship.associations['ship'].options, {});
-        deepEqual(Ship.associations['ship'].modelName, {
-            className: 'Ship',
-            paramKey:  'ship',
-            plural:    'ships',
-            routeKey:  'ships',
-            singular:  'ship'
+        propEqual(Ship.associations['ship'].modelName, {
+            name: 'Ship',
+            element: 'ship',
+            human: 'Ship',
+            paramKey: 'ship',
+            plural: 'ships',
+            routeKey: 'ships',
+            singular: 'ship',
+            collection: 'ships'
         });
         
         delete Ship;
     });
     
     test("::extend adds belongsTo relationships with options to associations", function() {
-        Ship = Viking.Model.extend({ belongsTo: [['ship', {model: 'Carrier'}]] });
+        Ship = Viking.Model.extend({ belongsTo: [['ship', {modelName: 'Carrier'}]] });
         
         equal(Ship.associations['ship'].name, 'ship');
         equal(Ship.associations['ship'].macro, 'belongsTo');
-        deepEqual(Ship.associations['ship'].options, {model: 'Carrier'});
-        equal(Ship.associations['ship'].modelName, 'Carrier');
+        deepEqual(Ship.associations['ship'].options, {modelName: 'Carrier'});
+        propEqual(Ship.associations['ship'].modelName, new Viking.Model.Name('carrier'));
         
         delete Ship;
     });

@@ -4,8 +4,11 @@
     test("#url /pluralModelName/id by default", function() {
         var Model = Viking.Model.extend('model');
         var model = new Model({id: 42});
-    
         equal(model.url(), '/models/42');
+
+        Model = Viking.Model.extend('namespaced/model');
+        model = new Model({ id: 42 });
+        equal(model.url(), '/namespaced_models/42');
     });
     
     test("#url /pluralModelName/slug by overriding #toParam()", function() {

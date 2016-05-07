@@ -10,26 +10,29 @@
         equal(assocation.name, 'parent');
         equal(assocation.macro, 'belongsTo');
         deepEqual(assocation.options, {});
-        deepEqual(assocation.modelName, {
-            className: 'Parent',
-            paramKey:  'parent',
-            plural:    'parents',
-            routeKey:  'parents',
-            singular:  'parent'
+        propEqual(assocation.modelName, {
+            name: 'Parent',
+            element: 'parent',
+            human: 'Parent',
+            paramKey: 'parent',
+            plural: 'parents',
+            routeKey: 'parents',
+            singular: 'parent',
+            collection: 'parents'
         });
         
         delete Parent;
     });
     
-    test("::new('children', {model: 'Region'})", function() {
+    test("::new('children', { modelName: 'Region' })", function() {
         Region = Viking.Model.extend();
         
-        var assocation = new Viking.Model.BelongsToReflection('parent', {model: 'Region'});
-        
+        var assocation = new Viking.Model.BelongsToReflection('parent', { modelName: 'Region' });
+
         equal(assocation.name, 'parent');
         equal(assocation.macro, 'belongsTo');
-        deepEqual(assocation.options, {model: 'Region'});
-        equal(assocation.modelName, 'Region');
+        deepEqual(assocation.options, { modelName: 'Region'});
+        deepEqual(assocation.modelName, new Viking.Model.Name('Region'));
         
         delete Region;
     });

@@ -4,12 +4,28 @@
     test("::new sets modelName on the instance", function() {
         var Ship = Viking.Model.extend('ship');
         
-        deepEqual((new Ship).modelName, {
-            className: 'Ship',
-            paramKey:  'ship',
-            plural:    'ships',
-            routeKey:  'ships',
-            singular:  'ship'
+        propEqual((new Ship).modelName, {
+            name: 'Ship',
+            element: 'ship',
+            human: 'Ship',
+            paramKey: 'ship',
+            plural: 'ships',
+            routeKey: 'ships',
+            singular: 'ship',
+            collection: 'ships'
+        });
+
+        var Namespaced = {};
+        var Model = Viking.Model.extend('namespaced/model');
+        propEqual((new Model).modelName, {
+            'name': 'Namespaced.Model',
+            singular: 'namespaced_model',
+            plural: 'namespaced_models',
+            routeKey: 'namespaced_models',
+            paramKey: 'namespaced_model',
+            human: 'Model',
+            element: 'model',
+            collection: 'namespaced_models'
         });
     });
     
