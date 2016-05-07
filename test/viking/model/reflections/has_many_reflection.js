@@ -36,7 +36,7 @@
         equal(assocation.name, 'children');
         equal(assocation.macro, 'hasMany');
         deepEqual(assocation.options, { modelName: 'Region' });
-        equal(assocation.collectionName, 'ChildCollection');
+        equal(assocation.collectionName, 'RegionCollection');
         
         delete Region;
         delete RegionCollection;
