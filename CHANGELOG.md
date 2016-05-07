@@ -5,7 +5,7 @@ Major Changes:
  - Introduced String#demodulize
  - Modified Model#paramRoot to demodulize
  - `Viking.Model::modelName` is now `Viking.Model::name` and returns an object
-    with various nameing convetions.
+    with various nameing conventions.
  - `Model::coercions` and `Model::defaults` is now `Model::schema`
  - moved `Viking.AssociationReflection` to `Viking.Model.Reflection` and
    friends
