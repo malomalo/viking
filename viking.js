@@ -1,4 +1,4 @@
-//     Viking.js 0.9.0 (sha:ef1f75c)
+//     Viking.js 0.9.0 (sha:0f9fd9b)
 //
 //     (c) 2012-2016 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -579,7 +579,7 @@ Viking.Model = Backbone.Model.extend({
     inheritanceAttribute: 'type',
 
     defaults: function () {
-        dflts = {};
+        var dflts = {};
         
         _.each(this.schema, function(options, key) {
             if(options['default']) {
@@ -728,7 +728,7 @@ Viking.Model.Name = function (name) {
     this.routeKey = this.plural;
     this.element = objectName.demodulize().underscore();
 
-    this.model = function () {;
+    this.model = function () {
         if (this._model) {
             return this._model;
         }
@@ -737,7 +737,7 @@ Viking.Model.Name = function (name) {
         return this._model;
     }
 
-};
+}
 Viking.Model.Reflection = function () { };
 _.extend(Viking.Model.Reflection.prototype, {
     klass: function() {
@@ -1219,7 +1219,7 @@ Viking.Model.prototype.toJSON = function (options) {
                     data[key] = klass.dump(data[key], key);
                 }
             } else {
-                throw new TypeError("Coercion of " + column.options.type + " unsupported");
+                throw new TypeError("Coercion of " + options.type + " unsupported");
             }
         }
     });
@@ -2817,7 +2817,7 @@ FormBuilder.prototype = {
     },
     
     fieldsFor: function(attribute, records, options, content) {
-        var builder, modelName;
+        var builder;
         
         if (records instanceof Viking.Model) {
             records = [records];
@@ -3537,7 +3537,7 @@ Viking.View.Helpers.textField = function (model, attribute, options) {
 
     var name = options['name'] || Viking.View.tagNameForModelAttribute(model, attribute);
     var value = model.get(attribute)
-    var value = value && typeof value === 'object' ? value.toString() : value
+    value = value && typeof value === 'object' ? value.toString() : value
     return Viking.View.Helpers.textFieldTag(name, value, options);
 };
 // TODO: make this accept model string names
@@ -4014,7 +4014,7 @@ Viking.Controller = Backbone.Model.extend({
 
         if(typeof controllerName === 'string') { child.controllerName = controllerName; }
         
-        _.each(protoProps, function(value, key, list) {
+        _.each(protoProps, function(value, key) {
             if (typeof value === 'function') { child.prototype[key].controller = child; }
         });
         
