@@ -12,7 +12,8 @@
             plural: 'ships',
             routeKey: 'ships',
             singular: 'ship',
-            collection: 'ships'
+            collection: 'ships',
+            collectionName: 'ShipCollection'
         });
 
         var Namespaced = {};
@@ -25,12 +26,13 @@
             paramKey: 'namespaced_model',
             human: 'Model',
             element: 'model',
-            collection: 'namespaced_models'
+            collection: 'namespaced_models',
+            collectionName: 'Namespaced.ModelCollection'
         });
     });
     
     test("::new sets associations on the instance as a refernce to the associations on the Class", function() {
-        Ship = Viking.Model.extend({ hasMany: [['ships', {collection: 'MyCollection'}]] });
+        Ship = Viking.Model.extend({ hasMany: [['ships', {collectionName: 'MyCollection'}]] });
         MyCollection = Viking.Collection.extend();
         
         var myship = new Ship();

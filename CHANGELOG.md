@@ -2,6 +2,7 @@
 
 Major Changes:
 
+ - Moved assocation option `collection` to `collectionName`
  - Introduced String#demodulize
  - Modified Model#paramRoot to demodulize
  - `Viking.Model::modelName` is now `Viking.Model::name` and returns an object

@@ -13,7 +13,8 @@
             plural: 'models',
             routeKey: 'models',
             singular: 'model',
-            collection: 'models'
+            collection: 'models',
+            collectionName: 'ModelCollection'
         });
     });
     

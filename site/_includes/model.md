@@ -98,7 +98,7 @@ Viking.Model.getRelationshipDetails('hasMany', 'carriers', { modelName: 'Ship' }
 ----------------------------------------------------------------
 
 Same as [Backbone](http://backbonejs.org/#Model-constructor), but
-`{collection: ...}` is unnecessary to compute the mode's url if the model `name`
+`{collectionName: ...}` is unnecessary to compute the mode's url if the model `name`
 is defined when creating the model.
 
 <div id="Model-set"></div>

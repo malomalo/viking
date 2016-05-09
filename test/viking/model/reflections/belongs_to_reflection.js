@@ -18,7 +18,8 @@
             plural: 'parents',
             routeKey: 'parents',
             singular: 'parent',
-            collection: 'parents'
+            collection: 'parents',
+            collectionName: 'ParentCollection'
         });
         
         delete Parent;

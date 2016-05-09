@@ -20,7 +20,8 @@
             plural: 'models',
             routeKey: 'models',
             singular: 'model',
-            collection: 'models'
+            collection: 'models',
+            collectionName: 'ModelCollection'
         });
         propEqual(_.omit((new Model()).modelName, 'model'), {
             name: 'Model',
@@ -30,7 +31,8 @@
             plural: 'models',
             routeKey: 'models',
             singular: 'model',
-            collection: 'models'
+            collection: 'models',
+            collectionName: 'ModelCollection'
         });
     });
     
@@ -52,11 +54,11 @@
     });
     
     test("::extend adds hasMany relationships with options to associations", function() {
-        Ship = Viking.Model.extend({ hasMany: [['ships', {collection: 'MyCollection'}]] });
+        Ship = Viking.Model.extend({ hasMany: [['ships', {collectionName: 'MyCollection'}]] });
         
         equal(Ship.associations['ships'].name, 'ships');
         equal(Ship.associations['ships'].macro, 'hasMany');
-        deepEqual(Ship.associations['ships'].options, {collection: 'MyCollection'});
+        deepEqual(Ship.associations['ships'].options, {collectionName: 'MyCollection'});
         equal(Ship.associations['ships'].collectionName, 'MyCollection');
         
         delete Ship;
@@ -76,7 +78,8 @@
             plural: 'ships',
             routeKey: 'ships',
             singular: 'ship',
-            collection: 'ships'
+            collection: 'ships',
+            collectionName: 'ShipCollection'
         });
         
         delete Ship;

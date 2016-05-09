@@ -14,14 +14,14 @@
         delete ChildCollection;
     });
     
-    test("::new('children', {collection: 'MyCollection'})", function() {
+    test("::new('children', {collectionName: 'MyCollection'})", function() {
         MyCollection = Viking.Collection.extend();
         
-        var assocation = new Viking.Model.HasManyReflection('children', {collection: 'MyCollection'});
+        var assocation = new Viking.Model.HasManyReflection('children', {collectionName: 'MyCollection'});
         
         equal(assocation.name, 'children');
         equal(assocation.macro, 'hasMany');
-        deepEqual(assocation.options, {collection: 'MyCollection'});
+        deepEqual(assocation.options, {collectionName: 'MyCollection'});
         equal(assocation.collectionName, 'MyCollection');
         
         delete MyCollection;

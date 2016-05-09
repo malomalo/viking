@@ -32,7 +32,8 @@
             plural: 'agents',
             routeKey: 'agents',
             singular: 'agent',
-            collection: 'agents'
+            collection: 'agents',
+            collectionName: 'AgentCollection'
         });
         
         delete Account;
