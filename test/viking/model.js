@@ -5,7 +5,7 @@
         var Model = Viking.Model.extend('model');
         var model = new Model();
 
-        propEqual(model.modelName, {
+        propEqual(_.omit(model.modelName, 'model'), {
             name: 'Model',
             element: 'model',
             human: 'Model',

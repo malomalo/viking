@@ -24,7 +24,7 @@
         account.set({type: 'agent'});
         
         strictEqual(Agent.modelName, account.modelName);
-        propEqual(account.modelName, {
+        propEqual(_.omit(account.modelName, 'model'), {
             name: 'Agent',
             element: 'agent',
             human: 'Agent',

@@ -12,7 +12,7 @@
     test("::extend with modelName", function() {
         var Model = Viking.Model.extend('model');
     
-        propEqual(Model.modelName, {
+        propEqual(_.omit(Model.modelName, 'model'), {
             name: 'Model',
             element: 'model',
             human: 'Model',
@@ -22,7 +22,7 @@
             singular: 'model',
             collection: 'models'
         });
-        propEqual((new Model()).modelName, {
+        propEqual(_.omit((new Model()).modelName, 'model'), {
             name: 'Model',
             element: 'model',
             human: 'Model',
@@ -68,7 +68,7 @@
         equal(Ship.associations['ship'].name, 'ship');
         equal(Ship.associations['ship'].macro, 'belongsTo');
         deepEqual(Ship.associations['ship'].options, {});
-        propEqual(Ship.associations['ship'].modelName, {
+        propEqual(_.omit(Ship.associations['ship'].modelName, 'model'), {
             name: 'Ship',
             element: 'ship',
             human: 'Ship',

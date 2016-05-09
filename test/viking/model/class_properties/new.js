@@ -4,7 +4,7 @@
     test("::new sets modelName on the instance", function() {
         var Ship = Viking.Model.extend('ship');
         
-        propEqual((new Ship).modelName, {
+        propEqual(_.omit((new Ship).modelName, 'model'), {
             name: 'Ship',
             element: 'ship',
             human: 'Ship',
@@ -17,7 +17,7 @@
 
         var Namespaced = {};
         var Model = Viking.Model.extend('namespaced/model');
-        propEqual((new Model).modelName, {
+        propEqual(_.omit((new Model).modelName, 'model'), {
             'name': 'Namespaced.Model',
             singular: 'namespaced_model',
             plural: 'namespaced_models',

@@ -10,7 +10,7 @@
         equal(assocation.name, 'parent');
         equal(assocation.macro, 'hasOne');
         deepEqual(assocation.options, {});
-        propEqual(assocation.modelName, {
+        propEqual(_.omit(assocation.modelName, 'model'), {
             name: 'Parent',
             element: 'parent',
             human: 'Parent',
