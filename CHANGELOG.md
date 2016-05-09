@@ -2,6 +2,10 @@
 
 Major Changes:
 
+## 0.9.0 (May 8th, 2016)
+
+Major Changes:
+
  - Moved assocation option `collection` to `collectionName`
  - Introduced String#demodulize
  - Modified Model#paramRoot to demodulize

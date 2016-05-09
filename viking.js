@@ -1,4 +1,4 @@
-//     Viking.js 0.9.0 (sha:da9b1bc)
+//     Viking.js 0.9.0 (sha:ef1f75c)
 //
 //     (c) 2012-2016 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -716,16 +716,26 @@ Viking.Model = Backbone.Model.extend({
 
 });
 Viking.Model.Name = function (name) {
-    var class_name = name.camelize(); // Namespaced.Name
+    var objectName = name.camelize(); // Namespaced.Name
 
-    this.name = class_name;
-    this.singular = class_name.underscore().replace(/\//g, '_'); // namespaced_name
+    this.name = objectName;
+    this.collectionName = objectName + 'Collection';
+    this.singular = objectName.underscore().replace(/\//g, '_'); // namespaced_name
     this.plural = this.singular.pluralize(); // namespaced_names
-    this.human = class_name.demodulize().humanize(); // Name
+    this.human = objectName.demodulize().humanize(); // Name
     this.collection = this.singular.pluralize(); // namespaced/names
     this.paramKey = this.singular;
     this.routeKey = this.plural;
-    this.element = class_name.demodulize().underscore();
+    this.element = objectName.demodulize().underscore();
+
+    this.model = function () {;
+        if (this._model) {
+            return this._model;
+        }
+
+        this._model = this.name.constantize();
+        return this._model;
+    }
 
 };
 Viking.Model.Reflection = function () { };
@@ -739,12 +749,13 @@ _.extend(Viking.Model.Reflection.prototype, {
     },
     
     model: function() {
-        return this.modelName.name.constantize();
+        return this.modelName.model();
     },
     
     collection: function() {
         return this.collectionName.constantize();
     }
+
 });
 Viking.Model.Reflection.extend = Backbone.Model.extend;
 Viking.Model.BelongsToReflection = Viking.Model.Reflection.extend({
@@ -755,7 +766,7 @@ Viking.Model.BelongsToReflection = Viking.Model.Reflection.extend({
         this.options = _.extend({}, options);
     
         if (!this.options.polymorphic) {
-            if (typeof(this.options.modelName) === 'string') {
+            if (this.options.modelName) {
                 this.modelName = new Viking.Model.Name(this.options.modelName);
             } else {
                 this.modelName = new Viking.Model.Name(name);
@@ -771,13 +782,18 @@ Viking.Model.HasAndBelongsToManyReflection = Viking.Model.Reflection.extend({
         this.macro = 'hasAndBelongsToMany';
         this.options = _.extend({}, options);
     
-        if (this.options.collection) {
-            this.collectionName = this.options.collection;
-        } else if (this.options.model) {
-            this.collectionName = (this.options.model + 'Collection');
+        if (this.options.modelName) {
+            this.modelName = new Viking.Model.Name(this.options.modelName);
         } else {
-            this.collectionName = (this.name.singularize().camelize() + 'Collection');
+            this.modelName = new Viking.Model.Name(this.name.singularize());
         }
+
+        if (this.options.collectionName) {
+            this.collectionName = this.options.CollectionName;
+        } else {
+            this.collectionName = this.modelName.collectionName;
+        }
+
     }
     
 });
@@ -787,13 +803,17 @@ Viking.Model.HasManyReflection = Viking.Model.Reflection.extend({
         this.name = name;
         this.macro = 'hasMany';
         this.options = _.extend({}, options);
-    
-        if (this.options.collection) {
-            this.collectionName = options.collection;
-        } else if (this.options.model) {
-            this.collectionName = (this.options.model + 'Collection');
+
+        if (this.options.modelName) {
+            this.modelName = new Viking.Model.Name(this.options.modelName);
         } else {
-            this.collectionName = (this.name.singularize().camelize() + 'Collection');
+            this.modelName = new Viking.Model.Name(this.name.singularize());
+        }
+
+        if (this.options.collectionName) {
+            this.collectionName = this.options.collectionName;
+        } else {
+            this.collectionName = this.modelName.collectionName;
         }
     }
     
@@ -804,16 +824,16 @@ Viking.Model.HasOneReflection = Viking.Model.Reflection.extend({
         this.name = name;
         this.macro = 'hasOne';
         this.options = _.extend({}, options);
-    
+
         if (!this.options.polymorphic) {
-            if (typeof(this.options.modelName) === 'string') {
+            if (this.options.modelName) {
                 this.modelName = new Viking.Model.Name(this.options.modelName);
             } else {
                 this.modelName = new Viking.Model.Name(name);
             }
         }
     }
-    
+
 });
 // Create a model with +attributes+. Options are the 
 // same as Viking.Model#save
@@ -2978,7 +2998,6 @@ Viking.View.Helpers.distanceOfTimeInWords = function (fromTime, toTime, options)
 
     if (distance_in_seconds <= 60) {
         if ( options.includeSeconds ) {
-            console.log((toTime.getTime() - fromTime.getTime()), distance_in_seconds)
             if (distance_in_seconds < 2) {
                 return "a second";
             } else if (distance_in_seconds < 10) {
@@ -3642,7 +3661,7 @@ urlFor = function (modelOrUrl, options) {
     }, options);
     
     var route;
-    var klass = modelOrUrl.baseModel.modelName.name.constantize();
+    var klass = modelOrUrl.baseModel.modelName.model();
     if (modelOrUrl instanceof klass) {
         if (modelOrUrl.isNew()) {
             route = (klass.baseModel.modelName.plural + 'Path').constantize();
