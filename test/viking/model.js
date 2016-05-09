@@ -4,8 +4,18 @@
     test("instance.modelName is set on instantiation", function() {
         var Model = Viking.Model.extend('model');
         var model = new Model();
-    
-        equal(model.modelName, 'model');
+
+        propEqual(_.omit(model.modelName, 'model'), {
+            name: 'Model',
+            element: 'model',
+            human: 'Model',
+            paramKey: 'model',
+            plural: 'models',
+            routeKey: 'models',
+            singular: 'model',
+            collection: 'models',
+            collectionName: 'ModelCollection'
+        });
     });
     
     test("::where() returns ModelCollection without a predicate", function() {

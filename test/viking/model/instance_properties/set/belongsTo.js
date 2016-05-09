@@ -71,13 +71,13 @@
         a.set({subject: ship});
         ok(a.get('subject') instanceof Ship);
         equal(a.get('subject_id'), 10);
-        equal(a.get('subject_type'), 'ship');
+        equal(a.get('subject_type'), 'Ship');
         
         var account = new Account({id: 1});
         a.set({subject: account});
         ok(a.get('subject') instanceof Account);
         equal(a.get('subject_id'), 1);
-        equal(a.get('subject_type'), 'account');
+        equal(a.get('subject_type'), 'Account');
         
         delete Ship;
         delete Account;

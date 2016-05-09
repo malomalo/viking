@@ -2,7 +2,7 @@
     module("Viking.Model::reflectOnAssociation");
 
     test("::reflectOnAssociation() returns the assocation", function() {
-        Ship = Viking.Model.extend({ hasMany: ['ships'], belongsTo: [['carrier', {model: 'Ship'}]] });
+        Ship = Viking.Model.extend({ hasMany: ['ships'], belongsTo: [['carrier', {modelName: 'Ship'}]] });
         ShipCollection = Viking.Collection.extend({ model: Ship });
         
         equal('ships', Ship.reflectOnAssociation('ships').name);

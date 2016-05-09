@@ -4,11 +4,35 @@
     test("::new sets modelName on the instance", function() {
         var Ship = Viking.Model.extend('ship');
         
-        equal((new Ship).modelName, 'ship');
+        propEqual(_.omit((new Ship).modelName, 'model'), {
+            name: 'Ship',
+            element: 'ship',
+            human: 'Ship',
+            paramKey: 'ship',
+            plural: 'ships',
+            routeKey: 'ships',
+            singular: 'ship',
+            collection: 'ships',
+            collectionName: 'ShipCollection'
+        });
+
+        var Namespaced = {};
+        var Model = Viking.Model.extend('namespaced/model');
+        propEqual(_.omit((new Model).modelName, 'model'), {
+            'name': 'Namespaced.Model',
+            singular: 'namespaced_model',
+            plural: 'namespaced_models',
+            routeKey: 'namespaced_models',
+            paramKey: 'namespaced_model',
+            human: 'Model',
+            element: 'model',
+            collection: 'namespaced_models',
+            collectionName: 'Namespaced.ModelCollection'
+        });
     });
     
     test("::new sets associations on the instance as a refernce to the associations on the Class", function() {
-        Ship = Viking.Model.extend({ hasMany: [['ships', {collection: 'MyCollection'}]] });
+        Ship = Viking.Model.extend({ hasMany: [['ships', {collectionName: 'MyCollection'}]] });
         MyCollection = Viking.Collection.extend();
         
         var myship = new Ship();
@@ -69,7 +93,7 @@
         Agent = Account.extend('agent');
         
         var agent = new Agent();
-        equal('agent', agent.get('type'));
+        equal('Agent', agent.get('type'));
         
         delete Account;
         delete Agent;
@@ -80,7 +104,7 @@
         Agent = Account.extend('agent');
         
         var account = new Account();
-        equal('account', account.get('type'));
+        equal('Account', account.get('type'));
         
         delete Account;
         delete Agent;

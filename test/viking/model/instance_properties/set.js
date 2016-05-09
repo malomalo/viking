@@ -24,7 +24,17 @@
         account.set({type: 'agent'});
         
         strictEqual(Agent.modelName, account.modelName);
-        strictEqual('agent', account.modelName);
+        propEqual(_.omit(account.modelName, 'model'), {
+            name: 'Agent',
+            element: 'agent',
+            human: 'Agent',
+            paramKey: 'agent',
+            plural: 'agents',
+            routeKey: 'agents',
+            singular: 'agent',
+            collection: 'agents',
+            collectionName: 'AgentCollection'
+        });
         
         delete Account;
         delete Agent;

@@ -6,18 +6,17 @@
         '_': true,
         'Viking': true,
         'Backbone': true,
-        'escape': true
+        'escape': true,
+        'jQuery': true
     },
+    'extends': 'eslint:recommended',
     'rules': {
-        'eol-last': false,
-        'quotes':   false,
-        'global-strict': [2, 'never'],
-        'no-trailing-spaces': false,
-
-        'no-underscore-dangle': false,
-        'strict': false,
-        'no-trailing-spaces': false,
-        'no-extend-native': false,
-        'key-spacing': false
+        'eol-last': "off",
+        'quotes':   "off",
+        'no-underscore-dangle': "off",
+        'strict': "off",
+        'no-trailing-spaces': "off",
+        'no-extend-native': "off",
+        'key-spacing': "off"
     }
 }

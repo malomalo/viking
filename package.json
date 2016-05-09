@@ -12,5 +12,5 @@
     "test": "phantomjs test/runner.js http://127.0.0.1:4321/test/index.html"
   },
   "main"          : "viking.js",
-  "version"       : "0.8.1"
+  "version"       : "0.9.0"
 }

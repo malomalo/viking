@@ -14,28 +14,28 @@
         delete ChildCollection;
     });
     
-    test("::new('children', {collection: 'MyCollection'})", function() {
+    test("::new('children', {collectionName: 'MyCollection'})", function() {
         MyCollection = Viking.Collection.extend();
         
-        var assocation = new Viking.Model.HasManyReflection('children', {collection: 'MyCollection'});
+        var assocation = new Viking.Model.HasManyReflection('children', {collectionName: 'MyCollection'});
         
         equal(assocation.name, 'children');
         equal(assocation.macro, 'hasMany');
-        deepEqual(assocation.options, {collection: 'MyCollection'});
+        deepEqual(assocation.options, {collectionName: 'MyCollection'});
         equal(assocation.collectionName, 'MyCollection');
         
         delete MyCollection;
     });
     
-    test("::new('children', {model: 'Region'})", function() {
+    test("::new('children', { modelName: 'Region' })", function() {
         Region = Viking.Model.extend();
         RegionCollection = Viking.Collection.extend();
         
-        var assocation = new Viking.Model.HasManyReflection('children', {model: 'Region'});
+        var assocation = new Viking.Model.HasManyReflection('children', { modelName: 'Region' });
         
         equal(assocation.name, 'children');
         equal(assocation.macro, 'hasMany');
-        deepEqual(assocation.options, {model: 'Region'});
+        deepEqual(assocation.options, { modelName: 'Region' });
         equal(assocation.collectionName, 'RegionCollection');
         
         delete Region;

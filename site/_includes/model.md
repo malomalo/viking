@@ -84,13 +84,13 @@ Also accepts arguments in the format of: `getRelationshipDetails(relation, [key,
 {% highlight bash %}
 Viking.Model.getRelationshipDetails('belongsTo', 'user') // => {key: 'user', type: User}
 
-Viking.Model.getRelationshipDetails('belongsTo', 'user', {model: 'Account'}) // => {key: 'user', type: Account}
+Viking.Model.getRelationshipDetails('belongsTo', 'user', { modelName: 'Account' }) // => {key: 'user', type: Account}
 
-Viking.Model.getRelationshipDetails('belongsTo', ['user', {model: 'Account'}]) // => {key: 'user', type: Account}
+Viking.Model.getRelationshipDetails('belongsTo', ['user', { modelName: 'Account' }]) // => {key: 'user', type: Account}
 
 Viking.Model.getRelationshipDetails('hasMany', 'carriers') // => {key: 'carriers', type: CarrierCollection}
 
-Viking.Model.getRelationshipDetails('hasMany', 'carriers', {model: 'Ship'}) // => {key: 'carriers', type: ShipCollection}
+Viking.Model.getRelationshipDetails('hasMany', 'carriers', { modelName: 'Ship' }) // => {key: 'carriers', type: ShipCollection}
 {% endhighlight %}
 
 <div id="Model-initialize"></div>
@@ -98,7 +98,7 @@ Viking.Model.getRelationshipDetails('hasMany', 'carriers', {model: 'Ship'}) // =
 ----------------------------------------------------------------
 
 Same as [Backbone](http://backbonejs.org/#Model-constructor), but
-`{collection: ...}` is unnecessary to compute the mode's url if the model `name`
+`{collectionName: ...}` is unnecessary to compute the mode's url if the model `name`
 is defined when creating the model.
 
 <div id="Model-set"></div>

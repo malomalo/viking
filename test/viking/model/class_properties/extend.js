@@ -12,8 +12,28 @@
     test("::extend with modelName", function() {
         var Model = Viking.Model.extend('model');
     
-        equal(Model.modelName, 'model');
-        equal((new Model()).modelName, 'model');
+        propEqual(_.omit(Model.modelName, 'model'), {
+            name: 'Model',
+            element: 'model',
+            human: 'Model',
+            paramKey: 'model',
+            plural: 'models',
+            routeKey: 'models',
+            singular: 'model',
+            collection: 'models',
+            collectionName: 'ModelCollection'
+        });
+        propEqual(_.omit((new Model()).modelName, 'model'), {
+            name: 'Model',
+            element: 'model',
+            human: 'Model',
+            paramKey: 'model',
+            plural: 'models',
+            routeKey: 'models',
+            singular: 'model',
+            collection: 'models',
+            collectionName: 'ModelCollection'
+        });
     });
     
     test("::extend initalizes the assocations", function() {
@@ -34,11 +54,11 @@
     });
     
     test("::extend adds hasMany relationships with options to associations", function() {
-        Ship = Viking.Model.extend({ hasMany: [['ships', {collection: 'MyCollection'}]] });
+        Ship = Viking.Model.extend({ hasMany: [['ships', {collectionName: 'MyCollection'}]] });
         
         equal(Ship.associations['ships'].name, 'ships');
         equal(Ship.associations['ships'].macro, 'hasMany');
-        deepEqual(Ship.associations['ships'].options, {collection: 'MyCollection'});
+        deepEqual(Ship.associations['ships'].options, {collectionName: 'MyCollection'});
         equal(Ship.associations['ships'].collectionName, 'MyCollection');
         
         delete Ship;
@@ -50,18 +70,28 @@
         equal(Ship.associations['ship'].name, 'ship');
         equal(Ship.associations['ship'].macro, 'belongsTo');
         deepEqual(Ship.associations['ship'].options, {});
-        equal(Ship.associations['ship'].modelName, 'Ship');
+        propEqual(_.omit(Ship.associations['ship'].modelName, 'model'), {
+            name: 'Ship',
+            element: 'ship',
+            human: 'Ship',
+            paramKey: 'ship',
+            plural: 'ships',
+            routeKey: 'ships',
+            singular: 'ship',
+            collection: 'ships',
+            collectionName: 'ShipCollection'
+        });
         
         delete Ship;
     });
     
     test("::extend adds belongsTo relationships with options to associations", function() {
-        Ship = Viking.Model.extend({ belongsTo: [['ship', {model: 'Carrier'}]] });
+        Ship = Viking.Model.extend({ belongsTo: [['ship', {modelName: 'Carrier'}]] });
         
         equal(Ship.associations['ship'].name, 'ship');
         equal(Ship.associations['ship'].macro, 'belongsTo');
-        deepEqual(Ship.associations['ship'].options, {model: 'Carrier'});
-        equal(Ship.associations['ship'].modelName, 'Carrier');
+        deepEqual(Ship.associations['ship'].options, {modelName: 'Carrier'});
+        propEqual(Ship.associations['ship'].modelName, new Viking.Model.Name('carrier'));
         
         delete Ship;
     });

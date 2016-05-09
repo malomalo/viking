@@ -2,6 +2,15 @@
 
 Major Changes:
 
+## 0.9.0 (May 8th, 2016)
+
+Major Changes:
+
+ - Moved assocation option `collection` to `collectionName`
+ - Introduced String#demodulize
+ - Modified Model#paramRoot to demodulize
+ - `Viking.Model::modelName` is now `Viking.Model::name` and returns an object
+    with various nameing conventions.
  - `Model::coercions` and `Model::defaults` is now `Model::schema`
  - moved `Viking.AssociationReflection` to `Viking.Model.Reflection` and
    friends

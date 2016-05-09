@@ -4,6 +4,9 @@
     test("::urlRoot returns an URL based on modelName", function() {
         var Model = Viking.Model.extend('model');
         equal(Model.urlRoot(), '/models');
+
+        var Model = Viking.Model.extend('namespaced/model');
+        equal(Model.urlRoot(), '/namespaced_models');
     });
     
     test("::urlRoot returns an URL based on #urlRoot set on the model", function () {

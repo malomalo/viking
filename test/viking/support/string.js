@@ -66,6 +66,12 @@
         equal("words".singularize(), "word");
     });
 
+    test('demodulize()', function () {
+        equal('Namespaced.Module'.demodulize(), 'Module');
+        equal('Module'.demodulize(), 'Module');
+        equal(''.demodulize(), '');
+    });
+
 	test("constantize()", function() {
 		equal("Viking".constantize(), Viking);
 		equal("Viking.Model".constantize(), Viking.Model);
