@@ -3,6 +3,7 @@ language: javascript
 before_install:
   - npm install jslint --global
   - gem install sprockets rest_client
+  - bundle install
   - mkdir -p jscover
   - wget --trust-server-name --output-document=jscover/jscover.zip "http://gemini.42floors.com/jscover.zip"
   - unzip -d jscover/jscover jscover/jscover.zip
