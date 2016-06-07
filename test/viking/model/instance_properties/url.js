@@ -2,8 +2,8 @@
     module("Viking.Model#url");
 
     test("#url /pluralModelName/id by default", function() {
-        var Model = Viking.Model.extend('model');
-        var model = new Model({id: 42});
+        let Model = Viking.Model.extend('model');
+        let model = new Model({id: 42});
         equal(model.url(), '/models/42');
 
         Model = Viking.Model.extend('namespaced/model');
@@ -12,8 +12,8 @@
     });
     
     test("#url /pluralModelName/slug by overriding #toParam()", function() {
-        var Model = Viking.Model.extend('model');
-        var model = new Model({id: 42});
+        let Model = Viking.Model.extend('model');
+        let model = new Model({id: 42});
         model.toParam = function () {
             return 'slug'
         }

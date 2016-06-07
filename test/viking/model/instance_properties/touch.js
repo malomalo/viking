@@ -16,9 +16,9 @@
     });
 
     test("sends a PUT request to /models/:id/touch", function() {
-        var Model = Viking.Model.extend('model');
+        let Model = Viking.Model.extend('model');
     
-        var m = new Model({id: 2, foo: 'bar'});
+        let m = new Model({id: 2, foo: 'bar'});
         m.touch();
         equal(this.requests[0].method, 'PATCH');
         equal(this.requests[0].url, '/models/2');
@@ -28,9 +28,9 @@
     });
     
     test("sends an empty body", function() {
-        var Model = Viking.Model.extend('model');
+        let Model = Viking.Model.extend('model');
     
-        var m = new Model({id: 2, foo: 'bar'});
+        let m = new Model({id: 2, foo: 'bar'});
         m.touch();
         deepEqual(JSON.parse(this.requests[0].requestBody), {
             model: {updated_at: (new Date()).toISOString(3)}
@@ -38,9 +38,9 @@
     });
     
     test("sends the name of the column to be touched if specified", function() {
-        var Model = Viking.Model.extend('model');
+        let Model = Viking.Model.extend('model');
     
-        var m = new Model({id: 2, foo: 'bar'});
+        let m = new Model({id: 2, foo: 'bar'});
         m.touch('read_at');
         deepEqual(JSON.parse(this.requests[0].requestBody), {
             model: {
@@ -52,12 +52,12 @@
     });
     
     test("updates the attributes from the response", function() {
-        var Model = Viking.Model.extend('model', { schema: {
+        let Model = Viking.Model.extend('model', { schema: {
             updated_at: {type: 'date'},
             read_at: {type: 'date'}
         } });
     
-        var m = new Model({id: 2, updated_at: null, read_at: null});
+        let m = new Model({id: 2, updated_at: null, read_at: null});
         
         equal(m.get('updated_at'), null);
         m.touch();

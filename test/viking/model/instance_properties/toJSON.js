@@ -39,7 +39,7 @@
             coercions: {date: ['Date', {array: true}]}
         });
         
-        var ship = new Ship({
+        let ship = new Ship({
             date: ["2013-04-10T21:24:28.000Z"]
         });
         
