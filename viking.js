@@ -1,4 +1,4 @@
-//     Viking.js 0.9.0 (sha:4272ab3)
+//     Viking.js 0.9.0 (sha:ccdb523)
 //
 //     (c) 2012-2016 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -64,17 +64,52 @@ Viking.ArgumentError.prototype.constructor = Viking.ArgumentError;
 // extensions that were found useful for the Viking framework. These
 // additions reside in this package so they can be loaded as needed
 // in Javascript projects outside of Viking.
+// // Calls `toParam` on all its elements and joins the result with slashes.
+// // This is used by urlFor in Viking Pack.
+// Object.defineProperty(Array.prototype, 'toParam', {
+//     value: function () {
+//         return this.map(e => e.toParam()).join('/');
+//     }
+//     writable: true,
+//     configureable: true,
+//     enumerable: false
+//     //     function () {
+//     //     this.map(e => e.toParam()).join('/');
+//     //     // return _.map(this, function (e) {
+//     //     //     return e.toParam();
+//     //     // }).join('/');
+//     // },
+// });
+//
+//
+// // Converts an array into a string suitable for use as a URL query string,
+// // using the given key as the param name.
+// Object.defineProperty(Array.prototype, 'toQuery', {
+//     value: function (key) {
+//         let prefix = key + "[]";
+//         return _.map(this, function (value) {
+//             return value === null ? escape(prefix) + '=' : value.toQuery(prefix);
+//         }).join('&');
+//     },
+//     writable: true,
+//     configureable: true,
+//     enumerable: false
+// });
+
+
+
+
 // Calls `to_param` on all its elements and joins the result with slashes.
 // This is used by url_for in Viking Pack.
 Object.defineProperty(Array.prototype, 'toParam', {
     value: function() {
-        return _.map(this, function(e) { return e.toParam(); }).join('/');
+        // return this.map(function(e) { return e.toParam(); }).join('/');
+        return this.map(e => { return e.toParam(); }).join('/');
     },
     writable: true,
     configureable: true,
     enumerable: false
 });
-
 
 // Converts an array into a string suitable for use as a URL query string,
 // using the given key as the param name.

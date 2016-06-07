@@ -1,22 +1,17 @@
 {
-    'env': {
-        'browser': true
+    "env": {
+        "es6": true,
+        "browser": true
     },
-    'globals': {
-        '_': true,
-        'Viking': true,
-        'Backbone': true,
-        'escape': true,
-        'jQuery': true
+    "globals": {
+        "Viking": true,
+        "Backbone": true,
+        "escape": true,
+        "jQuery": true,
+        "strftime": true
     },
-    'extends': 'eslint:recommended',
-    'rules': {
-        'eol-last': "off",
-        'quotes':   "off",
-        'no-underscore-dangle': "off",
-        'strict': "off",
-        'no-trailing-spaces': "off",
-        'no-extend-native': "off",
-        'key-spacing': "off"
+    "extends": "eslint:recommended",
+    "rules": {
+      "no-var": 2
     }
 }
