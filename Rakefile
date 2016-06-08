@@ -3,7 +3,6 @@ require 'bundler/setup'
 require 'erb'
 require 'json'
 require 'fileutils'
-require 'byebug'
 require 'sprockets'
 require 'babel-transpiler'
 
@@ -17,19 +16,13 @@ def asset_pipeline
   @asset_pipeline.append_path 'lib'
   @asset_pipeline.append_path 'test'
   @asset_pipeline.append_path 'test/dependencies'
-  byebug
-  # babel = Sprockets::BabelProcessor
-  # @asset_pipeline.register_transformer 'application/ecmascript-6', 'application/javascript', babel
-  # @asset_pipeline.register_transformer 'application/javascript', 'application/javascript', babel
-
-  # puts @asset_pipeline.mime_exts
   # @asset_pipeline.register_transformer 'application/ecmascript-6', 'application/javascript', Sprockets::BabelProcessor.new()
-  # @asset_pipeline.register_transformer 'application/javascript', 'application/javascript', Sprockets::BabelProcessor.new()
-  # @asset_pipeline.config = Sprockets::Utils.hash_reassoc(@asset_pipeline.config, :bundle_reducers, 'application/javascript') do |reducers|
-  #   reducers.delete(:data) # Remove the SafetyColons
-  #   reducers
-  # end
-  
+  @asset_pipeline.register_transformer 'application/javascript', 'application/javascript', Sprockets::BabelProcessor.new()
+  @asset_pipeline.config = Sprockets::Utils.hash_reassoc(@asset_pipeline.config, :bundle_reducers, 'application/javascript') do |reducers|
+    reducers.delete(:data) # Remove the SafetyColons
+    reducers
+  end
+
   @asset_pipeline
 end
 
