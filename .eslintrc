@@ -13,5 +13,8 @@
     "extends": "eslint:recommended",
     "rules": {
       "no-var": 2
+    },
+    "parserOptions": {
+      "sourceType": "module"
     }
 }
