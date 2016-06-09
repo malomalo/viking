@@ -1,16 +1,49 @@
 {
-  "name"          : "viking",
-  "description"   : "Backbone bindings for Rails",
-  "url"           : "http://vikingjs.com",
-  "keywords"      : ["backbone", "rails", "activerecord", "model", "view", "controller", "router", "server", "client", "browser"],
-  "author"        : "Jonathan Bracy <jonbracy@gmail.com>",
-  "devDependencies": {
-    "phantomjs"  : "1.8.1-3",
-    "docco"      : "0.6.1"
-  },
+  "name": "viking",
+  "url": "http://vikingjs.com",
+  "description": "Backbone bindings for Rails",
+  "author": "Jonathan Bracy <jonbracy@gmail.com>",
+  "homepage": "https://github.com/malomalo/viking#readme",
+  "keywords": [
+    "backbone",
+    "rails",
+    "activerecord",
+    "model",
+    "view",
+    "controller",
+    "router",
+    "server",
+    "client",
+    "browser"
+  ],
   "scripts": {
     "test": "phantomjs test/runner.js http://127.0.0.1:4321/test/index.html"
   },
-  "main"          : "viking.js",
-  "version"       : "0.9.0"
+  "main": "viking.js",
+  "version": "0.9.0",
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/malomalo/viking.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/malomalo/viking/issues"
+  },
+  "devDependencies": {
+    "babel": "^6.5.2",
+    "babel-preset-es2015-rollup": "^1.1.1",
+    "del": "^2.2.0",
+    "docco": "0.6.1",
+    "gulp": "^3.9.0",
+    "gulp-eslint": "^2.0.0",
+    "phantomjs": "1.8.1-3",
+    "rollup": "^0.29.1",
+    "rollup-plugin-babel": "^2.5.1",
+    "rollup-stream": "^1.6.0",
+    "vinyl-source-stream": "^1.1.0"
+  }
 }
