@@ -27,14 +27,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              <pre><code>Viking.js 0.1.0
-
-(c) 2012-2013 Jonathan Bracy, 42Floors Inc.
-Viking.js may be freely distributed under the MIT license.
-http://vikingjs.com</code></pre>
-<h2>Initial Setup</h2>
-
+              
             </div>
+            
+            <div class="content"><div class="highlight"><pre><span class="hljs-keyword">var</span> Viking = (<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+<span class="hljs-meta">	'use strict'</span>;</pre></div></div>
             
         </li>
         
@@ -45,11 +42,21 @@ http://vikingjs.com</code></pre>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <p>Setup the Viking namespace</p>
+              <p>Calls <code>to_param</code> on all its elements and joins the result with slashes.
+This is used by url_for in Viking Pack.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>Viking = {};</pre></div></div>
+            <div class="content"><div class="highlight"><pre><span class="hljs-built_in">Object</span>.defineProperty(<span class="hljs-built_in">Array</span>.prototype, <span class="hljs-string">'toParam'</span>, {
+	    value: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">value</span>(<span class="hljs-params"></span>) </span>{
+	        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.map(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">e</span>) </span>{
+	            <span class="hljs-keyword">return</span> e.toParam();
+	        }).join(<span class="hljs-string">'/'</span>);
+	    },
+	    writable: <span class="hljs-literal">true</span>,
+	    configureable: <span class="hljs-literal">true</span>,
+	    enumerable: <span class="hljs-literal">false</span>
+	});</pre></div></div>
             
         </li>
         
@@ -57,12 +64,28 @@ http://vikingjs.com</code></pre>
         <li id="section-3">
             <div class="annotation">
               
-              <div class="pilwrap for-h2">
+              <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <h2>CSRF Support for Ajax Request</h2>
+              <p>Converts an array into a string suitable for use as a URL query string,
+using the given key as the param name.</p>
 
             </div>
+            
+            <div class="content"><div class="highlight"><pre><span class="hljs-built_in">Object</span>.defineProperty(<span class="hljs-built_in">Array</span>.prototype, <span class="hljs-string">'toQuery'</span>, {
+	    value: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">value</span>(<span class="hljs-params">key</span>) </span>{
+	        <span class="hljs-keyword">var</span> prefix = key + <span class="hljs-string">"[]"</span>;
+	        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.map(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">value</span>) </span>{
+	            <span class="hljs-keyword">if</span> (value === <span class="hljs-literal">null</span>) {
+	                <span class="hljs-keyword">return</span> <span class="hljs-built_in">escape</span>(prefix) + <span class="hljs-string">'='</span>;
+	            }
+	            <span class="hljs-keyword">return</span> value.toQuery(prefix);
+	        }).join(<span class="hljs-string">'&amp;'</span>);
+	    },
+	    writable: <span class="hljs-literal">true</span>,
+	    configureable: <span class="hljs-literal">true</span>,
+	    enumerable: <span class="hljs-literal">false</span>
+	});</pre></div></div>
             
         </li>
         
@@ -73,15 +96,15 @@ http://vikingjs.com</code></pre>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <p>Set a callback for all AJAX request to set the CSRF Token header
-if the meta tag is present.</p>
+              <p>Alias of to_s.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>jQuery(document).ajaxSend(<span class="keyword">function</span>(event, xhr, settings) {
-    <span class="keyword">var</span> token = jQuery(<span class="string">'meta[name="csrf-token"]'</span>).attr(<span class="string">'content'</span>);
-    <span class="keyword">if</span> (token) { xhr.setRequestHeader(<span class="string">'X-CSRF-Token'</span>, token); }
-});</pre></div></div>
+            <div class="content"><div class="highlight"><pre><span class="hljs-built_in">Boolean</span>.prototype.toParam = <span class="hljs-built_in">Boolean</span>.prototype.toString;
+
+	<span class="hljs-built_in">Boolean</span>.prototype.toQuery = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">key</span>) </span>{
+		<span class="hljs-keyword">return</span> <span class="hljs-built_in">escape</span>(key.toParam()) + <span class="hljs-string">"="</span> + <span class="hljs-built_in">escape</span>(<span class="hljs-keyword">this</span>.toParam());
+	};</pre></div></div>
             
         </li>
         
@@ -89,12 +112,21 @@ if the meta tag is present.</p>
         <li id="section-5">
             <div class="annotation">
               
-              <div class="pilwrap for-h2">
+              <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <h2>Viking.Support</h2>
+              <p>strftime relies on <a href="https://github.com/samsonjs/strftime">https://github.com/samsonjs/strftime</a>. It supports
+standard specifiers from C as well as some other extensions from Ruby.</p>
 
             </div>
+            
+            <div class="content"><div class="highlight"><pre><span class="hljs-built_in">Date</span>.prototype.strftime = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">fmt</span>) </span>{
+	    <span class="hljs-keyword">return</span> strftime(fmt, <span class="hljs-keyword">this</span>);
+	};
+
+	<span class="hljs-built_in">Date</span>.fromISO = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">s</span>) </span>{
+	    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>(s);
+	};</pre></div></div>
             
         </li>
         
@@ -105,18 +137,35 @@ if the meta tag is present.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p>Viking.Support is a collection of utility classes and standard library
-extensions that were found useful for the Viking framework. These
-additions reside in this package so they can be loaded as needed
-in Javascript projects outside of Rails.
-strftime relies on <a href="https://github.com/samsonjs/strftime">https://github.com/samsonjs/strftime</a>. It supports
-standard specifiers from C as well as some other extensions from Ruby.</p>
+              <p>Alias of to_s.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>Date.prototype.strftime = <span class="keyword">function</span>(fmt) {
-    <span class="keyword">return</span> strftime(fmt, <span class="keyword">this</span>);
-};</pre></div></div>
+            <div class="content"><div class="highlight"><pre><span class="hljs-built_in">Date</span>.prototype.toParam = <span class="hljs-built_in">Date</span>.prototype.toJSON;
+
+	<span class="hljs-built_in">Date</span>.prototype.toQuery = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">key</span>) </span>{
+	    <span class="hljs-keyword">return</span> <span class="hljs-built_in">escape</span>(key.toParam()) + <span class="hljs-string">"="</span> + <span class="hljs-built_in">escape</span>(<span class="hljs-keyword">this</span>.toParam());
+	};
+
+	<span class="hljs-built_in">Date</span>.prototype.today = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+	    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>();
+	};
+
+	<span class="hljs-built_in">Date</span>.prototype.isToday = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+	    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.getUTCFullYear() === <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>().getUTCFullYear() &amp;&amp; <span class="hljs-keyword">this</span>.getUTCMonth() === <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>().getUTCMonth() &amp;&amp; <span class="hljs-keyword">this</span>.getUTCDate() === <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>().getUTCDate();
+	};
+
+	<span class="hljs-built_in">Date</span>.prototype.isThisMonth = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+	    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.getUTCFullYear() === <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>().getUTCFullYear() &amp;&amp; <span class="hljs-keyword">this</span>.getUTCMonth() === <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>().getUTCMonth();
+	};
+
+	<span class="hljs-built_in">Date</span>.prototype.isThisYear = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+	    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.getUTCFullYear() === <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>().getUTCFullYear();
+	};
+
+	<span class="hljs-built_in">Date</span>.prototype.past = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+	    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span> &lt; <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>();
+	};</pre></div></div>
             
         </li>
         
@@ -127,45 +176,35 @@ standard specifiers from C as well as some other extensions from Ruby.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <p>Since IE8 does not support new Dates with the ISO 8601 format we&#39;ll add
-supoprt for it</p>
-
+              <p>ordinalize returns the ordinal string corresponding to integer:</p>
+<pre><code>(1).ordinalize()    // =&gt; &#39;1st&#39;
+(2).ordinalize()    // =&gt; &#39;2nd&#39;
+(53).ordinalize()   // =&gt; &#39;53rd&#39;
+(2009).ordinalize() // =&gt; &#39;2009th&#39;
+(-134).ordinalize() // =&gt; &#39;-134th&#39;
+</code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>(<span class="keyword">function</span>(){
-    <span class="keyword">var</span> d = <span class="keyword">new</span> Date(<span class="string">'2011-06-02T09:34:29+02:00'</span>);
-    <span class="keyword">if</span>(!d || +d !== <span class="number">1307000069000</span>) {
-        Date.fromISO = <span class="keyword">function</span>(s) {
-            <span class="keyword">var</span> i, day, tz, regex, match;
-            
-            regex = <span class="regexp">/^(\d{4}\-\d\d\-\d\d([tT ][\d:\.]*)?)([zZ]|([+\-])(\d\d):(\d\d))?$/</span>;
-            match = regex.exec(s) || [];
-            
-            <span class="keyword">if</span>(match[<span class="number">1</span>]){
-                day = match[<span class="number">1</span>].split(<span class="regexp">/\D/</span>);
-                <span class="keyword">for</span>( i= <span class="number">0</span>; i &lt; day.length; i++) {
-                    day[i] = parseInt(day[i], <span class="number">10</span>) || <span class="number">0</span>;
-                }
-                day[<span class="number">1</span>] -= <span class="number">1</span>;
-                day = <span class="keyword">new</span> Date(Date.UTC.apply(Date, day));
-                <span class="keyword">if</span>(!day.getDate()) { <span class="keyword">return</span> <span class="literal">NaN</span>; }
-                <span class="keyword">if</span>(match[<span class="number">5</span>]){
-                    tz = (parseInt(match[<span class="number">5</span>], <span class="number">10</span>)*<span class="number">60</span>);
-                    <span class="keyword">if</span>(match[<span class="number">6</span>]) { tz += parseInt(match[<span class="number">6</span>], <span class="number">10</span>); }
-                    <span class="keyword">if</span>(match[<span class="number">4</span>] === <span class="string">'+'</span>) { tz*= -<span class="number">1</span>; }
-                    <span class="keyword">if</span>(tz) { day.setUTCMinutes(day.getUTCMinutes()+ tz); }
-                }
-                <span class="keyword">return</span> day;
-            }
+            <div class="content"><div class="highlight"><pre><span class="hljs-built_in">Number</span>.prototype.ordinalize = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+	    <span class="hljs-keyword">var</span> abs = <span class="hljs-built_in">Math</span>.abs(<span class="hljs-keyword">this</span>);
 
-            <span class="keyword">return</span> <span class="literal">NaN</span>;
-        };
-    } <span class="keyword">else</span> {
-        Date.fromISO = <span class="keyword">function</span>(s){
-            <span class="keyword">return</span> <span class="keyword">new</span> Date(s);
-        };
-    }
-}());</pre></div></div>
+	    <span class="hljs-keyword">if</span> (abs % <span class="hljs-number">100</span> &gt;= <span class="hljs-number">11</span> &amp;&amp; abs % <span class="hljs-number">100</span> &lt;= <span class="hljs-number">13</span>) {
+	        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span> + <span class="hljs-string">'th'</span>;
+	    }
+
+	    abs = abs % <span class="hljs-number">10</span>;
+	    <span class="hljs-keyword">if</span> (abs === <span class="hljs-number">1</span>) {
+	        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span> + <span class="hljs-string">'st'</span>;
+	    }
+	    <span class="hljs-keyword">if</span> (abs === <span class="hljs-number">2</span>) {
+	        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span> + <span class="hljs-string">'nd'</span>;
+	    }
+	    <span class="hljs-keyword">if</span> (abs === <span class="hljs-number">3</span>) {
+	        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span> + <span class="hljs-string">'rd'</span>;
+	    }
+
+	    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span> + <span class="hljs-string">'th'</span>;
+	};</pre></div></div>
             
         </li>
         
@@ -176,29 +215,53 @@ supoprt for it</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
-              <p>ordinalize returns the ordinal string corresponding to integer:</p>
-<pre><code>(1).ordinalize()    // =&gt; &#39;1st&#39;
-(2).ordinalize()    // =&gt; &#39;2nd&#39;
-(53).ordinalize()   // =&gt; &#39;53rd&#39;
-(2009).ordinalize() // =&gt; &#39;2009th&#39;
-(-134).ordinalize() // =&gt; &#39;-134th&#39;</code></pre>
+              <p>Alias of to_s.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>Number.prototype.ordinalize = <span class="keyword">function</span>() {
-    <span class="keyword">var</span> abs = Math.abs(<span class="keyword">this</span>);
-    
-    <span class="keyword">if</span> (abs % <span class="number">100</span> &gt;= <span class="number">11</span> &amp;&amp; abs % <span class="number">100</span> &lt;= <span class="number">13</span>) {
-        <span class="keyword">return</span> <span class="keyword">this</span> + <span class="string">'th'</span>;
-    }
-    
-    abs = abs % <span class="number">10</span>;
-    <span class="keyword">if</span> (abs === <span class="number">1</span>) { <span class="keyword">return</span> <span class="keyword">this</span> + <span class="string">'st'</span>; }
-    <span class="keyword">if</span> (abs === <span class="number">2</span>) { <span class="keyword">return</span> <span class="keyword">this</span> + <span class="string">'nd'</span>; }
-    <span class="keyword">if</span> (abs === <span class="number">3</span>) { <span class="keyword">return</span> <span class="keyword">this</span> + <span class="string">'rd'</span>; }
-    
-    <span class="keyword">return</span> <span class="keyword">this</span> + <span class="string">'th'</span>;
-};</pre></div></div>
+            <div class="content"><div class="highlight"><pre><span class="hljs-built_in">Number</span>.prototype.toParam = <span class="hljs-built_in">Number</span>.prototype.toString;
+
+	<span class="hljs-built_in">Number</span>.prototype.toQuery = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">key</span>) </span>{
+	    <span class="hljs-keyword">return</span> <span class="hljs-built_in">escape</span>(key.toParam()) + <span class="hljs-string">"="</span> + <span class="hljs-built_in">escape</span>(<span class="hljs-keyword">this</span>.toParam());
+	};
+
+	<span class="hljs-built_in">Number</span>.prototype.second = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+	    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span> * <span class="hljs-number">1000</span>;
+	};
+
+	<span class="hljs-built_in">Number</span>.prototype.seconds = <span class="hljs-built_in">Number</span>.prototype.second;
+
+	<span class="hljs-built_in">Number</span>.prototype.minute = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+	    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span> * <span class="hljs-number">60000</span>;
+	};
+
+	<span class="hljs-built_in">Number</span>.prototype.minutes = <span class="hljs-built_in">Number</span>.prototype.minute;
+
+	<span class="hljs-built_in">Number</span>.prototype.hour = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+	    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span> * <span class="hljs-number">3600000</span>;
+	};
+
+	<span class="hljs-built_in">Number</span>.prototype.hours = <span class="hljs-built_in">Number</span>.prototype.hour;
+
+	<span class="hljs-built_in">Number</span>.prototype.day = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+	    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span> * <span class="hljs-number">86400000</span>;
+	};
+
+	<span class="hljs-built_in">Number</span>.prototype.days = <span class="hljs-built_in">Number</span>.prototype.day;
+
+	<span class="hljs-built_in">Number</span>.prototype.week = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+	    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span> * <span class="hljs-number">7</span> * <span class="hljs-number">86400000</span>;
+	};
+
+	<span class="hljs-built_in">Number</span>.prototype.weeks = <span class="hljs-built_in">Number</span>.prototype.week;
+
+	<span class="hljs-built_in">Number</span>.prototype.ago = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+	    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>(<span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>().getTime() - <span class="hljs-keyword">this</span>);
+	};
+
+	<span class="hljs-built_in">Number</span>.prototype.fromNow = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+	    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>(<span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>().getTime() + <span class="hljs-keyword">this</span>);
+	};</pre></div></div>
             
         </li>
         
@@ -209,13 +272,37 @@ supoprt for it</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
-              <p>Converts the first character to uppercase</p>
+              <p>Returns a string representation of the receiver suitable for use as a URL
+query string:</p>
+<p>{name: &#39;David&#39;, nationality: &#39;Danish&#39;}.toParam()
+// =&gt; &quot;name=David&amp;nationality=Danish&quot;
+An optional namespace can be passed to enclose the param names:</p>
+<p>{name: &#39;David&#39;, nationality: &#39;Danish&#39;}.toParam(&#39;user&#39;)
+// =&gt; &quot;user[name]=David&amp;user[nationality]=Danish&quot;</p>
+<p>The string pairs &quot;key=value&quot; that conform the query string are sorted
+lexicographically in ascending order.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>String.prototype.capitalize = <span class="keyword">function</span>() {
-    <span class="keyword">return</span> <span class="keyword">this</span>.charAt(<span class="number">0</span>).toUpperCase() + <span class="keyword">this</span>.slice(<span class="number">1</span>);
-};</pre></div></div>
+            <div class="content"><div class="highlight"><pre><span class="hljs-built_in">Object</span>.defineProperty(<span class="hljs-built_in">Object</span>.prototype, <span class="hljs-string">'toParam'</span>, {
+	    writable: <span class="hljs-literal">true</span>,
+	    configureable: <span class="hljs-literal">true</span>,
+	    enumerable: <span class="hljs-literal">false</span>,
+	    value: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">value</span>(<span class="hljs-params">namespace</span>) </span>{
+	        <span class="hljs-keyword">var</span> _this = <span class="hljs-keyword">this</span>;
+
+	        <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.keys(<span class="hljs-keyword">this</span>).map(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">key</span>) </span>{
+	            <span class="hljs-keyword">var</span> value = _this[key];
+	            <span class="hljs-keyword">var</span> namespaceWithKey = namespace ? namespace + <span class="hljs-string">"["</span> + key + <span class="hljs-string">"]"</span> : key;
+
+	            <span class="hljs-keyword">if</span> (value === <span class="hljs-literal">null</span> || value === <span class="hljs-literal">undefined</span>) {
+	                <span class="hljs-keyword">return</span> <span class="hljs-built_in">escape</span>(namespaceWithKey);
+	            } <span class="hljs-keyword">else</span> {
+	                <span class="hljs-keyword">return</span> value.toQuery(namespaceWithKey);
+	            }
+	        }).join(<span class="hljs-string">'&amp;'</span>);
+	    }
+	});</pre></div></div>
             
         </li>
         
@@ -226,13 +313,19 @@ supoprt for it</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
-              <p>Converts the first character to lowercase</p>
+              <p>Converts an object into a string suitable for use as a URL query string,
+using the given key as the param name.</p>
+<p>Note: This method is defined as a default implementation for all Objects for
+Object#toQuery to work.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>String.prototype.anticapitalize = <span class="keyword">function</span>() {
-    <span class="keyword">return</span> <span class="keyword">this</span>.charAt(<span class="number">0</span>).toLowerCase() + <span class="keyword">this</span>.slice(<span class="number">1</span>);
-};</pre></div></div>
+            <div class="content"><div class="highlight"><pre><span class="hljs-built_in">Object</span>.defineProperty(<span class="hljs-built_in">Object</span>.prototype, <span class="hljs-string">'toQuery'</span>, {
+	    writable: <span class="hljs-literal">true</span>,
+	    configureable: <span class="hljs-literal">true</span>,
+	    enumerable: <span class="hljs-literal">false</span>,
+	    value: <span class="hljs-built_in">Object</span>.prototype.toParam
+	});</pre></div></div>
             
         </li>
         
@@ -243,14 +336,13 @@ supoprt for it</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
-              <p>Capitalizes all the words and replaces some characters in the string to
-create a nicer looking title. titleize is meant for creating pretty output.</p>
+              <p>Converts the first character to uppercase</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>String.prototype.titleize = <span class="keyword">function</span>() {
-    <span class="keyword">return</span> <span class="keyword">this</span>.underscore().humanize().replace(<span class="regexp">/\b('?[a-z])/g</span>, <span class="keyword">function</span>(m){ <span class="keyword">return</span> m.toUpperCase(); });
-};</pre></div></div>
+            <div class="content"><div class="highlight"><pre><span class="hljs-built_in">String</span>.prototype.capitalize = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+	    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.charAt(<span class="hljs-number">0</span>).toUpperCase() + <span class="hljs-keyword">this</span>.slice(<span class="hljs-number">1</span>);
+	};</pre></div></div>
             
         </li>
         
@@ -261,16 +353,13 @@ create a nicer looking title. titleize is meant for creating pretty output.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
-              <p>Capitalizes the first word and turns underscores into spaces and strips a
-trailing "_id", if any. Like titleize, this is meant for creating pretty output.</p>
+              <p>Converts the first character to lowercase</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>String.prototype.humanize = <span class="keyword">function</span>() {
-    <span class="keyword">var</span> result = <span class="keyword">this</span>.toLowerCase().replace(<span class="regexp">/_id$/</span>, <span class="string">''</span>).replace(<span class="regexp">/_/g</span>, <span class="string">' '</span>);
-    result = result.replace(<span class="regexp">/([a-z\d]*)/g</span>, <span class="keyword">function</span>(m) { <span class="keyword">return</span> m.toLowerCase(); });
-    <span class="keyword">return</span> result.capitalize();
-};</pre></div></div>
+            <div class="content"><div class="highlight"><pre><span class="hljs-built_in">String</span>.prototype.anticapitalize = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+	    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.charAt(<span class="hljs-number">0</span>).toLowerCase() + <span class="hljs-keyword">this</span>.slice(<span class="hljs-number">1</span>);
+	};</pre></div></div>
             
         </li>
         
@@ -281,23 +370,16 @@ trailing "_id", if any. Like titleize, this is meant for creating pretty output.
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
-              <p>Makes an underscored, lowercase form from the expression in the string.</p>
-<p>Changes '::' to '/' to convert namespaces to paths.</p>
-<p>Examples:</p>
-<pre><code>&quot;ActiveModel&quot;.underscore         # =&gt; &quot;active_model&quot;
-&quot;ActiveModel::Errors&quot;.underscore # =&gt; &quot;active_model/errors&quot;</code></pre>
-<p>As a rule of thumb you can think of underscore as the inverse of camelize,
-though there are cases where that does not hold:</p>
-<pre><code>&quot;SSLError&quot;.underscore().camelize() # =&gt; &quot;SslError&quot;</code></pre>
+              <p>Capitalizes all the words and replaces some characters in the string to
+create a nicer looking title. titleize is meant for creating pretty output.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>String.prototype.underscore = <span class="keyword">function</span>() {
-    <span class="keyword">var</span> result = <span class="keyword">this</span>.replace(<span class="string">'::'</span>, <span class="string">'/'</span>);
-    result = result.replace(<span class="regexp">/([A-Z\d]+)([A-Z][a-z])/g</span>, <span class="string">"$1_$2"</span>);
-    result = result.replace(<span class="regexp">/([a-z\d])([A-Z])/g</span>, <span class="string">"$1_$2"</span>);
-    <span class="keyword">return</span> result.replace(<span class="string">'-'</span>,<span class="string">'_'</span>).toLowerCase();
-};</pre></div></div>
+            <div class="content"><div class="highlight"><pre><span class="hljs-built_in">String</span>.prototype.titleize = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+	    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.underscore().humanize().replace(<span class="hljs-regexp">/\b('?[a-z])/g</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">m</span>) </span>{
+	        <span class="hljs-keyword">return</span> m.toUpperCase();
+	    });
+	};</pre></div></div>
             
         </li>
         
@@ -308,27 +390,18 @@ though there are cases where that does not hold:</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
-              <p>By default, #camelize converts strings to UpperCamelCase. If the argument
-to camelize is set to <code>false</code> then #camelize produces lowerCamelCase.</p>
-<p>#camelize will also convert &quot;/&quot; to &quot;::&quot; which is useful for converting
-paths to namespaces.</p>
-<p>Examples:</p>
-<pre><code>&quot;active_model&quot;.camelize               // =&gt; &quot;ActiveModel&quot;
-&quot;active_model&quot;.camelize(true)         // =&gt; &quot;ActiveModel&quot;
-&quot;active_model&quot;.camelize(false)        // =&gt; &quot;activeModel&quot;
-&quot;active_model/errors&quot;.camelize        // =&gt; &quot;ActiveModel::Errors&quot;
-&quot;active_model/errors&quot;.camelize(false) // =&gt; &quot;activeModel::Errors&quot;</code></pre>
-<p>As a rule of thumb you can think of camelize as the inverse of underscore,
-though there are cases where that does not hold:</p>
-<pre><code>&quot;SSLError&quot;.underscore().camelize()   // =&gt; &quot;SslError&quot;</code></pre>
+              <p>Capitalizes the first word and turns underscores into spaces and strips a
+trailing &quot;_id&quot;, if any. Like titleize, this is meant for creating pretty output.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>String.prototype.camelize = <span class="keyword">function</span>(uppercase_first_letter) {
-    <span class="keyword">var</span> result = uppercase_first_letter === <span class="literal">undefined</span> || uppercase_first_letter ? <span class="keyword">this</span>.capitalize() : <span class="keyword">this</span>.anticapitalize();
-    result = result.replace(<span class="regexp">/(_|(\/))([a-z\d]*)/g</span>, <span class="keyword">function</span>(_a, _b, first, rest) { <span class="keyword">return</span> (first || <span class="string">''</span>) + rest.capitalize(); });
-    <span class="keyword">return</span> result.replace(<span class="string">'/'</span>, <span class="string">'::'</span>);
-};</pre></div></div>
+            <div class="content"><div class="highlight"><pre><span class="hljs-built_in">String</span>.prototype.humanize = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+	    <span class="hljs-keyword">var</span> result = <span class="hljs-keyword">this</span>.toLowerCase().replace(<span class="hljs-regexp">/_id$/</span>, <span class="hljs-string">''</span>).replace(<span class="hljs-regexp">/_/g</span>, <span class="hljs-string">' '</span>);
+	    result = result.replace(<span class="hljs-regexp">/([a-z\d]*)/g</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">m</span>) </span>{
+	        <span class="hljs-keyword">return</span> m.toLowerCase();
+	    });
+	    <span class="hljs-keyword">return</span> result.capitalize();
+	};</pre></div></div>
             
         </li>
         
@@ -339,22 +412,23 @@ though there are cases where that does not hold:</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
-              <p>Convert a string to a boolean value. If the argument to #booleanize is
-passed if the string is not &#39;true&#39; or &#39;false&#39; it will return the argument.</p>
+              <p>Makes an underscored, lowercase form from the expression in the string.</p>
+<p>Changes &#39;.&#39; to &#39;/&#39; to convert namespaces to paths.</p>
 <p>Examples:</p>
-<pre><code>&quot;true&quot;.booleanize()       // =&gt; true
-&quot;false&quot;.booleanize()      // =&gt; false
-&quot;other&quot;.booleanize()      // =&gt; false
-&quot;other&quot;.booleanize(true)  // =&gt; true</code></pre>
-
+<pre><code>&quot;ActiveModel&quot;.underscore         # =&gt; &quot;active_model&quot;
+&quot;ActiveModel.Errors&quot;.underscore # =&gt; &quot;active_model/errors&quot;
+</code></pre><p>As a rule of thumb you can think of underscore as the inverse of camelize,
+though there are cases where that does not hold:</p>
+<pre><code>&quot;SSLError&quot;.underscore().camelize() # =&gt; &quot;SslError&quot;
+</code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>String.prototype.booleanize = <span class="keyword">function</span>(defaultTo) {
-    <span class="keyword">if</span>(<span class="keyword">this</span>.toString() === <span class="string">'true'</span>) { <span class="keyword">return</span> <span class="literal">true</span>; }
-    <span class="keyword">if</span> (<span class="keyword">this</span>.toString() === <span class="string">'false'</span>) { <span class="keyword">return</span> <span class="literal">false</span>; }
-    
-    <span class="keyword">return</span> (defaultTo === <span class="literal">undefined</span> ? <span class="literal">false</span> : defaultTo);
-};</pre></div></div>
+            <div class="content"><div class="highlight"><pre><span class="hljs-built_in">String</span>.prototype.underscore = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+	    <span class="hljs-keyword">var</span> result = <span class="hljs-keyword">this</span>.replace(<span class="hljs-string">'.'</span>, <span class="hljs-string">'/'</span>);
+	    result = result.replace(<span class="hljs-regexp">/([A-Z\d]+)([A-Z][a-z])/g</span>, <span class="hljs-string">"$1_$2"</span>);
+	    result = result.replace(<span class="hljs-regexp">/([a-z\d])([A-Z])/g</span>, <span class="hljs-string">"$1_$2"</span>);
+	    <span class="hljs-keyword">return</span> result.replace(<span class="hljs-string">'-'</span>, <span class="hljs-string">'_'</span>).toLowerCase();
+	};</pre></div></div>
             
         </li>
         
@@ -365,15 +439,37 @@ passed if the string is not &#39;true&#39; or &#39;false&#39; it will return the
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
-              <p>Replaces underscores with dashes.</p>
-<p>Example:</p>
-<pre><code>&quot;puni_puni&quot;  // =&gt; &quot;puni-puni&quot;</code></pre>
-
+              <p>By default, #camelize converts strings to UpperCamelCase. If the argument
+to camelize is set to <code>false</code> then #camelize produces lowerCamelCase.</p>
+<p>#camelize will also convert &quot;/&quot; to &quot;.&quot; which is useful for converting
+paths to namespaces.</p>
+<p>Examples:</p>
+<pre><code>&quot;active_model&quot;.camelize               // =&gt; &quot;ActiveModel&quot;
+&quot;active_model&quot;.camelize(true)         // =&gt; &quot;ActiveModel&quot;
+&quot;active_model&quot;.camelize(false)        // =&gt; &quot;activeModel&quot;
+&quot;active_model/errors&quot;.camelize        // =&gt; &quot;ActiveModel.Errors&quot;
+&quot;active_model/errors&quot;.camelize(false) // =&gt; &quot;activeModel.Errors&quot;
+</code></pre><p>As a rule of thumb you can think of camelize as the inverse of underscore,
+though there are cases where that does not hold:</p>
+<pre><code>&quot;SSLError&quot;.underscore().camelize()   // =&gt; &quot;SslError&quot;
+</code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>String.prototype.dasherize = <span class="keyword">function</span>() {
-    <span class="keyword">return</span> <span class="keyword">this</span>.replace(<span class="string">'_'</span>,<span class="string">'-'</span>);
-};</pre></div></div>
+            <div class="content"><div class="highlight"><pre><span class="hljs-built_in">String</span>.prototype.camelize = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">uppercase_first_letter</span>) </span>{
+	    <span class="hljs-keyword">var</span> result = <span class="hljs-keyword">void</span> <span class="hljs-number">0</span>;
+
+	    <span class="hljs-keyword">if</span> (uppercase_first_letter === <span class="hljs-literal">undefined</span> || uppercase_first_letter) {
+	        result = <span class="hljs-keyword">this</span>.capitalize();
+	    } <span class="hljs-keyword">else</span> {
+	        result = <span class="hljs-keyword">this</span>.anticapitalize();
+	    }
+
+	    result = result.replace(<span class="hljs-regexp">/(_|(\/))([a-z\d]*)/g</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">_a, _b, first, rest</span>) </span>{
+	        <span class="hljs-keyword">return</span> (first || <span class="hljs-string">''</span>) + rest.capitalize();
+	    });
+
+	    <span class="hljs-keyword">return</span> result.replace(<span class="hljs-string">'/'</span>, <span class="hljs-string">'.'</span>);
+	};</pre></div></div>
             
         </li>
         
@@ -384,16 +480,26 @@ passed if the string is not &#39;true&#39; or &#39;false&#39; it will return the
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
-              <p>Replaces special characters in a string so that it may be used as part of
-a &quot;pretty&quot; URL.</p>
-<p>Example:</p>
-<pre><code>&quot;Donald E. Knuth&quot;.parameterize() // =&gt; &#39;donald-e-knuth&#39;</code></pre>
-
+              <p>Convert a string to a boolean value. If the argument to #booleanize is
+passed if the string is not &#39;true&#39; or &#39;false&#39; it will return the argument.</p>
+<p>Examples:</p>
+<pre><code>&quot;true&quot;.booleanize()       // =&gt; true
+&quot;false&quot;.booleanize()      // =&gt; false
+&quot;other&quot;.booleanize()      // =&gt; false
+&quot;other&quot;.booleanize(true)  // =&gt; true
+</code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>String.prototype.parameterize = <span class="keyword">function</span>(seperator) {
-    <span class="keyword">return</span> <span class="keyword">this</span>.toLowerCase().replace(<span class="regexp">/[^a-z0-9\-_]+/g</span>, seperator || <span class="string">'-'</span>);
-};</pre></div></div>
+            <div class="content"><div class="highlight"><pre><span class="hljs-built_in">String</span>.prototype.booleanize = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">defaultTo</span>) </span>{
+	    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.toString() === <span class="hljs-string">'true'</span>) {
+	        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+	    }
+	    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.toString() === <span class="hljs-string">'false'</span>) {
+	        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+	    }
+
+	    <span class="hljs-keyword">return</span> defaultTo === <span class="hljs-literal">undefined</span> ? <span class="hljs-literal">false</span> : defaultTo;
+	};</pre></div></div>
             
         </li>
         
@@ -404,13 +510,15 @@ a &quot;pretty&quot; URL.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
-              <p>Add Underscore.inflection#pluralize function on the String object</p>
-
+              <p>Replaces underscores with dashes.</p>
+<p>Example:</p>
+<pre><code>&quot;puni_puni&quot;  // =&gt; &quot;puni-puni&quot;
+</code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>String.prototype.pluralize = <span class="keyword">function</span>(count, includeNumber) {
-    <span class="keyword">return</span> _.pluralize(<span class="keyword">this</span>, count, includeNumber);
-};</pre></div></div>
+            <div class="content"><div class="highlight"><pre><span class="hljs-built_in">String</span>.prototype.dasherize = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+	    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.replace(<span class="hljs-string">'_'</span>, <span class="hljs-string">'-'</span>);
+	};</pre></div></div>
             
         </li>
         
@@ -421,13 +529,16 @@ a &quot;pretty&quot; URL.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
-              <p>Add Underscore.inflection#singularize function on the String object</p>
-
+              <p>Replaces special characters in a string so that it may be used as part of
+a &quot;pretty&quot; URL.</p>
+<p>Example:</p>
+<pre><code>&quot;Donald E. Knuth&quot;.parameterize() // =&gt; &#39;donald-e-knuth&#39;
+</code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>String.prototype.singularize = <span class="keyword">function</span>() {
-    <span class="keyword">return</span> _.singularize(<span class="keyword">this</span>);
-};</pre></div></div>
+            <div class="content"><div class="highlight"><pre><span class="hljs-built_in">String</span>.prototype.parameterize = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">seperator</span>) </span>{
+	    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.toLowerCase().replace(<span class="hljs-regexp">/[^a-z0-9\-_]+/g</span>, seperator || <span class="hljs-string">'-'</span>);
+	};</pre></div></div>
             
         </li>
         
@@ -435,12 +546,16 @@ a &quot;pretty&quot; URL.</p>
         <li id="section-20">
             <div class="annotation">
               
-              <div class="pilwrap for-h2">
+              <div class="pilwrap ">
                 <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
-              <h2>Viking.config</h2>
+              <p>Add Underscore.inflection#pluralize function on the String object</p>
 
             </div>
+            
+            <div class="content"><div class="highlight"><pre><span class="hljs-built_in">String</span>.prototype.pluralize = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">count, includeNumber</span>) </span>{
+	    <span class="hljs-keyword">return</span> _.pluralize(<span class="hljs-keyword">this</span>, count, includeNumber);
+	};</pre></div></div>
             
         </li>
         
@@ -451,24 +566,13 @@ a &quot;pretty&quot; URL.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
-              <p>Helper method to configure defatults on an Viking Object.</p>
-<p>Example:</p>
-<pre><code>Viking.configure(Viking.Cursor, {per_page: 40});
-Viking.configure(Viking.Cursor, &#39;per_page&#39;, 5); // per_page is 5 by defatult</code></pre>
+              <p>Add Underscore.inflection#singularize function on the String object</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>Viking.config = <span class="function"><span class="keyword">function</span> <span class="params">(obj, key, val)</span> {</span>
-    <span class="keyword">var</span> attrs;
-    
-    <span class="keyword">if</span> (<span class="keyword">typeof</span> key === <span class="string">'object'</span>) {
-      attrs = key;
-    } <span class="keyword">else</span> {
-      (attrs = {})[key] = val;
-    }
-    
-    <span class="keyword">return</span> _.extend(obj.prototype.defaults, attrs);
-};</pre></div></div>
+            <div class="content"><div class="highlight"><pre><span class="hljs-built_in">String</span>.prototype.singularize = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+	    <span class="hljs-keyword">return</span> _.singularize(<span class="hljs-keyword">this</span>);
+	};</pre></div></div>
             
         </li>
         
@@ -476,12 +580,32 @@ Viking.configure(Viking.Cursor, &#39;per_page&#39;, 5); // per_page is 5 by defa
         <li id="section-22">
             <div class="annotation">
               
-              <div class="pilwrap for-h2">
+              <div class="pilwrap ">
                 <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
-              <h2>Viking.Model</h2>
+              <p>Tries to find a variable with the name specified in context of <code>context</code>.
+<code>context</code> defaults to the <code>window</code> variable.</p>
+<p>Examples:
+    &#39;Module&#39;.constantize     # =&gt; Module
+    &#39;Test.Unit&#39;.constantize  # =&gt; Test.Unit
+    &#39;Unit&#39;.constantize(Test) # =&gt; Test.Unit</p>
+<p>Viking.NameError is raised when the variable is unknown.</p>
 
             </div>
+            
+            <div class="content"><div class="highlight"><pre><span class="hljs-built_in">String</span>.prototype.constantize = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">context</span>) </span>{
+	    <span class="hljs-keyword">if</span> (!context) {
+	        context = <span class="hljs-built_in">window</span>;
+	    }
+
+	    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.split(<span class="hljs-string">'.'</span>).reduce(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">context, name</span>) </span>{
+	        <span class="hljs-keyword">var</span> v = context[name];
+	        <span class="hljs-keyword">if</span> (!v) {
+	            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Viking.NameError(<span class="hljs-string">"uninitialized variable "</span> + name);
+	        }
+	        <span class="hljs-keyword">return</span> v;
+	    }, context);
+	};</pre></div></div>
             
         </li>
         
@@ -492,15 +616,27 @@ Viking.configure(Viking.Cursor, &#39;per_page&#39;, 5); // per_page is 5 by defa
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
-              <p>Viking.Model is an extension of <a href="http://backbonejs.org/#Model">Backbone.Model</a>.
-It adds naming, relationships, data type coerions, selection, and modifies
-sync to work with <a href="http://rubyonrails.org/">Ruby on Rails</a> out of the box.</p>
+              <p>Removes the module part from the expression in the string.</p>
+<p>Examples:
+    &#39;Namespaced.Module&#39;.demodulize() # =&gt; &#39;Module&#39;
+    &#39;Module&#39;.demodulize() # =&gt; &#39;Module&#39;
+    &#39;&#39;.demodulize() # =&gt; &#39;&#39;</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>Viking.Model = Backbone.Model.extend({
-    
-    constructor: <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span></pre></div></div>
+            <div class="content"><div class="highlight"><pre><span class="hljs-built_in">String</span>.prototype.demodulize = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">seperator</span>) </span>{
+	    <span class="hljs-keyword">if</span> (!seperator) {
+	        seperator = <span class="hljs-string">'.'</span>;
+	    }
+
+	    <span class="hljs-keyword">var</span> index = <span class="hljs-keyword">this</span>.lastIndexOf(seperator);
+
+	    <span class="hljs-keyword">if</span> (index === <span class="hljs-number">-1</span>) {
+	        <span class="hljs-keyword">return</span> <span class="hljs-built_in">String</span>(<span class="hljs-keyword">this</span>);
+	    } <span class="hljs-keyword">else</span> {
+	        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.slice(index + <span class="hljs-number">1</span>);
+	    }
+	};</pre></div></div>
             
         </li>
         
@@ -511,11 +647,30 @@ sync to work with <a href="http://rubyonrails.org/">Ruby on Rails</a> out of the
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
-              <p>Initialize the object as a Backbone Model</p>
+              <p>If <code>length</code> is greater than the length of the string, returns a new String
+of length <code>length</code> with the string right justified and padded with padString;
+otherwise, returns string</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        Backbone.Model.apply(<span class="keyword">this</span>, arguments);</pre></div></div>
+            <div class="content"><div class="highlight"><pre><span class="hljs-built_in">String</span>.prototype.rjust = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">length, padString</span>) </span>{
+	    <span class="hljs-keyword">if</span> (!padString) {
+	        padString = <span class="hljs-string">' '</span>;
+	    }
+
+	    <span class="hljs-keyword">var</span> padding = <span class="hljs-string">''</span>;
+	    <span class="hljs-keyword">var</span> paddingLength = length - <span class="hljs-keyword">this</span>.length;
+
+	    <span class="hljs-keyword">while</span> (padding.length &lt; paddingLength) {
+	        <span class="hljs-keyword">if</span> (paddingLength - padding.length &lt; padString.length) {
+	            padding = padding + padString.slice(<span class="hljs-number">0</span>, paddingLength - padding.length);
+	        } <span class="hljs-keyword">else</span> {
+	            padding = padding + padString;
+	        }
+	    }
+
+	    <span class="hljs-keyword">return</span> padding + <span class="hljs-keyword">this</span>;
+	};</pre></div></div>
             
         </li>
         
@@ -526,11 +681,30 @@ sync to work with <a href="http://rubyonrails.org/">Ruby on Rails</a> out of the
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
-              <p>Add a helper reference to get the model name from an model instance.</p>
+              <p>If <code>length</code> is greater than the length of the string, returns a new String
+of length <code>length</code> with the string left justified and padded with padString;
+otherwise, returns string</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="keyword">this</span>.modelName = <span class="keyword">this</span>.constructor.modelName;</pre></div></div>
+            <div class="content"><div class="highlight"><pre><span class="hljs-built_in">String</span>.prototype.ljust = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">length, padString</span>) </span>{
+	    <span class="hljs-keyword">if</span> (!padString) {
+	        padString = <span class="hljs-string">' '</span>;
+	    }
+
+	    <span class="hljs-keyword">var</span> padding = <span class="hljs-string">''</span>;
+	    <span class="hljs-keyword">var</span> paddingLength = length - <span class="hljs-keyword">this</span>.length;
+
+	    <span class="hljs-keyword">while</span> (padding.length &lt; paddingLength) {
+	        <span class="hljs-keyword">if</span> (paddingLength - padding.length &lt; padString.length) {
+	            padding = padding + padString.slice(<span class="hljs-number">0</span>, paddingLength - padding.length);
+	        } <span class="hljs-keyword">else</span> {
+	            padding = padding + padString;
+	        }
+	    }
+
+	    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span> + padding;
+	};</pre></div></div>
             
         </li>
         
@@ -541,21 +715,29 @@ sync to work with <a href="http://rubyonrails.org/">Ruby on Rails</a> out of the
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
-              <p>Initialize any <code>hasMany</code> relationships to empty collections if
-they are not defined yet.</p>
+              <p>Alias of to_s.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="keyword">var</span> rel, i;
-        <span class="keyword">if</span> (<span class="keyword">this</span>.hasMany) {
-            <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="keyword">this</span>.hasMany.length; i++) {
-                rel = Viking.Model.getRelationshipDetails(<span class="string">'hasMany'</span>, <span class="keyword">this</span>.hasMany[i]);
-                <span class="keyword">if</span>(!<span class="keyword">this</span>.attributes[rel.key]) {
-                    <span class="keyword">this</span>.attributes[rel.key] = <span class="keyword">new</span> rel.type();
-                }
-            }
-        }
-    },</pre></div></div>
+            <div class="content"><div class="highlight"><pre><span class="hljs-built_in">String</span>.prototype.toParam = <span class="hljs-built_in">String</span>.prototype.toString;
+
+	<span class="hljs-built_in">String</span>.prototype.toQuery = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">key</span>) </span>{
+	    <span class="hljs-keyword">return</span> <span class="hljs-built_in">escape</span>(key.toParam()) + <span class="hljs-string">"="</span> + <span class="hljs-built_in">escape</span>(<span class="hljs-keyword">this</span>.toParam());
+	};
+
+	<span class="hljs-built_in">String</span>.prototype.downcase = <span class="hljs-built_in">String</span>.prototype.toLowerCase;
+
+	<span class="hljs-keyword">var</span> Model = { test: <span class="hljs-number">42</span>, a: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">a</span>(<span class="hljs-params"></span>) </span>{
+	    <span class="hljs-keyword">return</span> <span class="hljs-number">3</span>;
+	  } };
+
+	<span class="hljs-keyword">var</span> Viking$<span class="hljs-number">1</span> = {
+	    Model: Model
+	};
+
+	<span class="hljs-keyword">return</span> Viking$<span class="hljs-number">1</span>;
+
+}());</pre></div></div>
             
         </li>
         
@@ -566,764 +748,8 @@ they are not defined yet.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
-              <p>TODO: make the select method work as described below</p>
-<p>When the model is part of a collection and you want to select a single
-or multiple items from a collection. If a model is selected <code>selected</code>
-will be set <code>true</code>, otherwise it will be <code>false</code>.</p>
-<p>By default any other models in the collection with be unselected. To
-prevent other models in the collection from being unselected you can
-pass <code>true</code>.</p>
-<p>The <code>selected</code> event is fired when the object is selected.</p>
+              <h1 id="sourcemappingurl-data-application-json-charset-utf-8-base64-eyj2zxjzaw9uijozlcjmawxlijpudwxslcjzb3vyy2vzijpbii9vc2vycy93yxjhdhvtyw4vc3jjl3zpa2luzy9sawivdmlraw5nl3n1chbvcnqvyxjyyxkuanmilcivvxnlcnmvd2fyyxr1bwful3nyyy92awtpbmcvbglil3zpa2luzy9zdxbwb3j0l2jvb2xlyw4uanmilcivvxnlcnmvd2fyyxr1bwful3nyyy92awtpbmcvbglil3zpa2luzy9zdxbwb3j0l2rhdguuanmilcivvxnlcnmvd2fyyxr1bwful3nyyy92awtpbmcvbglil3zpa2luzy9zdxbwb3j0l251bwjlci5qcyisii9vc2vycy93yxjhdhvtyw4vc3jjl3zpa2luzy9sawivdmlraw5nl3n1chbvcnqvb2jqzwn0lmpziiwil1vzzxjzl3dhcmf0dw1hbi9zcmmvdmlraw5nl2xpyi92awtpbmcvc3vwcg9ydc9zdhjpbmcuanmilcivvxnlcnmvd2fyyxr1bwful3nyyy92awtpbmcvbglil3zpa2luzy9tb2rlbc5qcyisii9vc2vycy93yxjhdhvtyw4vc3jjl3zpa2luzy9sawivdmlraw5nlmpzil0sinnvdxjjzxndb250zw50ijpbii8vienhbgxzigb0b19wyxjhbwagb24gywxsigl0cyblbgvtzw50cybhbmqgam9pbnmgdghlihjlc3vsdcb3axroihnsyxnozxmuxg4vlybuaglziglzihvzzwqgynkgdxjsx2zvcibpbibwawtpbmcgugfjay5cbk9iamvjdc5kzwzpbmvqcm9wzxj0eshbcnjhes5wcm90b3r5cgusicd0b1bhcmftjywge1xuicagihzhbhvloibmdw5jdglvbiaoksb7ihjldhvybib0aglzlm1hccgozskgpt4gzs50b1bhcmftkckplmpvaw4ojy8nktsgfsxcbiagicb3cml0ywjsztogdhj1zsxcbiagicbjb25mawd1cmvhymxloib0cnvllfxuicagigvudw1lcmfibgu6igzhbhnlxg59kttcblxuly8gq29udmvydhmgyw4gyxjyyxkgaw50bybhihn0cmluzybzdwl0ywjszsbmb3igdxnligfzigegvvjmihf1zxj5ihn0cmluzyxcbi8vihvzaw5nihrozsbnaxzlbibrzxkgyxmgdghlihbhcmftig5hbwuuxg5pymply3quzgvmaw5luhjvcgvydhkoqxjyyxkuchjvdg90exbllcandg9rdwvyescsihtcbiagicb2ywx1ztogznvuy3rpb24gkgtleskge1xuicagicagicbszxqgchjlzml4id0ga2v5icsgxcjbxvwio1xuicagicagicbyzxr1cm4gdghpcy5tyxaoznvuy3rpb24gkhzhbhvlksb7xg4gicagicagicagicbpziaodmfsdwugpt09ig51bgwpihtcbiagicagicagicagicagicbyzxr1cm4gzxnjyxblkhbyzwzpeckgkyanpsc7xg4gicagicagicagicb9xg4gicagicagicagicbyzxr1cm4gdmfsdwuudg9rdwvyeshwcmvmaxgpo1xuicagicagicb9ks5qb2lukccmjyk7xg4gicagfsxcbiagicb3cml0ywjsztogdhj1zsxcbiagicbjb25mawd1cmvhymxloib0cnvllfxuicagigvudw1lcmfibgu6igzhbhnlxg59kttcbiisii8viefsawfzig9mihrvx3muxg5cb29szwfulnbyb3rvdhlwzs50b1bhcmftid0gqm9vbgvhbi5wcm90b3r5cguudg9tdhjpbmc7xg5cbkjvb2xlyw4uchjvdg90exbllnrvuxvlcnkgpsbmdw5jdglvbihrzxkpihtcblx0cmv0dxjuigvzy2fwzshrzxkudg9qyxjhbsgpksarifwipvwiicsgzxnjyxblkhroaxmudg9qyxjhbsgpkttcbn07iiwily8gc3ryznrpbwugcmvsawvzig9uigh0dhbzoi8vz2l0ahvilmnvbs9zyw1zb25qcy9zdhjmdgltzs4gsxqgc3vwcg9ydhncbi8vihn0yw5kyxjkihnwzwnpzmllcnmgznjvbsbdigfzihdlbgwgyxmgc29tzsbvdghlciblehrlbnnpb25zigzyb20gunvies5cbkrhdguuchjvdg90exbllnn0cmz0aw1lid0gznvuy3rpb24ozm10ksb7xg4gicagcmv0dxjuihn0cmz0aw1lkgztdcwgdghpcyk7xg59o1xuxg5eyxrllmzyb21ju08gpsaocykgpt4gbmv3ierhdguocyk7xg5cbi8viefsawfzig9mihrvx3muxg5eyxrllnbyb3rvdhlwzs50b1bhcmftid0grgf0zs5wcm90b3r5cguudg9ku09oo1xuxg5eyxrllnbyb3rvdhlwzs50b1f1zxj5id0gznvuy3rpb24oa2v5ksb7xg4gicagcmv0dxjuigvzy2fwzshrzxkudg9qyxjhbsgpksarifwipvwiicsgzxnjyxblkhroaxmudg9qyxjhbsgpkttcbn07xg5cbkrhdguuchjvdg90exbllnrvzgf5id0gkckgpt4gbmv3ierhdguokttcblxurgf0zs5wcm90b3r5cguuaxnub2rhesa9igz1bmn0aw9ukckge1xuicagihjldhvybiaodghpcy5nzxrvvengdwxswwvhcigpid09psaobmv3ierhdguokskuz2v0vvrdrnvsbfllyxioksamjib0aglzlmdldfvuq01vbnrokckgpt09ichuzxcgrgf0zsgpks5nzxrvvennb250acgpicymihroaxmuz2v0vvrdrgf0zsgpid09psaobmv3ierhdguokskuz2v0vvrdrgf0zsgpkttcbn07xg5cbkrhdguuchjvdg90exbllmlzvghpc01vbnroid0gznvuy3rpb24gkckge1xuicagihjldhvybiaodghpcy5nzxrvvengdwxswwvhcigpid09psaobmv3ierhdguokskuz2v0vvrdrnvsbfllyxioksamjib0aglzlmdldfvuq01vbnrokckgpt09ichuzxcgrgf0zsgpks5nzxrvvennb250acgpkttcbn1cblxurgf0zs5wcm90b3r5cguuaxnuaglzwwvhcia9igz1bmn0aw9ukckge1xuicagihjldhvybiaodghpcy5nzxrvvengdwxswwvhcigpid09psaobmv3ierhdguokskuz2v0vvrdrnvsbfllyxioksk7xg59o1xuxg5cbkrhdguuchjvdg90exbllnbhc3qgpsbmdw5jdglvbiaoksb7xg4gicagcmv0dxjuich0aglzidwgkg5ldybeyxrlkckpkttcbn0ilcivlybvcmrpbmfsaxplihjldhvybnmgdghlig9yzgluywwgc3ryaw5nignvcnjlc3bvbmrpbmcgdg8gaw50zwdlcjpcbi8vxg4vlyagicagkdeplm9yzgluywxpemuoksagicavlya9pianmxn0j1xuly8gicagicgyks5vcmrpbmfsaxplkckgicagly8gpt4gjzjuzcdcbi8vicagicaontmplm9yzgluywxpemuoksagic8vid0-icc1m3jkj1xuly8gicagicgymda5ks5vcmrpbmfsaxplkckgly8gpt4gjziwmdl0acdcbi8vicagicaolteznckub3jkaw5hbgl6zsgpic8vid0-icctmtm0dggnxg5odw1izxiuchjvdg90exbllm9yzgluywxpemugpsbmdw5jdglvbigpihtcbiagicbszxqgywjzid0gtwf0ac5hynmodghpcyk7xg4gicagxg4gicagawygkgficyalidewmca-psaxmsamjibhynmgjsaxmdagpd0gmtmpihtcbiagicagicagcmv0dxjuihroaxmgkyandggno1xuicagih1cbiagicbcbiagicbhynmgpsbhynmgjsaxmdtcbiagicbpziaoywjzid09psaxksb7ihjldhvybib0aglzicsgj3n0jzsgfvxuicagiglmichhynmgpt09idipihsgcmv0dxjuihroaxmgkyanbmqnoyb9xg4gicagawygkgficya9pt0gmykgeybyzxr1cm4gdghpcyaricdyzcc7ih1cbiagicbcbiagicbyzxr1cm4gdghpcyaricd0acc7xg59o1xuxg4vlybbbglhcybvzib0b19zllxutnvtymvylnbyb3rvdhlwzs50b1bhcmftid0gtnvtymvylnbyb3rvdhlwzs50b1n0cmluzztcblxutnvtymvylnbyb3rvdhlwzs50b1f1zxj5id0gznvuy3rpb24oa2v5ksb7xg4gicagcmv0dxjuigvzy2fwzshrzxkudg9qyxjhbsgpksarifwipvwiicsgzxnjyxblkhroaxmudg9qyxjhbsgpkttcbn07xg5cbk51bwjlci5wcm90b3r5cguuc2vjb25kid0gznvuy3rpb24oksb7xg4gicagcmv0dxjuihroaxmgkiaxmdawo1xufttcblxutnvtymvylnbyb3rvdhlwzs5zzwnvbmrzid0gtnvtymvylnbyb3rvdhlwzs5zzwnvbmq7xg5cbk51bwjlci5wcm90b3r5cguubwludxrlid0gznvuy3rpb24oksb7xg4gicagcmv0dxjuihroaxmgkia2mdawmdtcbn07xg5cbk51bwjlci5wcm90b3r5cguubwludxrlcya9ie51bwjlci5wcm90b3r5cguubwludxrlo1xuxg5odw1izxiuchjvdg90exbllmhvdxigpsbmdw5jdglvbigpihtcbiagicbyzxr1cm4gdghpcyaqidm2mdawmda7xg59o1xuxg5odw1izxiuchjvdg90exbllmhvdxjzid0gtnvtymvylnbyb3rvdhlwzs5ob3vyo1xuxg5odw1izxiuchjvdg90exbllmrhesa9igz1bmn0aw9ukckge1xuicagihjldhvybib0aglzicogody0mdawmda7xg59o1xuxg5odw1izxiuchjvdg90exbllmrhexmgpsbodw1izxiuchjvdg90exbllmrhettcblxutnvtymvylnbyb3rvdhlwzs53zwvrid0gznvuy3rpb24oksb7xg4gicagcmv0dxjuihroaxmgkia3icogody0mdawmda7xg59o1xuxg5odw1izxiuchjvdg90exbllndlzwtzid0gtnvtymvylnbyb3rvdhlwzs53zwvro1xuxg5odw1izxiuchjvdg90exbllmfnbya9igz1bmn0aw9ukckge1xuicagihjldhvybibuzxcgrgf0zsgobmv3ierhdguokskuz2v0vgltzsgpic0gdghpcyk7xg59o1xuxg5odw1izxiuchjvdg90exbllmzyb21ob3cgpsbmdw5jdglvbigpihtcbiagicbyzxr1cm4gbmv3ierhdguokg5ldybeyxrlkckplmdldfrpbwuoksarihroaxmpo1xufttcbiisii8vifjldhvybnmgysbzdhjpbmcgcmvwcmvzzw50yxrpb24gb2ygdghlihjly2vpdmvyihn1axrhymxligzvcib1c2ugyxmgysbvukxcbi8vihf1zxj5ihn0cmluzzpcbi8vifxuly8ge25hbwu6icdeyxzpzccsig5hdglvbmfsaxr5oianrgfuaxnoj30udg9qyxjhbsgpxg4vlyavlya9pibcim5hbwu9rgf2awqmbmf0aw9uywxpdhk9rgfuaxnoxcjcbi8viefuig9wdglvbmfsig5hbwvzcgfjzsbjyw4gymugcgfzc2vkihrvigvuy2xvc2ugdghlihbhcmftig5hbwvzolxuly8gxg4vlyb7bmftztogj0rhdmlkjywgbmf0aw9uywxpdhk6icdeyw5pc2gnfs50b1bhcmftkcd1c2vyjylcbi8vic8vid0-ifwidxnlcltuyw1lxt1eyxzpzcz1c2vyw25hdglvbmfsaxr5xt1eyw5pc2hcilxuly9cbi8vifrozsbzdhjpbmcgcgfpcnmgxcjrzxk9dmfsdwvciib0agf0ignvbmzvcm0gdghlihf1zxj5ihn0cmluzybhcmugc29ydgvkxg4vlybszxhpy29ncmfwagljywxsesbpbibhc2nlbmrpbmcgb3jkzxiuxg5pymply3quzgvmaw5luhjvcgvydhkot2jqzwn0lnbyb3rvdhlwzswgj3rvugfyyw0nlcb7xg4gicagd3jpdgfibgu6ihrydwusxg4gicagy29uzmlndxjlywjsztogdhj1zsxcbiagicblbnvtzxjhymxloibmywxzzsxcbiagicb2ywx1ztogznvuy3rpb24obmftzxnwywnlksb7xg4gicagicagihjldhvybibpymply3qua2v5cyh0aglzks5tyxaokgtleskgpt4ge1xuicagicagicagicagbgv0ihzhbhvlid0gdghpc1trzxldo1xuicagicagicagicagbgv0ig5hbwvzcgfjzvdpdghlzxkgpsaobmftzxnwywnlid8gkg5hbwvzcgfjzsarifwiw1wiicsga2v5icsgxcjdxcipidoga2v5kttcblxuicagicagicagicagawygkhzhbhvlid09psbudwxsihx8ihzhbhvlid09psb1bmrlzmluzwqpihtcbiagicagicagicagicagicbyzxr1cm4gzxnjyxblkg5hbwvzcgfjzvdpdghlzxkpo1xuicagicagicagicagfsblbhnlihtcbiagicagicagicagicagicbyzxr1cm4gdmfsdwuudg9rdwvyeshuyw1lc3bhy2vxaxros2v5kttcbiagicagicagicagih1cbiagicagicagfskuam9pbignjicpo1xuicagih1cbn0po1xuxg4vlybdb252zxj0cybhbibvymply3qgaw50bybhihn0cmluzybzdwl0ywjszsbmb3igdxnligfzigegvvjmihf1zxj5ihn0cmluzyxcbi8vihvzaw5nihrozsbnaxzlbibrzxkgyxmgdghlihbhcmftig5hbwuuxg4vl1xuly8gtm90ztogvghpcybtzxrob2qgaxmgzgvmaw5lzcbhcybhigrlzmf1bhqgaw1wbgvtzw50yxrpb24gzm9yigfsbcbpymply3rzigzvclxuly8gt2jqzwn0i3rvuxvlcnkgdg8gd29yay5cbk9iamvjdc5kzwzpbmvqcm9wzxj0eshpymply3quchjvdg90exbllcandg9rdwvyescsihtcbiagicb3cml0ywjsztogdhj1zsxcbiagicbjb25mawd1cmvhymxloib0cnvllfxuicagigvudw1lcmfibgu6igzhbhnllfxuicagihzhbhvloibpymply3quchjvdg90exbllnrvugfyyw1cbn0poyisii8vienvbnzlcnrzihrozsbmaxjzdcbjagfyywn0zxigdg8gdxbwzxjjyxnlxg5tdhjpbmcuchjvdg90exbllmnhcgl0ywxpemugpsbmdw5jdglvbigpihtcbiagicbyzxr1cm4gdghpcy5jagfyqxqomckudg9vchblcknhc2uoksarihroaxmuc2xpy2uomsk7xg59o1xuxg4vlybdb252zxj0cyb0agugzmlyc3qgy2hhcmfjdgvyihrvigxvd2vyy2fzzvxuu3ryaw5nlnbyb3rvdhlwzs5hbnrpy2fwaxrhbgl6zsa9igz1bmn0aw9ukckge1xuicagihjldhvybib0aglzlmnoyxjbdcgwks50b0xvd2vyq2fzzsgpicsgdghpcy5zbgljzsgxkttcbn07xg5cbi8vienhcgl0ywxpemvzigfsbcb0agugd29yzhmgyw5kihjlcgxhy2vzihnvbwugy2hhcmfjdgvycybpbib0agugc3ryaw5nihrvxg4vlybjcmvhdgugysbuawnlcibsb29raw5nihrpdgxllib0axrszwl6zsbpcybtzwfudcbmb3igy3jlyxrpbmcgchjldhr5ig91dhb1dc5cbln0cmluzy5wcm90b3r5cguudgl0bgvpemugpsbmdw5jdglvbigpihtcbiagicbyzxr1cm4gdghpcy51bmrlcnnjb3jlkckuahvtyw5pemuoks5yzxbsywnlkc9cxgiojz9bys16xskvzywgznvuy3rpb24obsl7ihjldhvybibtlnrvvxbwzxjdyxnlkck7ih0po1xufttcblxuly8gq2fwaxrhbgl6zxmgdghligzpcnn0ihdvcmqgyw5kihr1cm5zihvuzgvyc2nvcmvzigludg8gc3bhy2vzigfuzcbzdhjpchmgyvxuly8gdhjhawxpbmcgxcjfawrciiwgawygyw55libmawtlihrpdgxlaxpllcb0aglziglzig1lyw50igzvcibjcmvhdgluzybwcmv0dhkgb3v0chv0llxuu3ryaw5nlnbyb3rvdhlwzs5odw1hbml6zsa9igz1bmn0aw9ukckge1xuicagigxldcbyzxn1bhqgpsb0aglzlnrvtg93zxjdyxnlkckucmvwbgfjzsgvx2lkjc8siccnks5yzxbsywnlkc9fl2csiccgjyk7xg4gicagcmvzdwx0id0gcmvzdwx0lnjlcgxhy2uolyhbys16xfxkxsopl2csigz1bmn0aw9ukg0pihsgcmv0dxjuig0udg9mb3dlcknhc2uoktsgfsk7xg4gicagcmv0dxjuihjlc3vsdc5jyxbpdgfsaxplkck7xg59o1xuxg4vlybnywtlcybhbib1bmrlcnnjb3jlzcwgbg93zxjjyxnligzvcm0gznjvbsb0agugzxhwcmvzc2lvbibpbib0agugc3ryaw5nllxuly9cbi8vienoyw5nzxmgjy4nihrviccvjyb0bybjb252zxj0ig5hbwvzcgfjzxmgdg8gcgf0ahmuxg4vl1xuly8grxhhbxbszxm6xg4vlybcbi8vicagicbcikfjdgl2zu1vzgvsxciudw5kzxjzy29yzsagicagicagicmgpt4gxcjhy3rpdmvfbw9kzwxcilxuly8gicagifwiqwn0axzltw9kzwwurxjyb3jzxciudw5kzxjzy29yzsajid0-ifwiywn0axzlx21vzgvsl2vycm9yc1wixg4vl1xuly8gqxmgysbydwxlig9mihrodw1iihlvdsbjyw4gdghpbmsgb2ygdw5kzxjzy29yzsbhcyb0agugaw52zxjzzsbvzibjyw1lbgl6zsxcbi8vihrob3vnacb0agvyzsbhcmugy2fzzxmgd2hlcmugdghhdcbkb2vzig5vdcbob2xkolxuly9cbi8vicagicbcilnttevycm9yxciudw5kzxjzy29yzsgplmnhbwvsaxplkckgiya9pibcilnzbevycm9yxcjcbln0cmluzy5wcm90b3r5cguudw5kzxjzy29yzsa9igz1bmn0aw9ukckge1xuicagigxldcbyzxn1bhqgpsb0aglzlnjlcgxhy2uojy4nlcanlycpo1xuicagihjlc3vsdca9ihjlc3vsdc5yzxbsywnlkc8ow0etwlxczf0rkshbqs1axvthlxpdks9nlcbciiqxxyqyxcipo1xuicagihjlc3vsdca9ihjlc3vsdc5yzxbsywnlkc8ow2etelxczf0pkftblvpdks9nlcbciiqxxyqyxcipo1xuicagihjldhvybibyzxn1bhqucmvwbgfjzsgnlscsicdfjykudg9mb3dlcknhc2uokttcbn07xg5cbi8viej5igrlzmf1bhqsicnjyw1lbgl6zsbjb252zxj0cybzdhjpbmdzihrvifvwcgvyq2ftzwxdyxnllibjzib0agugyxjndw1lbnrcbi8vihrvignhbwvsaxpliglzihnldcb0bybgzmfsc2vgihrozw4gi2nhbwvsaxplihbyb2r1y2vzigxvd2vyq2ftzwxdyxnlllxuly9cbi8vifxci2nhbwvsaxplihdpbgwgywxzbybjb252zxj0ifwil1wiihrvifwillwiihdoawnoiglzihvzzwz1bcbmb3igy29udmvydgluz1xuly8gcgf0ahmgdg8gbmftzxnwywnlcy5cbi8vxg4vlybfegftcgxlczpcbi8vxg4vlyagicagxcjhy3rpdmvfbw9kzwxcii5jyw1lbgl6zsagicagicagicagicagic8vid0-ifwiqwn0axzltw9kzwxcilxuly8gicagifwiywn0axzlx21vzgvsxciuy2ftzwxpemuodhj1zskgicagicagicavlya9pibcikfjdgl2zu1vzgvsxcjcbi8vicagicbcimfjdgl2zv9tb2rlbfwilmnhbwvsaxplkgzhbhnlksagicagicagly8gpt4gxcjhy3rpdmvnb2rlbfwixg4vlyagicagxcjhy3rpdmvfbw9kzwwvzxjyb3jzxciuy2ftzwxpemugicagicagic8vid0-ifwiqwn0axzltw9kzwwurxjyb3jzxcjcbi8vicagicbcimfjdgl2zv9tb2rlbc9lcnjvcnncii5jyw1lbgl6zshmywxzzskgly8gpt4gxcjhy3rpdmvnb2rlbc5fcnjvcnncilxuly9cbi8viefzigegcnvszsbvzib0ahvtyib5b3ugy2fuihroaw5rig9mignhbwvsaxpligfzihrozsbpbnzlcnnlig9mihvuzgvyc2nvcmusxg4vlyb0ag91z2ggdghlcmugyxjlignhc2vzihdozxjlihroyxqgzg9lcybub3qgag9szdpcbi8vxg4vlyagicagxcjtu0xfcnjvclwilnvuzgvyc2nvcmuoks5jyw1lbgl6zsgpicagly8gpt4gxcjtc2xfcnjvclwixg5tdhjpbmcuchjvdg90exbllmnhbwvsaxplid0gznvuy3rpb24odxbwzxjjyxnlx2zpcnn0x2xldhrlcikge1xuicagigxldcbyzxn1bhq7xg5cbiagicbpziaodxbwzxjjyxnlx2zpcnn0x2xldhrlcia9pt0gdw5kzwzpbmvkihx8ihvwcgvyy2fzzv9maxjzdf9szxr0zxipihtcbiagicagicagcmvzdwx0id0gdghpcy5jyxbpdgfsaxplkck7xg4gicagfsblbhnlihtcbiagicagicagcmvzdwx0id0gdghpcy5hbnrpy2fwaxrhbgl6zsgpo1xuicagih1cblxuicagihjlc3vsdca9ihjlc3vsdc5yzxbsywnlkc8ox3woxfwvkskow2etelxczf0qks9nlcbmdw5jdglvbihfyswgx2isigzpcnn0lcbyzxn0ksb7xg4gicagicagihjldhvybiaozmlyc3qgfhwgjycpicsgcmvzdc5jyxbpdgfsaxplkck7xg4gicagfsk7xg5cbiagicbyzxr1cm4gcmvzdwx0lnjlcgxhy2uojy8nlcanlicpo1xufttcblxuly8gq29udmvydcbhihn0cmluzyb0bybhigjvb2xlyw4gdmfsdwuuielmihrozsbhcmd1bwvudcb0byajym9vbgvhbml6zsbpc1xuly8gcgfzc2vkiglmihrozsbzdhjpbmcgaxmgbm90icd0cnvljybvcianzmfsc2unigl0ihdpbgwgcmv0dxjuihrozsbhcmd1bwvudc5cbi8vxg4vlybfegftcgxlczpcbi8vxg4vlyagicagxcj0cnvlxciuym9vbgvhbml6zsgpicagicagic8vid0-ihrydwvcbi8vicagicbcimzhbhnlxciuym9vbgvhbml6zsgpicagicagly8gpt4gzmfsc2vcbi8vicagicbcim90agvyxciuym9vbgvhbml6zsgpicagicagly8gpt4gzmfsc2vcbi8vicagicbcim90agvyxciuym9vbgvhbml6zsh0cnvlksagly8gpt4gdhj1zvxuu3ryaw5nlnbyb3rvdhlwzs5ib29szwfuaxplid0gznvuy3rpb24ozgvmyxvsdfrvksb7xg4gicagawyodghpcy50b1n0cmluzygpid09psandhj1zscpihsgcmv0dxjuihrydwu7ih1cbiagicbpziaodghpcy50b1n0cmluzygpid09psanzmfsc2unksb7ihjldhvybibmywxzztsgfvxuicagifxuicagihjldhvybiaozgvmyxvsdfrvid09psb1bmrlzmluzwqgpybmywxzzsa6igrlzmf1bhrubyk7xg59o1xuxg4vlybszxbsywnlcyb1bmrlcnnjb3jlcyb3axroigrhc2hlcy5cbi8vxg4vlybfegftcgxlolxuly9cbi8vicagicbcinb1bmlfchvuavwiicavlya9pibcinb1bmktchvuavwixg5tdhjpbmcuchjvdg90exbllmrhc2hlcml6zsa9igz1bmn0aw9ukckge1xuicagihjldhvybib0aglzlnjlcgxhy2uoj18nlcanlscpo1xufttcblxuly8gumvwbgfjzxmgc3bly2lhbcbjagfyywn0zxjzigluigegc3ryaw5nihnvihroyxqgaxqgbwf5igjlihvzzwqgyxmgcgfydcbvzlxuly8gysbcinbyzxr0evwiifvstc5cbi8vxg4vlybfegftcgxlolxuly9cbi8vicagicbcikrvbmfszcbfliblbnv0afwilnbhcmftzxrlcml6zsgpic8vid0-icdkb25hbgqtzs1rbnv0acdcbln0cmluzy5wcm90b3r5cguucgfyyw1ldgvyaxplid0gznvuy3rpb24oc2vwzxjhdg9yksb7xg4gicagcmv0dxjuihroaxmudg9mb3dlcknhc2uoks5yzxbsywnlkc9bxmetejatovxclv9dky9nlcbzzxblcmf0b3igfhwgjy0nkttcbn07xg5cbi8viefkzcbvbmrlcnnjb3jllmluzmxly3rpb24jcgx1cmfsaxpligz1bmn0aw9uig9uihrozsbtdhjpbmcgb2jqzwn0xg5tdhjpbmcuchjvdg90exbllnbsdxjhbgl6zsa9igz1bmn0aw9ukgnvdw50lcbpbmnsdwrltnvtymvyksb7xg4gicagcmv0dxjuif8ucgx1cmfsaxplkhroaxmsignvdw50lcbpbmnsdwrltnvtymvykttcbn07xg5cbi8viefkzcbvbmrlcnnjb3jllmluzmxly3rpb24jc2luz3vsyxjpemugznvuy3rpb24gb24gdghlifn0cmluzybvymply3rcbln0cmluzy5wcm90b3r5cguuc2luz3vsyxjpemugpsbmdw5jdglvbigpihtcbiagicbyzxr1cm4gxy5zaw5ndwxhcml6zsh0aglzkttcbn07xg5cbi8vifryawvzihrvigzpbmqgysb2yxjpywjszsb3axroihrozsbuyw1lihnwzwnpzmllzcbpbibjb250zxh0ig9migbjb250zxh0yc5cbi8vigbjb250zxh0ycbkzwzhdwx0cyb0byb0agugyhdpbmrvd2agdmfyawfibguuxg4vl1xuly8grxhhbxbszxm6xg4vlyagicagj01vzhvszscuy29uc3rhbnrpemugicagicmgpt4gtw9kdwxlxg4vlyagicagj1rlc3quvw5pdccuy29uc3rhbnrpemugicmgpt4gvgvzdc5vbml0xg4vlyagicagj1vuaxqnlmnvbnn0yw50axplkfrlc3qpicmgpt4gvgvzdc5vbml0xg4vl1xuly8gvmlraw5nlk5hbwvfcnjvcibpcybyywlzzwqgd2hlbib0agugdmfyawfibgugaxmgdw5rbm93bi5cbln0cmluzy5wcm90b3r5cguuy29uc3rhbnrpemugpsbmdw5jdglvbihjb250zxh0ksb7xg4gicagawyoiwnvbnrlehqpihsgy29udgv4dca9ihdpbmrvdzsgfvxuxg4gicagcmv0dxjuihroaxmuc3bsaxqojy4nks5yzwr1y2uoznvuy3rpb24gkgnvbnrlehqsig5hbwupihtcbiagicagicagbgv0ihygpsbjb250zxh0w25hbwvdo1xuicagicagicbpziaoixypihtcbiagicagicagicagihrocm93ig5ldybwawtpbmcutmftzuvycm9ykfwidw5pbml0awfsaxplzcb2yxjpywjszsbciiarig5hbwupoybcbiagicagicagfvxuicagicagicbyzxr1cm4gdjtcbiagicb9lcbjb250zxh0kttcbn07xg5cbi8vifjlbw92zxmgdghlig1vzhvszsbwyxj0igzyb20gdghligv4chjlc3npb24gaw4gdghlihn0cmluzy5cbi8vxg4vlybfegftcgxlczpcbi8vicagicantmftzxnwywnlzc5nb2r1bgunlmrlbw9kdwxpemuoksajid0-icdnb2r1bgunxg4vlyagicagj01vzhvszscuzgvtb2r1bgl6zsgpicmgpt4gj01vzhvszsdcbi8vicagicanjy5kzw1vzhvsaxplkckgiya9pianj1xuu3ryaw5nlnbyb3rvdhlwzs5kzw1vzhvsaxplid0gznvuy3rpb24gkhnlcgvyyxrvcikge1xuicagiglmicghc2vwzxjhdg9yksb7xg4gicagicagihnlcgvyyxrvcia9iccujztcbiagicb9xg5cbiagicbszxqgaw5kzxggpsb0aglzlmxhc3rjbmrlee9mkhnlcgvyyxrvcik7xg5cbiagicbpziaoaw5kzxggpt09ic0xksb7xg4gicagicagihjldhvybibtdhjpbmcodghpcyk7xg4gicagfsblbhnlihtcbiagicagicagcmv0dxjuihroaxmuc2xpy2uoaw5kzxggkyaxkttcbiagicb9xg59xg5cbi8vielmigbszw5ndghgiglzigdyzwf0zxigdghhbib0agugbgvuz3roig9mihrozsbzdhjpbmcsihjldhvybnmgysbuzxcgu3ryaw5nxg4vlybvzibszw5ndgggygxlbmd0agagd2l0acb0agugc3ryaw5nihjpz2h0igp1c3rpzmllzcbhbmqgcgfkzgvkihdpdgggcgfku3ryaw5no1xuly8gb3rozxj3axnllcbyzxr1cm5zihn0cmluz1xuu3ryaw5nlnbyb3rvdhlwzs5yanvzdca9igz1bmn0aw9ukgxlbmd0acwgcgfku3ryaw5nksb7xg4gicagawygkcfwywrtdhjpbmcpihsgcgfku3ryaw5nid0gjyanoyb9xg4gicagxg4gicagbgv0ihbhzgrpbmcgpsanjztcbiagicbszxqgcgfkzgluz0xlbmd0aca9igxlbmd0acatihroaxmubgvuz3roo1xuxg4gicagd2hpbgugkhbhzgrpbmcubgvuz3roidwgcgfkzgluz0xlbmd0ackge1xuicagicagicbpziaocgfkzgluz0xlbmd0acatihbhzgrpbmcubgvuz3roidwgcgfku3ryaw5nlmxlbmd0ackge1xuicagicagicagicagcgfkzgluzya9ihbhzgrpbmcgkybwywrtdhjpbmcuc2xpy2uomcwgcgfkzgluz0xlbmd0acatihbhzgrpbmcubgvuz3rokttcbiagicagicagfsblbhnlihtcbiagicagicagicagihbhzgrpbmcgpsbwywrkaw5nicsgcgfku3ryaw5no1xuicagicagicb9xg4gicagfvxuxg4gicagcmv0dxjuihbhzgrpbmcgkyb0aglzo1xufttcblxuly8gswygygxlbmd0agagaxmgz3jlyxrlcib0agfuihrozsbszw5ndgggb2ygdghlihn0cmluzywgcmv0dxjucybhig5ldybtdhjpbmdcbi8vig9migxlbmd0acbgbgvuz3roycb3axroihrozsbzdhjpbmcgbgvmdcbqdxn0awzpzwqgyw5kihbhzgrlzcb3axroihbhzfn0cmluzztcbi8vig90agvyd2lzzswgcmv0dxjucybzdhjpbmdcbln0cmluzy5wcm90b3r5cguubgp1c3qgpsbmdw5jdglvbihszw5ndggsihbhzfn0cmluzykge1xuicagiglmicghcgfku3ryaw5nksb7ihbhzfn0cmluzya9iccgjzsgfvxuicagifxuicagigxldcbwywrkaw5nid0gjyc7xg4gicagbgv0ihbhzgrpbmdmzw5ndgggpsbszw5ndggglsb0aglzlmxlbmd0adtcblxuicagihdoawxlichwywrkaw5nlmxlbmd0aca8ihbhzgrpbmdmzw5ndggpihtcbiagicagicagawygkhbhzgrpbmdmzw5ndggglsbwywrkaw5nlmxlbmd0aca8ihbhzfn0cmluzy5szw5ndggpihtcbiagicagicagicagihbhzgrpbmcgpsbwywrkaw5nicsgcgfku3ryaw5nlnnsawnlkdasihbhzgrpbmdmzw5ndggglsbwywrkaw5nlmxlbmd0ack7xg4gicagicagih0gzwxzzsb7xg4gicagicagicagicbwywrkaw5nid0gcgfkzgluzyarihbhzfn0cmluzztcbiagicagicagfvxuicagih1cblxuicagihjldhvybib0aglzicsgcgfkzgluzztcbn07xg5cbi8viefsawfzig9mihrvx3muxg5tdhjpbmcuchjvdg90exbllnrvugfyyw0gpsbtdhjpbmcuchjvdg90exbllnrvu3ryaw5no1xuxg5tdhjpbmcuchjvdg90exbllnrvuxvlcnkgpsbmdw5jdglvbihrzxkpihtcblx0cmv0dxjuigvzy2fwzshrzxkudg9qyxjhbsgpksarifwipvwiicsgzxnjyxblkhroaxmudg9qyxjhbsgpkttcbn07xg5cbln0cmluzy5wcm90b3r5cguuzg93bmnhc2ugpsbtdhjpbmcuchjvdg90exbllnrvtg93zxjdyxnlo1xuiiwiy29uc3qgtw9kzwwgpsb7ihrlc3q6idqylcbhoiaoksa9pib7ihjldhvybiazoyb9ih1cblxuzxhwb3j0igrlzmf1bhqgtw9kzww7xg5cbi8vxg4vlyavlz0gcmvxdwlyzv9zzwxmxg4vlyavlz0gcmvxdwlyzsaul21vzgvsl25hbwvcbi8vic8vpsbyzxf1axjlic4vbw9kzwwvcmvmbgvjdglvblxuly8gly89ihjlcxvpcmvfdhjlzsaul21vzgvsl3jlzmxly3rpb25zxg4vlyavlz0gcmvxdwlyzv90cmvlic4vbw9kzwwvy2xhc3nfchjvcgvydgllc1xuly8gly89ihjlcxvpcmvfdhjlzsaul21vzgvsl2luc3rhbmnlx3byb3blcnrpzxncbi8vic8vpsbyzxf1axjlic4vbw9kzwwvdhlwzvxuly8gly89ihjlcxvpcmvfdhjlzsaul21vzgvsl3r5cgvzxg4vl1xuly8gly8gvmlraw5nlk1vzgvsxg4vlyavlyatls0tls0tls0tls1cbi8vic8vxg4vlyavlybwawtpbmcutw9kzwwgaxmgyw4gzxh0zw5zaw9uig9miftcywnrym9uzs5nb2rlbf0oahr0cdovl2jhy2tib25lanmub3jnlynnb2rlbckuxg4vlyavlybjdcbhzgrzig5hbwluzywgcmvsyxrpb25zaglwcywgzgf0ysb0exblignvzxjjaw9ucywgc2vszwn0aw9ulcbhbmqgbw9kawzpzxncbi8vic8vihn5bmmgdg8gd29yayb3axroiftsdwj5ig9uifjhawxzxshodhrwoi8vcnview9ucmfpbhmub3jnlykgb3v0ig9mihrozsbib3guxg4vlybwawtpbmcutw9kzwwgpsbcywnrym9uzs5nb2rlbc5lehrlbmqoe1xuly9cbi8vicagicbhynn0cmfjddogdhj1zsxcbi8vxg4vlyagicagly8gaw5ozxjpdgfuy2vbdhryawj1dgugaxmgdghligf0dglyynv0zxmgdxnlzcbmb3igu1rjxg4vlyagicagaw5ozxjpdgfuy2vbdhryawj1dgu6icd0exbljyxcbi8vxg4vlyagicagzgvmyxvsdhm6igz1bmn0aw9uicgpihtcbi8vicagicagicagbgv0igrmbhrzid0ge307xg4vl1xuly8gicagicagicbpziaodhlwzw9mkhroaxmuc2nozw1hksa9pt0gj3vuzgvmaw5lzccpihtcbi8vicagicagicagicagihjldhvybibkzmx0cztcbi8vicagicagicagfvxuly9cbi8vicagicagicagt2jqzwn0lmtlexmodghpcy5zy2hlbweplmzvckvhy2goichrzxkpid0-ihtcbi8vicagicagicagicagiglmich0aglzlnnjagvtyvtrzxldwydkzwzhdwx0j10pihtcbi8vicagicagicagicagicagicbkzmx0c1trzxldid0gdghpcy5zy2hlbwfba2v5xvsnzgvmyxvsdcddo1xuly8gicagicagicagicagfvxuly8gicagicagicb9kttcbi8vxg4vlyagicagicagihjldhvybibkzmx0cztcbi8vicagicb9lfxuly9cbi8vicagicavlybczwxvdybpcyb0agugc2ftzsbjb2rligzyb20gdghliejhy2tib25llk1vzgvsigz1bmn0aw9uxg4vlyagicagly8gzxhjzxb0ihdozxjlihrozxjligfyzsbjb21tzw50c1xuly8gicagignvbnn0cnvjdg9yoibmdw5jdglvbiaoyxr0cmlidxrlcywgb3b0aw9ucykge1xuly8gicagicagicbszxqgyxr0cnmgpsbhdhryawj1dgvzihx8iht9o1xuly8gicagicagicbvchrpb25zihx8ichvchrpb25zid0ge30po1xuly8gicagicagicb0aglzlmnpzca9if8udw5pcxvlswqoj2mnkttcbi8vicagicagicagdghpcy5hdhryawj1dgvzid0ge307xg4vl1xuly8gicagicagicbhdhrycya9if8uzgvmyxvsdhmoe30sigf0dhjzlcbflnjlc3vsdch0aglzlcanzgvmyxvsdhmnksk7xg4vl1xuly8gicagicagicbpziaodghpcy5pbmhlcml0yw5jzuf0dhjpynv0zskge1xuly8gicagicagicagicagawygkgf0dhjzw3roaxmuaw5ozxjpdgfuy2vbdhryawj1dgvdicymihroaxmuy29uc3rydwn0b3iubw9kzwxoyw1llm5hbwugit09igf0dhjzw3roaxmuaw5ozxjpdgfuy2vbdhryawj1dgvdksb7xg4vlyagicagicagicagicagicagly8gt1busu1jwku6icbndxrhdgluzyb0agugw1tqcm90b3r5cgvdxsbvzibhbibvymply3qsig5vig1hdhrlcibob3dcbi8vicagicagicagicagicagicavlyb0aglziglzigfjy29tcgxpc2hlzcwgaxmgc3ryb25nbhkgzglzy291cmfnzwqsigjly2f1c2ugaxqgaxmgdmvyevxuly8gicagicagicagicagicagic8vihnsb3cgyw5kihvuyxzvawrhymx5ihnsb3dzigrvd24gc3vic2vxdwvudcblegvjdxrpb24gaw4gbw9kzxjuxg4vlyagicagicagicagicagicagly8gsmf2yvnjcmlwdcbpbxbszw1lbnrhdglvbnncbi8vicagicagicagicagicagicavlybjzgvhczogtw92zsb0bybnb2rlbc5uzxcoli4uksbtzxrob2qgb2ygaw5pdglhbgl6aw5nig1vzgvsc1xuly8gicagicagicagicagicagigxldcb0exblid0gyxr0cnnbdghpcy5pbmhlcml0yw5jzuf0dhjpynv0zv0uy2ftzwxpemuoks5jb25zdgfudgl6zsgpo1xuly8gicagicagicagicagicagihroaxmuy29uc3rydwn0b3igpsb0exblo1xuly8gicagicagicagicagicagihroaxmux19wcm90b19fid0gdhlwzs5wcm90b3r5cgu7xg4vlyagicagicagicagicb9xg4vlyagicagicagih1cbi8vxg4vlyagicagicagic8viefkzcbhighlbhblcibyzwzlcmvuy2ugdg8gz2v0ihrozsbtb2rlbcbuyw1ligzyb20gyw4gbw9kzwwgaw5zdgfuy2uuxg4vlyagicagicagihroaxmubw9kzwxoyw1lid0gdghpcy5jb25zdhj1y3rvci5tb2rlbe5hbwu7xg4vlyagicagicagihroaxmuymfzzu1vzgvsid0gdghpcy5jb25zdhj1y3rvci5iyxnltw9kzww7xg4vl1xuly8gicagicagicbpziaodghpcy5iyxnltw9kzwwgjiygdghpcy5tb2rlbe5hbwugjiygdghpcy5pbmhlcml0yw5jzuf0dhjpynv0zskge1xuly8gicagicagicagicagawygkhroaxmuymfzzu1vzgvsid09psb0aglzlmnvbnn0cnvjdg9yicymihroaxmuymfzzu1vzgvslmrlc2nlbmrhbnrzlmxlbmd0aca-idapihtcbi8vicagicagicagicagicagicbhdhryc1t0aglzlmluagvyaxrhbmnlqxr0cmlidxrlxsa9ihroaxmubw9kzwxoyw1llm5hbwu7xg4vlyagicagicagicagicb9igvsc2ugawygkf8uy29udgfpbnmodghpcy5iyxnltw9kzwwuzgvzy2vuzgfudhmsihroaxmuy29uc3rydwn0b3ipksb7xg4vlyagicagicagicagicagicagyxr0cnnbdghpcy5pbmhlcml0yw5jzuf0dhjpynv0zv0gpsb0aglzlm1vzgvstmftzs5uyw1lo1xuly8gicagicagicagicagfvxuly8gicagicagicb9xg4vl1xuly8gicagicagicavlybtzxqgdxagyxnzb2npyxrpb25zxg4vlyagicagicagihroaxmuyxnzb2npyxrpb25zid0gdghpcy5jb25zdhj1y3rvci5hc3nvy2lhdglvbnm7xg4vlyagicagicagihroaxmucmvmbgvjde9uqxnzb2npyxrpb24gpsb0aglzlmnvbnn0cnvjdg9ylnjlzmxly3rpbkfzc29jawf0aw9uo1xuly8gicagicagicb0aglzlnjlzmxly3rpbkfzc29jawf0aw9ucya9ihroaxmuy29uc3rydwn0b3iucmvmbgvjde9uqxnzb2npyxrpb25zo1xuly9cbi8vicagicagicagly8gsw5pdglhbgl6zsbhbnkgyghhc01hbnlgihjlbgf0aw9uc2hpchmgdg8gzw1wdhkgy29sbgvjdglvbnncbi8vicagicagicagdghpcy5yzwzszwn0t25bc3nvy2lhdglvbnmoj2hhc01hbnknks5mb3jfywnokgz1bmn0aw9ukgfzc29jawf0aw9uksb7xg4vlyagicagicagicagicb0aglzlmf0dhjpynv0zxnbyxnzb2npyxrpb24ubmftzv0gpsbuzxcgkgfzc29jawf0aw9ulmnvbgxly3rpb24okskokttcbi8vicagicagicagfswgdghpcyk7xg4vl1xuly8gicagicagicbpziaob3b0aw9ucy5jb2xszwn0aw9uksb7ihroaxmuy29sbgvjdglvbia9ig9wdglvbnmuy29sbgvjdglvbjsgfvxuly8gicagicagicbpziaob3b0aw9ucy5wyxjzzskgeybhdhrycya9ihroaxmucgfyc2uoyxr0cnmsig9wdglvbnmpihx8iht9oyb9xg4vl1xuly8gicagicagicb0aglzlnnldchhdhrycywgb3b0aw9ucyk7xg4vlyagicagicagihroaxmuy2hhbmdlzca9iht9o1xuly8gicagicagicb0aglzlmluaxrpywxpemuuy2fsbch0aglzlcbhdhryawj1dgvzlcbvchrpb25zkttcbi8vicagicb9xg4vl1xuly8gfswge1xuly9cbi8vicagicbhc3nvy2lhdglvbnm6iftdlfxuly9cbi8vicagicavlybpdmvyawrlihrozsbkzwzhdwx0igv4dgvuzcbtzxrob2qgdg8gc3vwcg9ydcbwyxnzaw5nigluihrozsbtb2rlbe5hbwvcbi8vicagicavlybhbmqgc3vwcg9ydcbtvelcbi8vicagicavl1xuly8gicagic8vifrozsbtb2rlbe5hbwugaxmgdxnlzcbmb3igz2vuzxjhdgluzyb1cmxzigfuzcbyzwxhdglvbnnoaxbzllxuly8gicagic8vxg4vlyagicagly8gswygysbnb2rlbcbpcyblehrlbmrlzcbmdxj0agvyiglzigfjdhmgc2ltbgfyihrviefjdgl2zvjly29yzhmgu1rjllxuly8gicagic8vxg4vlyagicagly8gyg5hbwvgiglzig9wdglvbmfslcbhbmqgbxvzdcbizsbhihn0cmluz1xuly8gicagigv4dgvuzdogznvuy3rpb24obmftzswgchjvdg9qcm9wcywgc3rhdgljuhjvchmpihtcbi8vicagicagicagawyodhlwzw9mig5hbwugit09icdzdhjpbmcnksb7xg4vlyagicagicagicagicbzdgf0awnqcm9wcya9ihbyb3rvuhjvchm7xg4vlyagicagicagicagicbwcm90b1byb3bzid0gbmftzttcbi8vicagicagicagfvxuly8gicagicagicbwcm90b1byb3bzihx8ichwcm90b1byb3bzid0ge30po1xuly9cbi8vicagicagicagbgv0ignoawxkid0gqmfja2jvbmuutw9kzwwuzxh0zw5klmnhbgwodghpcywgchjvdg9qcm9wcywgc3rhdgljuhjvchmpo1xuly9cbi8vicagicagicagawyodhlwzw9mig5hbwugpt09icdzdhjpbmcnksb7xg4vlyagicagicagicagicbjaglszc5tb2rlbe5hbwugpsbuzxcgvmlraw5nlk1vzgvslk5hbwuobmftzsk7xg4vlyagicagicagih1cbi8vxg4vlyagicagicagignoawxklmfzc29jawf0aw9ucya9iht9o1xuly8gicagicagicbjaglszc5kzxnjzw5kyw50cya9iftdo1xuly8gicagicagicbjaglszc5pbmhlcml0yw5jzuf0dhjpynv0zsa9ichwcm90b1byb3bzlmluagvyaxrhbmnlqxr0cmlidxrlid09psb1bmrlzmluzwqpid8gdghpcy5wcm90b3r5cguuaw5ozxjpdgfuy2vbdhryawj1dgugoibwcm90b1byb3bzlmluagvyaxrhbmnlqxr0cmlidxrlo1xuly9cbi8vicagicagicagawygkgnoawxklmluagvyaxrhbmnlqxr0cmlidxrlid09psbmywxzzsb8fcaodghpcy5wcm90b3r5cguuagfzt3duuhjvcgvydhkoj2fic3ryywn0jykgjiygdghpcy5wcm90b3r5cguuywjzdhjhy3qpksb7xg4vlyagicagicagicagicbjaglszc5iyxnltw9kzwwgpsbjaglszdtcbi8vicagicagicagfsblbhnlihtcbi8vicagicagicagicagignoawxklmjhc2vnb2rlbc5kzxnjzw5kyw50cy5wdxnokgnoawxkkttcbi8vicagicagicagfvxuly9cbi8vicagicagicagwydizwxvbmdzvg8nlcanagfzt25ljywgj2hhc01hbnknlcanagfzqw5kqmvsb25nc1rvtwfuesddlmzvckvhy2goznvuy3rpb24obwfjcm8pihtcbi8vicagicagicagicagichwcm90b1byb3bzw21hy3jvxsb8fcbbxskuy29uy2f0khroaxnbbwfjcm9dihx8iftdks5mb3jfywnokgz1bmn0aw9ukg5hbwupihtcbi8vicagicagicagicagicagicbszxqgb3b0aw9ucztcbi8vxg4vlyagicagicagicagicagicagly8gsgfuzgxligjvdgggyhr5cgusigtleswgb3b0aw9uc2agyw5kigb0exbllcbba2v5lcbvchrpb25zxwagc3r5bgugyxjndw1lbnrzxg4vlyagicagicagicagicagicagawygkefycmf5lmlzqxjyyxkobmftzskpihtcbi8vicagicagicagicagicagicagicagb3b0aw9ucya9ig5hbwvbmv07xg4vlyagicagicagicagicagicagicagig5hbwugpsbuyw1lwzbdo1xuly8gicagicagicagicagicagih1cbi8vxg4vlyagicagicagicagicagicagawygkcfjaglszc5hc3nvy2lhdglvbnnbbmftzv0pihtcbi8vicagicagicagicagicagicagicagbgv0ihjlzmxly3rpb25dbgfzcya9ihtcbi8vicagicagicagicagicagicagicagicagicdizwxvbmdzvg8noibwawtpbmcutw9kzwwuqmvsb25nc1rvumvmbgvjdglvbixcbi8vicagicagicagicagicagicagicagicagicdoyxnpbmunoibwawtpbmcutw9kzwwusgfzt25lumvmbgvjdglvbixcbi8vicagicagicagicagicagicagicagicagicdoyxnnyw55jzogvmlraw5nlk1vzgvslkhhc01hbnlszwzszwn0aw9ulfxuly8gicagicagicagicagicagicagicagicagj2hhc0fuzejlbg9uz3nub01hbnknoibwawtpbmcutw9kzwwusgfzqw5kqmvsb25nc1rvtwfuevjlzmxly3rpb25cbi8vicagicagicagicagicagicagicagfvxuly8gicagicagicagicagicagicagicbyzwzszwn0aw9uq2xhc3mgpsbyzwzszwn0aw9uq2xhc3nbbwfjcm9do1xuly9cbi8vicagicagicagicagicagicagicagy2hpbgquyxnzb2npyxrpb25zw25hbwvdid0gbmv3ihjlzmxly3rpb25dbgfzcyhuyw1llcbvchrpb25zkttcbi8vicagicagicagicagicagicb9xg4vlyagicagicagicagicb9kttcbi8vicagicagicagfswgdghpcy5wcm90b3r5cgupo1xuly9cbi8vicagicagicagawygkhroaxmuchjvdg90exbllnnjagvtysamjibwcm90b1byb3bzlnnjagvtyskge1xuly8gicagicagicagicagt2jqzwn0lmtlexmodghpcy5wcm90b3r5cguuc2nozw1hks5mb3jfywnokcaoa2v5ksa9pib7xg4vlyagicagicagicagicagicagawyoiwnoawxklnbyb3rvdhlwzs5zy2hlbwfba2v5xskge1xuly8gicagicagicagicagicagicagicbjaglszc5wcm90b3r5cguuc2nozw1hw2tlev0gpsb0aglzlnbyb3rvdhlwzs5zy2hlbwfba2v5xttcbi8vicagicagicagicagicagicb9xg4vlyagicagicagicagicb9kttcbi8vicagicagicagfvxuly9cbi8vicagicagicagcmv0dxjuignoawxko1xuly8gicagih1cbi8vxg4vlyb9kttcbiisii8vifzpa2luzy5qcya8jt0gdmvyc2lvbialpiaoc2hhojwlpsbnaxrfaw5mb1s6agvhzf1bonnoyv0gjt4pxg4vlybcbi8vichjksaymdeyltwlpsbuaw1llm5vdy55zwfyicu-iepvbmf0agfuiejyywn5lca0mkzsb29ycybjbmmuxg4vlybwawtpbmcuanmgbwf5igjligzyzwvsesbkaxn0cmlidxrlzcb1bmrlcib0agugtuluigxpy2vuc2uuxg4vlybodhrwoi8vdmlraw5nanmuy29txg5cbmltcg9ydcanli92awtpbmcvc3vwcg9ydcc7xg5pbxbvcnqgtw9kzwwgznjvbsanli92awtpbmcvbw9kzwwno1xuxg5jb25zdcbwawtpbmcgpsb7xg4gicagtw9kzww6ie1vzgvslfxufttcblxuzxhwb3j0igrlzmf1bhqgvmlraw5no1xuil0sim5hbwvzijpbilzpa2luzyjdlcjtyxbwaw5ncyi6ijs7ozs7quffqsxdqufble9bqu8sy0fbucxdqufzqixnqufnlfnbqtvclevbqxvdlfnbqxzdlevbqwteo0fbqzldlenbquesv0fbtyxpqkfbwttbqufflenbqueszufbtyxlquflledbquwsq0fbuyxvqufdlenbquq7qufbqsxdqufblg1cqufplevbquust0fbrixfqufqo0fbquesq0fbqsxtqufulevbqtzclelbqtdclenbqwtdledbqwxdlenbqva7qufbz0qsq0fbqsxlqur2qjtbquu5qyxdqufblgnbqvussufgb0m7qufhoumsq0fbqsxtqkfbzsxjqugrqjtbquk5qyxdqufblgdcqufzo0fbsmtdlenbquesq0fbbeq7ozs7quftqsxdqufble9bqu8sy0fbucxdqufzqixnqufnlfnbqtvclevbqxvdlfnbqxzdlevbqwteo0fbqzldlenbquesv0fbtyxlqufvledbqvysrufbzttbqunsqixdqufblflbquksu0fbuyxnqufnlelbqw5co0fbq0esq0fbqsxlqufpletbqussr0fbtcxdquftlfvbqvuss0fbvixfqufpqjtbqum3qixdqufblgdcqufjlfvbqvussufbzcxfqufvqjtbqunoqixdqufblhvcqufple9bqu8stufbucxjqufpqixhquf4qjtbqunilenbque7qufdrcxdqufblg1cqufple1bqu0st0fbtixdqufjle1bqwqsq0fbudtbqunilenbquesu0fmtsxfqutklelbteksq0flqyxhquxelenbqva7qufnscxdqufbletbvdzdo0fbvtldlenbquesy0fbvsxjqvzvqztbqvc5qyxdqufblg1cqufllelbwctco0fbwtldlenbquesz0jbqvk7qufaa0msq0fbqsxdqufsrds7o0fdvkesq0fbqsxrqufrlfnbqvisq0fba0ist0fbbeisr0fbneisuufbusxtqufslenbqwtclffbqtldoztbquvblenbquesuufbusxtqufslenbqwtcle9bqwxcledbqtrclfvbqvmsr0fbvcxfqufjo0fbq3pdlenbquesuufbtyxpqufplelbqukst0fbsixfqufqlelbqxdcledbqxhcledbqthcle9bqu8ss0fbsyxpqufmlevbqvasq0fbckm7qufdqsxdqufblenbrkq7ozs7quneqsxdqufbletbqussu0fbtcxdqufllffbqwysr0fbmeisvufbuyxhqufulevbqwm7qufdcemsq0fbqsxxqufplfnbqvmsr0fbvcxfqufjlelbqwqsq0fbudtbqunilenbquesq0fgrds7qufjqsxdqufbletbqusst0fbtcxhqufllfvbqumsq0fbrdtbqufblenbquesv0fbtyxjqufjlelbquosq0fbuyxdqufulenbqva7qufbqsxdqufblenbqwy7oztbqudblenbquess0fbsyxtqufmlenbqwust0fbzixhquf5qixlqufllfnbquwsq0fbzsxnquf4qzs7quffqsxdqufbletbqussu0fbtcxdquflle9bqwysr0fbeuisvufbuyxhqufulevbqwm7qufdbkmsq0fbqsxxqufple9bqu8ssufbssxpqufklevbqvassufbd0isr0fbeeisr0fboeist0fbtyxlquflle9bquwsrufbucxdqufyqztbqunilenbquesq0fgrds7qufjqsxdqufbletbqussu0fbtcxdquflletbqwysr0fbdui7qufbqsxdqufblfdbqu0ssufbssxjqufklevbqu47qufbqsxdqufblenbqxzcoztbquvblenbquess0fbsyxtqufmlenbqwust0fbzixhquf5qixzqufxo0fbq2hdlenbquesv0fbusxlqufllgnbquwst0fbmkissufbssxjqufklevbquqsq0fbysxjqufilevbqtfclelbqtjeletbqussv0fbtcxpquf3qixjqufjlelbquosrufbrcxdqufhlfdbqwisrufbbeyssufbz0gss0fbsyxvqufmle9bqxvclelbqukssufbsixfqufelenbqwesvufbyixfque5sttbqunilenbquesq0fgrds7qufjqsxdqufbletbqussu0fbtcxdqufllfdbqwysr0fbnkiswufbwttbqunyqyxdqufblfdbqvess0fbsyxjqufmle9bqtjclelbqukssufbsixfqufelenbqwesy0fbyixfquexqixjqueyrcxlqufllfdbquwst0fbd0issufbssxjqufklevbquqsq0fbysxxqufilevbqtfgo0fbq0gsq0fbqsxdquzeoztbqulblenbquess0fbsyxtqufmlenbqwusvufbzixhque0qixzqufxo0fbq25dlenbquesv0fbusxlqufllgnbquwst0fbmkissufbssxjqufklevbquqsq0fbysxjqufilevbqwxdo0fbq0gsq0fbqsxdquzeoztbqutblenbquess0fbsyxtqufmlenbqwussufbzixhqufzqixzqufzo0fbqzlclenbquesv0fbusxpqufrlelbqukssufbsixfqufoqjtbqunilenbquesq0fgrds7ozs7ozs7o0fddkjblenbquest0fbtyxtqufqlenbqwlclfvbqwpcledbqthclflbqvc7qufdckmsq0fbqsxrqufjle1bqu0ss0fbsyxhqufmlenbqvmssufbvcxdqufwoztbquvblenbquesuufbssxnqufnledbqu4ssufbysxfqufilelbqw1cle1bqu0sr0fbtixjqufhlevbqxbdlevbqxddo0fbq3bdlenbqueszufbtyxpqufplelbqwq7qufdscxdqufboztbquvelenbquesvufbtsxnqufnlevbqvo7qufdqsxdqufblffbquksuufbusxdqufalevbqwu7qufbrsxdqufblgvbqu8st0fbtyxjqufko0fbqxfclenbque7qufddemsq0fbqsxrqufjlffbqvesq0fbwixfquflo0fbquusq0fbqsxlqufple9bqu8ssufbzdtbqufxqixdqufbo0fbq3rdlenbquesuufbssxrqufrlenbqvosrufbzttbqufflenbqueszufbtyxpqufplelbqwq7qufbcuisq0fbqts7quffdemsq0fbqsxxqufple9bqu8ssufbzdtbqunilenbquesq0firds7o0fbz0jblenbquest0fbtyxtqufqlenbqwlcle9bqwpcledbqtjcle9bqu8su0fbucxdqufpqixrque1qzs7quffqsxdqufble9bqu8su0fbucxdqufpqixpqufqqixhqueyqixvquftledbqvqsrufbyztbqunyqyxdqufblfdbqu8st0fbtyxjqufjle9bquosrufbucxjquf3qixhquf4qixhque4qixpqufpletbqusst0fbtcxfqufqlenbqxjdo0fbq0gsq0fbqsxdquzeoztbqulblenbquest0fbtyxtqufqlenbqwlcle1bqwpcledbqtbclflbqvc7qufdakmsq0fbqsxxqufple9bqu8ssufbzdtbqunilenbquesq0fgrds7qufjqsxdqufble9bqu8su0fbucxdqufpqixpqufqqixhqueyqixpqufplfnbqvasq0fbauistufbnum7o0fbruesq0fbqsxpqufplfnbqvasq0fbauistufbakisr0fbmeiswufbvztbqunqqyxdqufblfdbqu8st0fbtyxlqufko0fbq0gsq0fbqsxdquzeoztbqulblenbquest0fbtyxtqufqlenbqwlcle9bqwpcledbqtjcle9bqu8su0fbucxdqufpqixnque1qzs7quffqsxdqufble9bqu8su0fbucxdqufpqixjqufqqixhquf3qixzqufxo0fbqy9clenbquesv0fbtyxpqufple9bqwq7qufdscxdqufblenbrkq7o0fbsuesq0fbqsxpqufplfnbqvasq0fbauiss0fbakisr0fbeuist0fbtyxtqufqlenbqwlclelbqtfdoztbquvblenbquest0fbtyxtqufqlenbqwlcledbqwpcledbqxvclflbqvc7qufdouisq0fbqsxxqufple9bqu8suufbzdtbqunilenbquesq0fgrds7qufjqsxdqufble9bqu8su0fbucxdqufpqixjqufqqixhquf3qixpqufplfnbqvasq0fbauisr0fbekm7o0fbruesq0fbqsxpqufplfnbqvasq0fbauissufbakisr0fbd0iswufbvztbqumvqixdqufblfdbqu8st0fbtyxdqufqledbqvcsuufbbei7qufdscxdqufblenbrkq7o0fbsuesq0fbqsxpqufplfnbqvasq0fbauiss0fbakisr0fbeuist0fbtyxtqufqlenbqwlclelbqtfdoztbquvblenbquest0fbtyxtqufqlenbqwlcledbqwpcledbqxvclflbqvc7qufdouisq0fbqsxxqufplelbqukssufbsixdqufvlelbqukssufbsixfqufelenbqwest0fbyixlquf5qixjqufsqyxdqufqo0fbq0gsq0fbqsxdquzeoztbqulblenbquest0fbtyxtqufqlenbqwlcle9bqwpcledbqtjclflbqvc7qufdbemsq0fbqsxxqufplelbqukssufbsixdqufvlelbqukssufbsixfqufelenbqwest0fbyixlquf5qixjqufsqyxdqufqo0fbq0gsq0fbqsxdquzeozs7ozs7ozs7ozs7oztbq25eqsxdqufble9bqu8sy0fbucxdqufzqixpqufplfnbqtdclevbqxddlfnbqxhdlevbqw1eo0fbqy9dlenbquesy0fbvsxjqurxqztbquuvqyxdqufblg1cqufllelbrmddo0fbry9dlenbquesz0jbqvkss0fibum7qufjl0msq0fbqsxxqufplgvbqvmsu0fbvcxfqufvqjtbqufblenbque7o0fbq3zclenbqueszufbtyxpqufplelbqvasq0fbwsxjqufalevbqwtcledbqwxclenbqxnclfvbqumsr0fbrcxfqufto0fbq2xdlenbquesz0jbquksuufbusxnquflledbquwsq0fbwjtbqunblenbquesz0jbquksbujbqw9clflbqweswufbwsxhqufaledbqwtcledbqwxcledbqxdcledbqxjdledbqtrdledbqxbfoztbquvblenbquesz0jbquksvufbvsxjqufwlelbqwtclfvbqvusu0fbaemsrufbmkm7qufddkmsq0fbqsx1qkfbtyxpqufplgdcqufqlenbqva7qufdscxdqufblgfbrkqstufftztbqunilenbquesdujbqu8stufbtsxpqufolenbqwmsz0jbqwqsq0fbudtbqunilenbque7qufdsixdqufblfnbve0sruftsixjqvrjlenbu0msr0furcxdqufqo0fbvugsq0fbqttbqwy4qyxdqufblenbqw5eozs7ozs7o0fbdujblenbquest0fbtyxjqufqlenbqxncle9bqu8su0fbn0isrufbd0msu0fbeemsrufbbuq7qufdl0msq0fbqsxjqufvlelbrhfdo0fbrs9dlenbquesbujbqwussufgz0m7qufhl0msq0fbqsxnqkfbwsxlquhtqztbqukvqyxdqufblfdbqu8st0fbtyxtqufqlenbqwlco0fbsnvclenbquesq0fbbkq7oztbq2xdqsxdqufble9bqu8su0fbucxdqufpqixvqufqqixhque4qixzqufxo0fbq3jdlenbquesv0fbtyxlquflle1bquwsq0fbwsxdqufalevbqwusv0fbzixlquerqixlquflletbquwsq0fbvyxdqufylenbqxrdo0fbq0gsq0fbqsxdquzeozs7quflqsxdqufble9bqu8su0fbucxdqufpqixjqufqqixhqufrqyxzqufxo0fbq3pdlenbquesv0fbtyxlquflle1bquwsq0fbwsxdqufalevbqwusv0fbzixlquerqixlquflletbquwsq0fbvyxdqufylenbqxrdo0fbq0gsq0fbqsxdquzeozs7o0fbtuesq0fbqsxpqufplfnbqvasq0fbauisuufbakisr0fbneiswufbvztbqunuqyxdqufblfdbqu8ss0fbsyxvqufmledbqwtclffbqwxcledbqtzcle9bqtdclenbqxfdlgnbqxjdlevbqxfelfvbqvmsq0fbvcxfqufxo0fbquusq0fbqsxlqufplevbquusv0fbrixfqufqo0fbqxlclenbquess0fbm0ysq0fbudtbqunilenbquesq0fgrds7oztbqu1blenbquest0fbtyxtqufqlenbqwlclffbqwpcledbqtrclflbqvc7qufdbkmsq0fbqsxrqufjlfnbqvmss0fbsyxxqufmledbqw1cle9bqw5clenbqtjcle1bqtnclevbqw1dlevbqw5dlevbqxvdle9bqxzdlenbqstdlelbqs9dlevbqxfeledbqxjelenbqwi7qufdqsxdqufblgfbqvmst0fbtyxpqufqlenbqwusyufbzixfque4qixvquftlenbqvqsrufbwttbqufflenbqueszufbtyxfqufflfdbquysrufbudtbquf5qixdqufbletbqxjflenbqvq7qufdqsxdqufblfdbqu8st0fbtyxvqufqlevbqva7qufdscxdqufblenbskq7ozs7ozs7ozs7ozs7oztbqw1cqsxdqufble9bqu8su0fbucxdqufpqixvqufqqixhque4qixzqufxo0fbq3jdlenbquesuufbssxtquftletbqusst0fbtcxdqufhledbqwisrufba0isr0fbbeisq0fbyjtbqunblenbquesyufbuyxpqufple9bqvasq0fbzsx5qkfbzixfquewqyxpquexqyxdqufuo0fbq0esq0fbqsxhquftle9bqu8st0fbucxdqufllg1cqufmlevbqw9dle9bqxbdlenbqvq7qufdqsxdqufblfdbqu8st0fbtyxpqufqlenbqwusr0fbzixfqufvqixhqufwqixfquf5qixxquf6qixfqufqo0fbq0gsq0fbqsxdquxeozs7ozs7ozs7ozs7ozs7ozs7oztbqxlcqsxdqufble9bqu8su0fbucxdqufpqixrqufqqixhque0qixvquftlhncqufulevbqwldo0fbq3pelenbquesuufbssxlqufkoztbquvblenbquesuufbsswyqkfbmkisu0fbm0issufbd0msc0jbqtvdlevbqw9fo0fbq2hflenbquesaujbqvmss0fbsyxvqufmlevbqvq7qufdscxdqufbletbrkqstufftztbqunilenbquesaujbqvmss0fbsyxjqufmlevbqvq7qufdscxdqufboztbquvelenbquesyufbuyxpqufple9bqvasq0fbzsxxqkfbzixfqufzqyxvquftlevbqvqsrufbysxfqufilevbqwlcletbqwpclevbqxdclelbqxhclevbqthco0fbq3pflenbqueszufbtyxdqufdlfnbqvmsrufbvixjqufnqixlqufllfvbquwsrufbdki7qufdscxdqufbletbrlesq0fbvds7qufjqsxdqufblfdbqu8st0fbtyxpqufqlenbqwusr0fbzixfqufvqixhqufwqixdqufqo0fbq0gsq0fbqsxdqwreozs7ozs7ozs7oztbqxlcqsxdqufble9bqu8su0fbucxdqufpqixvqufqqixhque4qixvquftlfnbqvqsrufbb0i7qufdoumsq0fbqsxrqufhletbqussuufbtcxpqufvqixnquf2qixfquerqjtbqufflenbqueszufbtyxjqufqo0fbqwmsq0fbqttbqumvqyxdqufblffbqukss0fbsyxrqufmle9bqw9cle9bqxhclevbqwldo0fbquusq0fbqsxlqufpletbqva7qufbzsxdqufboztbquvsrcxdqufblfdbqvesy0fbyyxtqufkledbqtbcletbqtfcledbqwtdlfnbqtfdo0fbq0gsq0fbqsxdquxeozs7ozs7o0fbwuesq0fbqsxpqufplfnbqvasq0fbauisu0fbakisr0fbnkiswufbvztbqunwqyxdqufblfdbqu8ss0fbsyxpqufmlenbqwesr0fbyixfqufrqixhqufsqixdqufqo0fbq0gsq0fbqsxdquzeozs7ozs7oztbqvvblenbquest0fbtyxtqufqlenbqwlclflbqwpcledbqwddlfvbqvmsu0fbvcxfqufvqjtbqunorcxdqufblfdbqu8ss0fbsyxxqufmledbqw1cle9bqw5clenbqtjclgdcquezqixfque2qyxhqufhledbqtfelenbqva7qufdscxdqufblenbrkq7oztbqutblenbquest0fbtyxtqufqlenbqwlclfnbqwpcledbqtzclfvbqvmss0fbvcxfqufnqixhqufoqixfquerqjtbqun4rcxdqufblfdbqu8srufbrsxtqufglenbqvkssufbwixfqufrqixlqufsqixfquf5qixhquf6qixdqufqo0fbq0gsq0fbqsxdquzeozs7quflqsxdqufble9bqu8su0fbucxdqufpqixxqufqqixhquerqixzqufxo0fbq3rdlenbquesv0fbtyxfqufflfdbquysq0fbyyxjqufklenbqva7qufdscxdqufblenbrkq7ozs7ozs7ozs7o0fbyuesq0fbqsxpqufplfnbqvasq0fbauisv0fbakisr0fbk0isvufbuyxpqufulevbqwtco0fbqzddlenbquesuufbryxdqufdle9bquosrufbyttbqufflenbquesa0jbqvustufbvjtbquftqixdqufboztbquvsqyxdqufblfdbqu8ss0fbsyxlqufmlenbqvcsr0fbwcxfqufnqixnqufoqixdquf1qixvqufvle9bqvysrufbbuissufbbkisrufbeui7qufdbkqsq0fbqsxzqufjlelbquksuufbusxjqufslenbqvi7qufdqsxdqufblflbquksq0fbqyxdqufmlevbqve7qufdsixdqufblgtcqufnlelbqukst0fbtyxtqufylenbqxfcldrcque0qixjqufqrcxdqufoo0fbq0gsq0fbqttbqunelenbqueszufbtyxdqufqo0fbq0gsq0fbqsxlqu5nlevbtuost0fossxdqufqo0fbt0gsq0fbqsxdqvzeozs7ozs7oztbqwtcqsxdqufble9bqu8su0fbucxdqufpqixvqufqqixhque4qixvqufvlfnbqvysrufbcui7qufdl0msq0fbqsxrqufjlenbqumsu0fbtcxfqufnqjtbqunalenbquesb0jbqvksr0fbwjtbqunilenbque7o0fbruqsq0fbqsxrqufjlffbqvess0fbsyxxqufmlenbqwlclfnbqwpclenbqvo7o0fbruesq0fbqsxrqufjlfvbqvusq0fbqyxdqufmlevbqwtco0fbq2qsq0fbqsxlqufple9bqu8ssufbucxdqufqo0fbq0gsq0fbqsxlquzele1bru87qufdscxdqufblgvbqu8ss0fbsyxlqufmlenbqvcsuufbusxdqufuqixdqufqo0fbq0gsq0fbqttbqunklenbquesq0fards7ozs7qufpqkesq0fbqsxpqufplfnbqvasq0fbauiss0fbakisr0fbeuisvufbuyxnqufulevbqwlclfnbqwpclevbqtrco0fbq2pelenbquesuufbssxdqufdlfnbquwsrufbz0i7qufbrsxdqufblg9cqufzledbqvo7qufba0isq0fbqts7quffcemsq0fbqsxrqufjlfvbqvusrufbzdtbqunblenbquesuufbssxnqkfbz0isu0fbuyxlquflle1bqwxdoztbquvblenbquesv0fbtyxrqufrle1bqvisr0fbauisyufbeeisrufbdum7qufdbkmsq0fbqsxzqufjlgdcqufnqixrqufrle1bqxhcledbqwldlfvbqvustufbl0msrufbduq7qufdbkqsq0fbqsxzqkfbvsxvqufvlfvbqvuss0fbvixdqufnqixdqufoqixfquftqixnqkfbz0isuufbusxnquezqyxdqufwqjtbqunilenbquesu0fgrcxnquvpo0fbq0gsq0fbqsxzqkfbvsxvqufvlfnbqxbco0fbq0gsq0fbqttbqunklenbque7o0fbruqsq0fbqsxxqufplfvbqvussufbaki7qufdscxdqufblenbzkq7ozs7o0fbb0jblenbquest0fbtyxtqufqlenbqwlcletbqwpcledbqxlclfvbqvmstufbvcxfqufpqixtqufqqixfque0qjtbqunqrcxdqufblffbquksq0fbqyxtqufmlevbqwdco0fbquusq0fbqsxvqkfbwsxhqufao0fbqwtclenbque7o0fbrxbdlenbquesuufbssxvqufvlevbqwq7qufdqsxdqufblffbquksz0jbqwdclfnbqvmss0fbsyxnqufsqzs7quffqsxdqufblfdbqu8suufbusxnqufsledbqwlclgfbqxhclevbqxvdo0fbq25dlenbqueswufbssxnqkfbz0isuufbusxnquf4qixhqufpqyxvqufvle1bqs9dlevbqxveo0fbq25elenbquesc0jbqvusvufbvsxvqufvletbqvysq0fbz0isq0fbaeisrufbbuisz0jbqwdclffbqvestufbm0msq0fbcei7qufdscxdqufblfnbrkqstufftztbqunilenbquesc0jbqvusvufbvsxtqufwqjtbqunilenbque7qufdsixdqufboztbquvelenbquesv0fbtyxpqufple9bqwq7qufdscxdqufblenbzkq7oztbqwtcqsxdqufble9bqu8su0fbucxdqufpqixpqufqqixhqueyqixpqufplfnbqvasq0fbauisuufbnum7o0fbruesq0fbqsxpqufplfnbqvasq0fbauist0fbakisr0fbmkisvufbuyxhqufulevbqwm7qufdeemsq0fbqsxxqufple9bqu8ssufbssxpqufklevbqvassufbd0isr0fbeeisr0fboeist0fbtyxlquflle9bquwsrufbucxdqufyqztbqunblenbquesq0fgrds7qufjqsxdqufble9bqu8su0fbucxdqufpqixrqufqqixhque0qixpqufplfnbqvasq0fbauisv0fbn0m7o0ndbk5blelbqu0suufbusxfquffle1bqu0srufbuixfqufzledbqucsyufbtttbqufflenbquesv0fbtyxdqufqo0fbqvcsq0fbqsxhqufsqyxfqufklenbrue7o0ndt0essufbtuesv0fbuztbqunylenbquesv0fbtztbqurjlenbquesq0fbzixdqulblefbqwusqufbzjs7ozsifq-">sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjpudWxsLCJzb3VyY2VzIjpbIi9Vc2Vycy93YXJhdHVtYW4vc3JjL3Zpa2luZy9saWIvdmlraW5nL3N1cHBvcnQvYXJyYXkuanMiLCIvVXNlcnMvd2FyYXR1bWFuL3NyYy92aWtpbmcvbGliL3Zpa2luZy9zdXBwb3J0L2Jvb2xlYW4uanMiLCIvVXNlcnMvd2FyYXR1bWFuL3NyYy92aWtpbmcvbGliL3Zpa2luZy9zdXBwb3J0L2RhdGUuanMiLCIvVXNlcnMvd2FyYXR1bWFuL3NyYy92aWtpbmcvbGliL3Zpa2luZy9zdXBwb3J0L251bWJlci5qcyIsIi9Vc2Vycy93YXJhdHVtYW4vc3JjL3Zpa2luZy9saWIvdmlraW5nL3N1cHBvcnQvb2JqZWN0LmpzIiwiL1VzZXJzL3dhcmF0dW1hbi9zcmMvdmlraW5nL2xpYi92aWtpbmcvc3VwcG9ydC9zdHJpbmcuanMiLCIvVXNlcnMvd2FyYXR1bWFuL3NyYy92aWtpbmcvbGliL3Zpa2luZy9tb2RlbC5qcyIsIi9Vc2Vycy93YXJhdHVtYW4vc3JjL3Zpa2luZy9saWIvdmlraW5nLmpzIl0sInNvdXJjZXNDb250ZW50IjpbIi8vIENhbGxzIGB0b19wYXJhbWAgb24gYWxsIGl0cyBlbGVtZW50cyBhbmQgam9pbnMgdGhlIHJlc3VsdCB3aXRoIHNsYXNoZXMuXG4vLyBUaGlzIGlzIHVzZWQgYnkgdXJsX2ZvciBpbiBWaWtpbmcgUGFjay5cbk9iamVjdC5kZWZpbmVQcm9wZXJ0eShBcnJheS5wcm90b3R5cGUsICd0b1BhcmFtJywge1xuICAgIHZhbHVlOiBmdW5jdGlvbiAoKSB7IHJldHVybiB0aGlzLm1hcCgoZSkgPT4gZS50b1BhcmFtKCkpLmpvaW4oJy8nKTsgfSxcbiAgICB3cml0YWJsZTogdHJ1ZSxcbiAgICBjb25maWd1cmVhYmxlOiB0cnVlLFxuICAgIGVudW1lcmFibGU6IGZhbHNlXG59KTtcblxuLy8gQ29udmVydHMgYW4gYXJyYXkgaW50byBhIHN0cmluZyBzdWl0YWJsZSBmb3IgdXNlIGFzIGEgVVJMIHF1ZXJ5IHN0cmluZyxcbi8vIHVzaW5nIHRoZSBnaXZlbiBrZXkgYXMgdGhlIHBhcmFtIG5hbWUuXG5PYmplY3QuZGVmaW5lUHJvcGVydHkoQXJyYXkucHJvdG90eXBlLCAndG9RdWVyeScsIHtcbiAgICB2YWx1ZTogZnVuY3Rpb24gKGtleSkge1xuICAgICAgICBsZXQgcHJlZml4ID0ga2V5ICsgXCJbXVwiO1xuICAgICAgICByZXR1cm4gdGhpcy5tYXAoZnVuY3Rpb24gKHZhbHVlKSB7XG4gICAgICAgICAgICBpZiAodmFsdWUgPT09IG51bGwpIHtcbiAgICAgICAgICAgICAgICByZXR1cm4gZXNjYXBlKHByZWZpeCkgKyAnPSc7XG4gICAgICAgICAgICB9XG4gICAgICAgICAgICByZXR1cm4gdmFsdWUudG9RdWVyeShwcmVmaXgpO1xuICAgICAgICB9KS5qb2luKCcmJyk7XG4gICAgfSxcbiAgICB3cml0YWJsZTogdHJ1ZSxcbiAgICBjb25maWd1cmVhYmxlOiB0cnVlLFxuICAgIGVudW1lcmFibGU6IGZhbHNlXG59KTtcbiIsIi8vIEFsaWFzIG9mIHRvX3MuXG5Cb29sZWFuLnByb3RvdHlwZS50b1BhcmFtID0gQm9vbGVhbi5wcm90b3R5cGUudG9TdHJpbmc7XG5cbkJvb2xlYW4ucHJvdG90eXBlLnRvUXVlcnkgPSBmdW5jdGlvbihrZXkpIHtcblx0cmV0dXJuIGVzY2FwZShrZXkudG9QYXJhbSgpKSArIFwiPVwiICsgZXNjYXBlKHRoaXMudG9QYXJhbSgpKTtcbn07IiwiLy8gc3RyZnRpbWUgcmVsaWVzIG9uIGh0dHBzOi8vZ2l0aHViLmNvbS9zYW1zb25qcy9zdHJmdGltZS4gSXQgc3VwcG9ydHNcbi8vIHN0YW5kYXJkIHNwZWNpZmllcnMgZnJvbSBDIGFzIHdlbGwgYXMgc29tZSBvdGhlciBleHRlbnNpb25zIGZyb20gUnVieS5cbkRhdGUucHJvdG90eXBlLnN0cmZ0aW1lID0gZnVuY3Rpb24oZm10KSB7XG4gICAgcmV0dXJuIHN0cmZ0aW1lKGZtdCwgdGhpcyk7XG59O1xuXG5EYXRlLmZyb21JU08gPSAocykgPT4gbmV3IERhdGUocyk7XG5cbi8vIEFsaWFzIG9mIHRvX3MuXG5EYXRlLnByb3RvdHlwZS50b1BhcmFtID0gRGF0ZS5wcm90b3R5cGUudG9KU09OO1xuXG5EYXRlLnByb3RvdHlwZS50b1F1ZXJ5ID0gZnVuY3Rpb24oa2V5KSB7XG4gICAgcmV0dXJuIGVzY2FwZShrZXkudG9QYXJhbSgpKSArIFwiPVwiICsgZXNjYXBlKHRoaXMudG9QYXJhbSgpKTtcbn07XG5cbkRhdGUucHJvdG90eXBlLnRvZGF5ID0gKCkgPT4gbmV3IERhdGUoKTtcblxuRGF0ZS5wcm90b3R5cGUuaXNUb2RheSA9IGZ1bmN0aW9uKCkge1xuICAgIHJldHVybiAodGhpcy5nZXRVVENGdWxsWWVhcigpID09PSAobmV3IERhdGUoKSkuZ2V0VVRDRnVsbFllYXIoKSAmJiB0aGlzLmdldFVUQ01vbnRoKCkgPT09IChuZXcgRGF0ZSgpKS5nZXRVVENNb250aCgpICYmIHRoaXMuZ2V0VVRDRGF0ZSgpID09PSAobmV3IERhdGUoKSkuZ2V0VVRDRGF0ZSgpKTtcbn07XG5cbkRhdGUucHJvdG90eXBlLmlzVGhpc01vbnRoID0gZnVuY3Rpb24gKCkge1xuICAgIHJldHVybiAodGhpcy5nZXRVVENGdWxsWWVhcigpID09PSAobmV3IERhdGUoKSkuZ2V0VVRDRnVsbFllYXIoKSAmJiB0aGlzLmdldFVUQ01vbnRoKCkgPT09IChuZXcgRGF0ZSgpKS5nZXRVVENNb250aCgpKTtcbn1cblxuRGF0ZS5wcm90b3R5cGUuaXNUaGlzWWVhciA9IGZ1bmN0aW9uKCkge1xuICAgIHJldHVybiAodGhpcy5nZXRVVENGdWxsWWVhcigpID09PSAobmV3IERhdGUoKSkuZ2V0VVRDRnVsbFllYXIoKSk7XG59O1xuXG5cbkRhdGUucHJvdG90eXBlLnBhc3QgPSBmdW5jdGlvbiAoKSB7XG4gICAgcmV0dXJuICh0aGlzIDwgKG5ldyBEYXRlKCkpKTtcbn0iLCIvLyBvcmRpbmFsaXplIHJldHVybnMgdGhlIG9yZGluYWwgc3RyaW5nIGNvcnJlc3BvbmRpbmcgdG8gaW50ZWdlcjpcbi8vXG4vLyAgICAgKDEpLm9yZGluYWxpemUoKSAgICAvLyA9PiAnMXN0J1xuLy8gICAgICgyKS5vcmRpbmFsaXplKCkgICAgLy8gPT4gJzJuZCdcbi8vICAgICAoNTMpLm9yZGluYWxpemUoKSAgIC8vID0+ICc1M3JkJ1xuLy8gICAgICgyMDA5KS5vcmRpbmFsaXplKCkgLy8gPT4gJzIwMDl0aCdcbi8vICAgICAoLTEzNCkub3JkaW5hbGl6ZSgpIC8vID0+ICctMTM0dGgnXG5OdW1iZXIucHJvdG90eXBlLm9yZGluYWxpemUgPSBmdW5jdGlvbigpIHtcbiAgICBsZXQgYWJzID0gTWF0aC5hYnModGhpcyk7XG4gICAgXG4gICAgaWYgKGFicyAlIDEwMCA+PSAxMSAmJiBhYnMgJSAxMDAgPD0gMTMpIHtcbiAgICAgICAgcmV0dXJuIHRoaXMgKyAndGgnO1xuICAgIH1cbiAgICBcbiAgICBhYnMgPSBhYnMgJSAxMDtcbiAgICBpZiAoYWJzID09PSAxKSB7IHJldHVybiB0aGlzICsgJ3N0JzsgfVxuICAgIGlmIChhYnMgPT09IDIpIHsgcmV0dXJuIHRoaXMgKyAnbmQnOyB9XG4gICAgaWYgKGFicyA9PT0gMykgeyByZXR1cm4gdGhpcyArICdyZCc7IH1cbiAgICBcbiAgICByZXR1cm4gdGhpcyArICd0aCc7XG59O1xuXG4vLyBBbGlhcyBvZiB0b19zLlxuTnVtYmVyLnByb3RvdHlwZS50b1BhcmFtID0gTnVtYmVyLnByb3RvdHlwZS50b1N0cmluZztcblxuTnVtYmVyLnByb3RvdHlwZS50b1F1ZXJ5ID0gZnVuY3Rpb24oa2V5KSB7XG4gICAgcmV0dXJuIGVzY2FwZShrZXkudG9QYXJhbSgpKSArIFwiPVwiICsgZXNjYXBlKHRoaXMudG9QYXJhbSgpKTtcbn07XG5cbk51bWJlci5wcm90b3R5cGUuc2Vjb25kID0gZnVuY3Rpb24oKSB7XG4gICAgcmV0dXJuIHRoaXMgKiAxMDAwO1xufTtcblxuTnVtYmVyLnByb3RvdHlwZS5zZWNvbmRzID0gTnVtYmVyLnByb3RvdHlwZS5zZWNvbmQ7XG5cbk51bWJlci5wcm90b3R5cGUubWludXRlID0gZnVuY3Rpb24oKSB7XG4gICAgcmV0dXJuIHRoaXMgKiA2MDAwMDtcbn07XG5cbk51bWJlci5wcm90b3R5cGUubWludXRlcyA9IE51bWJlci5wcm90b3R5cGUubWludXRlO1xuXG5OdW1iZXIucHJvdG90eXBlLmhvdXIgPSBmdW5jdGlvbigpIHtcbiAgICByZXR1cm4gdGhpcyAqIDM2MDAwMDA7XG59O1xuXG5OdW1iZXIucHJvdG90eXBlLmhvdXJzID0gTnVtYmVyLnByb3RvdHlwZS5ob3VyO1xuXG5OdW1iZXIucHJvdG90eXBlLmRheSA9IGZ1bmN0aW9uKCkge1xuICAgIHJldHVybiB0aGlzICogODY0MDAwMDA7XG59O1xuXG5OdW1iZXIucHJvdG90eXBlLmRheXMgPSBOdW1iZXIucHJvdG90eXBlLmRheTtcblxuTnVtYmVyLnByb3RvdHlwZS53ZWVrID0gZnVuY3Rpb24oKSB7XG4gICAgcmV0dXJuIHRoaXMgKiA3ICogODY0MDAwMDA7XG59O1xuXG5OdW1iZXIucHJvdG90eXBlLndlZWtzID0gTnVtYmVyLnByb3RvdHlwZS53ZWVrO1xuXG5OdW1iZXIucHJvdG90eXBlLmFnbyA9IGZ1bmN0aW9uKCkge1xuICAgIHJldHVybiBuZXcgRGF0ZSgobmV3IERhdGUoKSkuZ2V0VGltZSgpIC0gdGhpcyk7XG59O1xuXG5OdW1iZXIucHJvdG90eXBlLmZyb21Ob3cgPSBmdW5jdGlvbigpIHtcbiAgICByZXR1cm4gbmV3IERhdGUoKG5ldyBEYXRlKCkpLmdldFRpbWUoKSArIHRoaXMpO1xufTtcbiIsIi8vIFJldHVybnMgYSBzdHJpbmcgcmVwcmVzZW50YXRpb24gb2YgdGhlIHJlY2VpdmVyIHN1aXRhYmxlIGZvciB1c2UgYXMgYSBVUkxcbi8vIHF1ZXJ5IHN0cmluZzpcbi8vIFxuLy8ge25hbWU6ICdEYXZpZCcsIG5hdGlvbmFsaXR5OiAnRGFuaXNoJ30udG9QYXJhbSgpXG4vLyAvLyA9PiBcIm5hbWU9RGF2aWQmbmF0aW9uYWxpdHk9RGFuaXNoXCJcbi8vIEFuIG9wdGlvbmFsIG5hbWVzcGFjZSBjYW4gYmUgcGFzc2VkIHRvIGVuY2xvc2UgdGhlIHBhcmFtIG5hbWVzOlxuLy8gXG4vLyB7bmFtZTogJ0RhdmlkJywgbmF0aW9uYWxpdHk6ICdEYW5pc2gnfS50b1BhcmFtKCd1c2VyJylcbi8vIC8vID0+IFwidXNlcltuYW1lXT1EYXZpZCZ1c2VyW25hdGlvbmFsaXR5XT1EYW5pc2hcIlxuLy9cbi8vIFRoZSBzdHJpbmcgcGFpcnMgXCJrZXk9dmFsdWVcIiB0aGF0IGNvbmZvcm0gdGhlIHF1ZXJ5IHN0cmluZyBhcmUgc29ydGVkXG4vLyBsZXhpY29ncmFwaGljYWxseSBpbiBhc2NlbmRpbmcgb3JkZXIuXG5PYmplY3QuZGVmaW5lUHJvcGVydHkoT2JqZWN0LnByb3RvdHlwZSwgJ3RvUGFyYW0nLCB7XG4gICAgd3JpdGFibGU6IHRydWUsXG4gICAgY29uZmlndXJlYWJsZTogdHJ1ZSxcbiAgICBlbnVtZXJhYmxlOiBmYWxzZSxcbiAgICB2YWx1ZTogZnVuY3Rpb24obmFtZXNwYWNlKSB7XG4gICAgICAgIHJldHVybiBPYmplY3Qua2V5cyh0aGlzKS5tYXAoKGtleSkgPT4ge1xuICAgICAgICAgICAgbGV0IHZhbHVlID0gdGhpc1trZXldO1xuICAgICAgICAgICAgbGV0IG5hbWVzcGFjZVdpdGhLZXkgPSAobmFtZXNwYWNlID8gKG5hbWVzcGFjZSArIFwiW1wiICsga2V5ICsgXCJdXCIpIDoga2V5KTtcblxuICAgICAgICAgICAgaWYgKHZhbHVlID09PSBudWxsIHx8IHZhbHVlID09PSB1bmRlZmluZWQpIHtcbiAgICAgICAgICAgICAgICByZXR1cm4gZXNjYXBlKG5hbWVzcGFjZVdpdGhLZXkpO1xuICAgICAgICAgICAgfSBlbHNlIHtcbiAgICAgICAgICAgICAgICByZXR1cm4gdmFsdWUudG9RdWVyeShuYW1lc3BhY2VXaXRoS2V5KTtcbiAgICAgICAgICAgIH1cbiAgICAgICAgfSkuam9pbignJicpO1xuICAgIH1cbn0pO1xuXG4vLyBDb252ZXJ0cyBhbiBvYmplY3QgaW50byBhIHN0cmluZyBzdWl0YWJsZSBmb3IgdXNlIGFzIGEgVVJMIHF1ZXJ5IHN0cmluZyxcbi8vIHVzaW5nIHRoZSBnaXZlbiBrZXkgYXMgdGhlIHBhcmFtIG5hbWUuXG4vL1xuLy8gTm90ZTogVGhpcyBtZXRob2QgaXMgZGVmaW5lZCBhcyBhIGRlZmF1bHQgaW1wbGVtZW50YXRpb24gZm9yIGFsbCBPYmplY3RzIGZvclxuLy8gT2JqZWN0I3RvUXVlcnkgdG8gd29yay5cbk9iamVjdC5kZWZpbmVQcm9wZXJ0eShPYmplY3QucHJvdG90eXBlLCAndG9RdWVyeScsIHtcbiAgICB3cml0YWJsZTogdHJ1ZSxcbiAgICBjb25maWd1cmVhYmxlOiB0cnVlLFxuICAgIGVudW1lcmFibGU6IGZhbHNlLFxuICAgIHZhbHVlOiBPYmplY3QucHJvdG90eXBlLnRvUGFyYW1cbn0pOyIsIi8vIENvbnZlcnRzIHRoZSBmaXJzdCBjaGFyYWN0ZXIgdG8gdXBwZXJjYXNlXG5TdHJpbmcucHJvdG90eXBlLmNhcGl0YWxpemUgPSBmdW5jdGlvbigpIHtcbiAgICByZXR1cm4gdGhpcy5jaGFyQXQoMCkudG9VcHBlckNhc2UoKSArIHRoaXMuc2xpY2UoMSk7XG59O1xuXG4vLyBDb252ZXJ0cyB0aGUgZmlyc3QgY2hhcmFjdGVyIHRvIGxvd2VyY2FzZVxuU3RyaW5nLnByb3RvdHlwZS5hbnRpY2FwaXRhbGl6ZSA9IGZ1bmN0aW9uKCkge1xuICAgIHJldHVybiB0aGlzLmNoYXJBdCgwKS50b0xvd2VyQ2FzZSgpICsgdGhpcy5zbGljZSgxKTtcbn07XG5cbi8vIENhcGl0YWxpemVzIGFsbCB0aGUgd29yZHMgYW5kIHJlcGxhY2VzIHNvbWUgY2hhcmFjdGVycyBpbiB0aGUgc3RyaW5nIHRvXG4vLyBjcmVhdGUgYSBuaWNlciBsb29raW5nIHRpdGxlLiB0aXRsZWl6ZSBpcyBtZWFudCBmb3IgY3JlYXRpbmcgcHJldHR5IG91dHB1dC5cblN0cmluZy5wcm90b3R5cGUudGl0bGVpemUgPSBmdW5jdGlvbigpIHtcbiAgICByZXR1cm4gdGhpcy51bmRlcnNjb3JlKCkuaHVtYW5pemUoKS5yZXBsYWNlKC9cXGIoJz9bYS16XSkvZywgZnVuY3Rpb24obSl7IHJldHVybiBtLnRvVXBwZXJDYXNlKCk7IH0pO1xufTtcblxuLy8gQ2FwaXRhbGl6ZXMgdGhlIGZpcnN0IHdvcmQgYW5kIHR1cm5zIHVuZGVyc2NvcmVzIGludG8gc3BhY2VzIGFuZCBzdHJpcHMgYVxuLy8gdHJhaWxpbmcgXCJfaWRcIiwgaWYgYW55LiBMaWtlIHRpdGxlaXplLCB0aGlzIGlzIG1lYW50IGZvciBjcmVhdGluZyBwcmV0dHkgb3V0cHV0LlxuU3RyaW5nLnByb3RvdHlwZS5odW1hbml6ZSA9IGZ1bmN0aW9uKCkge1xuICAgIGxldCByZXN1bHQgPSB0aGlzLnRvTG93ZXJDYXNlKCkucmVwbGFjZSgvX2lkJC8sICcnKS5yZXBsYWNlKC9fL2csICcgJyk7XG4gICAgcmVzdWx0ID0gcmVzdWx0LnJlcGxhY2UoLyhbYS16XFxkXSopL2csIGZ1bmN0aW9uKG0pIHsgcmV0dXJuIG0udG9Mb3dlckNhc2UoKTsgfSk7XG4gICAgcmV0dXJuIHJlc3VsdC5jYXBpdGFsaXplKCk7XG59O1xuXG4vLyBNYWtlcyBhbiB1bmRlcnNjb3JlZCwgbG93ZXJjYXNlIGZvcm0gZnJvbSB0aGUgZXhwcmVzc2lvbiBpbiB0aGUgc3RyaW5nLlxuLy9cbi8vIENoYW5nZXMgJy4nIHRvICcvJyB0byBjb252ZXJ0IG5hbWVzcGFjZXMgdG8gcGF0aHMuXG4vL1xuLy8gRXhhbXBsZXM6XG4vLyBcbi8vICAgICBcIkFjdGl2ZU1vZGVsXCIudW5kZXJzY29yZSAgICAgICAgICMgPT4gXCJhY3RpdmVfbW9kZWxcIlxuLy8gICAgIFwiQWN0aXZlTW9kZWwuRXJyb3JzXCIudW5kZXJzY29yZSAjID0+IFwiYWN0aXZlX21vZGVsL2Vycm9yc1wiXG4vL1xuLy8gQXMgYSBydWxlIG9mIHRodW1iIHlvdSBjYW4gdGhpbmsgb2YgdW5kZXJzY29yZSBhcyB0aGUgaW52ZXJzZSBvZiBjYW1lbGl6ZSxcbi8vIHRob3VnaCB0aGVyZSBhcmUgY2FzZXMgd2hlcmUgdGhhdCBkb2VzIG5vdCBob2xkOlxuLy9cbi8vICAgICBcIlNTTEVycm9yXCIudW5kZXJzY29yZSgpLmNhbWVsaXplKCkgIyA9PiBcIlNzbEVycm9yXCJcblN0cmluZy5wcm90b3R5cGUudW5kZXJzY29yZSA9IGZ1bmN0aW9uKCkge1xuICAgIGxldCByZXN1bHQgPSB0aGlzLnJlcGxhY2UoJy4nLCAnLycpO1xuICAgIHJlc3VsdCA9IHJlc3VsdC5yZXBsYWNlKC8oW0EtWlxcZF0rKShbQS1aXVthLXpdKS9nLCBcIiQxXyQyXCIpO1xuICAgIHJlc3VsdCA9IHJlc3VsdC5yZXBsYWNlKC8oW2EtelxcZF0pKFtBLVpdKS9nLCBcIiQxXyQyXCIpO1xuICAgIHJldHVybiByZXN1bHQucmVwbGFjZSgnLScsICdfJykudG9Mb3dlckNhc2UoKTtcbn07XG5cbi8vIEJ5IGRlZmF1bHQsICNjYW1lbGl6ZSBjb252ZXJ0cyBzdHJpbmdzIHRvIFVwcGVyQ2FtZWxDYXNlLiBJZiB0aGUgYXJndW1lbnRcbi8vIHRvIGNhbWVsaXplIGlzIHNldCB0byBgZmFsc2VgIHRoZW4gI2NhbWVsaXplIHByb2R1Y2VzIGxvd2VyQ2FtZWxDYXNlLlxuLy9cbi8vIFxcI2NhbWVsaXplIHdpbGwgYWxzbyBjb252ZXJ0IFwiL1wiIHRvIFwiLlwiIHdoaWNoIGlzIHVzZWZ1bCBmb3IgY29udmVydGluZ1xuLy8gcGF0aHMgdG8gbmFtZXNwYWNlcy5cbi8vXG4vLyBFeGFtcGxlczpcbi8vXG4vLyAgICAgXCJhY3RpdmVfbW9kZWxcIi5jYW1lbGl6ZSAgICAgICAgICAgICAgIC8vID0+IFwiQWN0aXZlTW9kZWxcIlxuLy8gICAgIFwiYWN0aXZlX21vZGVsXCIuY2FtZWxpemUodHJ1ZSkgICAgICAgICAvLyA9PiBcIkFjdGl2ZU1vZGVsXCJcbi8vICAgICBcImFjdGl2ZV9tb2RlbFwiLmNhbWVsaXplKGZhbHNlKSAgICAgICAgLy8gPT4gXCJhY3RpdmVNb2RlbFwiXG4vLyAgICAgXCJhY3RpdmVfbW9kZWwvZXJyb3JzXCIuY2FtZWxpemUgICAgICAgIC8vID0+IFwiQWN0aXZlTW9kZWwuRXJyb3JzXCJcbi8vICAgICBcImFjdGl2ZV9tb2RlbC9lcnJvcnNcIi5jYW1lbGl6ZShmYWxzZSkgLy8gPT4gXCJhY3RpdmVNb2RlbC5FcnJvcnNcIlxuLy9cbi8vIEFzIGEgcnVsZSBvZiB0aHVtYiB5b3UgY2FuIHRoaW5rIG9mIGNhbWVsaXplIGFzIHRoZSBpbnZlcnNlIG9mIHVuZGVyc2NvcmUsXG4vLyB0aG91Z2ggdGhlcmUgYXJlIGNhc2VzIHdoZXJlIHRoYXQgZG9lcyBub3QgaG9sZDpcbi8vXG4vLyAgICAgXCJTU0xFcnJvclwiLnVuZGVyc2NvcmUoKS5jYW1lbGl6ZSgpICAgLy8gPT4gXCJTc2xFcnJvclwiXG5TdHJpbmcucHJvdG90eXBlLmNhbWVsaXplID0gZnVuY3Rpb24odXBwZXJjYXNlX2ZpcnN0X2xldHRlcikge1xuICAgIGxldCByZXN1bHQ7XG5cbiAgICBpZiAodXBwZXJjYXNlX2ZpcnN0X2xldHRlciA9PT0gdW5kZWZpbmVkIHx8IHVwcGVyY2FzZV9maXJzdF9sZXR0ZXIpIHtcbiAgICAgICAgcmVzdWx0ID0gdGhpcy5jYXBpdGFsaXplKCk7XG4gICAgfSBlbHNlIHtcbiAgICAgICAgcmVzdWx0ID0gdGhpcy5hbnRpY2FwaXRhbGl6ZSgpO1xuICAgIH1cblxuICAgIHJlc3VsdCA9IHJlc3VsdC5yZXBsYWNlKC8oX3woXFwvKSkoW2EtelxcZF0qKS9nLCBmdW5jdGlvbihfYSwgX2IsIGZpcnN0LCByZXN0KSB7XG4gICAgICAgIHJldHVybiAoZmlyc3QgfHwgJycpICsgcmVzdC5jYXBpdGFsaXplKCk7XG4gICAgfSk7XG5cbiAgICByZXR1cm4gcmVzdWx0LnJlcGxhY2UoJy8nLCAnLicpO1xufTtcblxuLy8gQ29udmVydCBhIHN0cmluZyB0byBhIGJvb2xlYW4gdmFsdWUuIElmIHRoZSBhcmd1bWVudCB0byAjYm9vbGVhbml6ZSBpc1xuLy8gcGFzc2VkIGlmIHRoZSBzdHJpbmcgaXMgbm90ICd0cnVlJyBvciAnZmFsc2UnIGl0IHdpbGwgcmV0dXJuIHRoZSBhcmd1bWVudC5cbi8vXG4vLyBFeGFtcGxlczpcbi8vXG4vLyAgICAgXCJ0cnVlXCIuYm9vbGVhbml6ZSgpICAgICAgIC8vID0+IHRydWVcbi8vICAgICBcImZhbHNlXCIuYm9vbGVhbml6ZSgpICAgICAgLy8gPT4gZmFsc2Vcbi8vICAgICBcIm90aGVyXCIuYm9vbGVhbml6ZSgpICAgICAgLy8gPT4gZmFsc2Vcbi8vICAgICBcIm90aGVyXCIuYm9vbGVhbml6ZSh0cnVlKSAgLy8gPT4gdHJ1ZVxuU3RyaW5nLnByb3RvdHlwZS5ib29sZWFuaXplID0gZnVuY3Rpb24oZGVmYXVsdFRvKSB7XG4gICAgaWYodGhpcy50b1N0cmluZygpID09PSAndHJ1ZScpIHsgcmV0dXJuIHRydWU7IH1cbiAgICBpZiAodGhpcy50b1N0cmluZygpID09PSAnZmFsc2UnKSB7IHJldHVybiBmYWxzZTsgfVxuICAgIFxuICAgIHJldHVybiAoZGVmYXVsdFRvID09PSB1bmRlZmluZWQgPyBmYWxzZSA6IGRlZmF1bHRUbyk7XG59O1xuXG4vLyBSZXBsYWNlcyB1bmRlcnNjb3JlcyB3aXRoIGRhc2hlcy5cbi8vXG4vLyBFeGFtcGxlOlxuLy9cbi8vICAgICBcInB1bmlfcHVuaVwiICAvLyA9PiBcInB1bmktcHVuaVwiXG5TdHJpbmcucHJvdG90eXBlLmRhc2hlcml6ZSA9IGZ1bmN0aW9uKCkge1xuICAgIHJldHVybiB0aGlzLnJlcGxhY2UoJ18nLCAnLScpO1xufTtcblxuLy8gUmVwbGFjZXMgc3BlY2lhbCBjaGFyYWN0ZXJzIGluIGEgc3RyaW5nIHNvIHRoYXQgaXQgbWF5IGJlIHVzZWQgYXMgcGFydCBvZlxuLy8gYSBcInByZXR0eVwiIFVSTC5cbi8vXG4vLyBFeGFtcGxlOlxuLy9cbi8vICAgICBcIkRvbmFsZCBFLiBLbnV0aFwiLnBhcmFtZXRlcml6ZSgpIC8vID0+ICdkb25hbGQtZS1rbnV0aCdcblN0cmluZy5wcm90b3R5cGUucGFyYW1ldGVyaXplID0gZnVuY3Rpb24oc2VwZXJhdG9yKSB7XG4gICAgcmV0dXJuIHRoaXMudG9Mb3dlckNhc2UoKS5yZXBsYWNlKC9bXmEtejAtOVxcLV9dKy9nLCBzZXBlcmF0b3IgfHwgJy0nKTtcbn07XG5cbi8vIEFkZCBVbmRlcnNjb3JlLmluZmxlY3Rpb24jcGx1cmFsaXplIGZ1bmN0aW9uIG9uIHRoZSBTdHJpbmcgb2JqZWN0XG5TdHJpbmcucHJvdG90eXBlLnBsdXJhbGl6ZSA9IGZ1bmN0aW9uKGNvdW50LCBpbmNsdWRlTnVtYmVyKSB7XG4gICAgcmV0dXJuIF8ucGx1cmFsaXplKHRoaXMsIGNvdW50LCBpbmNsdWRlTnVtYmVyKTtcbn07XG5cbi8vIEFkZCBVbmRlcnNjb3JlLmluZmxlY3Rpb24jc2luZ3VsYXJpemUgZnVuY3Rpb24gb24gdGhlIFN0cmluZyBvYmplY3RcblN0cmluZy5wcm90b3R5cGUuc2luZ3VsYXJpemUgPSBmdW5jdGlvbigpIHtcbiAgICByZXR1cm4gXy5zaW5ndWxhcml6ZSh0aGlzKTtcbn07XG5cbi8vIFRyaWVzIHRvIGZpbmQgYSB2YXJpYWJsZSB3aXRoIHRoZSBuYW1lIHNwZWNpZmllZCBpbiBjb250ZXh0IG9mIGBjb250ZXh0YC5cbi8vIGBjb250ZXh0YCBkZWZhdWx0cyB0byB0aGUgYHdpbmRvd2AgdmFyaWFibGUuXG4vL1xuLy8gRXhhbXBsZXM6XG4vLyAgICAgJ01vZHVsZScuY29uc3RhbnRpemUgICAgICMgPT4gTW9kdWxlXG4vLyAgICAgJ1Rlc3QuVW5pdCcuY29uc3RhbnRpemUgICMgPT4gVGVzdC5Vbml0XG4vLyAgICAgJ1VuaXQnLmNvbnN0YW50aXplKFRlc3QpICMgPT4gVGVzdC5Vbml0XG4vL1xuLy8gVmlraW5nLk5hbWVFcnJvciBpcyByYWlzZWQgd2hlbiB0aGUgdmFyaWFibGUgaXMgdW5rbm93bi5cblN0cmluZy5wcm90b3R5cGUuY29uc3RhbnRpemUgPSBmdW5jdGlvbihjb250ZXh0KSB7XG4gICAgaWYoIWNvbnRleHQpIHsgY29udGV4dCA9IHdpbmRvdzsgfVxuXG4gICAgcmV0dXJuIHRoaXMuc3BsaXQoJy4nKS5yZWR1Y2UoZnVuY3Rpb24gKGNvbnRleHQsIG5hbWUpIHtcbiAgICAgICAgbGV0IHYgPSBjb250ZXh0W25hbWVdO1xuICAgICAgICBpZiAoIXYpIHtcbiAgICAgICAgICAgIHRocm93IG5ldyBWaWtpbmcuTmFtZUVycm9yKFwidW5pbml0aWFsaXplZCB2YXJpYWJsZSBcIiArIG5hbWUpOyBcbiAgICAgICAgfVxuICAgICAgICByZXR1cm4gdjtcbiAgICB9LCBjb250ZXh0KTtcbn07XG5cbi8vIFJlbW92ZXMgdGhlIG1vZHVsZSBwYXJ0IGZyb20gdGhlIGV4cHJlc3Npb24gaW4gdGhlIHN0cmluZy5cbi8vXG4vLyBFeGFtcGxlczpcbi8vICAgICAnTmFtZXNwYWNlZC5Nb2R1bGUnLmRlbW9kdWxpemUoKSAjID0+ICdNb2R1bGUnXG4vLyAgICAgJ01vZHVsZScuZGVtb2R1bGl6ZSgpICMgPT4gJ01vZHVsZSdcbi8vICAgICAnJy5kZW1vZHVsaXplKCkgIyA9PiAnJ1xuU3RyaW5nLnByb3RvdHlwZS5kZW1vZHVsaXplID0gZnVuY3Rpb24gKHNlcGVyYXRvcikge1xuICAgIGlmICghc2VwZXJhdG9yKSB7XG4gICAgICAgIHNlcGVyYXRvciA9ICcuJztcbiAgICB9XG5cbiAgICBsZXQgaW5kZXggPSB0aGlzLmxhc3RJbmRleE9mKHNlcGVyYXRvcik7XG5cbiAgICBpZiAoaW5kZXggPT09IC0xKSB7XG4gICAgICAgIHJldHVybiBTdHJpbmcodGhpcyk7XG4gICAgfSBlbHNlIHtcbiAgICAgICAgcmV0dXJuIHRoaXMuc2xpY2UoaW5kZXggKyAxKTtcbiAgICB9XG59XG5cbi8vIElmIGBsZW5ndGhgIGlzIGdyZWF0ZXIgdGhhbiB0aGUgbGVuZ3RoIG9mIHRoZSBzdHJpbmcsIHJldHVybnMgYSBuZXcgU3RyaW5nXG4vLyBvZiBsZW5ndGggYGxlbmd0aGAgd2l0aCB0aGUgc3RyaW5nIHJpZ2h0IGp1c3RpZmllZCBhbmQgcGFkZGVkIHdpdGggcGFkU3RyaW5nO1xuLy8gb3RoZXJ3aXNlLCByZXR1cm5zIHN0cmluZ1xuU3RyaW5nLnByb3RvdHlwZS5yanVzdCA9IGZ1bmN0aW9uKGxlbmd0aCwgcGFkU3RyaW5nKSB7XG4gICAgaWYgKCFwYWRTdHJpbmcpIHsgcGFkU3RyaW5nID0gJyAnOyB9XG4gICAgXG4gICAgbGV0IHBhZGRpbmcgPSAnJztcbiAgICBsZXQgcGFkZGluZ0xlbmd0aCA9IGxlbmd0aCAtIHRoaXMubGVuZ3RoO1xuXG4gICAgd2hpbGUgKHBhZGRpbmcubGVuZ3RoIDwgcGFkZGluZ0xlbmd0aCkge1xuICAgICAgICBpZiAocGFkZGluZ0xlbmd0aCAtIHBhZGRpbmcubGVuZ3RoIDwgcGFkU3RyaW5nLmxlbmd0aCkge1xuICAgICAgICAgICAgcGFkZGluZyA9IHBhZGRpbmcgKyBwYWRTdHJpbmcuc2xpY2UoMCwgcGFkZGluZ0xlbmd0aCAtIHBhZGRpbmcubGVuZ3RoKTtcbiAgICAgICAgfSBlbHNlIHtcbiAgICAgICAgICAgIHBhZGRpbmcgPSBwYWRkaW5nICsgcGFkU3RyaW5nO1xuICAgICAgICB9XG4gICAgfVxuXG4gICAgcmV0dXJuIHBhZGRpbmcgKyB0aGlzO1xufTtcblxuLy8gSWYgYGxlbmd0aGAgaXMgZ3JlYXRlciB0aGFuIHRoZSBsZW5ndGggb2YgdGhlIHN0cmluZywgcmV0dXJucyBhIG5ldyBTdHJpbmdcbi8vIG9mIGxlbmd0aCBgbGVuZ3RoYCB3aXRoIHRoZSBzdHJpbmcgbGVmdCBqdXN0aWZpZWQgYW5kIHBhZGRlZCB3aXRoIHBhZFN0cmluZztcbi8vIG90aGVyd2lzZSwgcmV0dXJucyBzdHJpbmdcblN0cmluZy5wcm90b3R5cGUubGp1c3QgPSBmdW5jdGlvbihsZW5ndGgsIHBhZFN0cmluZykge1xuICAgIGlmICghcGFkU3RyaW5nKSB7IHBhZFN0cmluZyA9ICcgJzsgfVxuICAgIFxuICAgIGxldCBwYWRkaW5nID0gJyc7XG4gICAgbGV0IHBhZGRpbmdMZW5ndGggPSBsZW5ndGggLSB0aGlzLmxlbmd0aDtcblxuICAgIHdoaWxlIChwYWRkaW5nLmxlbmd0aCA8IHBhZGRpbmdMZW5ndGgpIHtcbiAgICAgICAgaWYgKHBhZGRpbmdMZW5ndGggLSBwYWRkaW5nLmxlbmd0aCA8IHBhZFN0cmluZy5sZW5ndGgpIHtcbiAgICAgICAgICAgIHBhZGRpbmcgPSBwYWRkaW5nICsgcGFkU3RyaW5nLnNsaWNlKDAsIHBhZGRpbmdMZW5ndGggLSBwYWRkaW5nLmxlbmd0aCk7XG4gICAgICAgIH0gZWxzZSB7XG4gICAgICAgICAgICBwYWRkaW5nID0gcGFkZGluZyArIHBhZFN0cmluZztcbiAgICAgICAgfVxuICAgIH1cblxuICAgIHJldHVybiB0aGlzICsgcGFkZGluZztcbn07XG5cbi8vIEFsaWFzIG9mIHRvX3MuXG5TdHJpbmcucHJvdG90eXBlLnRvUGFyYW0gPSBTdHJpbmcucHJvdG90eXBlLnRvU3RyaW5nO1xuXG5TdHJpbmcucHJvdG90eXBlLnRvUXVlcnkgPSBmdW5jdGlvbihrZXkpIHtcblx0cmV0dXJuIGVzY2FwZShrZXkudG9QYXJhbSgpKSArIFwiPVwiICsgZXNjYXBlKHRoaXMudG9QYXJhbSgpKTtcbn07XG5cblN0cmluZy5wcm90b3R5cGUuZG93bmNhc2UgPSBTdHJpbmcucHJvdG90eXBlLnRvTG93ZXJDYXNlO1xuIiwiY29uc3QgTW9kZWwgPSB7IHRlc3Q6IDQyLCBhOiAoKSA9PiB7IHJldHVybiAzOyB9IH1cblxuZXhwb3J0IGRlZmF1bHQgTW9kZWw7XG5cbi8vXG4vLyAvLz0gcmVxdWlyZV9zZWxmXG4vLyAvLz0gcmVxdWlyZSAuL21vZGVsL25hbWVcbi8vIC8vPSByZXF1aXJlIC4vbW9kZWwvcmVmbGVjdGlvblxuLy8gLy89IHJlcXVpcmVfdHJlZSAuL21vZGVsL3JlZmxlY3Rpb25zXG4vLyAvLz0gcmVxdWlyZV90cmVlIC4vbW9kZWwvY2xhc3NfcHJvcGVydGllc1xuLy8gLy89IHJlcXVpcmVfdHJlZSAuL21vZGVsL2luc3RhbmNlX3Byb3BlcnRpZXNcbi8vIC8vPSByZXF1aXJlIC4vbW9kZWwvdHlwZVxuLy8gLy89IHJlcXVpcmVfdHJlZSAuL21vZGVsL3R5cGVzXG4vL1xuLy8gLy8gVmlraW5nLk1vZGVsXG4vLyAvLyAtLS0tLS0tLS0tLS1cbi8vIC8vXG4vLyAvLyBWaWtpbmcuTW9kZWwgaXMgYW4gZXh0ZW5zaW9uIG9mIFtCYWNrYm9uZS5Nb2RlbF0oaHR0cDovL2JhY2tib25lanMub3JnLyNNb2RlbCkuXG4vLyAvLyBJdCBhZGRzIG5hbWluZywgcmVsYXRpb25zaGlwcywgZGF0YSB0eXBlIGNvZXJjaW9ucywgc2VsZWN0aW9uLCBhbmQgbW9kaWZpZXNcbi8vIC8vIHN5bmMgdG8gd29yayB3aXRoIFtSdWJ5IG9uIFJhaWxzXShodHRwOi8vcnVieW9ucmFpbHMub3JnLykgb3V0IG9mIHRoZSBib3guXG4vLyBWaWtpbmcuTW9kZWwgPSBCYWNrYm9uZS5Nb2RlbC5leHRlbmQoe1xuLy9cbi8vICAgICBhYnN0cmFjdDogdHJ1ZSxcbi8vXG4vLyAgICAgLy8gaW5oZXJpdGFuY2VBdHRyaWJ1dGUgaXMgdGhlIGF0dGlyYnV0ZXMgdXNlZCBmb3IgU1RJXG4vLyAgICAgaW5oZXJpdGFuY2VBdHRyaWJ1dGU6ICd0eXBlJyxcbi8vXG4vLyAgICAgZGVmYXVsdHM6IGZ1bmN0aW9uICgpIHtcbi8vICAgICAgICAgbGV0IGRmbHRzID0ge307XG4vL1xuLy8gICAgICAgICBpZiAodHlwZW9mKHRoaXMuc2NoZW1hKSA9PT0gJ3VuZGVmaW5lZCcpIHtcbi8vICAgICAgICAgICAgIHJldHVybiBkZmx0cztcbi8vICAgICAgICAgfVxuLy9cbi8vICAgICAgICAgT2JqZWN0LmtleXModGhpcy5zY2hlbWEpLmZvckVhY2goIChrZXkpID0+IHtcbi8vICAgICAgICAgICAgIGlmICh0aGlzLnNjaGVtYVtrZXldWydkZWZhdWx0J10pIHtcbi8vICAgICAgICAgICAgICAgICBkZmx0c1trZXldID0gdGhpcy5zY2hlbWFba2V5XVsnZGVmYXVsdCddO1xuLy8gICAgICAgICAgICAgfVxuLy8gICAgICAgICB9KTtcbi8vXG4vLyAgICAgICAgIHJldHVybiBkZmx0cztcbi8vICAgICB9LFxuLy9cbi8vICAgICAvLyBCZWxvdyBpcyB0aGUgc2FtZSBjb2RlIGZyb20gdGhlIEJhY2tib25lLk1vZGVsIGZ1bmN0aW9uXG4vLyAgICAgLy8gZXhjZXB0IHdoZXJlIHRoZXJlIGFyZSBjb21tZW50c1xuLy8gICAgIGNvbnN0cnVjdG9yOiBmdW5jdGlvbiAoYXR0cmlidXRlcywgb3B0aW9ucykge1xuLy8gICAgICAgICBsZXQgYXR0cnMgPSBhdHRyaWJ1dGVzIHx8IHt9O1xuLy8gICAgICAgICBvcHRpb25zIHx8IChvcHRpb25zID0ge30pO1xuLy8gICAgICAgICB0aGlzLmNpZCA9IF8udW5pcXVlSWQoJ2MnKTtcbi8vICAgICAgICAgdGhpcy5hdHRyaWJ1dGVzID0ge307XG4vL1xuLy8gICAgICAgICBhdHRycyA9IF8uZGVmYXVsdHMoe30sIGF0dHJzLCBfLnJlc3VsdCh0aGlzLCAnZGVmYXVsdHMnKSk7XG4vL1xuLy8gICAgICAgICBpZiAodGhpcy5pbmhlcml0YW5jZUF0dHJpYnV0ZSkge1xuLy8gICAgICAgICAgICAgaWYgKGF0dHJzW3RoaXMuaW5oZXJpdGFuY2VBdHRyaWJ1dGVdICYmIHRoaXMuY29uc3RydWN0b3IubW9kZWxOYW1lLm5hbWUgIT09IGF0dHJzW3RoaXMuaW5oZXJpdGFuY2VBdHRyaWJ1dGVdKSB7XG4vLyAgICAgICAgICAgICAgICAgLy8gT1BUSU1JWkU6ICBNdXRhdGluZyB0aGUgW1tQcm90b3R5cGVdXSBvZiBhbiBvYmplY3QsIG5vIG1hdHRlciBob3dcbi8vICAgICAgICAgICAgICAgICAvLyB0aGlzIGlzIGFjY29tcGxpc2hlZCwgaXMgc3Ryb25nbHkgZGlzY291cmFnZWQsIGJlY2F1c2UgaXQgaXMgdmVyeVxuLy8gICAgICAgICAgICAgICAgIC8vIHNsb3cgYW5kIHVuYXZvaWRhYmx5IHNsb3dzIGRvd24gc3Vic2VxdWVudCBleGVjdXRpb24gaW4gbW9kZXJuXG4vLyAgICAgICAgICAgICAgICAgLy8gSmF2YVNjcmlwdCBpbXBsZW1lbnRhdGlvbnNcbi8vICAgICAgICAgICAgICAgICAvLyBJZGVhczogTW92ZSB0byBNb2RlbC5uZXcoLi4uKSBtZXRob2Qgb2YgaW5pdGlhbGl6aW5nIG1vZGVsc1xuLy8gICAgICAgICAgICAgICAgIGxldCB0eXBlID0gYXR0cnNbdGhpcy5pbmhlcml0YW5jZUF0dHJpYnV0ZV0uY2FtZWxpemUoKS5jb25zdGFudGl6ZSgpO1xuLy8gICAgICAgICAgICAgICAgIHRoaXMuY29uc3RydWN0b3IgPSB0eXBlO1xuLy8gICAgICAgICAgICAgICAgIHRoaXMuX19wcm90b19fID0gdHlwZS5wcm90b3R5cGU7XG4vLyAgICAgICAgICAgICB9XG4vLyAgICAgICAgIH1cbi8vXG4vLyAgICAgICAgIC8vIEFkZCBhIGhlbHBlciByZWZlcmVuY2UgdG8gZ2V0IHRoZSBtb2RlbCBuYW1lIGZyb20gYW4gbW9kZWwgaW5zdGFuY2UuXG4vLyAgICAgICAgIHRoaXMubW9kZWxOYW1lID0gdGhpcy5jb25zdHJ1Y3Rvci5tb2RlbE5hbWU7XG4vLyAgICAgICAgIHRoaXMuYmFzZU1vZGVsID0gdGhpcy5jb25zdHJ1Y3Rvci5iYXNlTW9kZWw7XG4vL1xuLy8gICAgICAgICBpZiAodGhpcy5iYXNlTW9kZWwgJiYgdGhpcy5tb2RlbE5hbWUgJiYgdGhpcy5pbmhlcml0YW5jZUF0dHJpYnV0ZSkge1xuLy8gICAgICAgICAgICAgaWYgKHRoaXMuYmFzZU1vZGVsID09PSB0aGlzLmNvbnN0cnVjdG9yICYmIHRoaXMuYmFzZU1vZGVsLmRlc2NlbmRhbnRzLmxlbmd0aCA+IDApIHtcbi8vICAgICAgICAgICAgICAgICBhdHRyc1t0aGlzLmluaGVyaXRhbmNlQXR0cmlidXRlXSA9IHRoaXMubW9kZWxOYW1lLm5hbWU7XG4vLyAgICAgICAgICAgICB9IGVsc2UgaWYgKF8uY29udGFpbnModGhpcy5iYXNlTW9kZWwuZGVzY2VuZGFudHMsIHRoaXMuY29uc3RydWN0b3IpKSB7XG4vLyAgICAgICAgICAgICAgICAgYXR0cnNbdGhpcy5pbmhlcml0YW5jZUF0dHJpYnV0ZV0gPSB0aGlzLm1vZGVsTmFtZS5uYW1lO1xuLy8gICAgICAgICAgICAgfVxuLy8gICAgICAgICB9XG4vL1xuLy8gICAgICAgICAvLyBTZXQgdXAgYXNzb2NpYXRpb25zXG4vLyAgICAgICAgIHRoaXMuYXNzb2NpYXRpb25zID0gdGhpcy5jb25zdHJ1Y3Rvci5hc3NvY2lhdGlvbnM7XG4vLyAgICAgICAgIHRoaXMucmVmbGVjdE9uQXNzb2NpYXRpb24gPSB0aGlzLmNvbnN0cnVjdG9yLnJlZmxlY3RPbkFzc29jaWF0aW9uO1xuLy8gICAgICAgICB0aGlzLnJlZmxlY3RPbkFzc29jaWF0aW9ucyA9IHRoaXMuY29uc3RydWN0b3IucmVmbGVjdE9uQXNzb2NpYXRpb25zO1xuLy9cbi8vICAgICAgICAgLy8gSW5pdGlhbGl6ZSBhbnkgYGhhc01hbnlgIHJlbGF0aW9uc2hpcHMgdG8gZW1wdHkgY29sbGVjdGlvbnNcbi8vICAgICAgICAgdGhpcy5yZWZsZWN0T25Bc3NvY2lhdGlvbnMoJ2hhc01hbnknKS5mb3JFYWNoKGZ1bmN0aW9uKGFzc29jaWF0aW9uKSB7XG4vLyAgICAgICAgICAgICB0aGlzLmF0dHJpYnV0ZXNbYXNzb2NpYXRpb24ubmFtZV0gPSBuZXcgKGFzc29jaWF0aW9uLmNvbGxlY3Rpb24oKSkoKTtcbi8vICAgICAgICAgfSwgdGhpcyk7XG4vL1xuLy8gICAgICAgICBpZiAob3B0aW9ucy5jb2xsZWN0aW9uKSB7IHRoaXMuY29sbGVjdGlvbiA9IG9wdGlvbnMuY29sbGVjdGlvbjsgfVxuLy8gICAgICAgICBpZiAob3B0aW9ucy5wYXJzZSkgeyBhdHRycyA9IHRoaXMucGFyc2UoYXR0cnMsIG9wdGlvbnMpIHx8IHt9OyB9XG4vL1xuLy8gICAgICAgICB0aGlzLnNldChhdHRycywgb3B0aW9ucyk7XG4vLyAgICAgICAgIHRoaXMuY2hhbmdlZCA9IHt9O1xuLy8gICAgICAgICB0aGlzLmluaXRpYWxpemUuY2FsbCh0aGlzLCBhdHRyaWJ1dGVzLCBvcHRpb25zKTtcbi8vICAgICB9XG4vL1xuLy8gfSwge1xuLy9cbi8vICAgICBhc3NvY2lhdGlvbnM6IFtdLFxuLy9cbi8vICAgICAvLyBPdmVyaWRlIHRoZSBkZWZhdWx0IGV4dGVuZCBtZXRob2QgdG8gc3VwcG9ydCBwYXNzaW5nIGluIHRoZSBtb2RlbE5hbWVcbi8vICAgICAvLyBhbmQgc3VwcG9ydCBTVElcbi8vICAgICAvL1xuLy8gICAgIC8vIFRoZSBtb2RlbE5hbWUgaXMgdXNlZCBmb3IgZ2VuZXJhdGluZyB1cmxzIGFuZCByZWxhdGlvbnNoaXBzLlxuLy8gICAgIC8vXG4vLyAgICAgLy8gSWYgYSBNb2RlbCBpcyBleHRlbmRlZCBmdXJ0aGVyIGlzIGFjdHMgc2ltbGFyIHRvIEFjdGl2ZVJlY29yZHMgU1RJLlxuLy8gICAgIC8vXG4vLyAgICAgLy8gYG5hbWVgIGlzIG9wdGlvbmFsLCBhbmQgbXVzdCBiZSBhIHN0cmluZ1xuLy8gICAgIGV4dGVuZDogZnVuY3Rpb24obmFtZSwgcHJvdG9Qcm9wcywgc3RhdGljUHJvcHMpIHtcbi8vICAgICAgICAgaWYodHlwZW9mIG5hbWUgIT09ICdzdHJpbmcnKSB7XG4vLyAgICAgICAgICAgICBzdGF0aWNQcm9wcyA9IHByb3RvUHJvcHM7XG4vLyAgICAgICAgICAgICBwcm90b1Byb3BzID0gbmFtZTtcbi8vICAgICAgICAgfVxuLy8gICAgICAgICBwcm90b1Byb3BzIHx8IChwcm90b1Byb3BzID0ge30pO1xuLy9cbi8vICAgICAgICAgbGV0IGNoaWxkID0gQmFja2JvbmUuTW9kZWwuZXh0ZW5kLmNhbGwodGhpcywgcHJvdG9Qcm9wcywgc3RhdGljUHJvcHMpO1xuLy9cbi8vICAgICAgICAgaWYodHlwZW9mIG5hbWUgPT09ICdzdHJpbmcnKSB7XG4vLyAgICAgICAgICAgICBjaGlsZC5tb2RlbE5hbWUgPSBuZXcgVmlraW5nLk1vZGVsLk5hbWUobmFtZSk7XG4vLyAgICAgICAgIH1cbi8vXG4vLyAgICAgICAgIGNoaWxkLmFzc29jaWF0aW9ucyA9IHt9O1xuLy8gICAgICAgICBjaGlsZC5kZXNjZW5kYW50cyA9IFtdO1xuLy8gICAgICAgICBjaGlsZC5pbmhlcml0YW5jZUF0dHJpYnV0ZSA9IChwcm90b1Byb3BzLmluaGVyaXRhbmNlQXR0cmlidXRlID09PSB1bmRlZmluZWQpID8gdGhpcy5wcm90b3R5cGUuaW5oZXJpdGFuY2VBdHRyaWJ1dGUgOiBwcm90b1Byb3BzLmluaGVyaXRhbmNlQXR0cmlidXRlO1xuLy9cbi8vICAgICAgICAgaWYgKGNoaWxkLmluaGVyaXRhbmNlQXR0cmlidXRlID09PSBmYWxzZSB8fCAodGhpcy5wcm90b3R5cGUuaGFzT3duUHJvcGVydHkoJ2Fic3RyYWN0JykgJiYgdGhpcy5wcm90b3R5cGUuYWJzdHJhY3QpKSB7XG4vLyAgICAgICAgICAgICBjaGlsZC5iYXNlTW9kZWwgPSBjaGlsZDtcbi8vICAgICAgICAgfSBlbHNlIHtcbi8vICAgICAgICAgICAgIGNoaWxkLmJhc2VNb2RlbC5kZXNjZW5kYW50cy5wdXNoKGNoaWxkKTtcbi8vICAgICAgICAgfVxuLy9cbi8vICAgICAgICAgWydiZWxvbmdzVG8nLCAnaGFzT25lJywgJ2hhc01hbnknLCAnaGFzQW5kQmVsb25nc1RvTWFueSddLmZvckVhY2goZnVuY3Rpb24obWFjcm8pIHtcbi8vICAgICAgICAgICAgIChwcm90b1Byb3BzW21hY3JvXSB8fCBbXSkuY29uY2F0KHRoaXNbbWFjcm9dIHx8IFtdKS5mb3JFYWNoKGZ1bmN0aW9uKG5hbWUpIHtcbi8vICAgICAgICAgICAgICAgICBsZXQgb3B0aW9ucztcbi8vXG4vLyAgICAgICAgICAgICAgICAgLy8gSGFuZGxlIGJvdGggYHR5cGUsIGtleSwgb3B0aW9uc2AgYW5kIGB0eXBlLCBba2V5LCBvcHRpb25zXWAgc3R5bGUgYXJndW1lbnRzXG4vLyAgICAgICAgICAgICAgICAgaWYgKEFycmF5LmlzQXJyYXkobmFtZSkpIHtcbi8vICAgICAgICAgICAgICAgICAgICAgb3B0aW9ucyA9IG5hbWVbMV07XG4vLyAgICAgICAgICAgICAgICAgICAgIG5hbWUgPSBuYW1lWzBdO1xuLy8gICAgICAgICAgICAgICAgIH1cbi8vXG4vLyAgICAgICAgICAgICAgICAgaWYgKCFjaGlsZC5hc3NvY2lhdGlvbnNbbmFtZV0pIHtcbi8vICAgICAgICAgICAgICAgICAgICAgbGV0IHJlZmxlY3Rpb25DbGFzcyA9IHtcbi8vICAgICAgICAgICAgICAgICAgICAgICAgICdiZWxvbmdzVG8nOiBWaWtpbmcuTW9kZWwuQmVsb25nc1RvUmVmbGVjdGlvbixcbi8vICAgICAgICAgICAgICAgICAgICAgICAgICdoYXNPbmUnOiBWaWtpbmcuTW9kZWwuSGFzT25lUmVmbGVjdGlvbixcbi8vICAgICAgICAgICAgICAgICAgICAgICAgICdoYXNNYW55JzogVmlraW5nLk1vZGVsLkhhc01hbnlSZWZsZWN0aW9uLFxuLy8gICAgICAgICAgICAgICAgICAgICAgICAgJ2hhc0FuZEJlbG9uZ3NUb01hbnknOiBWaWtpbmcuTW9kZWwuSGFzQW5kQmVsb25nc1RvTWFueVJlZmxlY3Rpb25cbi8vICAgICAgICAgICAgICAgICAgICAgfVxuLy8gICAgICAgICAgICAgICAgICAgICByZWZsZWN0aW9uQ2xhc3MgPSByZWZsZWN0aW9uQ2xhc3NbbWFjcm9dO1xuLy9cbi8vICAgICAgICAgICAgICAgICAgICAgY2hpbGQuYXNzb2NpYXRpb25zW25hbWVdID0gbmV3IHJlZmxlY3Rpb25DbGFzcyhuYW1lLCBvcHRpb25zKTtcbi8vICAgICAgICAgICAgICAgICB9XG4vLyAgICAgICAgICAgICB9KTtcbi8vICAgICAgICAgfSwgdGhpcy5wcm90b3R5cGUpO1xuLy9cbi8vICAgICAgICAgaWYgKHRoaXMucHJvdG90eXBlLnNjaGVtYSAmJiBwcm90b1Byb3BzLnNjaGVtYSkge1xuLy8gICAgICAgICAgICAgT2JqZWN0LmtleXModGhpcy5wcm90b3R5cGUuc2NoZW1hKS5mb3JFYWNoKCAoa2V5KSA9PiB7XG4vLyAgICAgICAgICAgICAgICAgaWYoIWNoaWxkLnByb3RvdHlwZS5zY2hlbWFba2V5XSkge1xuLy8gICAgICAgICAgICAgICAgICAgICBjaGlsZC5wcm90b3R5cGUuc2NoZW1hW2tleV0gPSB0aGlzLnByb3RvdHlwZS5zY2hlbWFba2V5XTtcbi8vICAgICAgICAgICAgICAgICB9XG4vLyAgICAgICAgICAgICB9KTtcbi8vICAgICAgICAgfVxuLy9cbi8vICAgICAgICAgcmV0dXJuIGNoaWxkO1xuLy8gICAgIH1cbi8vXG4vLyB9KTtcbiIsIi8vIFZpa2luZy5qcyA8JT0gdmVyc2lvbiAlPiAoc2hhOjwlPSBnaXRfaW5mb1s6aGVhZF1bOnNoYV0gJT4pXG4vLyBcbi8vIChjKSAyMDEyLTwlPSBUaW1lLm5vdy55ZWFyICU+IEpvbmF0aGFuIEJyYWN5LCA0MkZsb29ycyBJbmMuXG4vLyBWaWtpbmcuanMgbWF5IGJlIGZyZWVseSBkaXN0cmlidXRlZCB1bmRlciB0aGUgTUlUIGxpY2Vuc2UuXG4vLyBodHRwOi8vdmlraW5nanMuY29tXG5cbmltcG9ydCAnLi92aWtpbmcvc3VwcG9ydCc7XG5pbXBvcnQgTW9kZWwgZnJvbSAnLi92aWtpbmcvbW9kZWwnO1xuXG5jb25zdCBWaWtpbmcgPSB7XG4gICAgTW9kZWw6IE1vZGVsLFxufTtcblxuZXhwb3J0IGRlZmF1bHQgVmlraW5nO1xuIl0sIm5hbWVzIjpbIlZpa2luZyJdLCJtYXBwaW5ncyI6Ijs7Ozs7QUFFQSxDQUFBLE9BQU8sY0FBUCxDQUFzQixNQUFNLFNBQTVCLEVBQXVDLFNBQXZDLEVBQWtEO0FBQzlDLENBQUEsV0FBTyxpQkFBWTtBQUFFLENBQUEsZUFBTyxLQUFLLEdBQUwsQ0FBUyxVQUFDLENBQUQ7QUFBQSxDQUFBLG1CQUFPLEVBQUUsT0FBRixFQUFQO0FBQUEsQ0FBQSxTQUFULEVBQTZCLElBQTdCLENBQWtDLEdBQWxDLENBQVA7QUFBZ0QsQ0FBQSxLQUR2QjtBQUU5QyxDQUFBLGNBQVUsSUFGb0M7QUFHOUMsQ0FBQSxtQkFBZSxJQUgrQjtBQUk5QyxDQUFBLGdCQUFZO0FBSmtDLENBQUEsQ0FBbEQ7Ozs7QUFTQSxDQUFBLE9BQU8sY0FBUCxDQUFzQixNQUFNLFNBQTVCLEVBQXVD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</h1>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    select: <span class="keyword">function</span>(multiple) {
-        <span class="keyword">this</span>.collection.select(<span class="keyword">this</span>, multiple);
-    },</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-28">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
-              </div>
-              <p>TODO: implement</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    unselect: <span class="keyword">function</span>() {
-        
-    },</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-29">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
-              </div>
-              <p>Alias for <code>::urlRoot</code></p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    urlRoot: <span class="keyword">function</span>() {
-        <span class="keyword">return</span> <span class="keyword">this</span>.constructor.urlRoot();
-    },</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-30">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
-              </div>
-              <p>Returns string to use for params names. This is the key attributes from
-the model will be namespaced under when saving to the server</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    paramRoot: <span class="keyword">function</span>() {
-        <span class="keyword">return</span> <span class="keyword">this</span>.modelName.underscore();
-    },</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-31">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
-              </div>
-              <p>Returns a string representing the object's key suitable for use in URLs,
-or nil if <code>#isNew</code> is true.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    toParam: <span class="keyword">function</span>() {
-        <span class="keyword">return</span> <span class="keyword">this</span>.isNew() ? <span class="literal">null</span> : <span class="keyword">this</span>.get(<span class="string">'id'</span>);
-    },
-    
-    set: <span class="function"><span class="keyword">function</span> <span class="params">(key, val, options)</span> {</span>
-        <span class="keyword">var</span> attrs;
-        <span class="keyword">if</span> (key === <span class="literal">null</span>) { <span class="keyword">return</span> <span class="keyword">this</span>; }</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-32">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-32">&#182;</a>
-              </div>
-              <p>Handle both <code>&quot;key&quot;, value</code> and <code>{key: value}</code> -style arguments.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="keyword">if</span> (<span class="keyword">typeof</span> key === <span class="string">'object'</span>) {
-            attrs = key;
-            options = val;
-        } <span class="keyword">else</span> {
-            (attrs = {})[key] = val;
-        }
-
-        <span class="keyword">this</span>.coerceAttributes(attrs);
-
-        <span class="keyword">return</span> Backbone.Model.prototype.set.call(<span class="keyword">this</span>, attrs, options);
-    },</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-33">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-33">&#182;</a>
-              </div>
-              <p>Override <a href="http://backbonejs.org/#Model-sync">Backbone.Model#sync</a>.
-<a href="http://rubyonrails.org/">Ruby on Rails</a> expects the attributes to be
-namespaced</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    sync: <span class="keyword">function</span>(method, model, options) {
-        options || (options = {});
-        
-        <span class="keyword">if</span> (!options.data &amp;&amp; (method === <span class="string">'create'</span> || method === <span class="string">'update'</span> || method === <span class="string">'patch'</span>)) {
-            options.contentType = <span class="string">'application/json'</span>;
-            options.data = {};
-            options.data[_.result(model, <span class="string">'paramRoot'</span>)] = (options.attrs || model.toJSON(options));
-            options.data = JSON.stringify(options.data);
-        }
-
-        <span class="keyword">return</span> Backbone.sync.call(<span class="keyword">this</span>, method, model, options);
-    },
-    
-    coerceAttributes: <span class="keyword">function</span>(attrs) {
-        <span class="keyword">var</span> rel, i, type, klass;
-
-        <span class="keyword">if</span> (<span class="keyword">this</span>.belongsTo) {
-            <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="keyword">this</span>.belongsTo.length; i++) {
-                rel = Viking.Model.getRelationshipDetails(<span class="string">'belongsTo'</span>, <span class="keyword">this</span>.belongsTo[i]);
-                <span class="keyword">if</span> (attrs[rel.key] &amp;&amp; !(attrs[rel.key] <span class="keyword">instanceof</span> rel.type)) {
-                    attrs[rel.key] = <span class="keyword">new</span> rel.type(attrs[rel.key]);
-                }
-            }
-        }
-
-        <span class="keyword">if</span> (<span class="keyword">this</span>.hasMany) {
-            <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="keyword">this</span>.hasMany.length; i++) {
-                rel = Viking.Model.getRelationshipDetails(<span class="string">'hasMany'</span>, <span class="keyword">this</span>.hasMany[i]);
-                <span class="keyword">if</span> (attrs[rel.key] &amp;&amp; !(attrs[rel.key] <span class="keyword">instanceof</span> rel.type)) {
-                    attrs[rel.key] = <span class="keyword">new</span> rel.type(attrs[rel.key]);
-                }
-            }
-        }
-
-        _.each(<span class="keyword">this</span>.coercions, <span class="function"><span class="keyword">function</span> <span class="params">(type, key)</span> {</span>
-            <span class="keyword">if</span> (attrs[key]) {
-                klass = window[type];
-                <span class="keyword">if</span> (klass === Date) {
-                    <span class="keyword">if</span> (<span class="keyword">typeof</span> attrs[key] === <span class="string">'string'</span> || <span class="keyword">typeof</span> attrs[key] === <span class="string">'number'</span>) {
-                        attrs[key] = Date.fromISO(attrs[key]);
-                    } <span class="keyword">else</span> <span class="keyword">if</span> (!(attrs[key] <span class="keyword">instanceof</span> Date)) {
-                        <span class="keyword">throw</span> <span class="keyword">new</span> TypeError(<span class="keyword">typeof</span> attrs[key] + <span class="string">" can't be coerced into "</span> + type);
-                    }
-                } <span class="keyword">else</span> {
-                    <span class="keyword">throw</span> <span class="keyword">new</span> TypeError(<span class="string">"Coercion of "</span> + type + <span class="string">" unsupported"</span>);
-                }
-            }
-        });
-
-        <span class="keyword">return</span> attrs;
-    },
-    
-    toJSON: <span class="function"><span class="keyword">function</span> <span class="params">(options)</span> {</span>
-        <span class="keyword">var</span> rel, i;
-        <span class="keyword">var</span> data = _.clone(<span class="keyword">this</span>.attributes);
-
-        <span class="keyword">if</span> (<span class="keyword">this</span>.belongsTo) {
-            <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="keyword">this</span>.belongsTo.length; i++) {
-                rel = Viking.Model.getRelationshipDetails(<span class="string">'belongsTo'</span>, <span class="keyword">this</span>.belongsTo[i]);
-
-                <span class="keyword">if</span> (data[rel.key]) {
-                    data[rel.key+<span class="string">'_attributes'</span>] = data[rel.key].toJSON();
-                    <span class="keyword">delete</span> data[rel.key];
-                } <span class="keyword">else</span> <span class="keyword">if</span> (data[rel.key] === <span class="literal">null</span>) {
-                    data[rel.key+<span class="string">'_attributes'</span>] = <span class="literal">null</span>;
-                    <span class="keyword">delete</span> data[rel.key];
-                }
-            }
-        }
-
-        <span class="keyword">if</span> (<span class="keyword">this</span>.hasMany) {
-            <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="keyword">this</span>.hasMany.length; i++) {
-                rel = Viking.Model.getRelationshipDetails(<span class="string">'hasMany'</span>, <span class="keyword">this</span>.hasMany[i]);
-
-                <span class="keyword">if</span> (data[rel.key]) {
-                    data[rel.key + <span class="string">'_attributes'</span>] = data[rel.key].toJSON();
-                    <span class="keyword">delete</span> data[rel.key];
-                }
-            }
-        }
-
-        _.each(<span class="keyword">this</span>.coercions, <span class="function"><span class="keyword">function</span> <span class="params">(type, key)</span> {</span>
-            <span class="keyword">if</span> (data[key]) {
-                <span class="keyword">if</span> (type === <span class="string">'Date'</span>) {
-                    data[key] = data[key].toISOString();
-                } <span class="keyword">else</span> {
-                    <span class="keyword">throw</span> <span class="keyword">new</span> TypeError(<span class="string">"Coercion of "</span> + type + <span class="string">" unsupported"</span>);
-                }
-            }
-        });
-
-        <span class="keyword">return</span> data;
-    }
-    
-}, {</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-34">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-34">&#182;</a>
-              </div>
-              <p>TODO: test support not passing in name and just protoProps &amp; staticProps
-Overide the default extend method to support passing in the model name
-to be used for url generation and replationships.</p>
-<p><code>name</code> is optional, and must be a string</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    extend: <span class="keyword">function</span>(name, protoProps, staticProps) {
-        <span class="keyword">if</span>(<span class="keyword">typeof</span> name !== <span class="string">'string'</span>) {
-            staticProps = protoProps;
-            protoProps = name;
-        }
-        <span class="keyword">var</span> child = Backbone.Model.extend.call(<span class="keyword">this</span>, protoProps, staticProps);
-        <span class="keyword">if</span>(<span class="keyword">typeof</span> name === <span class="string">'string'</span>) { child.modelName = name; }
-        <span class="keyword">return</span> child;
-    },</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-35">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-35">&#182;</a>
-              </div>
-              <p>Generates the <code>urlRoot</code> based off of the model name.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    urlRoot: <span class="keyword">function</span>() {
-        <span class="keyword">return</span> <span class="string">"/"</span> + <span class="keyword">this</span>.modelName.pluralize();
-    },</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-36">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-36">&#182;</a>
-              </div>
-              <p>TODO</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    find: <span class="keyword">function</span>(id, options) {
-        Backbone.sync(<span class="string">'GET'</span>, <span class="keyword">new</span> <span class="keyword">this</span>({id: id}), options);
-    },
-    
-    getRelationshipDetails: <span class="function"><span class="keyword">function</span> <span class="params">(type, key, options)</span> {</span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-37">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-37">&#182;</a>
-              </div>
-              <p>Handle both <code>type, key, options</code> and <code>type, [key, options]</code> style arguments</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="keyword">if</span> (_.isArray(key)) {
-            options = key[<span class="number">1</span>];
-            key = key[<span class="number">0</span>];
-        }
-
-        <span class="keyword">var</span> relation = {
-            key: key
-        };
-
-        <span class="keyword">if</span> (options) {
-            <span class="keyword">if</span> (type === <span class="string">'hasMany'</span> &amp;&amp; options.collection) {
-                relation.type = window[options.collection];
-            } <span class="keyword">else</span> <span class="keyword">if</span> (type === <span class="string">'hasMany'</span> &amp;&amp; options.model) {
-                relation.type = window[options.model + <span class="string">'Collection'</span>];
-            } <span class="keyword">else</span> {
-                relation.type = window[options.model];
-            }
-        } <span class="keyword">else</span> {
-            <span class="keyword">if</span> (type === <span class="string">'belongsTo'</span>) {
-                relation.type = window[relation.key.camelize()];
-            } <span class="keyword">else</span> <span class="keyword">if</span> (type === <span class="string">'hasMany'</span>) {
-                relation.type = window[relation.key.camelize(<span class="literal">true</span>).replace(<span class="regexp">/s$/</span>, <span class="string">''</span>) + <span class="string">'Collection'</span>];
-            }
-        }
-
-        <span class="keyword">return</span> relation;
-    }
-    
-});</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-38">
-            <div class="annotation">
-              
-              <div class="pilwrap for-h2">
-                <a class="pilcrow" href="#section-38">&#182;</a>
-              </div>
-              <h2>Viking.Collection</h2>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-39">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-39">&#182;</a>
-              </div>
-              <p>Viking.Collection is an extension of <a href="http://backbonejs.org/#Collection">Backbone.Collection</a>.
-It adds predicates, selection, and modifies fetch to cancel any current
-request if a new fetch is triggered.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>Viking.Collection = Backbone.Collection.extend({</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-40">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-40">&#182;</a>
-              </div>
-              <p>Set the default model to a generic Viking.Model</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    model: Viking.Model,
-
-    constructor: <span class="keyword">function</span>(models, options) {
-        Backbone.Collection.apply(<span class="keyword">this</span>, arguments);
-        
-        <span class="keyword">if</span>(options &amp;&amp; options.predicate) {
-            <span class="keyword">this</span>.setPredicate(options.predicate, {silent: <span class="literal">true</span>});
-        }
-    },
-    
-    url: <span class="keyword">function</span>() {
-        <span class="keyword">return</span> <span class="string">"/"</span> + <span class="keyword">this</span>.model.modelName.underscore().pluralize();
-    },
-    paramRoot: <span class="keyword">function</span>() {
-        <span class="keyword">return</span> <span class="keyword">this</span>.model.modelName.underscore().pluralize();
-    },</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-41">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-41">&#182;</a>
-              </div>
-              <p>If a predicate is set it&#39;s paramaters will be passed under the
-<code>where</code> key when querying the server. #predicateChanged is
-set as a callback on the <code>change</code> event for the predicate</p>
-<h1>setPredicate accepts either attributes to instaniate a</h1>
-<p>Viking.Predicate or an instanceof a Viking.Predicate</p>
-<p>To remove a predeicate call <code>#setPredicate</code> with a falsey value.</p>
-<p>Calling #setPredicate and setting it the same object that is currently
-the predicate will not trigger a #predicateChanged call</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    setPredicate: <span class="keyword">function</span>(predicate, options) {
-        <span class="keyword">if</span> (<span class="keyword">this</span>.predicate === predicate) { <span class="keyword">return</span> <span class="literal">false</span>; }
-        
-        <span class="keyword">if</span>(<span class="keyword">this</span>.predicate) { <span class="keyword">this</span>.stopListening(<span class="keyword">this</span>.predicate); }
-        
-        <span class="keyword">if</span>(predicate) {
-            <span class="keyword">if</span>(!(predicate <span class="keyword">instanceof</span> Viking.Predicate)) {
-                predicate = <span class="keyword">new</span> Viking.Predicate(predicate);
-            }
-            <span class="keyword">this</span>.predicate = predicate;
-            <span class="keyword">this</span>.listenTo(predicate, <span class="string">'change'</span>, <span class="keyword">this</span>.predicateChanged);
-            <span class="keyword">if</span>(!(options &amp;&amp; options.silent)) { <span class="keyword">this</span>.predicateChanged(); }
-        } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">this</span>.predicate) {
-            <span class="keyword">delete</span> <span class="keyword">this</span>.predicate;
-            <span class="keyword">if</span>(!(options &amp;&amp; options.silent)) { <span class="keyword">this</span>.predicateChanged(); }
-        }
-    },</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-42">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-42">&#182;</a>
-              </div>
-              <p>Called when the predicate is changed. Having this being called
-when the predicate changes instead of just <code>fetch</code> allows sub
-collections to overwrite what happens when it changes. An example
-of this would be the <code>Viking.PaginatedCollection</code></p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    predicateChanged: <span class="keyword">function</span>(predicate, options) {
-        <span class="keyword">this</span>.fetch();
-    },</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-43">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-43">&#182;</a>
-              </div>
-              <p>Sets <code>&#39;selected&#39;</code> to <code>true</code> on the <code>model</code>. If <code>clearCurrentlySelected</code>
-is truthy all other models will have <code>selected</code> set to <code>false</code>.
-Also triggers the <code>selected</code> event on the collection. If the model is
-already selected the <code>selected</code> event is not triggered</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    select: <span class="keyword">function</span>(model, clearCurrentlySelected) {
-        <span class="keyword">if</span>(!clearCurrentlySelected) {
-            <span class="keyword">this</span>.clearSelected(model);
-        }
-        <span class="keyword">if</span>(!model.get(<span class="string">'selected'</span>)) {
-            model.set(<span class="string">'selected'</span>, <span class="literal">true</span>);
-            <span class="keyword">this</span>.trigger(<span class="string">'selected'</span>, <span class="keyword">this</span>.selected());
-        }
-    },</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-44">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-44">&#182;</a>
-              </div>
-              <p>returns all the models where <code>selected</code> == true</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    selected: <span class="keyword">function</span>() {
-        <span class="keyword">return</span> <span class="keyword">this</span>.filter(<span class="keyword">function</span>(m) { <span class="keyword">return</span> m.get(<span class="string">'selected'</span>); });
-    },</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-45">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-45">&#182;</a>
-              </div>
-              <p>Sets <code>&#39;selected&#39;</code> to <code>false</code> on all models</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    clearSelected: <span class="keyword">function</span>(exceptModel) {
-        <span class="keyword">if</span>(exceptModel <span class="keyword">instanceof</span> Viking.Model) {
-            exceptModel = exceptModel.cid;
-        }
-        <span class="keyword">this</span>.each(<span class="keyword">function</span>(m) {
-            <span class="keyword">if</span>(m.cid !== exceptModel) {
-                m.set(<span class="string">'selected'</span>, <span class="literal">false</span>);
-            }
-        });
-    },</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-46">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-46">&#182;</a>
-              </div>
-              <p>Override the default Backbone.Collection#fetch to cancel any current
-fetch request if fetch is called again. For example when the predicate
-changes 3 times, if the first 2 request don&#39;t return before the 3rd is
-sent they will be canceled and only the last one will finish and update
-the collection. You won&#39;t get the collection being updated 3 times.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    fetch: <span class="keyword">function</span>(options) {
-        options || (options = {});
-        
-        <span class="keyword">var</span> complete = options.complete;
-        options.complete = _.bind(<span class="keyword">function</span>() {
-            <span class="keyword">delete</span> <span class="keyword">this</span>.xhr;
-            <span class="keyword">if</span>(complete) { complete(); }
-        }, <span class="keyword">this</span>);
-        
-        <span class="keyword">if</span> (<span class="keyword">this</span>.xhr) { <span class="keyword">this</span>.xhr.abort(); }
-        <span class="keyword">this</span>.xhr = Backbone.Collection.prototype.fetch.call(<span class="keyword">this</span>, options);
-    },
-    
-    sync: <span class="keyword">function</span>(method, model, options) {
-        <span class="keyword">if</span>(method === <span class="string">'read'</span> &amp;&amp; <span class="keyword">this</span>.predicate) {
-            options.data || (options.data = {});
-            options.data.where = <span class="keyword">this</span>.predicate.attributes;
-        }
-        <span class="keyword">return</span> Backbone.sync.call(<span class="keyword">this</span>, method, model, options);
-    }
-    
-});
-Backbone.Model.prototype.updateAttribute = <span class="function"><span class="keyword">function</span> <span class="params">(key, value, options)</span>{</span>
-    <span class="keyword">var</span> data;
-    (data = {})[key] = value;
-    <span class="keyword">this</span>.updateAttributes(data, options);
-};
-
-Backbone.Model.prototype.updateAttributes = <span class="function"><span class="keyword">function</span> <span class="params">(data, options)</span> {</span>
-    <span class="keyword">this</span>.save(data, options);
-};
-Viking.PaginatedCollection = Viking.Collection.extend({
-    constructor: <span class="keyword">function</span>(models, options) {
-        Viking.Collection.apply(<span class="keyword">this</span>, arguments);
-        <span class="keyword">this</span>.cursor = ((options &amp;&amp; options.cursor) || <span class="keyword">new</span> Viking.Cursor());
-        <span class="keyword">this</span>.listenTo(<span class="keyword">this</span>.cursor, <span class="string">'change'</span>, <span class="keyword">function</span>() {
-            <span class="keyword">if</span>(<span class="keyword">this</span>.cursor.requiresRefresh()) {
-                <span class="keyword">this</span>.cursorChanged.apply(<span class="keyword">this</span>, arguments);
-            }
-        });
-    },
-    
-    predicateChanged: <span class="keyword">function</span>(predicate, options) {
-        <span class="keyword">this</span>.cursor.reset({silent: <span class="literal">true</span>});
-        <span class="keyword">this</span>.cursorChanged();
-    },
-    
-    cursorChanged: <span class="keyword">function</span>(cursor, options) {
-        <span class="keyword">this</span>.fetch();
-    },
-    
-    parse: <span class="keyword">function</span>(attrs, xhr) {
-        <span class="keyword">var</span> cursor_keys = [<span class="string">'page'</span>, <span class="string">'per_page'</span>, <span class="string">'offset'</span>, <span class="string">'total'</span>, <span class="string">'total_pages'</span>, <span class="string">'count'</span>];
-        <span class="keyword">var</span> cursor_attrs = _.pick(attrs, cursor_keys);
-        _.each(cursor_attrs, <span class="keyword">function</span>(v, k) {
-            cursor_attrs[k] = parseInt(v, <span class="number">10</span>);
-        })
-
-        <span class="keyword">this</span>.cursor.set(cursor_attrs);
-        <span class="keyword">return</span> attrs[<span class="keyword">this</span>.paramRoot()];
-    },
-    
-    sync: <span class="keyword">function</span>(method, model, options) {
-        <span class="keyword">if</span>(method === <span class="string">'read'</span>) {
-            options.data || (options.data = {});
-            options.data.page = model.cursor.get(<span class="string">'page'</span>);
-            options.data.per_page = model.cursor.get(<span class="string">'per_page'</span>);
-            options.data.offset = model.cursor.get(<span class="string">'offset'</span>);
-        }
-        <span class="keyword">return</span> Viking.Collection.prototype.sync.call(<span class="keyword">this</span>, method, model, options);
-    }
-    
-});</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-47">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-47">&#182;</a>
-              </div>
-              <p>TODO remove?</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>Viking.Controller = Backbone.Model.extend({}, {
-    
-    instance: <span class="keyword">function</span>(onInstantiated, onInstantiation) {
-        <span class="keyword">if</span>(<span class="keyword">this</span>._instance) {
-            <span class="keyword">if</span>(onInstantiated) { onInstantiated(<span class="keyword">this</span>._instance); }
-        } <span class="keyword">else</span> {
-            <span class="keyword">this</span>._instance = <span class="keyword">new</span> <span class="keyword">this</span>();
-            <span class="keyword">if</span>(onInstantiation) { onInstantiation(<span class="keyword">this</span>._instance); }
-        }
-
-        <span class="keyword">return</span> <span class="keyword">this</span>._instance;
-    }
-});
-Viking.Predicate = Backbone.Model;
-Viking.Cursor = Backbone.Model.extend({
-    defaults: {
-        page: <span class="number">1</span>,
-        offset: <span class="number">0</span>,
-        per_page: <span class="number">25</span>,
-        total: <span class="literal">undefined</span>,
-        total_pages: <span class="literal">undefined</span>
-    },
-    
-    reset: <span class="keyword">function</span>(options) {
-        <span class="keyword">this</span>.set({
-            page: <span class="number">1</span>,
-            offset: <span class="number">0</span>,
-            total: <span class="literal">undefined</span>,
-            total_pages: <span class="literal">undefined</span>
-        }, {silent: <span class="literal">true</span>});
-        <span class="keyword">if</span>(!(options &amp;&amp; options.silent) &amp;&amp; <span class="keyword">this</span>.requiresRefresh()) {
-            <span class="keyword">this</span>.trigger(<span class="string">'reset'</span>, <span class="keyword">this</span>, options);
-        }
-    },
-    
-    incrementPage: <span class="keyword">function</span>(options) {
-        <span class="keyword">this</span>.set(<span class="string">'page'</span>, <span class="keyword">this</span>.get(<span class="string">'page'</span>) + <span class="number">1</span>, options);
-    },
-    
-    decrementPage: <span class="keyword">function</span>(options) {
-        <span class="keyword">this</span>.set(<span class="string">'page'</span>, <span class="keyword">this</span>.get(<span class="string">'page'</span>) - <span class="number">1</span>, options);
-    },
-    
-    goToPage: <span class="keyword">function</span>(pageNumber, options) {
-        <span class="keyword">this</span>.set(<span class="string">'page'</span>, pageNumber, options);
-    },
-    
-    requiresRefresh: <span class="keyword">function</span>() {
-        <span class="keyword">var</span> changedAttributes = <span class="keyword">this</span>.changedAttributes();
-        <span class="keyword">if</span>(changedAttributes) {
-            <span class="keyword">var</span> triggers = [<span class="string">'page'</span>, <span class="string">'offset'</span>, <span class="string">'per_page'</span>];
-            <span class="keyword">return</span> (_.intersection(_.keys(changedAttributes), triggers).length &gt; <span class="number">0</span>);
-        }
-        
-        <span class="keyword">return</span> <span class="literal">false</span>;
-    }
-    
-});
-Viking.Router = Backbone.Router.extend({
-    
-    route: <span class="keyword">function</span>(route, name, callback) {
-        <span class="keyword">var</span> router, controller, action;
-        
-        <span class="keyword">if</span> (!_.isRegExp(route)) {
-            <span class="keyword">if</span>(<span class="regexp">/^r\/.*\/$/</span>.test(route)) {
-                route = <span class="keyword">new</span> RegExp(route.slice(<span class="number">2</span>, -<span class="number">1</span>));
-            } <span class="keyword">else</span> {
-                route = <span class="keyword">this</span>._routeToRegExp(route);
-            }
-        }
-        <span class="keyword">if</span> (_.isFunction(name)) {
-            callback = name;
-            name = <span class="string">''</span>;
-        }
-
-        <span class="keyword">if</span> (_.isObject(name)) {</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-48">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-48">&#182;</a>
-              </div>
-              <p>TODO: maybe this should be Controller::action since it&#39;s not
-an instance method</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>            controller = <span class="regexp">/^(\w+)#(\w+)$/</span>.exec(name.to);
-            action = controller[<span class="number">2</span>];
-            controller = controller[<span class="number">1</span>];
-            name = name.name;
-            
-            <span class="keyword">if</span> (window[controller] &amp;&amp; window[controller][action]) {
-                callback = window[controller][action];
-            }
-        }
-        <span class="keyword">if</span> (!callback) { callback = <span class="keyword">this</span>[name]; }
-                
-        router = <span class="keyword">this</span>;
-        Backbone.history.route(route, <span class="keyword">function</span>(fragment) {
-            <span class="keyword">var</span> args = router._extractParameters(route, fragment);
-            callback &amp;&amp; callback.apply(router, args);
-            router.trigger.apply(router, [<span class="string">'route:'</span> + name].concat(args));
-            router.trigger(<span class="string">'route'</span>, name, args);
-            Backbone.history.trigger(<span class="string">'route'</span>, router, name, args);
-        });
-        <span class="keyword">return</span> <span class="keyword">this</span>;
-    },
-        
-    start: <span class="keyword">function</span>() {
-        <span class="keyword">return</span> Backbone.history.start({pushState: <span class="literal">true</span>});
-    },
-    stop: <span class="keyword">function</span>() {
-        Backbone.history.stop();
-    },
-    
-    navigate: <span class="keyword">function</span>(fragment, args) {
-        <span class="keyword">var</span> root_url = window.location.protocol + <span class="string">'//'</span> + window.location.host;
-        <span class="keyword">if</span>(fragment.indexOf(root_url) === <span class="number">0</span>) { fragment = fragment.replace(root_url, <span class="string">''</span>); }
-        
-        Backbone.Router.prototype.navigate.call(<span class="keyword">this</span>, fragment, args);
-    }
-    
-});</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-49">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-49">&#182;</a>
-              </div>
-              
             </div>
             
         </li>

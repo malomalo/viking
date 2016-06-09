@@ -7,6 +7,4 @@ tmp
 viking.bundled.js
 .sass-cache
 coverage
-test/index.html
-test/ie8.html
 _site

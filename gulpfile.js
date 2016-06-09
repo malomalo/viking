@@ -8,7 +8,7 @@ let del = require('del'),
 let tests = ['lib/**/*.js'],
     sources = ['lib/**/*.js'];
 
-gulp.task('lint', () => {
+gulp.task('lint', function() {
     return gulp.src(sources.concat(tests))
         .pipe(eslint())
         .pipe(eslint.format())
