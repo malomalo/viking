@@ -1,0 +1,9 @@
+[ignore]
+
+[include]
+lib/viking/model/type/*
+
+[libs]
+declarations
+
+[options]
