@@ -48,4 +48,4 @@ const ArgumentError = function (message, file, lineNumber) {
 ArgumentError.prototype = Object.create(Error.prototype);
 ArgumentError.prototype.constructor = ArgumentError;
 
-export NameError, ArgumentError
+export { NameError, ArgumentError };

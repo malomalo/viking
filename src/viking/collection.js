@@ -1,29 +1,33 @@
+import Model from './model';
+import Predicate from './predicate';
+
 // Viking.Collection
 // -----------------
 //
 // Viking.Collection is an extension of [Backbone.Collection](http://backbonejs.org/#Collection).
 // It adds predicates, selection, and modifies fetch to cancel any current
 // request if a new fetch is triggered.
-Viking.Collection = Backbone.Collection.extend({
+const Collection = Backbone.Collection.extend({
     
     // Set the default model to a generic Viking.Model
-    model: Viking.Model,
+    model: Model,
 
     constructor: function(models, options) {
         Backbone.Collection.call(this, models, options);
-        
+
         if(options && options.predicate) {
             this.setPredicate(options.predicate, {silent: true});
         }
+
         if(options && options.order) {
             this.order(options.order, {silent: true});
         }
-
     },
     
     url: function() {
         return "/" + this.model.modelName.plural;
     },
+
     paramRoot: function() {
         return this.model.modelName.plural;
     },
@@ -45,8 +49,8 @@ Viking.Collection = Backbone.Collection.extend({
         if(this.predicate) { this.stopListening(this.predicate); }
         
         if(predicate) {
-            if(!(predicate instanceof Viking.Predicate)) {
-                predicate = new Viking.Predicate(predicate);
+            if(!(predicate instanceof Predicate)) {
+                predicate = new Predicate(predicate);
             }
             this.predicate = predicate;
             this.listenTo(predicate, 'change', this.predicateChanged);
@@ -202,3 +206,5 @@ Viking.Collection = Backbone.Collection.extend({
     }
     
 });
+
+export default Collection;

@@ -1,3 +1,5 @@
+import { NameError } from '../errors';
+
 // Converts the first character to uppercase
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
@@ -136,7 +138,7 @@ String.prototype.constantize = function(context) {
     return this.split('.').reduce(function (context, name) {
         let v = context[name];
         if (!v) {
-            throw new Viking.NameError("uninitialized variable " + name); 
+            throw new NameError("uninitialized variable " + name); 
         }
         return v;
     }, context);

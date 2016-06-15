@@ -1,3 +1,6 @@
+import Name from '../name';
+
+
 // Overide the default extend method to support passing in the modelName
 // and support STI
 //
@@ -16,7 +19,7 @@ export const extend = function(name, protoProps, staticProps) {
     let child = Backbone.Model.extend.call(this, protoProps, staticProps);
 
     if(typeof name === 'string') {
-        child.modelName = new Viking.Model.Name(name);
+        child.modelName = new Name(name);
     }
 
     child.associations = {};
@@ -41,10 +44,10 @@ export const extend = function(name, protoProps, staticProps) {
 
             if (!child.associations[name]) {
                 let reflectionClass = {
-                    'belongsTo': Viking.Model.BelongsToReflection,
-                    'hasOne': Viking.Model.HasOneReflection,
-                    'hasMany': Viking.Model.HasManyReflection,
-                    'hasAndBelongsToMany': Viking.Model.HasAndBelongsToManyReflection
+                    'belongsTo': Viking.Model.Reflection.Belongs,
+                    'hasOne': Viking.Model.Reflection.HasOne,
+                    'hasMany': Viking.Model.Reflection.HasMany,
+                    'hasAndBelongsToMany': Viking.Model.Reflection.HasAndBelongsToMany
                 }
                 reflectionClass = reflectionClass[macro];
 

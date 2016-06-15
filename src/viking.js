@@ -6,9 +6,11 @@
 
 import './viking/support';
 import Model from './viking/model';
+import Collection from './viking/collection';
 
-const Viking = {
+export const Viking = {
     Model: Model,
+    Collection: Collection
 };
 
 export default Viking;
