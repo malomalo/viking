@@ -1,3 +1,5 @@
+import { tagOptions } from './../utils';
+
 // contentTag(name, [content], [options], [escape=true], [&block])
 // ================================================================
 //
@@ -25,7 +27,7 @@
 //      return "Hello world!";
 //   });
 //   // => <div class="strong">Hello world!</div>
-Viking.View.Helpers.contentTag = function (name, content, options, escape) {
+export const contentTag = function (name, content, options, escape) {
     let tmp;
 
     // Handle `name, content`, `name, content, options`,
@@ -58,5 +60,7 @@ Viking.View.Helpers.contentTag = function (name, content, options, escape) {
         content = _.escape(content);
     }
 
-    return "<" + name + Viking.View.tagOptions(options, escape) + ">" + content + "</" + name + ">";
+    return "<" + name + tagOptions(options, escape) + ">" + content + "</" + name + ">";
 };
+
+export default contentTag;

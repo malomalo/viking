@@ -1,3 +1,4 @@
+import sync from './sync';
 import Model from './model';
 import Predicate from './predicate';
 
@@ -7,7 +8,7 @@ import Predicate from './predicate';
 // Viking.Collection is an extension of [Backbone.Collection](http://backbonejs.org/#Collection).
 // It adds predicates, selection, and modifies fetch to cancel any current
 // request if a new fetch is triggered.
-const Collection = Backbone.Collection.extend({
+export const Collection = Backbone.Collection.extend({
     
     // Set the default model to a generic Viking.Model
     model: Model,
@@ -122,7 +123,7 @@ const Collection = Backbone.Collection.extend({
         this.xhr = Backbone.Collection.prototype.fetch.call(this, options);
     },
     
-	// TODO: testme?
+    // TODO: testme?
     sync: function(method, model, options) {
         if(method === 'read' && this.predicate) {
             options.data || (options.data = {});
@@ -134,7 +135,7 @@ const Collection = Backbone.Collection.extend({
             options.data.order = this.ordering;
         }
         
-        return Viking.sync.apply(this, arguments);
+        return sync.apply(this, arguments);
     },
 
     // If a order is set it's paramaters will be passed under the
@@ -205,6 +206,21 @@ const Collection = Backbone.Collection.extend({
         this.fetch();
     }
     
+}, {
+
+    extend: function(protoProps, staticProps) {
+        let child = Backbone.Collection.extend.call(this, protoProps, staticProps);
+
+        // TODO: Track this in the viking global
+        // Track the collection in the Viking global namespace.
+        // Used in the constinize method
+        // if (collection.model.modelName) {
+        //     global[collection.model.modelName.singular] = collection;
+        // }
+
+        return child;
+    }
+
 });
 
 export default Collection;

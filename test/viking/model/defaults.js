@@ -1,3 +1,5 @@
+import Viking from '../../../src/viking';
+
 (function () {
     module("Viking#defaults");
 
@@ -8,8 +10,7 @@
                 bat: {'default': 'bazz'}
             }
         });
-    
+
         deepEqual(_.result(Klass.prototype, 'defaults'), {foo: 'bar', bat: 'bazz'});
     });
-
 }());

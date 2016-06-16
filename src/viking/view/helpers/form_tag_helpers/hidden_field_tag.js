@@ -1,3 +1,5 @@
+import textFieldTag from './text_field_tag';
+
 // hiddenFieldTag(name, value = nil, options = {})
 // ===============================================
 //
@@ -15,9 +17,11 @@
 //   
 //   hiddenFieldTag('token', 'VUBJKB23UIVI1UU1VOBVI@')
 //   // => <input name="token" type="hidden" value="VUBJKB23UIVI1UU1VOBVI@">
-Viking.View.Helpers.hiddenFieldTag = function (name, value, options, escape) {
+export const hiddenFieldTag = function (name, value, options, escape) {
     if (options === undefined) { options = {}; }
     _.defaults(options, {type: "hidden", id: null});
     
-    return Viking.View.Helpers.textFieldTag(name, value, options, escape);
+    return textFieldTag(name, value, options, escape);
 };
+
+export default hiddenFieldTag;

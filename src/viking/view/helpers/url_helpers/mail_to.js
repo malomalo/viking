@@ -46,7 +46,7 @@
 //
 //   mailTo('me@domain.com', function(){ return "Email me"; }, {key: 'value'});
 //   // => <a href="mailto:me@domain.com" key="value">Email me</a>
-Viking.View.Helpers.mailTo = function (email, name, options) {
+export const mailTo = function (email, name, options) {
     let tmp;
     
     // handle (email, name, options), (email, contentFunc), and 
@@ -74,3 +74,5 @@ Viking.View.Helpers.mailTo = function (email, name, options) {
 
     return Viking.View.Helpers.contentTag('a', name, options, false);
 };
+
+export default mailTo;

@@ -1,3 +1,5 @@
+import textFieldTag from './text_field_tag';
+
 // passwordFieldTag(name = "password", value = nil, options = {})
 // ================================================================
 // 
@@ -34,10 +36,12 @@
 //   
 //   passwordFieldTag('pin', '1234', {maxlength: 4, size: 6, class: "pin_input"})
 //   // => <input class="pin_input" maxlength="4" name="pin" size="6" type="password" value="1234">
-Viking.View.Helpers.passwordFieldTag = function (name, value, options) {
+export const passwordFieldTag = function (name, value, options) {
     if (name === undefined) { name = 'password'; }
     if (options === undefined) { options = {}; }
     _.defaults(options, {type: "password"});
 
-    return Viking.View.Helpers.textFieldTag(name, value, options);
+    return textFieldTag(name, value, options);
 };
+
+export default passwordFieldTag;

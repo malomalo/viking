@@ -1,3 +1,7 @@
+import tag from './tag';
+import contentTag from './content_tag';
+import hiddenFieldTag from './hidden_field_tag';
+
 // formTag([options], [content])
 // formTag([content], [options])
 // =============================
@@ -27,7 +31,7 @@
 //      return submitTag('Save');
 //   });
 //   // => <form action="/posts" method="post"><input type="submit" name="commit" value="Save" /></form>
-Viking.View.Helpers.formTag = function (options, content) {
+export const formTag = function (options, content) {
     let tmp, methodOverride = '';
     
     if (typeof options === 'function' || typeof options === 'string') {
@@ -40,7 +44,7 @@ Viking.View.Helpers.formTag = function (options, content) {
     if (options.action && !options.method) {
         options.method = 'post';
     } else if (options.method && options.method !== 'get' && options.method !== 'post') {
-        methodOverride = Viking.View.Helpers.hiddenFieldTag('_method', options.method);
+        methodOverride = hiddenFieldTag('_method', options.method);
         options.method = 'post';
     }
     
@@ -53,8 +57,10 @@ Viking.View.Helpers.formTag = function (options, content) {
     if(content !== undefined) {
         content = methodOverride + (typeof content === 'function' ? content() : content);
 
-        return Viking.View.Helpers.contentTag('form', content, options, false);
+        return contentTag('form', content, options, false);
     }
 
-    return Viking.View.Helpers.tag('form', options, false) + methodOverride;
+    return tag('form', options, false) + methodOverride;
 };
+
+export default formTag;

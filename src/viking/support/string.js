@@ -1,3 +1,4 @@
+import { global } from '../global';
 import { NameError } from '../errors';
 
 // Converts the first character to uppercase
@@ -124,7 +125,7 @@ String.prototype.singularize = function() {
 };
 
 // Tries to find a variable with the name specified in context of `context`.
-// `context` defaults to the `window` variable.
+// `context` defaults to the Viking global namespace.
 //
 // Examples:
 //     'Module'.constantize     # => Module
@@ -133,7 +134,12 @@ String.prototype.singularize = function() {
 //
 // Viking.NameError is raised when the variable is unknown.
 String.prototype.constantize = function(context) {
-    if(!context) { context = window; }
+
+    if (!context) {
+        // TODO: looking in viking global
+        // context = global;
+        context = window;
+    }
 
     return this.split('.').reduce(function (context, name) {
         let v = context[name];
@@ -142,6 +148,7 @@ String.prototype.constantize = function(context) {
         }
         return v;
     }, context);
+
 };
 
 // Removes the module part from the expression in the string.

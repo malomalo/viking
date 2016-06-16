@@ -1,3 +1,6 @@
+import { sanitizeToId } from './../utils';
+import contentTag from './content_tag';
+
 // selectTag(name, optionTags, options)
 // ====================================
 //
@@ -46,26 +49,28 @@
 //   
 //   selectTag("credit_card", options_for_select([ "VISA", "MasterCard" ], "MasterCard"))
 //   // => <select name="credit_card"><option>VISA</option><option selected>MasterCard</option></select>
-Viking.View.Helpers.selectTag = function (name, optionTags, options) {
+export const selectTag = function (name, optionTags, options) {
     let tagName = name;
     if (options === undefined) { options = {}; }
     if (options.multiple && tagName.slice(-2) !== "[]") { tagName = tagName + "[]"; }
     _.defaults(options, {
-        id: Viking.View.sanitizeToId(name),
+        id: sanitizeToId(name),
         name: tagName
     });
 
     if (options.includeBlank) {
         let content = typeof options.includeBlank == "string" ? options.includeBlank : "";
-        optionTags = Viking.View.Helpers.contentTag('option', content, {value: ''}) + optionTags;
+        optionTags = contentTag('option', content, {value: ''}) + optionTags;
         delete options.includeBlank;
     }
 
     if (options.prompt) {
         if (options.prompt === true) { options.prompt = 'Select'; }
-        optionTags = Viking.View.Helpers.contentTag('option', options.prompt, {value: ''}) + optionTags;
+        optionTags = contentTag('option', options.prompt, {value: ''}) + optionTags;
         delete options.prompt;
     }
 
-    return Viking.View.Helpers.contentTag('select', optionTags, options, false);
+    return contentTag('select', optionTags, options, false);
 };
+
+export default selectTag;

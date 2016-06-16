@@ -1,5 +1,6 @@
 import Name from '../name';
-
+import { global } from '../../global';
+import { Reflection } from '../reflection';
 
 // Overide the default extend method to support passing in the modelName
 // and support STI
@@ -18,7 +19,7 @@ export const extend = function(name, protoProps, staticProps) {
 
     let child = Backbone.Model.extend.call(this, protoProps, staticProps);
 
-    if(typeof name === 'string') {
+    if (typeof name === 'string') {
         child.modelName = new Name(name);
     }
 
@@ -44,10 +45,10 @@ export const extend = function(name, protoProps, staticProps) {
 
             if (!child.associations[name]) {
                 let reflectionClass = {
-                    'belongsTo': Viking.Model.Reflection.Belongs,
-                    'hasOne': Viking.Model.Reflection.HasOne,
-                    'hasMany': Viking.Model.Reflection.HasMany,
-                    'hasAndBelongsToMany': Viking.Model.Reflection.HasAndBelongsToMany
+                    'belongsTo': Reflection.BelongsTo,
+                    'hasOne': Reflection.HasOne,
+                    'hasMany': Reflection.HasMany,
+                    'hasAndBelongsToMany': Reflection.HasAndBelongsToMany
                 }
                 reflectionClass = reflectionClass[macro];
 
@@ -63,6 +64,13 @@ export const extend = function(name, protoProps, staticProps) {
             }
         });
     }
+
+    // TODO: 
+    // Track the model in the Viking global namespace.
+    // Used in the constinize method
+    // if (child.modelName) {
+    //     global[child.modelName.singular] = child;
+    // }
 
     return child;
 };

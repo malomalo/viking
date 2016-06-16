@@ -1,4 +1,7 @@
+import Viking from '../../src/viking';
+
 (function () {
+
     module("Viking.View", {
         setup : function() {
             Viking.View.templates = JST;
@@ -123,5 +126,4 @@
         model.set('name', 'Dr. DJ');
     });
 
-    
 }());

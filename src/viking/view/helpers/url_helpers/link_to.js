@@ -73,7 +73,7 @@
 //
 //   linkTo("Visit Other Site", "http://www.rubyonrails.org/", { data: { confirm: "Are you sure?" }})
 //   // => <a href="http://www.rubyonrails.org/" data-confirm="Are you sure?">Visit Other Site</a>
-Viking.View.Helpers.linkTo = function (content, modelOrUrl, options) {
+export const linkTo = function (content, modelOrUrl, options) {
     let tmp;
     
     if (typeof modelOrUrl === 'function') {
@@ -93,3 +93,5 @@ Viking.View.Helpers.linkTo = function (content, modelOrUrl, options) {
 
     return Viking.View.Helpers.contentTag('a', content, options);
 };
+
+export default linkTo;

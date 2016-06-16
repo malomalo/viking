@@ -1,3 +1,5 @@
+import { sync as vikingSync } from './../../sync';
+
 // Override [Backbone.Model#sync](http://backbonejs.org/#Model-sync).
 // [Ruby on Rails](http://rubyonrails.org/) expects the attributes to be
 // namespaced
@@ -11,5 +13,5 @@ export const sync = function(method, model, options) {
         options.data = JSON.stringify(options.data);
     }
 
-    return Viking.sync.call(this, method, model, options);
+    return vikingSync.call(this, method, model, options);
 };

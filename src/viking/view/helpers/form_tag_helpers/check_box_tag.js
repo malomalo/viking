@@ -1,3 +1,6 @@
+import { sanitizeToId } from './../utils';
+import tag from './tag';
+
 // checkBoxTag(name, value="1", checked=false, options)
 // ======================================================
 //
@@ -24,7 +27,7 @@
 //   
 //   checkBoxTag('eula', 'accepted', false, disabled: true)
 //   // => <input disabled="disabled" name="eula" type="checkbox" value="accepted" />
-Viking.View.Helpers.checkBoxTag = function (name, value, checked, options, escape) {
+export const checkBoxTag = function (name, value, checked, options, escape) {
     if (value === undefined) { value = "1"; }
     if (options === undefined) { options = {}; }
     if (checked === true) { options.checked = true; }
@@ -32,9 +35,11 @@ Viking.View.Helpers.checkBoxTag = function (name, value, checked, options, escap
     _.defaults(options, {
         type: "checkbox",
         value: value,
-        id: Viking.View.sanitizeToId(name),
+        id: sanitizeToId(name),
         name: name
     });
 
-    return Viking.View.Helpers.tag("input", options, escape);
+    return tag("input", options, escape);
 };
+
+export default checkBoxTag;

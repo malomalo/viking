@@ -1,17 +1,16 @@
-//= require_self
-//= require viking/view/helpers
+import Helpers from './view/helpers';
 
 // Viking.View
 // -----------
 //
 // Viking.View is a framework fro handling view template lookup and rendering.
 // It provides view helpers that assisst when building HTML forms and more.
-Viking.View = Backbone.View.extend({
+export const View = Backbone.View.extend({
 
     template: undefined,
 
     renderTemplate: function(locals) {
-        return Viking.View.Helpers.render(this.template, locals);
+        return Helpers.render(this.template, locals);
     },
 
     //Copied constructor from Backbone View
@@ -95,4 +94,6 @@ Viking.View = Backbone.View.extend({
     }
 });
 
-Viking.View.Helpers = {};
+View.Helpers = Helpers;
+
+export default View;

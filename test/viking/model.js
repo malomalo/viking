@@ -1,38 +1,81 @@
 import Viking from '../../src/viking';
 
-module("Viking.Model");
+(function() {
+    module("Viking.Model");
 
-test("instance.modelName is set on instantiation", function() {
-    let Model = Viking.Model.extend('model');
-    let model = new Model();
+    test("instance.modelName is set on instantiation", function() {
+        let model = new (Viking.Model.extend('model'))();
 
-    propEqual(_.omit(model.modelName, 'model'), {
-        name: 'Model',
-        element: 'model',
-        human: 'Model',
-        paramKey: 'model',
-        plural: 'models',
-        routeKey: 'models',
-        singular: 'model',
-        collection: 'models',
-        collectionName: 'ModelCollection'
+        propEqual(_.omit(model.modelName, 'model'), {
+            name: 'Model',
+            element: 'model',
+            human: 'Model',
+            paramKey: 'model',
+            plural: 'models',
+            routeKey: 'models',
+            singular: 'model',
+            collection: 'models',
+            collectionName: 'ModelCollection'
+        });
     });
-});
 
-test("::where() returns ModelCollection without a predicate", function() {
-    let Ship = Viking.Model.extend('ship');
-    window.ShipCollection = Viking.Collection.extend();
+    test("::where() returns ModelCollection without a predicate", function() {
+        let Ship = Viking.Model.extend('ship');
+        window.ShipCollection = Viking.Collection.extend();
 
-    let scope = Ship.where();
-    ok(scope instanceof ShipCollection);
-    strictEqual(undefined, scope.predicate);
-});
+        let scope = Ship.where();
+        ok(scope instanceof ShipCollection);
+        strictEqual(undefined, scope.predicate);
 
-test("::where(predicate) returns ModelCollection with a predicate set", function() {
-    let Ship = Viking.Model.extend('ship');
-    window.ShipCollection = Viking.Collection.extend();
+        delete window.ShipCollection;
+    });
 
-    let scope = Ship.where({name: 'Zoey'});
-    ok(scope instanceof ShipCollection);
-    deepEqual({name: 'Zoey'}, scope.predicate.attributes);
-});
+    test("::where(predicate) returns ModelCollection with a predicate set", function() {
+        let Ship = Viking.Model.extend('ship');
+        window.ShipCollection = Viking.Collection.extend();
+
+        let scope = Ship.where({name: 'Zoey'});
+        ok(scope instanceof ShipCollection);
+        deepEqual({name: 'Zoey'}, scope.predicate.attributes);
+    });
+}());
+
+import './model/defaults';
+import './model/types/boolean';
+import './model/types/date';
+import './model/types/json';
+import './model/types/number';
+import './model/types/string';
+import './model/class_properties/base_model';
+import './model/class_properties/create';
+import './model/class_properties/extend';
+import './model/class_properties/find_or_create_by';
+import './model/instance_properties/base_model';
+import './model/instance_properties/coerceAttributes/belongsTo';
+import './model/instance_properties/coerceAttributes/coercions';
+import './model/instance_properties/coerceAttributes/hasMany';
+import './model/instance_properties/inheritance_attribute';
+import './model/instance_properties/paramRoot';
+import './model/instance_properties/reflect_on_association';
+import './model/instance_properties/reflect_on_associations';
+import './model/instance_properties/save';
+import './model/instance_properties/select';
+import './model/instance_properties/set/belongsTo';
+import './model/instance_properties/set/coercions';
+import './model/instance_properties/set/hasMany';
+import './model/instance_properties/set';
+// ├── setErrors
+// ├── sync
+// ├── toJSON
+// │   ├── belongsTo
+// │   └── hasMany
+// ├── toJSON
+// ├── toParam
+// ├── touch
+// ├── unselect
+// ├── unset
+// │   └── hasMany
+// ├── update_attribute
+// ├── update_attributes
+// ├── url
+// └── urlRoot

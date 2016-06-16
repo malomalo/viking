@@ -1,3 +1,5 @@
+import textFieldTag from './text_field_tag';
+
 // numberFieldTag(name, value = nil, options = {})
 // ===============================================
 // 
@@ -24,7 +26,7 @@
 //   
 //   passwordFieldTag('count', {step: 25})
 //   # => <input name="count" step="25" type="number">
-Viking.View.Helpers.numberFieldTag = function (name, value, options) {
+export const numberFieldTag = function (name, value, options) {
     
     // Handle both `name, value, options`, and `name, options` syntax
     if (typeof value === 'object') {
@@ -35,5 +37,7 @@ Viking.View.Helpers.numberFieldTag = function (name, value, options) {
     options = _.extend({type: 'number'}, options);
     if (value) { options.value = value; }
 
-    return Viking.View.Helpers.textFieldTag(name, value, options);
+    return textFieldTag(name, value, options);
 };
+
+export default numberFieldTag;

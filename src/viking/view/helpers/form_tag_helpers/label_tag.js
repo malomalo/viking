@@ -1,3 +1,5 @@
+import contentTag from './content_tag';
+
 // labelTag(content, options)
 // ========================================================
 //
@@ -15,7 +17,7 @@
 //   
 //   labelTag('name', nil, {for: 'id'})
 //   // => <label for="name" class="small_label">Name</label>
-Viking.View.Helpers.labelTag = function (content, options, escape) {
+export const labelTag = function (content, options, escape) {
     let tmp;
 
     if (typeof options === 'function') {
@@ -24,5 +26,7 @@ Viking.View.Helpers.labelTag = function (content, options, escape) {
         options = tmp;
     }
 
-    return Viking.View.Helpers.contentTag('label', content, options, escape);
+    return contentTag('label', content, options, escape);
 };
+
+export default labelTag;

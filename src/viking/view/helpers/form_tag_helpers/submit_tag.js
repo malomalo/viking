@@ -1,3 +1,5 @@
+import tag from './tag';
+
 // submitTag(value="Save", options)
 // =================================
 //
@@ -22,7 +24,7 @@
 //   
 //   submitTag("Edit", class: "edit_button")
 //   // => <input class="edit_button" name="commit" type="submit" value="Edit">
-Viking.View.Helpers.submitTag = function (value, options) {
+export const submitTag = function (value, options) {
     if (options === undefined) { options = {}; }
     if (!value) { value = 'Save'; }
     _.defaults(options, {
@@ -32,5 +34,7 @@ Viking.View.Helpers.submitTag = function (value, options) {
         value: value
     });
 
-    return Viking.View.Helpers.tag('input', options);
+    return tag('input', options);
 };
+
+export default submitTag;

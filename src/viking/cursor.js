@@ -1,4 +1,4 @@
-Viking.Cursor = Backbone.Model.extend({
+const Cursor = Backbone.Model.extend({
     defaults: {
         "page": 1,
         "per_page": 25
@@ -49,3 +49,5 @@ Viking.Cursor = Backbone.Model.extend({
     }
     
 });
+
+export default Cursor;

@@ -1,3 +1,6 @@
+import tag from './tag';
+import { sanitizeToId } from './../utils';
+
 // radioButtonTag(name, value, checked, options)
 // =============================================
 //
@@ -22,15 +25,17 @@
 //   
 //   radioButtonTag('color', "green", true, {class: "color_input"})
 //   // => <input checked class="color_input" name="color" type="radio" value="green">
-Viking.View.Helpers.radioButtonTag = function (name, value, checked, options) {
+export const radioButtonTag = function (name, value, checked, options) {
     if (options === undefined) { options = {}; }
     if (checked === true) { options.checked = true; }
     _.defaults(options, {
         type: "radio",
         value: value,
         name: name,
-        id: Viking.View.sanitizeToId(name)
+        id: sanitizeToId(name)
     });
 
-    return Viking.View.Helpers.tag("input", options);
+    return tag("input", options);
 };
+
+export default radioButtonTag;

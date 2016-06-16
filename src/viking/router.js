@@ -1,4 +1,10 @@
-Viking.Router = Backbone.Router.extend({
+import Controller from './controller';
+
+// export let currentController;
+
+export const Router = Backbone.Router.extend({
+
+    currentController: undefined,
 
     route: function (route, name, callback) {
         let router, controller, action;
@@ -34,30 +40,30 @@ Viking.Router = Backbone.Router.extend({
 
         router = this;
         Backbone.history.route(route, function (fragment) {
-            let Controller;
+            let controllerClass;
             let args = router._extractParameters(route, fragment);
-            let current_controller = Viking.controller;
-            Viking.controller = undefined;
+            let previousController = router.currentController;
+            router.currentController = undefined;
 
             if (!callback) { return; }
 
             if (_.isFunction(callback)) {
                 callback.apply(router, args);
             } else if (window[callback.controller]) {
-                Controller = window[callback.controller];
+                controllerClass = window[callback.controller];
 
-                if (Controller.__super__ === Viking.Controller.prototype) {
-                    if ( !(current_controller instanceof Controller) ) {
-                        Viking.controller = new Controller();
+                if (controllerClass.__super__ === Controller.prototype) {
+                    if ( !(previousController instanceof controllerClass) ) {
+                        router.currentController = new controllerClass();
                     } else {
-                        Viking.controller = current_controller;
+                        router.currentController = previousController;
                     }
                 } else {
-                    Viking.controller = Controller;
+                    router.currentController = controllerClass;
                 }
     
-                if (Viking.controller && Viking.controller[callback.action]) {
-                    Viking.controller[callback.action].apply(Viking.controller, args);
+                if (router.currentController && router.currentController[callback.action]) {
+                    router.currentController[callback.action].apply(router.currentController, args);
                 }
             }
 
@@ -87,3 +93,5 @@ Viking.Router = Backbone.Router.extend({
     }
 
 });
+
+export default Router;

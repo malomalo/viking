@@ -1,3 +1,6 @@
+import contentTag from './content_tag';
+import { sanitizeToId } from './../utils';
+
 // textAreaTag(name, [content], [options], [escape=true])
 // =========================================
 //
@@ -32,11 +35,11 @@
 //   
 //   textAreaTag('comment', null, {class: 'comment_input'})
 //   // => <textarea class="comment_input" name="comment"></textarea>
-Viking.View.Helpers.textAreaTag = function (name, content, options, escape) {
+export const textAreaTag = function (name, content, options, escape) {
     if (options === undefined) { options = {}; }
     if (escape === undefined) { escape = true; }
     _.defaults(options, {
-        id: Viking.View.sanitizeToId(name),
+        id: sanitizeToId(name),
         name: name
     });
 
@@ -48,5 +51,7 @@ Viking.View.Helpers.textAreaTag = function (name, content, options, escape) {
 
     if (escape) { content = _.escape(content); }
 
-    return Viking.View.Helpers.contentTag('textarea', content, options, false);
+    return contentTag('textarea', content, options, false);
 };
+
+export default textAreaTag;

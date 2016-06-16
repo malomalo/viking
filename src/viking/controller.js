@@ -1,4 +1,4 @@
-Viking.Controller = Backbone.Model.extend({
+export const Controller = Backbone.Model.extend({
     
     // Below is the same code from the Backbone.Model function
     // except where there are comments
@@ -45,3 +45,5 @@ Viking.Controller = Backbone.Model.extend({
     }
 
 });
+
+export default Controller;

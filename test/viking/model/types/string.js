@@ -1,4 +1,6 @@
-(function () {
+import Viking from '../../../../src/viking';
+
+(function() {
     module("Viking.Model.Type.String");
 
     test("::load coerces boolean to string", function() {
@@ -36,5 +38,4 @@
     test("::dump coerces undefined to string", function() {
         equal(Viking.Model.Type.String.dump(undefined), undefined);
     });
-
 }());

@@ -1,3 +1,6 @@
+import { methodOrAttribute } from './../utils';
+import optionsForSelectTag from './options_for_select_tag';
+
 // optionsFromCollectionForSelectTag(collection, valueMethod, textMethod, selected)
 // =============================================================================
 //
@@ -33,11 +36,11 @@
 //   optionsFromCollectionForSelectTag(people, 'id', 'name', 1)
 //
 // should produce the desired results.
-Viking.View.Helpers.optionsFromCollectionForSelectTag = function(collection, valueAttribute, textAttribute, selected) {
+export const optionsFromCollectionForSelectTag = function(collection, valueAttribute, textAttribute, selected) {
     let selectedForSelect;
     
     let options = collection.map(function(model) {
-        return [Viking.View.methodOrAttribute(model, textAttribute), Viking.View.methodOrAttribute(model, valueAttribute)];
+        return [methodOrAttribute(model, textAttribute), methodOrAttribute(model, valueAttribute)];
     });
     
     if (_.isArray(selected)) {
@@ -51,5 +54,7 @@ Viking.View.Helpers.optionsFromCollectionForSelectTag = function(collection, val
         selectedForSelect = selected;
     }
 
-    return Viking.View.Helpers.optionsForSelectTag(options, selectedForSelect);
+    return optionsForSelectTag(options, selectedForSelect);
 };
+
+export default optionsFromCollectionForSelectTag;

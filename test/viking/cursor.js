@@ -1,4 +1,6 @@
-(function () {
+import Viking from '../../src/viking';
+
+(function() {
     module("Viking.Cursor");
 
     // Defaults ------------------------------------------------------------------
@@ -11,21 +13,21 @@
     // Reset ---------------------------------------------------------------------
     test("reset resets to default values", function() {
         var c = new Viking.Cursor({page: 21, per_page: 40});
-    
+
         c.reset()
         deepEqual(c.attributes, {page: 1, per_page: 40});
     });
 
     test("reset doesn't change per_page", function() {
         var c = new Viking.Cursor({per_page: 60});
-    
+
         c.reset()
         equal(60, c.get('per_page'));
     });
 
     test("reset triggers a reset event", function() {
         expect(1);
-    
+
         var c = new Viking.Cursor({page: 2});
         c.on('reset', function() { ok(true); });
         c.reset();
@@ -34,7 +36,7 @@
 
     test("reset doesnt trigger a change event", function() {
         expect(0);
-    
+
         var c = new Viking.Cursor({page: 2});
         c.on('change', function() { ok(true); });
         c.reset({silent: true});
@@ -43,7 +45,7 @@
 
     test("reset doesnt triggers a reset event when options.silent", function() {
         expect(0);
-    
+
         var c = new Viking.Cursor();
         c.on('reset', function() { ok(true); });
         c.reset({silent: true});
@@ -52,7 +54,7 @@
 
     test("reset doesn't trigger a reset event if !requiresRefresh()", function() {
         expect(0);
-    
+
         var c = new Viking.Cursor();
         c.on('reset', function() { ok(true); });
         c.reset();
@@ -132,5 +134,4 @@
         c.set('total_pages', 2);
         ok(!c.requiresRefresh());
     });
-
 }());

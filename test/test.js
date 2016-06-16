@@ -350,7 +350,7 @@ this.Viking = this.Viking || {};
   };
 
   // Tries to find a variable with the name specified in context of `context`.
-  // `context` defaults to the `window` variable.
+  // `context` defaults to the Viking global namespace.
   //
   // Examples:
   //     'Module'.constantize     # => Module
@@ -359,7 +359,10 @@ this.Viking = this.Viking || {};
   //
   // Viking.NameError is raised when the variable is unknown.
   String.prototype.constantize = function (context) {
+
       if (!context) {
+          // TODO: looking in viking global
+          // context = global;
           context = window;
       }
 
@@ -445,6 +448,1287 @@ this.Viking = this.Viking || {};
 
   String.prototype.downcase = String.prototype.toLowerCase;
 
+  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+  };
+
+  // import Collection from './collection';
+
+  var noXhrPatch = typeof window !== 'undefined' && !!window.ActiveXObject && !(window.XMLHttpRequest && new XMLHttpRequest().dispatchEvent);
+
+  // Map from CRUD to HTTP for our default `Backbone.sync` implementation.
+  var methodMap = {
+    'create': 'POST',
+    'update': 'PUT',
+    'patch': 'PATCH',
+    'delete': 'DELETE',
+    'read': 'GET'
+  };
+
+  var ajax = function ajax(model, options) {
+    // if (model instanceof Collection) {
+    //     model = model.model.prototype;
+    // }
+
+    if (model.connection) {
+      options.url = model.connection.host + options.url;
+      if (model.connection.withCredentials) {
+        options.xhrFields = { withCredentials: true };
+      }
+
+      if (options.headers) {
+        _.defaults(options.headers, model.connection.headers);
+      } else {
+        options.headers = model.connection.headers;
+      }
+    }
+
+    // We only speak json
+    if (options.headers) {
+      _.defaults(options.headers, {
+        'Accept': 'application/json'
+      });
+    } else {
+      options.headers = { 'Accept': 'application/json' };
+    }
+
+    return jQuery.ajax(options);
+  };
+
+  // Viking.sync
+  // -------------
+  // Override Backbone.sync to process data for the ajax request with
+  // +toParam()+ as opposed to letting jQuery automatically call $.param().
+  var vikingSync = function sync(method, model, options) {
+    var type = methodMap[method];
+
+    // Default options, unless specified.
+    _.defaults(options || (options = {}), {
+      emulateHTTP: Backbone.emulateHTTP,
+      emulateJSON: Backbone.emulateJSON
+    });
+
+    // Default JSON-request options.
+    var params = { type: type, dataType: 'json' };
+
+    // Ensure that we have a URL.
+    if (!options.url) {
+      params.url = _.result(model, 'url') || urlError();
+    }
+
+    // Ensure that we have the appropriate request data.
+    if (options.data == null && model && (method === 'create' || method === 'update' || method === 'patch')) {
+      params.contentType = 'application/json';
+      params.data = JSON.stringify(options.attrs || model.toJSON(options));
+    }
+
+    // For older servers, emulate JSON by encoding the request into an HTML-form.
+    if (options.emulateJSON) {
+      params.contentType = 'application/x-www-form-urlencoded';
+      params.data = params.data ? { model: params.data } : {};
+    }
+
+    // For older servers, emulate HTTP by mimicking the HTTP method with `_method`
+    // And an `X-HTTP-Method-Override` header.
+    if (options.emulateHTTP && (type === 'PUT' || type === 'DELETE' || type === 'PATCH')) {
+      (function () {
+        params.type = 'POST';
+        if (options.emulateJSON) {
+          params.data._method = type;
+        }
+        var beforeSend = options.beforeSend;
+        options.beforeSend = function (xhr) {
+          xhr.setRequestHeader('X-HTTP-Method-Override', type);
+          if (beforeSend) {
+            return beforeSend.apply(this, arguments);
+          }
+        };
+      })();
+    }
+
+    // Don't process data on a non-GET request.
+    if (params.type !== 'GET' && !options.emulateJSON) {
+      params.processData = false;
+    } else if (options.data && _typeof(options.data) === 'object') {
+      options.data = options.data.toParam();
+    }
+
+    // Make the request, allowing the user to override any Ajax options.
+    var xhr = options.xhr = ajax(model, _.extend(params, options));
+    model.trigger('request', model, xhr, options);
+    return xhr;
+  };
+
+  var booleanAttributes = ['disabled', 'readonly', 'multiple', 'checked', 'autobuffer', 'autoplay', 'controls', 'loop', 'selected', 'hidden', 'scoped', 'async', 'defer', 'reversed', 'ismap', 'seemless', 'muted', 'required', 'autofocus', 'novalidate', 'formnovalidate', 'open', 'pubdate', 'itemscope'];
+
+  var tagOption = function tagOption(key, value, escape) {
+      if (Array.isArray(value)) {
+          value = value.join(" ");
+      }
+
+      if (escape) {
+          value = _.escape(value);
+      }
+
+      return key + '="' + value + '"';
+  };
+
+  var dataTagOption = function dataTagOption(key, value, escape) {
+      key = "data-" + key;
+
+      if (_.isObject(value)) {
+          value = JSON.stringify(value);
+      }
+
+      return tagOption(key, value, escape);
+  };
+
+  var tagOptions = function tagOptions(options, escape) {
+      if (options === undefined) {
+          return "";
+      }
+
+      if (escape === undefined) {
+          escape = true;
+      }
+
+      var attrs = [];
+      _.each(options, function (value, key) {
+          if (key === "data" && _.isObject(value)) {
+              // TODO testme
+              _.each(value, function (value, key) {
+                  attrs.push(dataTagOption(key, value, escape));
+              });
+          } else if (value === true && _.contains(booleanAttributes, key)) {
+              attrs.push(key);
+          } else if (value !== null && value !== undefined) {
+              attrs.push(tagOption(key, value, escape));
+          }
+      });
+
+      if (attrs.length === 0) {
+          return '';
+      }
+
+      return " " + attrs.sort().join(' ');
+  };
+
+  // see http://www.w3.org/TR/html4/types.html#type-name
+  var sanitizeToId = function sanitizeToId(name) {
+      return name.replace(/[^\-a-zA-Z0-9:.]/g, "_").replace(/_+/g, '_').replace(/_+$/, '').replace(/_+/g, '_');
+  };
+
+  // TODO: move to model_helpers?
+  var tagNameForModelAttribute = function tagNameForModelAttribute(model, attribute, options) {
+      options || (options = {});
+
+      var value = model.get(attribute);
+      var name = void 0;
+
+      if (options.namespace) {
+          name = options.namespace + '[' + attribute + ']';
+      } else {
+          name = model.baseModel.modelName.paramKey + '[' + attribute + ']';
+      }
+
+      if (value instanceof Viking.Collection || Array.isArray(value)) {
+          name = name + '[]';
+      }
+
+      return name;
+  };
+
+  // TODO: move to model_helpers?
+  var addErrorClassToOptions = function addErrorClassToOptions(model, attribute, options) {
+      if (model.errorsOn(attribute)) {
+          if (options['class']) {
+              options['class'] = options['class'] + ' error';
+          } else {
+              options['class'] = 'error';
+          }
+      }
+  };
+
+  // TODO: move to model_helpers?
+  // TODO: testme
+  var methodOrAttribute = function methodOrAttribute(model, funcOrAttribute) {
+      if (typeof funcOrAttribute !== 'function') {
+          if (model[funcOrAttribute]) {
+              return _.result(model, funcOrAttribute);
+          }
+
+          return model.get(funcOrAttribute);
+      }
+
+      return funcOrAttribute(model);
+  };
+
+  // contentTag(name, [content], [options], [escape=true], [&block])
+  // ================================================================
+  //
+  // Returns an HTML block tag of type name surrounding the content. Add HTML
+  // attributes by passing an attributes hash to options. Instead of passing the
+  // content as an argument, you can also use a function in which case, you pass
+  // your options as the second parameter. Set escape to false to disable attribute
+  // value escaping.
+  //
+  // Examples
+  //
+  //   contentTag("p", "Hello world & all!")
+  //   // => <p>Hello world &amp; all!</p>
+  //
+  //   contentTag("p", "Hello world & all!", false)
+  //   // => <p>Hello world & all!</p>
+  //
+  //   contentTag("div", contentTag("p", "Hello world!"), {class: "strong"})
+  //   // => <div class="strong"><p>Hello world!</p></div>
+  //
+  //   contentTag("select", options, {multiple: true})
+  //   // => <select multiple="multiple">...options...</select>
+  //  
+  //   contentTag("div", {class: "strong"}, function() {
+  //      return "Hello world!";
+  //   });
+  //   // => <div class="strong">Hello world!</div>
+  var contentTag = function contentTag(name, content, options, escape) {
+      var tmp = void 0;
+
+      // Handle `name, content`, `name, content, options`,
+      // `name, content, options, escape`, `name, content, escape`, `name, block`,
+      // `name, options, block`, `name, options, escape, block`, && `name, escape, block`
+      // style arguments
+      if (typeof content === "boolean") {
+          escape = content;
+          content = options;
+          options = undefined;
+      } else if ((typeof content === 'undefined' ? 'undefined' : _typeof(content)) === 'object') {
+          if (typeof options === 'function') {
+              tmp = options;
+              options = content;
+              content = tmp;
+          } else if (typeof options === 'boolean') {
+              tmp = content;
+              content = escape;
+              escape = options;
+              options = tmp;
+          }
+      } else if (typeof options === 'boolean') {
+          escape = options;
+          options = undefined;
+      }
+      if (typeof content === 'function') {
+          content = content();
+      }
+      if (escape || escape === undefined) {
+          content = _.escape(content);
+      }
+
+      return "<" + name + tagOptions(options, escape) + ">" + content + "</" + name + ">";
+  };
+
+  // buttonTag(content, options), buttonTag(options, block)
+  // ========================================================
+  //
+  // Creates a button element that defines a submit button, reset button or a
+  // generic button which can be used in JavaScript, for example. You can use
+  // the button tag as a regular submit tag but it isn't supported in legacy
+  // browsers. However, the button tag allows richer labels such as images and
+  // emphasis.
+  //
+  // Options
+  // -------
+  //      - disabled: If true, the user will not be able to use this input.
+  //      - Any other key creates standard HTML attributes for the tag
+  //
+  // Examples
+  // --------
+  //   buttonTag("Button")
+  //   // => <button name="button" type="submit">Button</button>
+  //  
+  //   buttonTag("Checkout", { :disabled => true })
+  //   // => <button disabled name="button" type="submit">Checkout</button>
+  //  
+  //   buttonTag({type: "button"}, function() {
+  //      return "Ask me!";
+  //   });
+  //   // <button name="button" type="button"><strong>Ask me!</strong></button>
+  var buttonTag = function buttonTag(content, options) {
+      var tmp = void 0;
+
+      // Handle `content, options` && `options` style arguments
+      if ((typeof content === 'undefined' ? 'undefined' : _typeof(content)) === 'object') {
+          tmp = options;
+          options = content;
+          content = tmp;
+      } else if (options === undefined) {
+          options = {};
+      }
+
+      _.defaults(options, { name: 'button', type: 'submit' });
+      return contentTag('button', content, options);
+  };
+
+  // tag(name, [options = {}, escape = true])
+  // ========================================
+  //
+  // Returns an empty HTML tag of type `name` add HTML attributes by passing
+  // an attributes hash to `options`. Set escape to `false` to disable attribute
+  // value escaping.
+  //
+  // Arguments
+  // ---------
+  // - Use `true` with boolean attributes that can render with no value, like `disabled` and `readonly`.
+  // - HTML5 data-* attributes can be set with a single data key pointing to a hash of sub-attributes.
+  // - Values are encoded to JSON, with the exception of strings and symbols.
+  //
+  // Examples
+  // --------
+  //
+  //   tag("br")
+  //   // => <br>
+  //
+  //   tag("input", {type: 'text', disabled: true})
+  //   // => <input type="text" disabled="disabled" />
+  //
+  //   tag("img", {src: "open & shut.png"})
+  //   // => <img src="open &amp; shut.png" />
+  //  
+  //   tag("img", {src: "open &amp; shut.png"}, false, false)
+  //   // => <img src="open &amp; shut.png" />
+  //  
+  //   tag("div", {data: {name: 'Stephen', city_state: ["Chicago", "IL"]}})
+  //   // => <div data-name="Stephen" data-city_state="[&quot;Chicago&quot;,&quot;IL&quot;]" />
+  var tag = function tag(name, options, escape) {
+      return "<" + name + tagOptions(options, escape) + ">";
+  };
+
+  // checkBoxTag(name, value="1", checked=false, options)
+  // ======================================================
+  //
+  // Creates a check box form input tag.
+  //
+  // Options
+  // -------
+  //      - disabled: If true, the user will not be able to use this input.
+  //      - Any other key creates standard HTML attributes for the tag
+  //
+  // Examples
+  // --------
+  //   checkBoxTag('accept')
+  //   // => <input name="accept" type="checkbox" value="1" />
+  //  
+  //   checkBoxTag('rock', 'rock music')
+  //   // => <input name="rock" type="checkbox" value="rock music" />
+  //  
+  //   checkBoxTag('receive_email', 'yes', true)
+  //   // => <input checked="checked" name="receive_email" type="checkbox" value="yes" />
+  //  
+  //   checkBoxTag('tos', 'yes', false, class: 'accept_tos')
+  //   // => <input class="accept_tos" name="tos" type="checkbox" value="yes" />
+  //  
+  //   checkBoxTag('eula', 'accepted', false, disabled: true)
+  //   // => <input disabled="disabled" name="eula" type="checkbox" value="accepted" />
+  var checkBoxTag = function checkBoxTag(name, value, checked, options, escape) {
+      if (value === undefined) {
+          value = "1";
+      }
+      if (options === undefined) {
+          options = {};
+      }
+      if (checked === true) {
+          options.checked = true;
+      }
+
+      _.defaults(options, {
+          type: "checkbox",
+          value: value,
+          id: sanitizeToId(name),
+          name: name
+      });
+
+      return tag("input", options, escape);
+  };
+
+  // textFieldTag(name, [value], [options])
+  // ======================================
+  //
+  // Creates a standard text field. Returns the duplicated String.
+  //
+  // Arguments
+  // ---------
+  // name:    The name of the input
+  // value:   The value of the input
+  // options: A object with any of the following:
+  //      - disabled: If set to true, the user will not be able to use this input
+  //      - size: The number of visible characters that will fit in the input
+  //      - maxlength: The maximum number of characters that the browser will
+  //                   allow the user to enter
+  //      - placehoder: The text contained in the field by default, which is
+  //                    removed when the field receives focus
+  //      - Any other key creates standard HTML attributes for the tag
+  //
+  // Examples
+  // --------
+  //
+  //   textFieldTag('name')
+  //   // => <input name="name" type="text" />
+  //  
+  //   textFieldTag('query', 'Enter your search')
+  //   // => <input name="query" value="Enter your search" type="text" />
+  //  
+  //   textFieldTag('search', {placeholder: 'Enter search term...'})
+  //   // => <input name="search" placeholder="Enter search term..." type="text" />
+  //  
+  //   textFieldTag('request', {class: 'special_input'})
+  //   // => <input class="special_input" name="request" type="text" />
+  //  
+  //   textFieldTag('address', '', {size: 75})
+  //   // => <input name="address" size="75" value="" type="text" />
+  //  
+  //   textFieldTag('zip', {maxlength: 5})
+  //   // => <input maxlength="5" name="zip" type="text" />
+  //  
+  //   textFieldTag('payment_amount', '$0.00', {disabled: true})
+  //   // => <input disabled="disabled" name="payment_amount" value="$0.00" type="text" />
+  //  
+  //   textFieldTag('ip', '0.0.0.0', {maxlength: 15, size: 20, class: "ip-input"})
+  //   // => <input class="ip-input" maxlength="15" name="ip" size="20" value="0.0.0.0" type="text" />
+  var textFieldTag = function textFieldTag(name, value, options, escape) {
+
+      // Handle both `name, value` && `name, options` style arguments
+      if (value !== null && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' && !(value instanceof Backbone.Model)) {
+          options = value;
+          value = undefined;
+      }
+
+      return tag('input', _.extend({
+          "type": 'text',
+          "id": sanitizeToId(name),
+          "name": name,
+          "value": value
+      }, options), escape);
+  };
+
+  // hiddenFieldTag(name, value = nil, options = {})
+  // ===============================================
+  //
+  // Creates a hidden form input field used to transmit data that would be lost
+  // due to HTTP's statelessness or data that should be hidden from the user.
+  //
+  // Options
+  // -------
+  //      - Any key creates standard HTML attributes for the tag
+  //
+  // Examples
+  // --------
+  //   hiddenFieldTag('tags_list')
+  //   // => <input name="tags_list" type="hidden">
+  //  
+  //   hiddenFieldTag('token', 'VUBJKB23UIVI1UU1VOBVI@')
+  //   // => <input name="token" type="hidden" value="VUBJKB23UIVI1UU1VOBVI@">
+  var hiddenFieldTag = function hiddenFieldTag(name, value, options, escape) {
+      if (options === undefined) {
+          options = {};
+      }
+      _.defaults(options, { type: "hidden", id: null });
+
+      return textFieldTag(name, value, options, escape);
+  };
+
+  // formTag([options], [content])
+  // formTag([content], [options])
+  // =============================
+  //
+  // ==== Options
+  // * <tt>:action</tt> - The url the action of the form should be set to.
+  // * <tt>:multipart</tt> - If set to true, the enctype is set to "multipart/form-data".
+  // * <tt>:method</tt> - The method to use when submitting the form, usually either "get" or "post".
+  //   If "patch", "put", "delete", or another verb is used, a hidden input with name <tt>_method</tt>
+  //   is added to simulate the verb over post. The default is "POST". Only set if
+  //   :action is passed as an option.
+  //
+  // ==== Examples
+  //   formTag();
+  //   // => <form>
+  //
+  //   formTag({action: '/posts'});
+  //   // => <form action="/posts" method="post">
+  //
+  //   formTag({action: '/posts/1', method: "put"});
+  //   // => <form action="/posts/1" method="post"><input name="_method" type="hidden" value="put" />
+  //
+  //   formTag({action: '/upload', multipart: true});
+  //   // => <form action="/upload" method="post" enctype="multipart/form-data">
+  //
+  //   formTag({action: '/posts'}, function() {
+  //      return submitTag('Save');
+  //   });
+  //   // => <form action="/posts" method="post"><input type="submit" name="commit" value="Save" /></form>
+  var formTag = function formTag(options, content) {
+      var tmp = void 0,
+          methodOverride = '';
+
+      if (typeof options === 'function' || typeof options === 'string') {
+          tmp = content;
+          content = options;
+          options = tmp;
+      }
+      options || (options = {});
+
+      if (options.action && !options.method) {
+          options.method = 'post';
+      } else if (options.method && options.method !== 'get' && options.method !== 'post') {
+          methodOverride = hiddenFieldTag('_method', options.method);
+          options.method = 'post';
+      }
+
+      if (options.multipart) {
+          options.enctype = "multipart/form-data";
+          delete options.multipart;
+      }
+
+      if (content !== undefined) {
+          content = methodOverride + (typeof content === 'function' ? content() : content);
+
+          return contentTag('form', content, options, false);
+      }
+
+      return tag('form', options, false) + methodOverride;
+  };
+
+  // labelTag(content, options)
+  // ========================================================
+  //
+  // Creates a label element. Accepts a block.
+  //
+  // Options - Creates standard HTML attributes for the tag.
+  //
+  // Examples
+  // --------
+  //   labelTag('Name')
+  //   // => <label>Name</label>
+  //  
+  //   labelTag('name', 'Your name')
+  //   // => <label for="name">Your name</label>
+  //  
+  //   labelTag('name', nil, {for: 'id'})
+  //   // => <label for="name" class="small_label">Name</label>
+  var labelTag = function labelTag(content, options, escape) {
+      var tmp = void 0;
+
+      if (typeof options === 'function') {
+          tmp = content;
+          content = options;
+          options = tmp;
+      }
+
+      return contentTag('label', content, options, escape);
+  };
+
+  // numberFieldTag(name, value = nil, options = {})
+  // ===============================================
+  //
+  // Creates a number field.
+  //
+  // Options
+  // -------
+  //      - min:  The minimum acceptable value.
+  //      - max:  The maximum acceptable value.
+  //      - step: The acceptable value granularity.
+  //      - Otherwise accepts the same options as text_field_tag.
+  //
+  // Examples
+  // --------
+  //  
+  //   numberFieldTag('count')
+  //   // => <input name="count" type="number">
+  //  
+  //   nubmerFieldTag('count', 10)
+  //   // => <input" name="count" type="number" value="10">
+  //  
+  //   numberFieldTag('count', 4, {min: 1, max: 9})
+  //   // => <input min="1" max="9" name="count" type="number" value="4">
+  //  
+  //   passwordFieldTag('count', {step: 25})
+  //   # => <input name="count" step="25" type="number">
+  var numberFieldTag = function numberFieldTag(name, value, options) {
+
+      // Handle both `name, value, options`, and `name, options` syntax
+      if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object') {
+          options = value;
+          value = undefined;
+      }
+
+      options = _.extend({ type: 'number' }, options);
+      if (value) {
+          options.value = value;
+      }
+
+      return textFieldTag(name, value, options);
+  };
+
+  // optionsForSelectTag(container[, selected])
+  // =======================================
+  //
+  // Accepts a container (hash, array, collection, your type) and returns a
+  // string of option tags. Given a container where the elements respond to
+  // first and last (such as a two-element array), the "lasts" serve as option
+  // values and the "firsts" as option text. Hashes are turned into this
+  // form automatically, so the keys become "firsts" and values become lasts.
+  // If +selected+ is specified, the matching "last" or element will get the
+  // selected option-tag. +selected+ may also be an array of values to be
+  // selected when using a multiple select.
+  //
+  //   optionsForSelectTag([["Dollar", "$"], ["Kroner", "DKK"]])
+  //   // => <option value="$">Dollar</option>
+  //   // => <option value="DKK">Kroner</option>
+  //
+  //   optionsForSelectTag([ "VISA", "MasterCard" ], "MasterCard")
+  //   // => <option>VISA</option>
+  //   // => <option selected>MasterCard</option>
+  //
+  //   optionsForSelectTag({ "Basic" => "$20", "Plus" => "$40" }, "$40")
+  //   // => <option value="$20">Basic</option>
+  //   // => <option value="$40" selected>Plus</option>
+  //
+  //   optionsForSelectTag([ "VISA", "MasterCard", "Discover" ], ["VISA", "Discover"])
+  //   // => <option selected>VISA</option>
+  //   // => <option>MasterCard</option>
+  //   // => <option selected>Discover</option>
+  //
+  // You can optionally provide html attributes as the last element of the array.
+  //
+  //   optionsForSelectTag([ "Denmark", ["USA", {class: 'bold'}], "Sweden" ], ["USA", "Sweden"])
+  //   // => <option value="Denmark">Denmark</option>
+  //   // => <option value="USA" class="bold" selected>USA</option>
+  //   // => <option value="Sweden" selected>Sweden</option>
+  //
+  //   optionsForSelectTag([["Dollar", "$", {class: "bold"}], ["Kroner", "DKK", {class: "alert"}]])
+  //   // => <option value="$" class="bold">Dollar</option>
+  //   // => <option value="DKK" class="alert">Kroner</option>
+  //
+  // If you wish to specify disabled option tags, set +selected+ to be a hash,
+  // with <tt>:disabled</tt> being either a value or array of values to be
+  // disabled. In this case, you can use <tt>:selected</tt> to specify selected
+  // option tags.
+  //
+  //   optionsForSelectTag(["Free", "Basic", "Advanced", "Super Platinum"], {disabled: "Super Platinum"})
+  //   // => <option value="Free">Free</option>
+  //   // => <option value="Basic">Basic</option>
+  //   // => <option value="Advanced">Advanced</option>
+  //   // => <option value="Super Platinum" disabled>Super Platinum</option>
+  //
+  //   optionsForSelectTag(["Free", "Basic", "Advanced", "Super Platinum"], {disabled: ["Advanced", "Super Platinum"]})
+  //   // => <option value="Free">Free</option>
+  //   // => <option value="Basic">Basic</option>
+  //   // => <option value="Advanced" disabled>Advanced</option>
+  //   // => <option value="Super Platinum" disabled>Super Platinum</option>
+  //
+  //   optionsForSelectTag(["Free", "Basic", "Advanced", "Super Platinum"], {selected: "Free", disabled: "Super Platinum"})
+  //   // => <option value="Free" selected>Free</option>
+  //   // => <option value="Basic">Basic</option>
+  //   // => <option value="Advanced">Advanced</option>
+  //   // => <option value="Super Platinum" disabled>Super Platinum</option>
+  //
+  // NOTE: Only the option tags are returned, you have to wrap this call in a
+  // regular HTML select tag.
+  var optionsForSelectTag = function optionsForSelectTag(container, selected) {
+      var disabled = void 0;
+      var arrayWrap = function arrayWrap(data) {
+          if (_.isArray(data)) {
+              return data;
+          }
+          return [data];
+      };
+
+      if ((typeof selected === 'undefined' ? 'undefined' : _typeof(selected)) !== 'object' && typeof selected !== 'function') {
+          selected = arrayWrap(selected);
+      } else if (!_.isArray(selected) && typeof selected !== 'function') {
+          disabled = typeof selected.disabled === 'function' ? selected.disabled : arrayWrap(selected.disabled);
+          selected = typeof selected.selected === 'function' ? selected.selected : arrayWrap(selected.selected);
+      }
+
+      if (_.isArray(container)) {
+          return _.map(container, function (text) {
+              var value = void 0,
+                  options = {};
+              if (_.isArray(text)) {
+                  if (_typeof(_.last(text)) === 'object') {
+                      options = text.pop();
+                  }
+                  if (text.length === 2) {
+                      options.value = value = text[1];
+                      text = text[0];
+                  } else {
+                      value = text = text[0];
+                  }
+              } else {
+                  value = text;
+              }
+
+              if (typeof selected === 'function') {
+                  if (selected(value)) {
+                      options.selected = true;
+                  }
+              } else if (_.contains(selected, value)) {
+                  options.selected = true;
+              }
+              if (typeof disabled === 'function') {
+                  if (disabled(value)) {
+                      options.disabled = true;
+                  }
+              } else if (_.contains(disabled, value)) {
+                  options.disabled = true;
+              }
+
+              return contentTag('option', text, options);
+          }).join("\n");
+      }
+
+      return _.map(container, function (value, text) {
+          var options = { value: value };
+
+          if (typeof selected === 'function') {
+              if (selected(value)) {
+                  options.selected = true;
+              }
+          } else if (_.contains(selected, value)) {
+              options.selected = true;
+          }
+          if (typeof disabled === 'function') {
+              if (disabled(value)) {
+                  options.disabled = true;
+              }
+          } else if (_.contains(disabled, value)) {
+              options.disabled = true;
+          }
+
+          return contentTag('option', text, options);
+      }).join("\n");
+  };
+
+  // optionsFromCollectionForSelectTag(collection, valueMethod, textMethod, selected)
+  // =============================================================================
+  //
+  // Returns a string of option tags that have been compiled by iterating over
+  // the collection and assigning the result of a call to the valueMethod as
+  // the option value and the textMethod as the option text.
+  //
+  //   optionsFromCollectionForSelectTag(people, 'id', 'name')
+  //   // => <option value="person's id">person's name</option>
+  //
+  // This is more often than not used inside a selectTag like this example:
+  //
+  //   selectTag(person, optionsFromCollectionForSelectTag(people, 'id', 'name'))
+  //
+  // If selected is specified as a value or array of values, the element(s)
+  // returning a match on valueMethod will be selected option tag(s).
+  //
+  // If selected is specified as a Proc, those members of the collection that
+  // return true for the anonymous function are the selected values.
+  //
+  // selected can also be a hash, specifying both :selected and/or :disabled
+  // values as required.
+  //
+  // Be sure to specify the same class as the valueMethod when specifying
+  // selected or disabled options. Failure to do this will produce undesired
+  // results. Example:
+  //
+  //   optionsFromCollectionForSelectTag(people, 'id', 'name', '1')
+  //
+  // Will not select a person with the id of 1 because 1 (an Integer) is not
+  // the same as '1' (a string)
+  //
+  //   optionsFromCollectionForSelectTag(people, 'id', 'name', 1)
+  //
+  // should produce the desired results.
+  var optionsFromCollectionForSelectTag = function optionsFromCollectionForSelectTag(collection, valueAttribute, textAttribute, selected) {
+      var selectedForSelect = void 0;
+
+      var options = collection.map(function (model) {
+          return [methodOrAttribute(model, textAttribute), methodOrAttribute(model, valueAttribute)];
+      });
+
+      if (_.isArray(selected)) {
+          selectedForSelect = selected;
+      } else if ((typeof selected === 'undefined' ? 'undefined' : _typeof(selected)) === 'object') {
+          selectedForSelect = {
+              selected: selected.selected,
+              disabled: selected.disabled
+          };
+      } else {
+          selectedForSelect = selected;
+      }
+
+      return optionsForSelectTag(options, selectedForSelect);
+  };
+
+  // passwordFieldTag(name = "password", value = nil, options = {})
+  // ================================================================
+  //
+  // Creates a password field, a masked text field that will hide the users input
+  // behind a mask character.
+  //
+  // Options
+  // -------
+  //      - disabled:  If true, the user will not be able to use this input.
+  //      - size:      The number of visible characters that will fit in the input.
+  //      - maxlength: The maximum number of characters that the browser will allow the user to enter.
+  //      - Any other key creates standard HTML attributes for the tag
+  //
+  // Examples
+  // --------
+  //  
+  //   passwordFieldTag('pass')
+  //   // => <input name="pass" type="password">
+  //  
+  //   passwordFieldTag('secret', 'Your secret here')
+  //   // => <input" name="secret" type="password" value="Your secret here">
+  //  
+  //   passwordFieldTag('masked', nil, {class: 'masked_input_field'})
+  //   // => <input class="masked_input_field" name="masked" type="password">
+  //  
+  //   passwordFieldTag('token', '', {size: 15})
+  //   # => <input name="token" size="15" type="password" value="">
+  //  
+  //   passwordFieldTag('key', null, {maxlength: 16})
+  //   // => <input maxlength="16" name="key" type="password">
+  //  
+  //   passwordFieldTag('confirm_pass', null, {disabled: true})
+  //   // => <input disabled name="confirm_pass" type="password">
+  //  
+  //   passwordFieldTag('pin', '1234', {maxlength: 4, size: 6, class: "pin_input"})
+  //   // => <input class="pin_input" maxlength="4" name="pin" size="6" type="password" value="1234">
+  var passwordFieldTag = function passwordFieldTag(name, value, options) {
+      if (name === undefined) {
+          name = 'password';
+      }
+      if (options === undefined) {
+          options = {};
+      }
+      _.defaults(options, { type: "password" });
+
+      return textFieldTag(name, value, options);
+  };
+
+  // radioButtonTag(name, value, checked, options)
+  // =============================================
+  //
+  // Creates a radio button; use groups of radio buttons named the same to allow
+  // users to select from a group of options.
+  //
+  // Options
+  // -------
+  //      - disabled: If true, the user will not be able to use this input.
+  //      - Any other key creates standard HTML attributes for the tag
+  //
+  // Examples
+  // --------
+  //   radioButtonTag('gender', 'male')
+  //   // => <input name="gender" type="radio" value="male">
+  //  
+  //   radioButtonTag('receive_updates', 'no', true)
+  //   // => <input checked="checked" name="receive_updates" type="radio" value="no">
+  //
+  //   radioButtonTag('time_slot', "3:00 p.m.", false, {disabled: true})
+  //   // => <input disabled name="time_slot" type="radio" value="3:00 p.m.">
+  //  
+  //   radioButtonTag('color', "green", true, {class: "color_input"})
+  //   // => <input checked class="color_input" name="color" type="radio" value="green">
+  var radioButtonTag = function radioButtonTag(name, value, checked, options) {
+      if (options === undefined) {
+          options = {};
+      }
+      if (checked === true) {
+          options.checked = true;
+      }
+      _.defaults(options, {
+          type: "radio",
+          value: value,
+          name: name,
+          id: sanitizeToId(name)
+      });
+
+      return tag("input", options);
+  };
+
+  // selectTag(name, optionTags, options)
+  // ====================================
+  //
+  // Creates a dropdown selection box, or if the :multiple option is set to true,
+  // a multiple choice selection box.
+  //
+  // Options
+  // -------
+  //    - multiple:      If set to true the selection will allow multiple choices.
+  //    - disabled:      If set to true, the user will not be able to use this input.
+  //    - includeBlank:  If set to true, an empty option will be created, can pass a string to use as empty option content
+  //    - prompt:        Create a prompt option with blank value and the text asking user to select something
+  //    - Any other key creates standard HTML attributes for the tag.
+  //
+  // Examples
+  // --------
+  //   selectTag("people", options_for_select({ "Basic": "$20"}))
+  //   // <select name="people"><option value="$20">Basic</option></select>
+  //  
+  //   selectTag("people", "<option>David</option>")
+  //   // => <select name="people"><option>David</option></select>
+  //  
+  //   selectTag("count", "<option>1</option><option>2</option><option>3</option>")
+  //   // => <select name="count"><option>1</option><option>2</option><option>3</option></select>
+  //  
+  //   selectTag("colors", "<option>Red</option><option>Green</option><option>Blue</option>", {multiple: true})
+  //   // => <select multiple="multiple" name="colors[]"><option>Red</option>
+  //   //    <option>Green</option><option>Blue</option></select>
+  //  
+  //   selectTag("locations", "<option>Home</option><option selected='selected'>Work</option><option>Out</option>")
+  //   // => <select name="locations"><option>Home</option><option selected='selected'>Work</option>
+  //   //    <option>Out</option></select>
+  //  
+  //   selectTag("access", "<option>Read</option><option>Write</option>", {multiple: true, class: 'form_input'})
+  //   // => <select class="form_input" multiple="multiple" name="access[]"><option>Read</option>
+  //   //    <option>Write</option></select>
+  //  
+  //   selectTag("people", options_for_select({ "Basic": "$20"}), {includeBlank: true})
+  //   // => <select name="people"><option value=""></option><option value="$20">Basic</option></select>
+  //  
+  //   selectTag("people", options_for_select({"Basic": "$20"}), {prompt: "Select something"})
+  //   // => <select name="people"><option value="">Select something</option><option value="$20">Basic</option></select>
+  //  
+  //   selectTag("destination", "<option>NYC</option>", {disabled: true})
+  //   // => <select disabled name="destination"><option>NYC</option></select>
+  //  
+  //   selectTag("credit_card", options_for_select([ "VISA", "MasterCard" ], "MasterCard"))
+  //   // => <select name="credit_card"><option>VISA</option><option selected>MasterCard</option></select>
+  var selectTag = function selectTag(name, optionTags, options) {
+      var tagName = name;
+      if (options === undefined) {
+          options = {};
+      }
+      if (options.multiple && tagName.slice(-2) !== "[]") {
+          tagName = tagName + "[]";
+      }
+      _.defaults(options, {
+          id: sanitizeToId(name),
+          name: tagName
+      });
+
+      if (options.includeBlank) {
+          var content = typeof options.includeBlank == "string" ? options.includeBlank : "";
+          optionTags = contentTag('option', content, { value: '' }) + optionTags;
+          delete options.includeBlank;
+      }
+
+      if (options.prompt) {
+          if (options.prompt === true) {
+              options.prompt = 'Select';
+          }
+          optionTags = contentTag('option', options.prompt, { value: '' }) + optionTags;
+          delete options.prompt;
+      }
+
+      return contentTag('select', optionTags, options, false);
+  };
+
+  // submitTag(value="Save", options)
+  // =================================
+  //
+  // Creates a submit button with the text value as the caption.
+  //
+  // Options
+  // -------
+  //    - disabled:      If set to true, the user will not be able to use this input.
+  //    - Any other key creates standard HTML attributes for the tag.
+  //  
+  //   submitTag()
+  //   // => <input name="commit" type="submit" value="Save">
+  //  
+  //   submitTag "Edit this article"
+  //   // => <input name="commit" type="submit" value="Edit this article">
+  //  
+  //   submitTag("Save edits", {disabled: true})
+  //   // => <input disabled name="commit" type="submit" value="Save edits">
+  //  
+  //   submitTag(nil, {class: "form_submit"})
+  //   // => <input class="form_submit" name="commit" type="submit">
+  //  
+  //   submitTag("Edit", class: "edit_button")
+  //   // => <input class="edit_button" name="commit" type="submit" value="Edit">
+  var submitTag = function submitTag(value, options) {
+      if (options === undefined) {
+          options = {};
+      }
+      if (!value) {
+          value = 'Save';
+      }
+      _.defaults(options, {
+          type: 'submit',
+          name: 'commit',
+          id: null,
+          value: value
+      });
+
+      return tag('input', options);
+  };
+
+  // textAreaTag(name, [content], [options], [escape=true])
+  // =========================================
+  //
+  // Creates a text input area; use a textarea for longer text inputs such as
+  // blog posts or descriptions.
+  //
+  // Options
+  // -------
+  //    - size: A string specifying the dimensions (columns by rows) of the textarea (e.g., "25x10").
+  //    - rows: Specify the number of rows in the textarea
+  //    - cols: Specify the number of columns in the textarea
+  //    - disabled: If set to true, the user will not be able to use this input.
+  //    - Any other key creates standard HTML attributes for the tag.
+  //
+  // Examples
+  // --------
+  //  
+  //   textAreaTag('post')
+  //   // => <textarea name="post"></textarea>
+  //  
+  //   textAreaTag('bio', user.bio)
+  //   // => <textarea name="bio">This is my biography.</textarea>
+  //  
+  //   textAreaTag('body', null, {rows: 10, cols: 25})
+  //   // => <textarea cols="25" name="body" rows="10"></textarea>
+  //  
+  //   textAreaTag('body', null, {size: "25x10"})
+  //   // => <textarea name="body" cols="25" rows="10"></textarea>
+  //  
+  //   textAreaTag('description', "Description goes here.", {disabled: true})
+  //   // => <textarea disabled name="description">Description goes here.</textarea>
+  //  
+  //   textAreaTag('comment', null, {class: 'comment_input'})
+  //   // => <textarea class="comment_input" name="comment"></textarea>
+  var textAreaTag = function textAreaTag(name, content, options, escape) {
+      if (options === undefined) {
+          options = {};
+      }
+      if (escape === undefined) {
+          escape = true;
+      }
+      _.defaults(options, {
+          id: sanitizeToId(name),
+          name: name
+      });
+
+      if (options.size) {
+          options.cols = options.size.split('x')[0];
+          options.rows = options.size.split('x')[1];
+          delete options.size;
+      }
+
+      if (escape) {
+          content = _.escape(content);
+      }
+
+      return contentTag('textarea', content, options, false);
+  };
+
+  // timeTag(date, [options], [value])
+  // =================================
+  //
+  // Returns an html time tag for the given date or time.
+  //
+  // Examples
+  // --------
+  //
+  //   timeTag(Date.today)
+  //   // => <time datetime="2010-11-04">November 04, 2010</time>
+  //
+  //   timeTag(Date.now)
+  //   // => <time datetime="2010-11-04T17:55:45+01:00">November 04, 2010 17:55</time>
+  //
+  //   timeTag(Date.yesterday, 'Yesterday')
+  //   // => <time datetime="2010-11-03">Yesterday</time>
+  //
+  //   timeTag(Date.today, {pubdate: true})
+  //   // => <time datetime="2010-11-04" pubdate="pubdate">November 04, 2010</time>
+  //
+  //   timeTag(Date.today, {datetime: Date.today.strftime('%G-W%V')})
+  //   // => <time datetime="2010-W44">November 04, 2010</time>
+  //
+  //   time_tag(Date.now, function() {
+  //     return '<span>Right now</span>';
+  //   });
+  //   // => <time datetime="2010-11-04T17:55:45+01:00"><span>Right now</span></time>
+  var timeTag = function timeTag(date, content, options) {
+      var tmp = void 0;
+
+      // handle both (date, opts, func || str) and (date, func || str, opts)
+      if ((typeof content === 'undefined' ? 'undefined' : _typeof(content)) === 'object') {
+          tmp = options;
+          options = content;
+          content = tmp;
+      }
+      options || (options = {});
+
+      if (!content) {
+          content = options.format ? date.strftime(options.format) : date.toString();
+      }
+      if (options.format) {
+          delete options.format;
+      }
+      if (!options.datetime) {
+          options.datetime = date.toISOString();
+      }
+
+      return contentTag('time', content, options);
+  };
+
+  var render = function render(templatePath, locals) {
+      var template = Viking.View.templates[templatePath];
+
+      if (!locals) {
+          locals = {};
+      }
+
+      if (template) {
+          return template(_.extend(locals, Helpers));
+      }
+
+      throw new Error('Template does not exist: ' + templatePath);
+  };
+
+  var Helpers = {
+      // Utils
+      tagOption: tagOption,
+      dataTagOption: dataTagOption,
+      tagOptions: tagOptions,
+      sanitizeToId: sanitizeToId,
+      tagNameForModelAttribute: tagNameForModelAttribute,
+      addErrorClassToOptions: addErrorClassToOptions,
+      methodOrAttribute: methodOrAttribute,
+
+      // Form Tag Helpers
+      buttonTag: buttonTag,
+      checkBoxTag: checkBoxTag,
+      contentTag: contentTag,
+      formTag: formTag,
+      hiddenFieldTag: hiddenFieldTag,
+      labelTag: labelTag,
+      numberFieldTag: numberFieldTag,
+      optionsForSelectTag: optionsForSelectTag,
+      optionsFromCollectionForSelectTag: optionsFromCollectionForSelectTag,
+      passwordFieldTag: passwordFieldTag,
+      radioButtonTag: radioButtonTag,
+      selectTag: selectTag,
+      submitTag: submitTag,
+      tag: tag,
+      textAreaTag: textAreaTag,
+      textFieldTag: textFieldTag,
+      timeTag: timeTag,
+
+      render: render
+  };
+
+  // Viking.View
+  // -----------
+  //
+  // Viking.View is a framework fro handling view template lookup and rendering.
+  // It provides view helpers that assisst when building HTML forms and more.
+  var View = Backbone.View.extend({
+
+      template: undefined,
+
+      renderTemplate: function renderTemplate(locals) {
+          return Helpers.render(this.template, locals);
+      },
+
+      //Copied constructor from Backbone View
+      constructor: function constructor(options) {
+          this.cid = _.uniqueId('view');
+          options || (options = {});
+          _.extend(this, _.pick(options, ['model', 'collection', 'el', 'id', 'attributes', 'className', 'tagName', 'events']));
+          this._ensureElement();
+
+          // Add an array for storing subView attached to this view so we can remove then
+          this.subViews = [];
+
+          this.initialize.apply(this, arguments);
+          this.delegateEvents();
+      },
+
+      // A helper method that constructs a view and adds it to the subView array
+      subView: function subView(SubView, options) {
+          var view = new SubView(options);
+          this.subViews.push(view);
+          this.listenTo(view, 'remove', this.removeSubView);
+          return view;
+      },
+
+      // Removes the subview from the array and stop listening to it, and calls
+      // #remove on the subview.
+      removeSubView: function removeSubView(view) {
+          this.subViews = _.without(this.subViews, view);
+          this.stopListening(view);
+          view.remove();
+      },
+
+      // Remove all subviews when remove this view. We don't call stopListening
+      // here because this view is being removed anyways so those will get cleaned
+      // up by Backbone.
+      remove: function remove() {
+          while (this.subViews.length > 0) {
+              this.subViews.pop().remove();
+          }
+
+          // Emit a remove event for when a view is removed
+          // TODO: Maybe backport this to Backbone?
+          this.trigger('remove', this);
+
+          Backbone.View.prototype.remove.apply(this, arguments);
+      },
+
+      // Listens to attribute(s) of the model of the view, on change
+      // renders the new value to el. Optionally, pass render function to render
+      // something different, model is passed as an arg
+      // TODO: document me
+      bindEl: function bindEl(attributes, selector, render) {
+          var view = this;
+          render || (render = function render(model) {
+              return model.get(attributes);
+          });
+          if (!_.isArray(attributes)) {
+              attributes = [attributes];
+          }
+
+          //TODO: might want to Debounce because of some inputs being very rapid
+          // but maybe that should be left up to the user changes (ie textareas like description)
+          _.each(attributes, function (attribute) {
+              view.listenTo(view.model, 'change:' + attribute, function (model) {
+                  view.$(selector).html(render(model));
+              });
+          });
+      }
+
+      //TODO: Default render can just render template
+  }, {
+
+      // `Viking.View.templates` is used for storing templates.
+      // `Viking.View.Helpers.render` looks up templates in this
+      // variable
+      templates: {},
+
+      // Override the original extend function to support merging events
+      extend: function extend(protoProps, staticProps) {
+          if (protoProps && protoProps.events) {
+              _.defaults(protoProps.events, this.prototype.events);
+          }
+
+          return Backbone.View.extend.call(this, protoProps, staticProps);
+      }
+  });
+
+  View.Helpers = Helpers;
+
   var Name = function Name(name) {
       var objectName = name.camelize(); // Namespaced.Name
 
@@ -466,12 +1750,6 @@ this.Viking = this.Viking || {};
           this._model = this.name.constantize();
           return this._model;
       };
-  };
-
-  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-    return typeof obj;
-  } : function (obj) {
-    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
   };
 
   var DateType = {
@@ -613,9 +1891,9 @@ this.Viking = this.Viking || {};
 
           if (!this.options.polymorphic) {
               if (this.options.modelName) {
-                  this.modelName = new Viking.Model.Name(this.options.modelName);
+                  this.modelName = new Name(this.options.modelName);
               } else {
-                  this.modelName = new Viking.Model.Name(name);
+                  this.modelName = new Name(name);
               }
           }
       }
@@ -632,9 +1910,9 @@ this.Viking = this.Viking || {};
           this.options = _.extend({}, options);
 
           if (this.options.modelName) {
-              this.modelName = new Viking.Model.Name(this.options.modelName);
+              this.modelName = new Name(this.options.modelName);
           } else {
-              this.modelName = new Viking.Model.Name(this.name.singularize());
+              this.modelName = new Name(this.name.singularize());
           }
 
           if (this.options.collectionName) {
@@ -657,9 +1935,9 @@ this.Viking = this.Viking || {};
 
           if (!this.options.polymorphic) {
               if (this.options.modelName) {
-                  this.modelName = new Viking.Model.Name(this.options.modelName);
+                  this.modelName = new Name(this.options.modelName);
               } else {
-                  this.modelName = new Viking.Model.Name(name);
+                  this.modelName = new Name(name);
               }
           }
       }
@@ -676,9 +1954,9 @@ this.Viking = this.Viking || {};
           this.options = _.extend({}, options);
 
           if (this.options.modelName) {
-              this.modelName = new Viking.Model.Name(this.options.modelName);
+              this.modelName = new Name(this.options.modelName);
           } else {
-              this.modelName = new Viking.Model.Name(this.name.singularize());
+              this.modelName = new Name(this.name.singularize());
           }
 
           if (this.options.collectionName) {
@@ -1053,7 +2331,7 @@ this.Viking = this.Viking || {};
           options.data = JSON.stringify(options.data);
       }
 
-      return Viking.sync.call(this, method, model, options);
+      return vikingSync.call(this, method, model, options);
   };
 
   // similar to Rails as_json method
@@ -1350,10 +2628,10 @@ var instanceProperties = Object.freeze({
 
               if (!child.associations[name]) {
                   var reflectionClass = {
-                      'belongsTo': Viking.Model.Reflection.Belongs,
-                      'hasOne': Viking.Model.Reflection.HasOne,
-                      'hasMany': Viking.Model.Reflection.HasMany,
-                      'hasAndBelongsToMany': Viking.Model.Reflection.HasAndBelongsToMany
+                      'belongsTo': Reflection.BelongsTo,
+                      'hasOne': Reflection.HasOne,
+                      'hasMany': Reflection.HasMany,
+                      'hasAndBelongsToMany': Reflection.HasAndBelongsToMany
                   };
                   reflectionClass = reflectionClass[macro];
 
@@ -1369,6 +2647,13 @@ var instanceProperties = Object.freeze({
               }
           });
       }
+
+      // TODO:
+      // Track the model in the Viking global namespace.
+      // Used in the constinize method
+      // if (child.modelName) {
+      //     global[child.modelName.singular] = child;
+      // }
 
       return child;
   };
@@ -1400,6 +2685,212 @@ var classProperties = Object.freeze({
   Model.Name = Name;
   Model.Type = Type;
   Model.Reflection = Reflection;
+
+  var Cursor = Backbone.Model.extend({
+      defaults: {
+          "page": 1,
+          "per_page": 25
+      },
+
+      reset: function reset(options) {
+          this.set({
+              page: 1
+          }, { silent: true });
+
+          if (!(options && options.silent) && this.requiresRefresh()) {
+              this.trigger('reset', this, options);
+          }
+      },
+
+      incrementPage: function incrementPage(options) {
+          this.set('page', this.get('page') + 1, options);
+      },
+
+      decrementPage: function decrementPage(options) {
+          this.set('page', this.get('page') - 1, options);
+      },
+
+      goToPage: function goToPage(pageNumber, options) {
+          this.set('page', pageNumber, options);
+      },
+
+      limit: function limit() {
+          return this.get('per_page');
+      },
+
+      offset: function offset() {
+          return this.get('per_page') * (this.get('page') - 1);
+      },
+
+      totalPages: function totalPages() {
+          return Math.ceil(this.get('total_count') / this.limit());
+      },
+
+      requiresRefresh: function requiresRefresh() {
+          var changedAttributes = this.changedAttributes();
+          if (changedAttributes) {
+              var triggers = ['page', 'per_page'];
+              return _.intersection(_.keys(changedAttributes), triggers).length > 0;
+          }
+
+          return false;
+      }
+
+  });
+
+  var Controller$1 = Backbone.Model.extend({
+
+      // Below is the same code from the Backbone.Model function
+      // except where there are comments
+      constructor: function constructor(attributes, options) {
+          var attrs = attributes || {};
+          options || (options = {});
+          this.cid = _.uniqueId('c');
+          this.attributes = {};
+          if (options.collection) this.collection = options.collection;
+          if (options.parse) attrs = this.parse(attrs, options) || {};
+          attrs = _.defaults({}, attrs, _.result(this, 'defaults'));
+          this.set(attrs, options);
+          this.changed = {};
+          this.initialize.apply(this, arguments);
+
+          // Add a helper reference to get the model name from an model instance.
+          this.controllerName = this.constructor.controllerName;
+      }
+
+  }, {
+
+      // Overide the default extend method to support passing in the controlelr name
+      //
+      // The name is helpful for determining the current controller and using it
+      // as a key
+      //
+      // `name` is optional, and must be a string
+      extend: function extend(controllerName, protoProps, staticProps) {
+          if (typeof controllerName !== 'string') {
+              staticProps = protoProps;
+              protoProps = controllerName;
+          }
+          protoProps || (protoProps = {});
+
+          var child = Backbone.Model.extend.call(this, protoProps, staticProps);
+
+          if (typeof controllerName === 'string') {
+              child.controllerName = controllerName;
+          }
+
+          _.each(protoProps, function (value, key) {
+              if (typeof value === 'function') {
+                  child.prototype[key].controller = child;
+              }
+          });
+
+          return child;
+      }
+
+  });
+
+  // export let currentController;
+
+  var Router = Backbone.Router.extend({
+
+      currentController: undefined,
+
+      route: function route(_route, name, callback) {
+          var router = void 0,
+              controller = void 0,
+              action = void 0;
+
+          if (!_.isRegExp(_route)) {
+              if (/^r\/.*\/$/.test(_route)) {
+                  _route = new RegExp(_route.slice(2, -1));
+              } else {
+                  _route = this._routeToRegExp(_route);
+              }
+          }
+
+          if (_.isFunction(name)) {
+              callback = name;
+              name = '';
+          } else if (_.isString(name) && name.match(/^(\w+)#(\w+)$/)) {
+              controller = /^(\w+)#(\w+)$/.exec(name);
+              action = controller[2];
+              controller = controller[1];
+              callback = { controller: controller, action: action };
+          } else if (_.isObject(name)) {
+              // TODO: maybe this should be Controller::action since it's not
+              // an instance method
+              controller = /^(\w+)#(\w+)$/.exec(name.to);
+              action = controller[2];
+              controller = controller[1];
+              name = name.name;
+
+              callback = { controller: controller, action: action };
+          }
+
+          if (!callback) {
+              callback = this[name];
+          }
+
+          router = this;
+          Backbone.history.route(_route, function (fragment) {
+              var controllerClass = void 0;
+              var args = router._extractParameters(_route, fragment);
+              var previousController = router.currentController;
+              router.currentController = undefined;
+
+              if (!callback) {
+                  return;
+              }
+
+              if (_.isFunction(callback)) {
+                  callback.apply(router, args);
+              } else if (window[callback.controller]) {
+                  controllerClass = window[callback.controller];
+
+                  if (controllerClass.__super__ === Controller$1.prototype) {
+                      if (!(previousController instanceof controllerClass)) {
+                          router.currentController = new controllerClass();
+                      } else {
+                          router.currentController = previousController;
+                      }
+                  } else {
+                      router.currentController = controllerClass;
+                  }
+
+                  if (router.currentController && router.currentController[callback.action]) {
+                      router.currentController[callback.action].apply(router.currentController, args);
+                  }
+              }
+
+              router.trigger.apply(router, ['route:' + name].concat(args));
+              router.trigger('route', name, args);
+              Backbone.history.trigger('route', router, name, args);
+          });
+          return this;
+      },
+
+      // Calls Backbone.history.start, with the default options {pushState: true}
+      start: function start(options) {
+          options = _.extend({ pushState: true }, options);
+
+          return Backbone.history.start(options);
+      },
+
+      stop: function stop() {
+          Backbone.history.stop();
+      },
+
+      navigate: function navigate(fragment, args) {
+          var root_url = window.location.protocol + '//' + window.location.host;
+          if (fragment.indexOf(root_url) === 0) {
+              fragment = fragment.replace(root_url, '');
+          }
+
+          Backbone.Router.prototype.navigate.call(this, fragment, args);
+      }
+
+  });
 
   var Predicate = Backbone.Model;
 
@@ -1550,7 +3041,7 @@ var classProperties = Object.freeze({
               options.data.order = this.ordering;
           }
 
-          return Viking.sync.apply(this, arguments);
+          return vikingSync.apply(this, arguments);
       },
 
       // If a order is set it's paramaters will be passed under the
@@ -1631,88 +3122,2514 @@ var classProperties = Object.freeze({
           this.fetch();
       }
 
+  }, {
+
+      extend: function extend(protoProps, staticProps) {
+          var child = Backbone.Collection.extend.call(this, protoProps, staticProps);
+
+          // TODO: Track this in the viking global
+          // Track the collection in the Viking global namespace.
+          // Used in the constinize method
+          // if (collection.model.modelName) {
+          //     global[collection.model.modelName.singular] = collection;
+          // }
+
+          return child;
+      }
+
+  });
+
+  var PaginatedCollection = Collection.extend({
+
+      constructor: function constructor(models, options) {
+          Collection.apply(this, arguments);
+          this.cursor = options && options.cursor || new Cursor();
+          this.listenTo(this.cursor, 'change', function () {
+              if (this.cursor.requiresRefresh()) {
+                  this.cursorChanged.apply(this, arguments);
+              }
+          });
+      },
+
+      predicateChanged: function predicateChanged(predicate, options) {
+          this.cursor.reset({ silent: true });
+          this.cursorChanged();
+      },
+
+      cursorChanged: function cursorChanged(cursor, options) {
+          this.fetch();
+      },
+
+      parse: function parse(attrs, xhr) {
+          this.cursor.set({
+              total_count: parseInt(xhr.xhr.getResponseHeader('Total-Count'))
+          });
+
+          return attrs;
+      },
+
+      sync: function sync(method, model, options) {
+          if (method === 'read') {
+              options.data || (options.data = {});
+              options.data.limit = model.cursor.limit();
+              options.data.offset = model.cursor.offset();
+              options.headers || (options.headers = {});
+              options.headers['Total-Count'] = 'true';
+          }
+          return Collection.prototype.sync.call(this, method, model, options);
+      }
+
   });
 
   var Viking$1 = {
+      sync: vikingSync,
       Model: Model,
-      Collection: Collection
+      Cursor: Cursor,
+      Collection: Collection,
+      Predicate: Predicate,
+      PaginatedCollection: PaginatedCollection,
+      Controller: Controller$1,
+      Router: Router,
+      View: View
   };
 
-  module("Viking.Model");
-
-  test("instance.modelName is set on instantiation", function () {
-      var Model = Viking$1.Model.extend('model');
-      var model = new Model();
-
-      propEqual(_.omit(model.modelName, 'model'), {
-          name: 'Model',
-          element: 'model',
-          human: 'Model',
-          paramKey: 'model',
-          plural: 'models',
-          routeKey: 'models',
-          singular: 'model',
-          collection: 'models',
-          collectionName: 'ModelCollection'
+  (function () {
+      module("Viking.sync", {
+          setup: function setup() {
+              this.requests = [];
+              this.xhr = sinon.useFakeXMLHttpRequest();
+              this.xhr.onCreate = _.bind(function (xhr) {
+                  this.requests.push(xhr);
+              }, this);
+          },
+          teardown: function teardown() {
+              this.xhr.restore();
+          }
       });
-  });
 
-  test("::where() returns ModelCollection without a predicate", function () {
-      var Ship = Viking$1.Model.extend('ship');
-      window.ShipCollection = Viking$1.Collection.extend();
+      test("sync uses .toParam() as opposed to letting jQuery use $.param()", function () {
+          var model = new Viking$1.Model();
 
-      var scope = Ship.where();
-      ok(scope instanceof ShipCollection);
-      strictEqual(undefined, scope.predicate);
-  });
+          Viking$1.sync('read', model, { url: '/', data: { order: [{ key: 'asc' }] } });
+          equal(this.requests[0].url, encodeURI("/?order[][key]=asc"));
+      });
 
-  test("::where(predicate) returns ModelCollection with a predicate set", function () {
-      var Ship = Viking$1.Model.extend('ship');
-      window.ShipCollection = Viking$1.Collection.extend();
+      test("ajax uses connection config info from model", function () {
+          var Model = Viking$1.Model.extend('name', {
+              connection: {
+                  host: 'http://google.com',
+                  withCredentials: true,
+                  headers: {
+                      'API-Version': '0.1.0'
+                  }
+              }
+          });
 
-      var scope = Ship.where({ name: 'Zoey' });
-      ok(scope instanceof ShipCollection);
-      deepEqual({ name: 'Zoey' }, scope.predicate.attributes);
-  });
+          var model = new Model();
+          model.save();
 
-  // (function () {
-  //     module("Viking.Model");
-  //
-  //     test("instance.modelName is set on instantiation", function() {
-  //         let Model = Viking.Model.extend('model');
-  //         let model = new Model();
-  //
-  //         propEqual(_.omit(model.modelName, 'model'), {
-  //             name: 'Model',
-  //             element: 'model',
-  //             human: 'Model',
-  //             paramKey: 'model',
-  //             plural: 'models',
-  //             routeKey: 'models',
-  //             singular: 'model',
-  //             collection: 'models',
-  //             collectionName: 'ModelCollection'
-  //         });
-  //     });
-  //
-  //     test("::where() returns ModelCollection without a predicate", function() {
-  //         let Ship = Viking.Model.extend('ship');
-  //         let ShipCollection = Viking.Collection.extend();
-  //
-  //         let scope = Ship.where();
-  //         ok(scope instanceof ShipCollection);
-  //         strictEqual(undefined, scope.predicate);
-  //     });
-  //
-  //     test("::where(predicate) returns ModelCollection with a predicate set", function() {
-  //         let Ship = Viking.Model.extend('ship');
-  //         let ShipCollection = Viking.Collection.extend();
-  //
-  //         let scope = Ship.where({name: 'Zoey'});
-  //         ok(scope instanceof ShipCollection);
-  //         deepEqual({name: 'Zoey'}, scope.predicate.attributes);
-  //     });
-  //
-  // }());
+          equal(this.requests[0].url, encodeURI("http://google.com/names"));
+          equal(this.requests[0].withCredentials, true);
+          equal(this.requests[0].requestHeaders['API-Version'], "0.1.0");
+      });
+
+      test("ajax uses connection config info inherited from ancestors", function () {
+          var Name = Viking$1.Model.extend('name', {
+              connection: {
+                  host: 'http://google.com',
+                  withCredentials: true,
+                  headers: {
+                      'API-Version': '0.1.0'
+                  }
+              }
+          });
+
+          var FirstName = Name.extend('first_name');
+
+          var model = new FirstName();
+          model.save();
+
+          equal(this.requests[0].url, encodeURI("http://google.com/names"));
+          equal(this.requests[0].withCredentials, true);
+          equal(this.requests[0].requestHeaders['API-Version'], "0.1.0");
+      });
+
+      test("ajax uses connection config info from Viking.Model", function () {
+          var Model = Viking$1.Model.extend('name');
+
+          Viking$1.Model.prototype.connection = {
+              host: 'http://google.com',
+              withCredentials: true,
+              headers: {
+                  'API-Version': '0.1.0'
+              }
+          };
+
+          var model = new Model();
+          model.save();
+
+          equal(this.requests[0].url, encodeURI("http://google.com/names"));
+          equal(this.requests[0].withCredentials, true);
+          equal(this.requests[0].requestHeaders['API-Version'], "0.1.0");
+
+          delete Viking$1.Model.prototype.connection;
+      });
+
+      test("ajax uses connection config info inherited from abstract model", function () {
+          var MyModel = Viking$1.Model.extend({
+              abstract: true,
+
+              connection: {
+                  host: 'http://google.com',
+                  withCredentials: true,
+                  headers: {
+                      'API-Version': '0.1.0'
+                  }
+              }
+          });
+
+          var Model = MyModel.extend('name');
+
+          var model = new Model();
+          model.save();
+
+          equal(this.requests[0].url, encodeURI("http://google.com/names"));
+          equal(this.requests[0].withCredentials, true);
+          equal(this.requests[0].requestHeaders['API-Version'], "0.1.0");
+      });
+  })();
+
+  (function () {
+      module("Viking#defaults");
+
+      test("defaults with schema", function () {
+          var Klass = Viking$1.Model.extend({
+              schema: {
+                  foo: { 'default': 'bar' },
+                  bat: { 'default': 'bazz' }
+              }
+          });
+
+          deepEqual(_.result(Klass.prototype, 'defaults'), { foo: 'bar', bat: 'bazz' });
+      });
+  })();
+
+  (function () {
+      module("Viking.Model.Type.Boolean");
+
+      test("::load coerces the string 'true' to true", function () {
+          strictEqual(Viking$1.Model.Type.Boolean.load("true"), true);
+      });
+
+      test("::load coerces the string 'false' to false", function () {
+          strictEqual(Viking$1.Model.Type.Boolean.load("false"), false);
+      });
+
+      test("::load coerces true to true", function () {
+          strictEqual(Viking$1.Model.Type.Boolean.load(true), true);
+      });
+
+      test("::load coerces false to false", function () {
+          strictEqual(Viking$1.Model.Type.Boolean.load(false), false);
+      });
+
+      test("::dump true", function () {
+          strictEqual(Viking$1.Model.Type.Boolean.dump(true), true);
+      });
+
+      test("::dump false", function () {
+          strictEqual(Viking$1.Model.Type.Boolean.dump(false), false);
+      });
+  })();
+
+  (function () {
+      module("Viking.Model.Type.Date");
+
+      test("::load thows error when can't coerce value", function () {
+          expect(2);
+
+          throws(function () {
+              Viking$1.Model.Type.Date.load(true);
+          }, TypeError);
+
+          try {
+              Viking$1.Model.Type.Date.load(true);
+          } catch (e) {
+              equal(e.message, "boolean can't be coerced into Date");
+          }
+      });
+
+      test("::load coerces iso8601 string to date", function () {
+          deepEqual(Viking$1.Model.Type.Date.load("2013-04-10T21:24:28+00:00"), new Date(1365629068000));
+
+          equal(Viking$1.Model.Type.Date.load("2013-04-10T21:24:28+00:00").valueOf(), new Date(1365629068000).valueOf());
+      });
+
+      test("::load coerces int(milliseconds since epoch) to date", function () {
+          deepEqual(Viking$1.Model.Type.Date.load(1365629126097), new Date(1365629126097));
+
+          equal(Viking$1.Model.Type.Date.load(1365629126097).valueOf(), new Date(1365629126097).valueOf());
+      });
+
+      test("::load coerces date to date", function () {
+          equal(Viking$1.Model.Type.Date.load(new Date(1365629126097)).valueOf(), new Date(1365629126097).valueOf());
+      });
+
+      test("::dump coerces Date to ISOString", function () {
+          deepEqual(Viking$1.Model.Type.Date.dump(new Date(1365629068000)), "2013-04-10T21:24:28.000Z");
+      });
+  })();
+
+  (function () {
+      module("Viking.Model.Type.JSON");
+
+      test("::load coerces {} to Viking.Model", function () {
+          ok(Viking$1.Model.Type.JSON.load({}) instanceof Viking$1.Model);
+
+          deepEqual(Viking$1.Model.Type.JSON.load({}).attributes, {});
+          deepEqual(Viking$1.Model.Type.JSON.load({ key: 'value' }).attributes, { key: 'value' });
+      });
+
+      test("::load coerces {} to Viking.Model with modelName set to key", function () {
+          equal(Viking$1.Model.Type.JSON.load({}, 'key').modelName, 'key');
+      });
+
+      test("::load coerces {} to Viking.Model with baseModel set to the JSON object", function () {
+          attribute = Viking$1.Model.Type.JSON.load({}, 'key');
+
+          strictEqual(attribute.baseModel, attribute);
+      });
+
+      test("::load thows error when can't coerce value", function () {
+          expect(2);
+
+          throws(function () {
+              Viking$1.Model.Type.JSON.load(true);
+          }, TypeError);
+
+          try {
+              Viking$1.Model.Type.JSON.load(true);
+          } catch (e) {
+              equal(e.message, "boolean can't be coerced into JSON");
+          }
+      });
+
+      test("::load doesn't use the type key for STI", function () {
+          deepEqual(Viking$1.Model.Type.JSON.load({ type: 'my_value' }).attributes, { type: 'my_value' });
+      });
+
+      test("::dump calls toJSON() on model", function () {
+          var model = new Viking$1.Model({
+              foo: 'bar'
+          });
+
+          deepEqual(Viking$1.Model.Type.JSON.dump(model), {
+              foo: 'bar'
+          });
+      });
+
+      test("::dump calls toJSON() with object", function () {
+          var model = { foo: 'bar' };
+
+          deepEqual(Viking$1.Model.Type.JSON.dump(model), { foo: 'bar' });
+      });
+  })();
+
+  (function () {
+      module("Viking.Model.Type.Number");
+
+      test("::load coerces number to number", function () {
+          equal(Viking$1.Model.Type.Number.load(10), 10);
+          equal(Viking$1.Model.Type.Number.load(10.5), 10.5);
+      });
+
+      test("::load coerces string to number", function () {
+          equal(Viking$1.Model.Type.Number.load('10'), 10);
+          equal(Viking$1.Model.Type.Number.load('10.5'), 10.5);
+      });
+
+      test("::load coerces empty string to null", function () {
+          equal(Viking$1.Model.Type.Number.load(' '), null);
+          equal(Viking$1.Model.Type.Number.load(''), null);
+      });
+
+      test("::dump coerces number to number", function () {
+          equal(Viking$1.Model.Type.Number.dump(10), 10);
+          equal(Viking$1.Model.Type.Number.dump(10.5), 10.5);
+      });
+
+      test("::dump coerces null to null", function () {
+          equal(Viking$1.Model.Type.Number.dump(null), null);
+          equal(Viking$1.Model.Type.Number.dump(null), null);
+      });
+  })();
+
+  (function () {
+      module("Viking.Model.Type.String");
+
+      test("::load coerces boolean to string", function () {
+          equal(Viking$1.Model.Type.String.load(true), 'true');
+          equal(Viking$1.Model.Type.String.load(false), 'false');
+      });
+
+      test("::load coerces number to string", function () {
+          equal(Viking$1.Model.Type.String.load(10), '10');
+          equal(Viking$1.Model.Type.String.load(10.5), '10.5');
+      });
+
+      test("::load coerces null to string", function () {
+          equal(Viking$1.Model.Type.String.load(null), null);
+      });
+
+      test("::load coerces undefined to string", function () {
+          equal(Viking$1.Model.Type.String.load(undefined), undefined);
+      });
+
+      test("::dump coerces boolean to string", function () {
+          equal(Viking$1.Model.Type.String.dump(true), 'true');
+          equal(Viking$1.Model.Type.String.dump(false), 'false');
+      });
+
+      test("::dump coerces number to string", function () {
+          equal(Viking$1.Model.Type.String.dump(10), '10');
+          equal(Viking$1.Model.Type.String.dump(10.5), '10.5');
+      });
+
+      test("::dump coerces null to string", function () {
+          equal(Viking$1.Model.Type.String.dump(null), null);
+      });
+
+      test("::dump coerces undefined to string", function () {
+          equal(Viking$1.Model.Type.String.dump(undefined), undefined);
+      });
+  })();
+
+  (function () {
+      module("Viking.Model::baseModel");
+
+      test("::baseModel get's set to self when extending Viking.Model", function () {
+          var Ship = Viking$1.Model.extend();
+
+          strictEqual(Ship, Ship.baseModel);
+      });
+
+      test("::baseModel get's set to self when extending an abstract Viking.Model", function () {
+          var RussianShip = Viking$1.Model.extend({
+              abstract: true
+          });
+          var Ship = RussianShip.extend();
+
+          strictEqual(Ship, Ship.baseModel);
+      });
+
+      test("::baseModel get's set to parent Model when extending a Viking.Model", function () {
+          var Ship = Viking$1.Model.extend();
+          var Carrier = Ship.extend();
+
+          strictEqual(Ship, Carrier.baseModel);
+      });
+  })();
+
+  (function () {
+      module("Viking.Model::create", {
+          setup: function setup() {
+              this.requests = [];
+              this.xhr = sinon.useFakeXMLHttpRequest();
+              this.xhr.onCreate = _.bind(function (xhr) {
+                  this.requests.push(xhr);
+              }, this);
+          },
+          teardown: function teardown() {
+              this.xhr.restore();
+          }
+      });
+
+      test("::create returns an new model", function () {
+          var Model = Viking$1.Model.extend('model');
+
+          var m = Model.create({ name: "name" });
+          ok(m instanceof Model);
+      });
+
+      test("::create calls save with options", function () {
+          var Model = Viking$1.Model.extend('model');
+
+          Model.prototype.save = function (attributes, options) {
+              deepEqual(options, { option: 1 });
+          };
+
+          var m = Model.create({ name: "name" }, { option: 1 });
+      });
+  })();
+
+  (function () {
+      module("Viking.model::extend");
+
+      // setting attributes on a model coerces relations
+      test("::extend acts like normal Backbone.Model", function () {
+          var Model = Viking$1.Model.extend({ key: 'value' }, { key: 'value' });
+
+          equal(Model.key, 'value');
+          equal(new Model().key, 'value');
+      });
+
+      test("::extend with modelName", function () {
+          var Model = Viking$1.Model.extend('model');
+
+          propEqual(_.omit(Model.modelName, 'model'), {
+              name: 'Model',
+              element: 'model',
+              human: 'Model',
+              paramKey: 'model',
+              plural: 'models',
+              routeKey: 'models',
+              singular: 'model',
+              collection: 'models',
+              collectionName: 'ModelCollection'
+          });
+          propEqual(_.omit(new Model().modelName, 'model'), {
+              name: 'Model',
+              element: 'model',
+              human: 'Model',
+              paramKey: 'model',
+              plural: 'models',
+              routeKey: 'models',
+              singular: 'model',
+              collection: 'models',
+              collectionName: 'ModelCollection'
+          });
+      });
+
+      test("::extend initalizes the assocations", function () {
+          var Model = Viking$1.Model.extend();
+
+          deepEqual(Model.associations, {});
+      });
+
+      test("::extend adds hasMany relationships to associations", function () {
+          window.Ship = Viking$1.Model.extend({ hasMany: ['ships'] });
+
+          equal(Ship.associations['ships'].name, 'ships');
+          equal(Ship.associations['ships'].macro, 'hasMany');
+          deepEqual(Ship.associations['ships'].options, {});
+          equal(Ship.associations['ships'].collectionName, 'ShipCollection');
+
+          delete window.Ship;
+      });
+
+      test("::extend adds hasMany relationships with options to associations", function () {
+          window.Ship = Viking$1.Model.extend({ hasMany: [['ships', { collectionName: 'MyCollection' }]] });
+
+          equal(Ship.associations['ships'].name, 'ships');
+          equal(Ship.associations['ships'].macro, 'hasMany');
+          deepEqual(Ship.associations['ships'].options, { collectionName: 'MyCollection' });
+          equal(Ship.associations['ships'].collectionName, 'MyCollection');
+
+          delete window.Ship;
+      });
+
+      test("::extend adds belongsTo relationships to associations", function () {
+          window.Ship = Viking$1.Model.extend({ belongsTo: ['ship'] });
+
+          equal(Ship.associations['ship'].name, 'ship');
+          equal(Ship.associations['ship'].macro, 'belongsTo');
+          deepEqual(Ship.associations['ship'].options, {});
+          propEqual(_.omit(Ship.associations['ship'].modelName, 'model'), {
+              name: 'Ship',
+              element: 'ship',
+              human: 'Ship',
+              paramKey: 'ship',
+              plural: 'ships',
+              routeKey: 'ships',
+              singular: 'ship',
+              collection: 'ships',
+              collectionName: 'ShipCollection'
+          });
+
+          delete window.Ship;
+      });
+
+      test("::extend adds belongsTo relationships with options to associations", function () {
+          window.Ship = Viking$1.Model.extend({ belongsTo: [['ship', { modelName: 'Carrier' }]] });
+
+          equal(Ship.associations['ship'].name, 'ship');
+          equal(Ship.associations['ship'].macro, 'belongsTo');
+          deepEqual(Ship.associations['ship'].options, { modelName: 'Carrier' });
+          propEqual(Ship.associations['ship'].modelName, new Viking$1.Model.Name('carrier'));
+
+          delete window.Ship;
+      });
+
+      // STI
+      // ========================================================================
+
+      test("::extend a Viking.Model unions the hasMany relationships", function () {
+          window.Key = Viking$1.Model.extend('key');
+          window.Comment = Viking$1.Model.extend('comment');
+          window.Account = Viking$1.Model.extend('account', { hasMany: ['comments'] });
+          window.Agent = Account.extend('agent', { hasMany: ['keys'] });
+
+          deepEqual(['comments'], _.map(Account.associations, function (a) {
+              return a.name;
+          }));
+          deepEqual(['comments', 'keys'], _.map(Agent.associations, function (a) {
+              return a.name;
+          }).sort());
+
+          delete window.Key;
+          delete window.Comment;
+          delete window.Account;
+          delete window.Agent;
+      });
+
+      test("::extend a Viking.Model unions the belongsTo relationships", function () {
+          window.State = Viking$1.Model.extend('state');
+          window.Region = Viking$1.Model.extend('region');
+          window.Account = Viking$1.Model.extend('account', { belongsTo: ['state'] });
+          window.Agent = Account.extend('agent', { belongsTo: ['region'] });
+
+          deepEqual(['state'], _.map(Account.associations, function (a) {
+              return a.name;
+          }));
+          deepEqual(['region', 'state'], _.map(Agent.associations, function (a) {
+              return a.name;
+          }).sort());
+
+          delete window.State;
+          delete window.Region;
+          delete window.Account;
+          delete window.Agent;
+      });
+
+      test("::extend a Viking.Model unions the schema", function () {
+          window.Account = Viking$1.Model.extend('account', { schema: {
+                  created_at: { type: 'date' }
+              } });
+
+          window.Agent = Account.extend('agent', { schema: {
+                  name: { type: 'string' }
+              } });
+
+          deepEqual(Account.prototype.schema, {
+              created_at: { type: 'date' }
+          });
+          deepEqual(Agent.prototype.schema, {
+              created_at: { type: 'date' },
+              name: { type: 'string' }
+          });
+
+          delete window.Account;
+          delete window.Agent;
+      });
+
+      test("::extend a Viking.Model adds itself to the descendants", function () {
+          window.Account = Viking$1.Model.extend('account');
+          window.Agent = Account.extend('agent');
+
+          deepEqual(Account.descendants, [Agent]);
+          deepEqual(Agent.descendants, []);
+
+          delete window.Account;
+          delete window.Agent;
+      });
+  })();
+
+  (function () {
+      module("Viking.Model::findOrCreateBy", {
+          setup: function setup() {
+              this.requests = [];
+              this.xhr = sinon.useFakeXMLHttpRequest();
+              this.xhr.onCreate = _.bind(function (xhr) {
+                  this.requests.push(xhr);
+              }, this);
+          },
+          teardown: function teardown() {
+              this.xhr.restore();
+          }
+      });
+
+      test("::findOrCreateBy(attributes) find a model that exits", function () {
+          expect(1);
+
+          var Ship = Viking$1.Model.extend('ship');
+          var relient = new Ship({ name: 'Relient' });
+
+          window.ShipCollection = Viking$1.Collection.extend({
+              fetch: function fetch(options) {
+                  options.success(new ShipCollection([relient]));
+              }
+          });
+
+          Ship.findOrCreateBy({ name: 'Relient' }, {
+              success: function success(model) {
+                  strictEqual(model, relient);
+              }
+          });
+
+          delete window.ShipCollection;
+      });
+
+      test("::findOrCreateBy(attributes) without a success callback finds a model that exits", function () {
+          expect(0);
+
+          var Ship = Viking$1.Model.extend('ship');
+
+          window.ShipCollection = Viking$1.Collection.extend({
+              fetch: function fetch(options) {
+                  options.success(new ShipCollection([{ name: 'Relient' }]));
+              }
+          });
+
+          Ship.findOrCreateBy({ name: 'Relient' });
+
+          delete window.ShipCollection;
+      });
+
+      test("::findOrCreateBy(attributes) calls create when the model doesn't exist", function () {
+          expect(2);
+
+          var Ship = Viking$1.Model.extend('ship');
+          window.ShipCollection = Viking$1.Collection.extend({
+              fetch: function fetch(options) {
+                  options.success(new ShipCollection([]));
+              }
+          });
+
+          Ship.create = function (attributes, options) {
+              deepEqual(attributes, { name: 'Relient' });
+              deepEqual(options, { option: 1 });
+          };
+
+          Ship.findOrCreateBy({ name: 'Relient' }, { option: 1 });
+
+          delete window.ShipCollection;
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#baseModel");
+
+      test("#baseModel get's set to self when extending Viking.Model", function () {
+          var Ship = Viking.Model.extend();
+          var ship = new Ship();
+
+          strictEqual(Ship, ship.baseModel);
+      });
+
+      test("#baseModel get's set to self when extending an abstract Viking.Model", function () {
+          var RussianShip = Viking.Model.extend({
+              abstract: true
+          });
+          var Ship = RussianShip.extend();
+
+          var ship = new Ship();
+
+          strictEqual(Ship, ship.baseModel);
+      });
+
+      test("#baseModel get's set to parent Model when extending a Viking.Model", function () {
+          var Ship = Viking.Model.extend();
+          var Carrier = Ship.extend();
+          var carrier = new Carrier();
+
+          strictEqual(Ship, carrier.baseModel);
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#coerceAttributes - belongsTo");
+
+      test("#coerceAttributes initializes belongsTo relation with hash", function () {
+          var Ship = Viking$1.Model.extend({ belongsTo: ['ship'] });
+          var a = new Ship();
+
+          var result = a.coerceAttributes({ ship: { key: 'value' } });
+          ok(result.ship instanceof Ship);
+          deepEqual(result.ship.attributes, { key: 'value' });
+      });
+
+      test("#coerceAttributes initializes belongsTo relation with instance of model", function () {
+          var Ship = Viking$1.Model.extend({ belongsTo: ['ship'] });
+          var a = new Ship();
+          var b = new Ship({ key: 'value' });
+
+          var result = a.coerceAttributes({ ship: b });
+          ok(result.ship === b);
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#coerceAttributes - coercions");
+
+      // coerceAttributes modifies the object passed in ----------------------------
+      test("#coerceAttributes modifies the object passed in", function () {
+          var Model = Viking$1.Model.extend({ schema: {
+                  date: { type: 'date' }
+              } });
+          var a = new Model();
+          var attrs = { date: "2013-04-10T21:24:28+00:00" };
+          a.coerceAttributes(attrs);
+
+          deepEqual(attrs, { date: new Date(1365629068000) });
+          equal(attrs.date.valueOf(), new Date(1365629068000).valueOf());
+      });
+
+      // coercions and unsupported data type ---------------------------------------
+      test("#coerceAttributes thows error when can't coerce value", function () {
+          expect(2);
+
+          var Model = Viking$1.Model.extend({ schema: {
+                  date: { type: 'Unkown' }
+              } });
+          var a = new Model();
+
+          throws(function () {
+              a.coerceAttributes({ date: true });
+          }, TypeError);
+
+          try {
+              a.coerceAttributes({ date: true });
+          } catch (e) {
+              equal(e.message, "Coercion of Unkown unsupported");
+          }
+      });
+
+      // coercing dates ---------------------------------------------------------
+      test("#coerceAttributes coerces iso8601 string to date", function () {
+          var Model = Viking$1.Model.extend({ schema: {
+                  date: { type: 'date' }
+              } });
+          var a = new Model();
+
+          deepEqual(a.coerceAttributes({ date: "2013-04-10T21:24:28+00:00" }), { date: new Date(1365629068000) });
+          equal(a.coerceAttributes({ date: "2013-04-10T21:24:28+00:00" }).date.valueOf(), new Date(1365629068000).valueOf());
+      });
+
+      test("#coerceAttributes coerces int(milliseconds since epoch) to date", function () {
+          var Model = Viking$1.Model.extend({ schema: {
+                  date: { type: 'date' }
+              } });
+          var a = new Model();
+
+          deepEqual(a.coerceAttributes({ date: 1365629126097 }), { date: new Date(1365629126097) });
+          equal(a.coerceAttributes({ date: 1365629126097 }).date.valueOf(), new Date(1365629126097).valueOf());
+      });
+
+      // coercing strings -------------------------------------------------------
+      test("#coerceAttributes coerces boolean to string", function () {
+          var Model = Viking$1.Model.extend({ schema: {
+                  key: { type: 'string' }
+              } });
+          var a = new Model();
+
+          equal(a.coerceAttributes({ key: true }).key, 'true');
+          equal(a.coerceAttributes({ key: false }).key, 'false');
+      });
+
+      test("#coerceAttributes coerces number to string", function () {
+          var Model = Viking$1.Model.extend({ schema: {
+                  key: { type: 'string' }
+              } });
+          var a = new Model();
+
+          equal(a.coerceAttributes({ key: 10 }).key, '10');
+          equal(a.coerceAttributes({ key: 10.5 }).key, '10.5');
+      });
+
+      test("#coerceAttributes coerces null to string", function () {
+          var Model = Viking$1.Model.extend({ schema: {
+                  key: { type: 'string' }
+              } });
+          var a = new Model();
+
+          equal(a.coerceAttributes({ key: null }).key, null);
+      });
+
+      // coercing numbers -------------------------------------------------------
+      test("#coerceAttributes coerces string to number", function () {
+          var Model = Viking$1.Model.extend({ schema: {
+                  key: { type: 'number' }
+              } });
+          var a = new Model();
+
+          equal(a.coerceAttributes({ key: '10.5' }).key, 10.50);
+          equal(a.coerceAttributes({ key: '10' }).key, 10);
+      });
+
+      // coercing JSON ----------------------------------------------------------
+      test("#coerceAttributes coerces {} to Viking.Model", function () {
+          var Model = Viking$1.Model.extend({ schema: {
+                  key: { type: 'json' }
+              } });
+          var a = new Model();
+
+          ok(a.coerceAttributes({ key: {} }).key instanceof Viking$1.Model);
+          deepEqual(a.coerceAttributes({ key: {} }).key.attributes, {});
+          deepEqual(a.coerceAttributes({ key: { key: 'value' } }).key.attributes, { key: 'value' });
+      });
+
+      test("#coerceAttributes coerces {} to Viking.Model and sets the modelName", function () {
+          var Model = Viking$1.Model.extend({ schema: {
+                  key: { type: 'json' }
+              } });
+          var a = new Model();
+
+          deepEqual(a.coerceAttributes({ key: {} }).key.modelName, 'key');
+      });
+
+      test("#coerceAttributes thows error when can't coerce value", function () {
+          expect(2);
+
+          var Model = Viking$1.Model.extend({ schema: {
+                  date: { type: 'date' }
+              } });
+          var a = new Model();
+
+          throws(function () {
+              a.coerceAttributes({ date: true });
+          }, TypeError);
+
+          try {
+              a.coerceAttributes({ date: true });
+          } catch (e) {
+              equal(e.message, "boolean can't be coerced into Date");
+          }
+      });
+
+      // Array support
+      test("#coerceAttributes support array coercion", function () {
+          var Model = Viking$1.Model.extend({ schema: {
+                  key: { type: 'number', array: true }
+              } });
+          var a = new Model();
+
+          deepEqual(a.coerceAttributes({ key: [10, '10.5'] }).key, [10, 10.5]);
+          deepEqual(a.coerceAttributes({ key: ['10.5'] }).key, [10.50]);
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#coerceAttributes - hasMany");
+
+      test("#coerceAttributes initializes hasMany relation with array of hashes", function () {
+          var Ship = Viking$1.Model.extend({ hasMany: ['ships'] });
+          window.ShipCollection = Viking$1.Collection.extend({ model: Ship });
+
+          var a = new Ship();
+
+          var result = a.coerceAttributes({ ships: [{ key: 'foo' }, { key: 'bar' }] });
+          ok(result.ships instanceof ShipCollection);
+          ok(result.ships.models[0] instanceof Ship);
+          ok(result.ships.models[1] instanceof Ship);
+          deepEqual(result.ships.models[0].attributes.key, 'foo');
+          deepEqual(result.ships.models[1].attributes.key, 'bar');
+
+          delete window.ShipCollection;
+      });
+
+      test("#coerceAttributes() initializes hasMany relation with array of models", function () {
+          var Ship = Viking$1.Model.extend({ hasMany: ['ships'] });
+          window.ShipCollection = Viking$1.Collection.extend({ model: Ship });
+
+          var a = new Ship();
+          var models = [new Ship({ key: 'foo' }), new Ship({ key: 'bar' })];
+
+          var result = a.coerceAttributes({ ships: models });
+          ok(result.ships instanceof ShipCollection);
+          ok(result.ships.models[0] === models[0]);
+          ok(result.ships.models[1] === models[1]);
+
+          delete window.ShipCollection;
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#inheritanceAttribute");
+
+      test("#inheritanceAttribute get set when extending a Model", function () {
+          var Ship = Viking.Model.extend();
+          var ship = new Ship();
+
+          ok(ship.inheritanceAttribute);
+      });
+
+      test("::inheritanceAttribute default to `type`", function () {
+          var Ship = Viking.Model.extend();
+          var ship = new Ship();
+
+          equal('type', ship.inheritanceAttribute);
+      });
+
+      test("::inheritanceAttribute override", function () {
+          var Ship = Viking.Model.extend({
+              inheritanceAttribute: 'class_name'
+          });
+          var ship = new Ship();
+
+          equal('class_name', ship.inheritanceAttribute);
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#paramRoot");
+
+      test("instance.paramRoot returns underscored modelName", function () {
+          var Model = Viking.Model.extend('model');
+          var model = new Model();
+
+          equal(model.paramRoot(), 'model');
+
+          Model = Viking.Model.extend('namespaced/model');
+          model = new Model();
+          equal(model.paramRoot(), 'namespaced_model');
+      });
+
+      test("instance.paramRoot returns underscored baseModel.modelName when used as STI", function () {
+          var Boat = Viking.Model.extend('boat');
+          var Carrier = Boat.extend('boat');
+          var model = new Carrier();
+
+          equal(model.paramRoot(), 'boat');
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#reflectOnAssociation");
+
+      test("#reflectOnAssociation() is a reference to ::reflectOnAssociation()", function () {
+          var Ship = Viking.Model.extend();
+
+          strictEqual(Ship.reflectOnAssociation, new Ship().reflectOnAssociation);
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#reflectOnAssociations");
+
+      test("#reflectOnAssociations() is a reference to ::reflectOnAssociations()", function () {
+          var Ship = Viking.Model.extend();
+
+          strictEqual(Ship.reflectOnAssociations, new Ship().reflectOnAssociations);
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#save", {
+          setup: function setup() {
+              this.requests = [];
+              this.xhr = sinon.useFakeXMLHttpRequest();
+              this.xhr.onCreate = _.bind(function (xhr) {
+                  this.requests.push(xhr);
+              }, this);
+          },
+          teardown: function teardown() {
+              this.xhr.restore();
+          }
+      });
+
+      test("#save calls setErrors when a 400 is returned", function () {
+          expect(1);
+
+          var Model = Viking.Model.extend('model');
+
+          var m = new Model();
+          m.setErrors = function (errors, options) {
+              deepEqual(errors, {
+                  "address": { "city": ["cant be blank"] },
+                  "agents": [{ "email": ["cant be blank", "is invalid"] }],
+                  "size": ["cant be blank", "is not a number"]
+              });
+          };
+
+          m.save();
+          this.requests[0].respond(400, '[]', JSON.stringify({
+              "errors": {
+                  "address": { "city": ["cant be blank"] },
+                  "agents": [{ "email": ["cant be blank", "is invalid"] }],
+                  "size": ["cant be blank", "is not a number"]
+              }
+          }));
+      });
+
+      test("#save calls the invalid callback when a 400 is returned", function () {
+          expect(1);
+
+          var Model = Viking.Model.extend('model');
+
+          var m = new Model({ foo: 'bar' });
+          m.save(null, {
+              invalid: function invalid(model, errors, options) {
+                  deepEqual(errors, {
+                      "address": { "city": ["cant be blank"] },
+                      "agents": [{ "email": ["cant be blank", "is invalid"] }],
+                      "size": ["cant be blank", "is not a number"]
+                  });
+              }
+          });
+
+          this.requests[0].respond(400, '[]', JSON.stringify({
+              "errors": {
+                  "address": { "city": ["cant be blank"] },
+                  "agents": [{ "email": ["cant be blank", "is invalid"] }],
+                  "size": ["cant be blank", "is not a number"]
+              }
+          }));
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#select");
+
+      test("#select() sets 'selected' to true on model when not in a collection", function () {
+          var model = new Viking.Model({});
+          model.select();
+
+          ok(model.selected);
+      });
+
+      test("#select() sets 'selected' to true on the model when in a collection", function () {
+          var c = new Viking.Collection([{}, {}]);
+          var model = c.models[0];
+          model.select();
+
+          ok(model.selected);
+      });
+
+      test("#select() sets 'selected' to false other models", function () {
+          var c = new Viking.Collection([{}, {}, {}]);
+          var models = c.models;
+          models[0].selected = true;
+          models[1].selected = true;
+          models[2].selected = true;
+
+          ok(models[0].selected);
+          ok(models[1].selected);
+          ok(models[2].selected);
+
+          models[1].select();
+
+          ok(!models[0].selected);
+          ok(models[1].selected);
+          ok(!models[2].selected);
+      });
+
+      test("#select(true) selects the model", function () {
+          var c = new Viking.Collection([{}, {}, {}]);
+          var models = c.models;
+
+          ok(!models[0].selected);
+          models[0].select(true);
+          ok(models[0].selected);
+      });
+
+      test("#select(false) unselects the model", function () {
+          var c = new Viking.Collection([{}, {}, {}]);
+          var models = c.models;
+
+          models[0].select();
+
+          ok(models[0].selected);
+          models[0].select(false);
+          ok(!models[0].selected);
+      });
+
+      test("#select({multiple: true}) doesn't unselect other models", function () {
+          var c = new Viking.Collection([{}, {}, {}]);
+          var models = c.models;
+
+          models[0].select();
+          models[1].select({ multiple: true });
+          models[2].select({ multiple: true });
+
+          ok(models[0].selected);
+          ok(models[1].selected);
+          ok(models[2].selected);
+      });
+
+      test("#select() triggers a 'selected' event", function () {
+          expect(1);
+
+          var c = new Viking.Collection([{}]);
+          var model = c.models[0];
+
+          model.on('selected', function () {
+              ok(model.selected);
+          });
+          model.select();
+          model.off('selected');
+      });
+
+      test("#select() triggers a 'selected' event on the collection", function () {
+          expect(1);
+
+          var c = new Viking.Collection([{}]);
+          c.on('selected', function () {
+              ok(true);
+          });
+          c.models[0].select();
+          c.off('selected');
+      });
+
+      test("#select() triggers a 'selected' event only if change", function () {
+          expect(0);
+
+          var c = new Viking.Collection([{}]);
+          var m = c.models[0];
+          m.selected = true;
+          m.on('selected', function () {
+              ok(true);
+          });
+          m.select();
+          m.off('selected');
+      });
+
+      test("#select() triggers a 'selected' event on collection only if change", function () {
+          expect(0);
+
+          var c = new Viking.Collection([{}]);
+          c.models[0].selected = true;
+          c.on('selected', function () {
+              ok(true);
+          });
+          c.models[0].select();
+          c.off('selected');
+      });
+  })();
+
+  (function () {
+      module("Viking.model#set - belongsTo");
+
+      // setting attributes on a model coerces relations
+      test("#set(key, val) coerces belongsTo relations", function () {
+          var Ship = Viking$1.Model.extend({ belongsTo: ['ship'] });
+
+          var a = new Ship();
+          a.set('ship', {});
+          ok(a.get('ship') instanceof Ship);
+      });
+
+      test("#set({key, val}) coerces belongsTo relations", function () {
+          var Ship = Viking$1.Model.extend({ belongsTo: ['ship'] });
+
+          var a = new Ship();
+          a.set({ ship: {} });
+          ok(a.get('ship') instanceof Ship);
+      });
+
+      test("#set(key, val) sets relation id", function () {
+          var Ship = Viking$1.Model.extend({ belongsTo: ['ship'] });
+          var a = new Ship();
+
+          a.set('ship', { id: 12 });
+          equal(12, a.get('ship_id'));
+
+          a.set('ship', {});
+          equal(null, a.get('ship_id'));
+      });
+
+      test("#set({key, val}) sets relation id", function () {
+          var Ship = Viking$1.Model.extend({ belongsTo: ['ship'] });
+          var a = new Ship();
+
+          a.set({ ship: { id: 12 } });
+          equal(12, a.get('ship_id'));
+
+          a.set({ ship: {} });
+          equal(null, a.get('ship_id'));
+      });
+
+      test("#unset(key) unsets relation id", function () {
+          var Ship = Viking$1.Model.extend({ belongsTo: ['ship'] });
+          var a = new Ship();
+
+          a.set('ship', { id: 12 });
+          equal(12, a.get('ship_id'));
+
+          a.unset('ship');
+          equal(null, a.get('ship_id'));
+      });
+
+      test("::set(key, val) sets polymorphic belongsTo relation & sets appropriate keys", function () {
+          var Account = Viking$1.Model.extend('account');
+          var Ship = Viking$1.Model.extend('ship');
+          var Photo = Viking$1.Model.extend({ belongsTo: [['subject', { polymorphic: true }]] });
+
+          var a = new Photo();
+          var ship = new Ship({ id: 10 });
+          a.set({ subject: ship });
+          ok(a.get('subject') instanceof Ship);
+          equal(a.get('subject_id'), 10);
+          equal(a.get('subject_type'), 'Ship');
+
+          var account = new Account({ id: 1 });
+          a.set({ subject: account });
+          ok(a.get('subject') instanceof Account);
+          equal(a.get('subject_id'), 1);
+          equal(a.get('subject_type'), 'Account');
+      });
+
+      test("::set({key: {}, key_type: KLASS}) coerces polymorphic belongsTo relations useing type declared in model", function () {
+          var Ship = Viking$1.Model.extend('ship');
+          var Photo = Viking$1.Model.extend({ belongsTo: [['subject', { polymorphic: true }]] });
+
+          var a = new Photo();
+          a.set({ subject: { id: 10 }, subject_type: 'ship' });
+          ok(a.get('subject') instanceof Ship);
+          equal(a.get('subject').get('id'), 10);
+          equal(a.get('subject_type'), 'ship');
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#set - coercions");
+
+      test("#set(key, val) does coercions", function () {
+          var Model = Viking$1.Model.extend({ schema: {
+                  date: { type: 'date' }
+              } });
+
+          var a = new Model();
+          a.set('date', "2013-04-10T21:24:28+00:00");
+          equal(a.get('date').valueOf(), new Date(1365629068000).valueOf());
+      });
+
+      test("#set({key, val}) does coercions", function () {
+          var Model = Viking$1.Model.extend({ schema: {
+                  date: { type: 'date' }
+              } });
+
+          var a = new Model();
+          a.set({ date: "2013-04-10T21:24:28+00:00" });
+          equal(a.get('date').valueOf(), new Date(1365629068000).valueOf());
+      });
+  })();
+
+  (function () {
+      module("Viking.model#set - hasMany");
+
+      // setting attributes on a model coerces relations
+      test("#set(key, val) coerces hasMany relations", function () {
+          var Ship = Viking$1.Model.extend({ hasMany: ['ships'] });
+          window.ShipCollection = Viking$1.Collection.extend({ model: Ship });
+
+          var a = new Ship();
+          a.set('ships', [{}, {}]);
+          ok(a.get('ships') instanceof ShipCollection);
+          equal(a.get('ships').length, 2);
+          ok(a.get('ships').first() instanceof Ship);
+
+          delete window.ShipCollection;
+      });
+
+      test("#set({key, val}) coerces hasMany relations", function () {
+          var Ship = Viking$1.Model.extend({ hasMany: ['ships'] });
+          window.ShipCollection = Viking$1.Collection.extend({ model: Ship });
+
+          var a = new Ship();
+          a.set({ ships: [{}, {}] });
+          ok(a.get('ships') instanceof ShipCollection);
+          equal(a.get('ships').length, 2);
+          ok(a.get('ships').first() instanceof Ship);
+
+          delete window.ShipCollection;
+      });
+
+      test("#set(belongsToRelation, data) updates the current collection and doesn't create a new one", function () {
+          expect(6);
+
+          var Ship = Viking$1.Model.extend({ hasMany: ['ships'] });
+          window.ShipCollection = Viking$1.Collection.extend({ model: Ship });
+
+          var a = new Ship();
+          a.set({ ships: [{ id: 1 }, {}, { id: 3 }] });
+          a.get('ships').on("add", function () {
+              ok(true);
+          });
+          a.get('ships').get(1).on("change", function () {
+              ok(true);
+          });
+          a.get('ships').on("remove", function () {
+              ok(true);
+          });
+
+          var oldCollection = a.get('ships');
+          a.set({ ships: [{ id: 1, key: 'value' }, { id: 2 }] });
+
+          strictEqual(oldCollection, a.get('ships'));
+          deepEqual([1, 2], a.get('ships').map(function (s) {
+              return s.id;
+          }));
+          a.get('ships').off();
+          a.get('ships').get(1).off();
+
+          delete window.ShipCollection;
+      });
+
+      test("#set(hasManyRelation, data) updates the current collection and doesn't create a new one", function () {
+          var Ship = Viking$1.Model.extend({});
+          window.ShipCollection = Viking$1.Collection.extend({ model: Ship });
+          var Fleet = Viking$1.Model.extend({ hasMany: ['ships'] });
+
+          var f = new Fleet();
+          var s = new Ship();
+
+          f.set({ ships: [s] });
+          strictEqual(s.collection, f.get('ships'));
+
+          delete window.ShipCollection;
+      });
+
+      test("#set({type: klass}) initilizes hasMany associations", function () {
+          var Ship = Viking$1.Model.extend('ship');
+          window.ShipCollection = Viking$1.Collection.extend({ model: Ship });
+          var Account = Viking$1.Model.extend('account');
+          var Agent = Account.extend('agent', { hasMany: ['ships'] });
+
+          var account = new Account();
+          ok(!(account instanceof Agent));
+          account.set({ type: 'agent' });
+          ok(account instanceof Agent);
+          ok(account.get('ships') instanceof ShipCollection);
+
+          delete window.ShipCollection;
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#set");
+
+      test("#set({type: klass}) changes the object prototype of klass", function () {
+          var Account = Viking$1.Model.extend('account');
+          var Agent = Account.extend('agent');
+
+          var account = new Account();
+          ok(!(account instanceof Agent));
+          account.set({ type: 'agent' });
+
+          ok(account instanceof Agent);
+      });
+
+      test("#set({type: klass}) changes the modelName on instance to modelName of klass", function () {
+          var Account = Viking$1.Model.extend('account');
+          var Agent = Account.extend('agent');
+
+          var account = new Account();
+          ok(!(account instanceof Agent));
+          account.set({ type: 'agent' });
+
+          strictEqual(Agent.modelName, account.modelName);
+          propEqual(_.omit(account.modelName, 'model'), {
+              name: 'Agent',
+              element: 'agent',
+              human: 'Agent',
+              paramKey: 'agent',
+              plural: 'agents',
+              routeKey: 'agents',
+              singular: 'agent',
+              collection: 'agents',
+              collectionName: 'AgentCollection'
+          });
+      });
+
+      test("::set({type: string}) doesn't change the object prototype when inheritanceAttribute set to false", function () {
+          var Ship = Viking$1.Model.extend('ship', {
+              inheritanceAttribute: false
+          });
+          var Battleship = Ship.extend('battleship', {});
+
+          var bship = new Battleship();
+          bship.set({ type: 'ship' });
+
+          strictEqual(Battleship, bship.baseModel);
+      });
+
+      test("#set({type: klass}) doesn't change the modelName on instance to modelName of klass when inheritanceAttribute set to false", function () {
+          var Ship = Viking$1.Model.extend('ship', {
+              inheritanceAttribute: false
+          });
+          var Battleship = Ship.extend('battleship', {});
+
+          var bship = new Battleship();
+          bship.set({ type: 'ship' });
+
+          strictEqual(Battleship.modelName, bship.modelName);
+      });
+  })();
+
+  (function () {
+      module("Viking.Model");
+
+      test("instance.modelName is set on instantiation", function () {
+          var model = new (Viking$1.Model.extend('model'))();
+
+          propEqual(_.omit(model.modelName, 'model'), {
+              name: 'Model',
+              element: 'model',
+              human: 'Model',
+              paramKey: 'model',
+              plural: 'models',
+              routeKey: 'models',
+              singular: 'model',
+              collection: 'models',
+              collectionName: 'ModelCollection'
+          });
+      });
+
+      test("::where() returns ModelCollection without a predicate", function () {
+          var Ship = Viking$1.Model.extend('ship');
+          window.ShipCollection = Viking$1.Collection.extend();
+
+          var scope = Ship.where();
+          ok(scope instanceof ShipCollection);
+          strictEqual(undefined, scope.predicate);
+
+          delete window.ShipCollection;
+      });
+
+      test("::where(predicate) returns ModelCollection with a predicate set", function () {
+          var Ship = Viking$1.Model.extend('ship');
+          window.ShipCollection = Viking$1.Collection.extend();
+
+          var scope = Ship.where({ name: 'Zoey' });
+          ok(scope instanceof ShipCollection);
+          deepEqual({ name: 'Zoey' }, scope.predicate.attributes);
+      });
+  })();
+
+  (function () {
+      module("Viking.Cursor");
+
+      // Defaults ------------------------------------------------------------------
+      test("defaults are set", function () {
+          var c = new Viking$1.Cursor();
+
+          deepEqual(c.attributes, { page: 1, per_page: 25 });
+      });
+
+      // Reset ---------------------------------------------------------------------
+      test("reset resets to default values", function () {
+          var c = new Viking$1.Cursor({ page: 21, per_page: 40 });
+
+          c.reset();
+          deepEqual(c.attributes, { page: 1, per_page: 40 });
+      });
+
+      test("reset doesn't change per_page", function () {
+          var c = new Viking$1.Cursor({ per_page: 60 });
+
+          c.reset();
+          equal(60, c.get('per_page'));
+      });
+
+      test("reset triggers a reset event", function () {
+          expect(1);
+
+          var c = new Viking$1.Cursor({ page: 2 });
+          c.on('reset', function () {
+              ok(true);
+          });
+          c.reset();
+          c.off('reset');
+      });
+
+      test("reset doesnt trigger a change event", function () {
+          expect(0);
+
+          var c = new Viking$1.Cursor({ page: 2 });
+          c.on('change', function () {
+              ok(true);
+          });
+          c.reset({ silent: true });
+          c.off('change');
+      });
+
+      test("reset doesnt triggers a reset event when options.silent", function () {
+          expect(0);
+
+          var c = new Viking$1.Cursor();
+          c.on('reset', function () {
+              ok(true);
+          });
+          c.reset({ silent: true });
+          c.off('reset');
+      });
+
+      test("reset doesn't trigger a reset event if !requiresRefresh()", function () {
+          expect(0);
+
+          var c = new Viking$1.Cursor();
+          c.on('reset', function () {
+              ok(true);
+          });
+          c.reset();
+          c.off('reset');
+      });
+
+      test("reset options get passed to callbacks", function () {
+          expect(1);
+
+          var c = new Viking$1.Cursor({ page: 2 });
+          c.on('reset', function (model, options) {
+              deepEqual({ remove: false }, options);
+          });
+          c.reset({ remove: false });
+          c.off('reset');
+      });
+
+      // incrementPage -------------------------------------------------------------
+      test("incrementPage increments page by 1", function () {
+          var c = new Viking$1.Cursor();
+          equal(c.get('page'), 1);
+          c.incrementPage();
+          equal(c.get('page'), 2);
+      });
+
+      test("incrementPage options get passed to callbacks", function () {
+          expect(2);
+
+          var c = new Viking$1.Cursor();
+          c.on('change', function (model, options) {
+              deepEqual({ remove: false }, options);
+          });
+          c.on('change:page', function (model, value, options) {
+              deepEqual({ remove: false }, options);
+          });
+          c.incrementPage({ remove: false });
+          c.off('change');
+          c.off('change:page');
+      });
+
+      // decrementPage -------------------------------------------------------------
+      test("decrementPage decrements page by 1", function () {
+          var c = new Viking$1.Cursor({ page: 2 });
+          equal(c.get('page'), 2);
+          c.decrementPage();
+          equal(c.get('page'), 1);
+      });
+
+      test("decrementPage options get passed to callbacks", function () {
+          expect(2);
+
+          var c = new Viking$1.Cursor();
+          c.on('change', function (model, options) {
+              deepEqual({ remove: false }, options);
+          });
+          c.on('change:page', function (model, value, options) {
+              deepEqual({ remove: false }, options);
+          });
+          c.decrementPage({ remove: false });
+          c.off('change');
+          c.off('change:page');
+      });
+
+      // goToPage ------------------------------------------------------------------
+      test("goToPage changes page to given pageNumber", function () {
+          var c = new Viking$1.Cursor({ page: 1 });
+          equal(c.get('page'), 1);
+          c.goToPage(12);
+          equal(c.get('page'), 12);
+      });
+
+      // requiresRefresh -----------------------------------------------------------
+      test("requiresRefresh returns true if page changes", function () {
+          var c = new Viking$1.Cursor({ page: 1 });
+          c.set('page', 2);
+          ok(c.requiresRefresh());
+      });
+
+      test("requiresRefresh returns true if per_page changes", function () {
+          var c = new Viking$1.Cursor({ page: 1 });
+          c.set('per_page', 2);
+          ok(c.requiresRefresh());
+      });
+
+      test("requiresRefresh returns false if neither page, offset, or per_page have changed", function () {
+          var c = new Viking$1.Cursor();
+          c.set('total_pages', 2);
+          ok(!c.requiresRefresh());
+      });
+  })();
+
+  (function () {
+      module("Viking.Collection");
+
+      // Url -----------------------------------------------------------------------
+      test("url based on model.modelName", function () {
+          var m = Viking$1.Model.extend('model');
+          var mc = Viking$1.Collection.extend({
+              model: m
+          });
+
+          var c = new mc();
+
+          equal('/models', c.url());
+      });
+
+      test("url based on model.modelName", function () {
+          var m = Viking$1.Model.extend('model');
+          var mc = Viking$1.Collection.extend({
+              model: m
+          });
+
+          var c = new mc();
+
+          equal('/models', c.url());
+      });
+
+      // paramRoot -----------------------------------------------------------------
+      test("paramRoot based on model.modelName", function () {
+          var m = Viking$1.Model.extend('model');
+          var mc = Viking$1.Collection.extend({
+              model: m
+          });
+
+          var c = new mc();
+
+          equal('models', c.paramRoot());
+      });
+
+      // select() ------------------------------------------------------------------
+      test("select(model) sets 'selected' to true on the model", function () {
+          var c = new Viking$1.Collection([{}, {}]);
+          var model = c.models[0];
+          c.select(model);
+
+          ok(model.selected);
+      });
+
+      test("select(model) sets 'selected' to false other models", function () {
+          var c = new Viking$1.Collection([{}, {}, {}]);
+          var models = c.models;
+          models[0].selected = true;
+          models[1].selected = true;
+          models[2].selected = true;
+
+          ok(models[0].selected);
+          ok(models[1].selected);
+          ok(models[2].selected);
+
+          c.select(models[1]);
+
+          ok(!models[0].selected);
+          ok(models[1].selected);
+          ok(!models[2].selected);
+      });
+
+      test("select(model, {multiple: true}) doesn't unselect other models", function () {
+          var c = new Viking$1.Collection([{}, {}, {}]);
+          var models = c.models;
+
+          c.select(models[0]);
+          c.select(models[1], { multiple: true });
+          c.select(models[2], { multiple: true });
+
+          ok(models[0].selected);
+          ok(models[1].selected);
+          ok(models[2].selected);
+      });
+
+      test("select(model) triggers a 'selected' event on collection", function () {
+          expect(1);
+
+          var c = new Viking$1.Collection([{}]);
+          var model = c.models[0];
+          c.on('selected', function () {
+              ok(model.selected);
+          });
+          c.select(model);
+          c.off('selected');
+      });
+
+      test("select(model) triggers a 'selected' event on collection only if change", function () {
+          expect(0);
+
+          var c = new Viking$1.Collection([{}]);
+          c.models[0].selected = true;
+          c.on('selected', function () {
+              ok(true);
+          });
+          c.select(c.models[0]);
+          c.off('selected');
+      });
+
+      test("model.unselect() triggers a 'unselected' event on collection", function () {
+          expect(1);
+
+          var c = new Viking$1.Collection([{}]);
+          var model = c.models[0];
+          model.selected = true;
+          c.on('unselected', function () {
+              ok(!model.selected);
+          });
+          model.unselect();
+          c.off('unselected');
+      });
+
+      test("model.unselect() triggers a 'unselected' event on collection only if change", function () {
+          expect(0);
+
+          var c = new Viking$1.Collection([{}]);
+          c.on('unselected', function () {
+              ok(true);
+          });
+          c.models[0].select(c.models[0]);
+          c.off('unselected');
+      });
+
+      test("selected() only returns selected models", function () {
+          var c = new Viking$1.Collection([{}, {}, {}]);
+          var models = c.models;
+
+          c.select(models[0]);
+          var selected = c.selected();
+          equal(1, selected.length);
+          equal(c.models[0].cid, selected[0].cid);
+
+          c.select(models[1], { multiple: true });
+          c.select(models[2], { multiple: true });
+
+          selected = c.selected();
+          equal(3, selected.length);
+          equal(c.models[0].cid, selected[0].cid);
+          equal(c.models[1].cid, selected[1].cid);
+          equal(c.models[2].cid, selected[2].cid);
+      });
+
+      // clearSelected() ------------------------------------------------------------
+      test("clearSelected() set 'selected' to false on all models", function () {
+          var c = new Viking$1.Collection([{}, {}, {}]);
+          c.models[0].selected = true;
+          c.models[1].selected = true;
+          c.models[2].selected = true;
+
+          equal(3, c.selected().length);
+          c.clearSelected();
+          equal(0, c.selected().length);
+      });
+
+      test("clearSelected(except) set 'selected' to false on all models", function () {
+          var c = new Viking$1.Collection([{}, {}, {}]);
+          c.models[0].selected = true;
+          c.models[1].selected = true;
+          c.models[2].selected = true;
+
+          var model = c.models[1];
+          equal(3, c.selected().length);
+          c.clearSelected(model);
+          equal(1, c.selected().length);
+      });
+
+      test("clearSelected() triggers 'unselected' event on all models", function () {
+          expect(2);
+
+          var c = new Viking$1.Collection([{}, {}, {}]);
+          c.models[0].selected = false;
+          c.models[1].selected = true;
+          c.models[2].selected = true;
+          c.models[0].on('unselected', function () {
+              ok(true);
+          });
+          c.models[1].on('unselected', function () {
+              ok(true);
+          });
+          c.models[2].on('unselected', function () {
+              ok(true);
+          });
+
+          c.clearSelected();
+
+          c.models[0].off('unselected');
+          c.models[1].off('unselected');
+          c.models[2].off('unselected');
+      });
+
+      test("decrementPage options get passed to callbacks", function () {
+          expect(2);
+
+          var c = new Viking$1.Cursor();
+          c.on('change', function (model, options) {
+              deepEqual({ remove: false }, options);
+          });
+          c.on('change:page', function (model, value, options) {
+              deepEqual({ remove: false }, options);
+          });
+          c.decrementPage({ remove: false });
+          c.off('change');
+          c.off('change:page');
+      });
+
+      // set -----------------------------------------------------------------------
+      test("predicate.set() options get passed to predicateChanged", function () {
+          expect(3);
+
+          var f = new Viking$1.Predicate();
+          var m = Viking$1.Model.extend('model');
+          var c = Viking$1.Collection.extend({
+              model: m,
+              predicateChanged: function predicateChanged(model, options) {
+                  deepEqual({ remove: false }, options);
+              }
+          });
+          var c = new c([], { predicate: f });
+
+          f.on('change', function (model, options) {
+              deepEqual({ remove: false }, options);
+          });
+          f.on('change:query', function (model, value, options) {
+              deepEqual({ remove: false }, options);
+          });
+          f.set('query', 'Дорогой', { remove: false });
+          f.off('change');
+          f.off('change:query');
+      });
+  })();
+
+  (function () {
+      module("Viking.PaginatedCollection");
+
+      // Cursor -----------------------------------------------------------------------
+      test("new sets new cursor", function () {
+          var pc = new Viking$1.PaginatedCollection();
+
+          ok(pc.cursor);
+      });
+
+      test("new sets cursor passed in options", function () {
+          var cursor = new Viking$1.Cursor();
+          var pc = new Viking$1.PaginatedCollection([], { cursor: cursor });
+
+          ok(cursor === pc.cursor);
+      });
+
+      test("cursorChanged called when cursor changes", function () {
+          expect(1);
+
+          var collection = Viking$1.PaginatedCollection.extend({
+              cursorChanged: function cursorChanged() {
+                  ok(true);
+              }
+          });
+          var pc = new collection();
+
+          pc.cursor.incrementPage();
+      });
+
+      test("cursorChanged doesn't get called when not needed", function () {
+          expect(0);
+
+          var collection = Viking$1.PaginatedCollection.extend({
+              cursorChanged: function cursorChanged() {
+                  ok(true);
+              }
+          });
+          var pc = new collection();
+
+          pc.cursor.set('total_pages', 4);
+      });
+
+      // Predicate -----------------------------------------------------------------
+      test("predicateChanged method is called when predicate is changed", function () {
+          expect(1);
+
+          var collection = Viking$1.PaginatedCollection.extend({
+              predicateChanged: function predicateChanged(options) {
+                  ok(true);
+              }
+          });
+          var predicate = new Viking$1.Predicate();
+          var pc = new collection([], { predicate: predicate });
+
+          predicate.trigger('change');
+      });
+
+      test("predicateChanged resets the cursor and calls fetch()", function () {
+          expect(1);
+
+          var collection = Viking$1.PaginatedCollection.extend({
+              cursorChanged: function cursorChanged() {
+                  ok(true);
+              }
+          });
+          var predicate = new Viking$1.Predicate();
+          var cursor = new Viking$1.Cursor({ page: 10 });
+          var pc = new collection([], { predicate: predicate, cursor: cursor });
+          predicate.trigger('change');
+      });
+
+      test("predicateChanged() calls cursorChanged()", function () {
+          expect(1);
+
+          var c = Viking$1.PaginatedCollection.extend({
+              cursorChanged: function cursorChanged() {
+                  ok(true);
+              }
+          });
+          var c = new c();
+
+          c.predicateChanged();
+      });
+
+      // Parse ---------------------------------------------------------------------
+      test("parse extracts cursor information", function () {
+          var m = Viking$1.Model.extend('model');
+          var c = Viking$1.PaginatedCollection.extend({ model: m });
+          var c = new c();
+
+          c.cursor.set({ page: 3, per_page: 40, offset: 0 }, { silent: true });
+          c.parse([{ "id": 2069, "type": "lease" }], {
+              xhr: { getResponseHeader: function getResponseHeader(key) {
+                      if (key == 'Total-Count') {
+                          return 3049;
+                      }
+                  } }
+          });
+          equal(77, c.cursor.totalPages());
+          equal(3049, c.cursor.get('total_count'));
+      });
+
+      // sync() --------------------------------------------------------------------
+      test("sync() adds in cursor params", function () {
+          expect(2);
+
+          var m = Viking$1.Model.extend('model');
+          var c = Viking$1.PaginatedCollection.extend({ model: m });
+          var c = new c([]);
+
+          var old = Viking$1.sync;
+          Viking$1.sync = function (method, model, options) {
+              equal(40, options.data.limit);
+              equal(40, options.data.offset);
+          };
+          c.cursor.set({ page: 2, per_page: 40 });
+          Viking$1.sync = old;
+      });
+  })();
+
+  (function () {
+      module("Viking.Router", {
+          setup: function setup() {
+              Viking$1.Router.prototype.cleanup = function () {
+                  this.stop();
+                  Backbone.history.handlers = [];
+              };
+          },
+          teardown: function teardown() {
+              delete Viking$1.Router.prototype.cleanup;
+          }
+      });
+
+      test("routes to a function in the router", function () {
+          expect(2);
+
+          var router = Viking$1.Router.extend({
+              routes: {
+                  '': 'func'
+              },
+              func: function func() {
+                  ok(true);
+              }
+          });
+          router = new router();
+
+          ok(Backbone.history.handlers[0].route.test(''));
+          Backbone.history.handlers[0].callback('');
+          router.cleanup();
+      });
+
+      test("routes to a function", function () {
+          expect(2);
+
+          var func = function func() {
+              ok(true);
+          };
+          var router = Viking$1.Router.extend({
+              routes: {
+                  '': func
+              }
+          });
+          router = new router();
+
+          ok(Backbone.history.handlers[0].route.test(''));
+          Backbone.history.handlers[0].callback('');
+          router.cleanup();
+      });
+
+      test("routes to a controller and action (normal obj)", function () {
+          expect(2);
+
+          window.Controller = { action: function action() {
+                  ok(true);
+              } };
+          var router = Viking$1.Router.extend({
+              routes: {
+                  '': { to: 'Controller#action', name: 'root' }
+              }
+          });
+          router = new router();
+
+          ok(Backbone.history.handlers[0].route.test(''));
+          Backbone.history.handlers[0].callback('');
+          router.cleanup();
+          delete window.Controller;
+      });
+
+      test("routes to a controller and undefined action", function () {
+          expect(1);
+
+          window.Controller = {};
+          var router = Viking$1.Router.extend({
+              routes: {
+                  '': { to: 'Controller#action', name: 'root' }
+              }
+          });
+          router = new router();
+
+          ok(Backbone.history.handlers[0].route.test(''));
+          Backbone.history.handlers[0].callback('');
+          router.cleanup();
+          delete window.Controller;
+      });
+
+      test("routes to a undefined controller and undefined action", function () {
+          expect(1);
+
+          var router = Viking$1.Router.extend({
+              routes: {
+                  '': { to: 'Controller#action', name: 'root' }
+              }
+          });
+          router = new router();
+
+          ok(Backbone.history.handlers[0].route.test(''));
+          Backbone.history.handlers[0].callback('');
+          router.cleanup();
+      });
+
+      test("routes to a uninitialized controller and action (Viking.Controller)", function () {
+          expect(2);
+
+          window.Controller = Viking$1.Controller.extend({ action: function action() {
+                  ok(true);
+              } });
+          var router = Viking$1.Router.extend({
+              routes: {
+                  '': { to: 'Controller#action', name: 'root' }
+              }
+          });
+          router = new router();
+
+          ok(Backbone.history.handlers[0].route.test(''));
+          Backbone.history.handlers[0].callback('');
+          router.cleanup();
+          delete window.Controller;
+      });
+
+      test("routes to a initialized controller and action (Viking.Controller)", function () {
+          expect(2);
+
+          window.Controller = Viking$1.Controller.extend({ action: function action() {
+                  ok(true);
+              } });
+          var router = Viking$1.Router.extend({
+              routes: {
+                  '': { to: 'Controller#action', name: 'root' }
+              }
+          });
+          router = new router();
+          router.currentController = new Controller();
+
+          ok(Backbone.history.handlers[0].route.test(''));
+          Backbone.history.handlers[0].callback('');
+          router.cleanup();
+          delete window.Controller;
+      });
+
+      test("routing to a Viking.Controller more than once in a row only initializes the controller once", function () {
+          expect(2);
+
+          window.Controller = Viking$1.Controller.extend({ initialize: function initialize() {
+                  ok(true);
+              } });
+          var router = Viking$1.Router.extend({
+              routes: {
+                  '': { to: 'Controller#action', name: 'root' }
+              }
+          });
+          router = new router();
+
+          ok(Backbone.history.handlers[0].route.test(''));
+          Backbone.history.handlers[0].callback('');
+          Backbone.history.handlers[0].callback('');
+          Backbone.history.handlers[0].callback('');
+          router.cleanup();
+          delete window.Controller;
+      });
+
+      test("routing to a Viking.Controller then to another route changes the controller", function () {
+          expect(6);
+
+          window.Controller = Viking$1.Controller.extend();
+          window.BController = Viking$1.Controller.extend();
+          window.Another = {};
+          var router = Viking$1.Router.extend({
+              routes: {
+                  '': { to: 'Controller#action', name: 'root' },
+                  'b': { to: 'BController#action', name: 'b' },
+                  'other': { to: 'Other#action', name: 'other' },
+                  'another': { to: 'Another#action', name: 'another' },
+                  'func': 'func',
+                  'closure': function closure() {}
+              },
+
+              func: function func() {}
+          });
+          router = new router();
+
+          Backbone.history.handlers[0].callback('');
+          ok(router.currentController instanceof Controller);
+
+          Backbone.history.handlers[0].callback('');
+          Backbone.history.handlers[1].callback('b');
+          ok(router.currentController instanceof BController);
+
+          Backbone.history.handlers[0].callback('');
+          Backbone.history.handlers[2].callback('other');
+          equal(undefined, router.currentController);
+
+          Backbone.history.handlers[0].callback('');
+          Backbone.history.handlers[3].callback('another');
+          equal(Another, router.currentController);
+
+          Backbone.history.handlers[0].callback('');
+          Backbone.history.handlers[4].callback('func');
+          equal(undefined, router.currentController);
+
+          Backbone.history.handlers[0].callback('');
+          Backbone.history.handlers[5].callback('closure');
+          equal(undefined, router.currentController);
+
+          router.cleanup();
+          delete window.Controller;
+          delete window.BController;
+          delete window.Another;
+      });
+
+      test("routes to a Viking.Controller and undefined action", function () {
+          expect(1);
+
+          window.Controller = Viking$1.Controller.extend();
+          var router = Viking$1.Router.extend({
+              routes: {
+                  '': { to: 'Controller#action', name: 'root' }
+              }
+          });
+          router = new router();
+
+          ok(Backbone.history.handlers[0].route.test(''));
+          Backbone.history.handlers[0].callback('');
+          router.cleanup();
+          delete window.Controller;
+      });
+
+      test("routes with a regex", function () {
+          expect(5);
+
+          var router = Viking$1.Router.extend({
+              routes: {
+                  'r/^([a-z][a-z])\/([^\/]+)\/([^\/]+)$/': 'func'
+              },
+              func: function func(state, something, another) {
+                  equal(state, 'ca');
+                  equal(something, 'something');
+                  equal(another, 'another');
+              }
+          });
+          router = new router();
+          ok(Backbone.history.handlers[0].route.test('ca/something/another'));
+          ok(!Backbone.history.handlers[0].route.test('dca/something/another'));
+          Backbone.history.handlers[0].callback.call(router, 'ca/something/another');
+          router.cleanup();
+      });
+
+      test('routes with a string', function () {
+          expect(3);
+
+          var router = Viking$1.Router.extend({
+              routes: {
+                  '': 'Controller#action'
+              }
+          });
+          router = new router();
+
+          window.Controller = { action: function action() {
+                  ok(true);
+              } };
+          ok(Backbone.history.handlers[0].route.test(''));
+          ok(!Backbone.history.handlers[0].route.test('dca/something/another'));
+          Backbone.history.handlers[0].callback.call(router, '');
+          router.cleanup();
+          delete window.Controller;
+      });
+
+      test("router.start() starts Backbone.history", function () {
+          expect(1);
+
+          var router = new Viking$1.Router();
+          var oldstart = Backbone.history.start;
+          Backbone.history.start = function () {
+              ok(true);
+          };
+          router.start();
+          Backbone.history.start = oldstart;
+      });
+
+      test("router.start() passes {pushState: true} as options to Backbone.history", function () {
+          expect(1);
+
+          var router = new Viking$1.Router();
+          var oldstart = Backbone.history.start;
+          Backbone.history.start = function (options) {
+              deepEqual({ pushState: true }, options);
+          };
+          router.start();
+          Backbone.history.start = oldstart;
+      });
+
+      test("router.start(options) passes options to Backbone.history", function () {
+          expect(1);
+
+          var router = new Viking$1.Router();
+          var oldstart = Backbone.history.start;
+          Backbone.history.start = function (options) {
+              deepEqual({ pushState: true, silent: true }, options);
+          };
+          router.start({ silent: true });
+          Backbone.history.start = oldstart;
+      });
+
+      test("router.stop() stops Backbone.history", function () {
+          expect(1);
+
+          var router = new Viking$1.Router();
+          var oldstop = Backbone.history.stop;
+          Backbone.history.stop = function () {
+              ok(true);
+          };
+          router.start();
+          router.stop();
+          Backbone.history.stop = oldstop;
+          router.cleanup();
+      });
+
+      test('router.start() calls callbacks with the name of the route', function () {
+          expect(2);
+
+          window.Controller = { action: function action() {
+                  ok(true);
+              } };
+          var r = {};
+          r[window.location.pathname.replace('/', '')] = { to: 'Controller#action', name: 'root' };
+          var Router = Viking$1.Router.extend({ routes: r });
+
+          var router = new Router();
+          router.on('route:root', function () {
+              ok(true);
+          });
+          router.start();
+
+          router.cleanup();
+          router.off('route:root');
+          delete window.Controller;
+      });
+
+      test('router.navigate() calls Backbone.Router.prototype.navigate', function () {
+          expect(2);
+
+          var oldnavigate = Backbone.Router.prototype.navigate;
+
+          var router = new Viking$1.Router();
+          Backbone.Router.prototype.navigate = function (f, a) {
+              equal(f, '/path');
+              equal(a, 'arguments');
+          };
+          router.navigate('/path', 'arguments');
+
+          Backbone.Router.prototype.navigate = oldnavigate;
+      });
+
+      test('router.navigate() strips the root_url from urls from the current domain', function () {
+          expect(2);
+
+          var oldnavigate = Backbone.Router.prototype.navigate;
+
+          var router = new Viking$1.Router();
+          Backbone.Router.prototype.navigate = function (f, a) {
+              equal(f, '/path');
+              equal(a, 'arguments');
+          };
+          router.navigate(window.location.protocol + '//' + window.location.host + '/path', 'arguments');
+
+          Backbone.Router.prototype.navigate = oldnavigate;
+      });
+  })();
+
+  (function () {
+      module("Viking.Controller");
+
+      test("::extend acts like normal Backbone.Model", function () {
+          var Controller = Viking$1.Controller.extend({ key: 'value' }, { key: 'value' });
+
+          equal(Controller.key, 'value');
+          equal(new Controller().key, 'value');
+      });
+
+      test("::extend with name", function () {
+          var Controller = Viking$1.Controller.extend('controller');
+
+          equal(Controller.controllerName, 'controller');
+          equal(new Controller().controllerName, 'controller');
+      });
+
+      test("action functions get a reference to the controller", function () {
+          var Controller = Viking$1.Controller.extend('controller', {
+              'index': function index() {
+                  return true;
+              }
+          });
+
+          var controller = new Controller();
+
+          strictEqual(controller.index.controller, Controller);
+      });
+  })();
+
+  (function () {
+
+      module("Viking.View", {
+          setup: function setup() {
+              Viking$1.View.templates = JST;
+          }
+      });
+
+      test("inherits events", function () {
+          var View = Viking$1.View.extend({
+              events: {
+                  'click': 'click'
+              }
+          });
+          var SubView = View.extend({
+              events: {
+                  'hover': 'hover'
+              }
+          });
+
+          deepEqual(SubView.prototype.events, {
+              'hover': 'hover',
+              'click': 'click'
+          });
+      });
+
+      test("overrides inherited events", function () {
+          var View = Viking$1.View.extend({
+              events: {
+                  'click': 'click',
+                  'hover': 'hover'
+              }
+          });
+          var SubView = View.extend({
+              events: {
+                  'hover': "newHover"
+              }
+          });
+
+          deepEqual(SubView.prototype.events, {
+              'click': 'click',
+              'hover': 'newHover'
+          });
+      });
+
+      test('calls the original extend', function () {
+          expect(1);
+
+          var originalFunction = Backbone.View.extend;
+
+          Backbone.View.extend = function () {
+              ok(true);
+          };
+
+          Viking$1.View.extend();
+          Backbone.View.extend = originalFunction;
+      });
+
+      test('renderTemplate with template set on view', function () {
+          var View = Viking$1.View.extend({
+              'template': 'a/template/path'
+          });
+
+          equal(new View().renderTemplate(), '<h1>Some Title</h1>');
+      });
+
+      test('renderTemplate without template set on view', function () {
+          var template = undefined;
+          var View = Viking$1.View.extend({
+              'template': template
+          });
+
+          throws(function () {
+              new View().renderTemplate();
+          }, new Error('Template does not exist: ' + template));
+      });
+
+      test("#remove() triggers a 'remove' event on the view", function () {
+          expect(1);
+
+          var view = new Viking$1.View();
+          view.on('remove', function () {
+              ok(true);
+          });
+          view.remove();
+          view.off('remmove');
+      });
+
+      test('#bindEl() with a model', function () {
+          expect(2);
+
+          var model = new Viking$1.Model();
+          var view = new Viking$1.View({ model: model });
+
+          view.$ = function (selector) {
+              equal(selector, '.name');
+              return {
+                  html: function html(_html) {
+                      equal(_html, 'Dr. DJ');
+                  }
+              };
+          };
+
+          view.bindEl('name', '.name');
+          model.set('name', 'Dr. DJ');
+      });
+
+      test('#bindEl() with a model with custom render', function () {
+          expect(2);
+
+          var model = new Viking$1.Model();
+          var view = new Viking$1.View({ model: model });
+
+          view.$ = function (selector) {
+              equal(selector, '.name');
+              return {
+                  html: function html(_html2) {
+                      equal(_html2, 'Name: Dr. DJ');
+                  }
+              };
+          };
+
+          view.bindEl('name', '.name', function (model) {
+              return 'Name: ' + model.get('name');
+          });
+          model.set('name', 'Dr. DJ');
+      });
+  })();
 
 }());

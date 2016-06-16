@@ -1,3 +1,5 @@
+import contentTag from './content_tag';
+
 // optionsForSelectTag(container[, selected])
 // =======================================
 //
@@ -63,7 +65,7 @@
 //
 // NOTE: Only the option tags are returned, you have to wrap this call in a
 // regular HTML select tag.
-Viking.View.Helpers.optionsForSelectTag = function (container, selected) {
+export const optionsForSelectTag = function (container, selected) {
     let disabled;
     let arrayWrap = function (data) {
         if (_.isArray(data)) { return data; }
@@ -104,7 +106,7 @@ Viking.View.Helpers.optionsForSelectTag = function (container, selected) {
                 options.disabled = true;
             }
             
-            return Viking.View.Helpers.contentTag('option', text, options);
+            return contentTag('option', text, options);
         }).join("\n");
     }
     
@@ -122,6 +124,8 @@ Viking.View.Helpers.optionsForSelectTag = function (container, selected) {
             options.disabled = true;
         }
         
-        return Viking.View.Helpers.contentTag('option', text, options);
+        return contentTag('option', text, options);
     }).join("\n");
 };
+
+export default optionsForSelectTag;

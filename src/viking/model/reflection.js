@@ -1,3 +1,5 @@
+import Name from './name';
+
 export const Reflection = function () { };
 
 _.extend(Reflection.prototype, {
@@ -31,9 +33,9 @@ export const BelongsTo = Reflection.extend({
     
         if (!this.options.polymorphic) {
             if (this.options.modelName) {
-                this.modelName = new Viking.Model.Name(this.options.modelName);
+                this.modelName = new Name(this.options.modelName);
             } else {
-                this.modelName = new Viking.Model.Name(name);
+                this.modelName = new Name(name);
             }
         }
     }
@@ -50,9 +52,9 @@ export const HasMany = Reflection.extend({
         this.options = _.extend({}, options);
 
         if (this.options.modelName) {
-            this.modelName = new Viking.Model.Name(this.options.modelName);
+            this.modelName = new Name(this.options.modelName);
         } else {
-            this.modelName = new Viking.Model.Name(this.name.singularize());
+            this.modelName = new Name(this.name.singularize());
         }
 
         if (this.options.collectionName) {
@@ -75,9 +77,9 @@ export const HasOne = Reflection.extend({
 
         if (!this.options.polymorphic) {
             if (this.options.modelName) {
-                this.modelName = new Viking.Model.Name(this.options.modelName);
+                this.modelName = new Name(this.options.modelName);
             } else {
-                this.modelName = new Viking.Model.Name(name);
+                this.modelName = new Name(name);
             }
         }
     }
@@ -94,9 +96,9 @@ export const HasAndBelongsToMany = Reflection.extend({
         this.options = _.extend({}, options);
     
         if (this.options.modelName) {
-            this.modelName = new Viking.Model.Name(this.options.modelName);
+            this.modelName = new Name(this.options.modelName);
         } else {
-            this.modelName = new Viking.Model.Name(this.name.singularize());
+            this.modelName = new Name(this.name.singularize());
         }
 
         if (this.options.collectionName) {

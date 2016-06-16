@@ -1,11 +1,13 @@
-(function () {
+import Viking from '../../src/viking';
+
+(function() {
     module("Viking.Collection");
 
     // Url -----------------------------------------------------------------------
     test("url based on model.modelName", function() {
         var m = Viking.Model.extend('model');
         var mc = Viking.Collection.extend({
-           model: m
+            model: m
         });
     
         var c = new mc();
@@ -16,7 +18,7 @@
     test("url based on model.modelName", function() {
         var m = Viking.Model.extend('model');
         var mc = Viking.Collection.extend({
-           model: m
+            model: m
         });
     
         var c = new mc();
@@ -28,7 +30,7 @@
     test("paramRoot based on model.modelName", function() {
         var m = Viking.Model.extend('model');
         var mc = Viking.Collection.extend({
-           model: m
+            model: m
         });
     
         var c = new mc();
@@ -90,7 +92,7 @@
         expect(0);
     
         var c = new Viking.Collection([{}]);
-		c.models[0].selected = true;
+        c.models[0].selected = true;
         c.on('selected', function() { ok(true); });
         c.select(c.models[0]);
         c.off('selected');
@@ -101,7 +103,7 @@
     
         var c = new Viking.Collection([{}]);
         var model = c.models[0];
-		model.selected = true;
+        model.selected = true;
         c.on('unselected', function() { ok(!model.selected); });
         model.unselect();
         c.off('unselected');
@@ -138,9 +140,9 @@
     // clearSelected() ------------------------------------------------------------
     test("clearSelected() set 'selected' to false on all models", function() {
         var c = new Viking.Collection([{}, {}, {}]);
-		c.models[0].selected = true;
-		c.models[1].selected = true;
-		c.models[2].selected = true;
+        c.models[0].selected = true;
+        c.models[1].selected = true;
+        c.models[2].selected = true;
 		
         equal(3, c.selected().length);
         c.clearSelected()
@@ -149,9 +151,9 @@
 
     test("clearSelected(except) set 'selected' to false on all models", function() {
         var c = new Viking.Collection([{}, {}, {}]);
-		c.models[0].selected = true;
-		c.models[1].selected = true;
-		c.models[2].selected = true;
+        c.models[0].selected = true;
+        c.models[1].selected = true;
+        c.models[2].selected = true;
 		
         var model = c.models[1];
         equal(3, c.selected().length);
@@ -159,22 +161,22 @@
         equal(1, c.selected().length);
     });
 	
-	test("clearSelected() triggers 'unselected' event on all models", function() {
-		expect(2);
+    test("clearSelected() triggers 'unselected' event on all models", function() {
+        expect(2);
 		
         var c = new Viking.Collection([{}, {}, {}]);
-		c.models[0].selected = false;
-		c.models[1].selected = true;
-		c.models[2].selected = true;
-		c.models[0].on('unselected', function() { ok(true); });
-		c.models[1].on('unselected', function() { ok(true); });
-		c.models[2].on('unselected', function() { ok(true); });
+        c.models[0].selected = false;
+        c.models[1].selected = true;
+        c.models[2].selected = true;
+        c.models[0].on('unselected', function() { ok(true); });
+        c.models[1].on('unselected', function() { ok(true); });
+        c.models[2].on('unselected', function() { ok(true); });
 
         c.clearSelected();
 		
-		c.models[0].off('unselected');
-		c.models[1].off('unselected');
-		c.models[2].off('unselected');
+        c.models[0].off('unselected');
+        c.models[1].off('unselected');
+        c.models[2].off('unselected');
     });
 
     test("decrementPage options get passed to callbacks", function() {
@@ -208,5 +210,4 @@
         f.off('change');
         f.off('change:query');
     });
-
 }());

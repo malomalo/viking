@@ -1,3 +1,5 @@
+import Viking from '../../../../src/viking';
+
 (function () {
     module("Viking.Model::findOrCreateBy", {
         setup: function() {
@@ -15,10 +17,10 @@
     test("::findOrCreateBy(attributes) find a model that exits", function () {
         expect(1);
         
-        Ship = Viking.Model.extend('ship');
+        let Ship = Viking.Model.extend('ship');
         var relient = new Ship({name: 'Relient'});
         
-        ShipCollection = Viking.Collection.extend({
+        window.ShipCollection = Viking.Collection.extend({
             fetch: function (options) {
                 options.success(new ShipCollection([relient]));
             }
@@ -30,16 +32,15 @@
             }
         });
         
-        delete Ship;
-        delete ShipCollection;
+        delete window.ShipCollection;
     });
     
     test("::findOrCreateBy(attributes) without a success callback finds a model that exits", function () {
         expect(0);
         
-        Ship = Viking.Model.extend('ship');
+        let Ship = Viking.Model.extend('ship');
         
-        ShipCollection = Viking.Collection.extend({
+        window.ShipCollection = Viking.Collection.extend({
             fetch: function (options) {
                 options.success(new ShipCollection([{name: 'Relient'}]));
             }
@@ -47,15 +48,14 @@
         
         Ship.findOrCreateBy({name: 'Relient'});
         
-        delete Ship;
-        delete ShipCollection;
+        delete window.ShipCollection;
     });
     
     test("::findOrCreateBy(attributes) calls create when the model doesn't exist", function () {
         expect(2);
         
-        Ship = Viking.Model.extend('ship');
-        ShipCollection = Viking.Collection.extend({
+        let Ship = Viking.Model.extend('ship');
+        window.ShipCollection = Viking.Collection.extend({
             fetch: function (options) {
                 options.success(new ShipCollection([]));
             }
@@ -68,8 +68,7 @@
         
         Ship.findOrCreateBy({name: 'Relient'}, {option: 1});
         
-        delete Ship;
-        delete ShipCollection;
+        delete window.ShipCollection;
     });
 
 }());

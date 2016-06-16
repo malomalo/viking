@@ -1,4 +1,6 @@
-(function () {
+import Viking from '../../../../src/viking';
+
+(function() {
     module("Viking.Model.Type.Date");
 
     test("::load thows error when can't coerce value", function() {

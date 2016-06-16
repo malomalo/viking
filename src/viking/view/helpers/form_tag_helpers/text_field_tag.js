@@ -1,3 +1,6 @@
+import tag from './tag';
+import { sanitizeToId } from './../utils';
+
 // textFieldTag(name, [value], [options])
 // ======================================
 //
@@ -42,7 +45,7 @@
 //   
 //   textFieldTag('ip', '0.0.0.0', {maxlength: 15, size: 20, class: "ip-input"})
 //   // => <input class="ip-input" maxlength="15" name="ip" size="20" value="0.0.0.0" type="text" />
-Viking.View.Helpers.textFieldTag = function (name, value, options, escape) {
+export const textFieldTag = function (name, value, options, escape) {
 
     // Handle both `name, value` && `name, options` style arguments
     if (value !== null && typeof value === 'object' && !(value instanceof Backbone.Model)) {
@@ -50,11 +53,13 @@ Viking.View.Helpers.textFieldTag = function (name, value, options, escape) {
         value = undefined;
     }
 
-    return Viking.View.Helpers.tag('input', _.extend({
+    return tag('input', _.extend({
         "type": 'text',
-        "id": Viking.View.sanitizeToId(name),
+        "id": sanitizeToId(name),
         "name": name,
         "value": value
     }, options), escape);
     
 };
+
+export default textFieldTag;

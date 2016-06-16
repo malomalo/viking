@@ -1,3 +1,5 @@
+import contentTag from './content_tag';
+
 // timeTag(date, [options], [value])
 // =================================
 //
@@ -25,7 +27,7 @@
 //     return '<span>Right now</span>';
 //   });
 //   // => <time datetime="2010-11-04T17:55:45+01:00"><span>Right now</span></time>
-Viking.View.Helpers.timeTag = function (date, content, options) {
+export const timeTag = function (date, content, options) {
     let tmp;
 
     // handle both (date, opts, func || str) and (date, func || str, opts)
@@ -43,5 +45,7 @@ Viking.View.Helpers.timeTag = function (date, content, options) {
     if (!options.datetime) { options.datetime = date.toISOString(); }
     
 
-    return Viking.View.Helpers.contentTag('time', content, options);
+    return contentTag('time', content, options);
 };
+
+export default timeTag;

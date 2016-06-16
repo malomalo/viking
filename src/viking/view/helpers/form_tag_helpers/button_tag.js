@@ -1,3 +1,5 @@
+import contentTag from './content_tag';
+
 // buttonTag(content, options), buttonTag(options, block)
 // ========================================================
 //
@@ -24,7 +26,7 @@
 //      return "Ask me!";
 //   });
 //   // <button name="button" type="button"><strong>Ask me!</strong></button>
-Viking.View.Helpers.buttonTag = function (content, options) {
+export const buttonTag = function (content, options) {
     let tmp;
 
     // Handle `content, options` && `options` style arguments
@@ -37,5 +39,7 @@ Viking.View.Helpers.buttonTag = function (content, options) {
     }
 
     _.defaults(options, {name: 'button', type: 'submit'});
-    return Viking.View.Helpers.contentTag('button', content, options);
+    return contentTag('button', content, options);
 };
+
+export default buttonTag;

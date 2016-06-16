@@ -1,4 +1,6 @@
-(function () {
+import Viking from '../../../../src/viking';
+
+(function() {
     module("Viking.Model.Type.Number");
 
     test("::load coerces number to number", function() {

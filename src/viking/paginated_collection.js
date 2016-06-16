@@ -1,7 +1,11 @@
-Viking.PaginatedCollection = Viking.Collection.extend({
+import Cursor from './cursor';
+import Collection from './collection';
+
+export const PaginatedCollection = Collection.extend({
+
     constructor: function(models, options) {
-        Viking.Collection.apply(this, arguments);
-        this.cursor = ((options && options.cursor) || new Viking.Cursor());
+        Collection.apply(this, arguments);
+        this.cursor = ((options && options.cursor) || new Cursor());
         this.listenTo(this.cursor, 'change', function() {
             if(this.cursor.requiresRefresh()) {
                 this.cursorChanged.apply(this, arguments);
@@ -34,7 +38,9 @@ Viking.PaginatedCollection = Viking.Collection.extend({
             options.headers || (options.headers = {});
             options.headers['Total-Count'] = 'true';
         }
-        return Viking.Collection.prototype.sync.call(this, method, model, options);
+        return Collection.prototype.sync.call(this, method, model, options);
     }
     
 });
+
+export default PaginatedCollection;

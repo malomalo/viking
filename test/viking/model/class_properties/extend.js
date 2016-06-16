@@ -1,3 +1,5 @@
+import Viking from '../../../../src/viking';
+
 (function () {
     module("Viking.model::extend");
 
@@ -43,29 +45,29 @@
     });
     
     test("::extend adds hasMany relationships to associations", function() {
-        Ship = Viking.Model.extend({ hasMany: ['ships'] });
+        window.Ship = Viking.Model.extend({ hasMany: ['ships'] });
         
         equal(Ship.associations['ships'].name, 'ships');
         equal(Ship.associations['ships'].macro, 'hasMany');
         deepEqual(Ship.associations['ships'].options, {});
         equal(Ship.associations['ships'].collectionName, 'ShipCollection');
         
-        delete Ship;
+        delete window.Ship;
     });
     
     test("::extend adds hasMany relationships with options to associations", function() {
-        Ship = Viking.Model.extend({ hasMany: [['ships', {collectionName: 'MyCollection'}]] });
+        window.Ship = Viking.Model.extend({ hasMany: [['ships', {collectionName: 'MyCollection'}]] });
         
         equal(Ship.associations['ships'].name, 'ships');
         equal(Ship.associations['ships'].macro, 'hasMany');
         deepEqual(Ship.associations['ships'].options, {collectionName: 'MyCollection'});
         equal(Ship.associations['ships'].collectionName, 'MyCollection');
         
-        delete Ship;
+        delete window.Ship;
     });
     
     test("::extend adds belongsTo relationships to associations", function() {
-        Ship = Viking.Model.extend({ belongsTo: ['ship'] });
+        window.Ship = Viking.Model.extend({ belongsTo: ['ship'] });
         
         equal(Ship.associations['ship'].name, 'ship');
         equal(Ship.associations['ship'].macro, 'belongsTo');
@@ -82,59 +84,59 @@
             collectionName: 'ShipCollection'
         });
         
-        delete Ship;
+        delete window.Ship;
     });
     
     test("::extend adds belongsTo relationships with options to associations", function() {
-        Ship = Viking.Model.extend({ belongsTo: [['ship', {modelName: 'Carrier'}]] });
+        window.Ship = Viking.Model.extend({ belongsTo: [['ship', {modelName: 'Carrier'}]] });
         
         equal(Ship.associations['ship'].name, 'ship');
         equal(Ship.associations['ship'].macro, 'belongsTo');
         deepEqual(Ship.associations['ship'].options, {modelName: 'Carrier'});
         propEqual(Ship.associations['ship'].modelName, new Viking.Model.Name('carrier'));
         
-        delete Ship;
+        delete window.Ship;
     });
     
     // STI
     // ========================================================================
     
     test("::extend a Viking.Model unions the hasMany relationships", function () {
-        Key = Viking.Model.extend('key');
-        Comment = Viking.Model.extend('comment');
-        Account = Viking.Model.extend('account', { hasMany: ['comments'] });
-        Agent   = Account.extend('agent', { hasMany: ['keys'] });
+        window.Key = Viking.Model.extend('key');
+        window.Comment = Viking.Model.extend('comment');
+        window.Account = Viking.Model.extend('account', { hasMany: ['comments'] });
+        window.Agent   = Account.extend('agent', { hasMany: ['keys'] });
         
         deepEqual(['comments'], _.map(Account.associations, function(a) { return a.name; }));
         deepEqual(['comments', 'keys'], _.map(Agent.associations, function(a) { return a.name; }).sort());
         
-        delete Key;
-        delete Comment;
-        delete Account;
-        delete Agent;
+        delete window.Key;
+        delete window.Comment;
+        delete window.Account;
+        delete window.Agent;
     });
     
     test("::extend a Viking.Model unions the belongsTo relationships", function () {
-        State = Viking.Model.extend('state');
-        Region = Viking.Model.extend('region');
-        Account = Viking.Model.extend('account', { belongsTo: ['state'] });
-        Agent   = Account.extend('agent', { belongsTo: ['region'] });
+        window.State = Viking.Model.extend('state');
+        window.Region = Viking.Model.extend('region');
+        window.Account = Viking.Model.extend('account', { belongsTo: ['state'] });
+        window.Agent   = Account.extend('agent', { belongsTo: ['region'] });
         
         deepEqual(['state'], _.map(Account.associations, function(a) { return a.name; }));
         deepEqual(['region', 'state'], _.map(Agent.associations, function(a) { return a.name; }).sort());
         
-        delete State;
-        delete Region;
-        delete Account;
-        delete Agent;
+        delete window.State;
+        delete window.Region;
+        delete window.Account;
+        delete window.Agent;
     });
     
     test("::extend a Viking.Model unions the schema", function () {
-        Account = Viking.Model.extend('account', { schema: {
+        window.Account = Viking.Model.extend('account', { schema: {
             created_at: {type: 'date'}
         }});
         
-        Agent   = Account.extend('agent', { schema: {
+        window.Agent   = Account.extend('agent', { schema: {
             name: {type: 'string'}
         }});
         
@@ -146,19 +148,19 @@
             name: {type: 'string'}
         });
         
-        delete Account;
-        delete Agent;
+        delete window.Account;
+        delete window.Agent;
     });
     
     test("::extend a Viking.Model adds itself to the descendants", function () {
-        Account = Viking.Model.extend('account');
-        Agent   = Account.extend('agent');
+        window.Account = Viking.Model.extend('account');
+        window.Agent   = Account.extend('agent');
 
         deepEqual(Account.descendants, [Agent]);
         deepEqual(Agent.descendants, []);
         
-        delete Account;
-        delete Agent;
+        delete window.Account;
+        delete window.Agent;
     });
     
 }());

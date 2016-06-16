@@ -5,12 +5,26 @@
 // http://vikingjs.com
 
 import './viking/support';
+import sync from './viking/sync';
+import View from './viking/view';
 import Model from './viking/model';
+import Cursor from './viking/cursor';
+import Router from './viking/router';
+import Predicate from './viking/predicate';
+import Controller from './viking/controller';
 import Collection from './viking/collection';
+import PaginatedCollection from './viking/paginated_collection';
 
 export const Viking = {
+    sync: sync,
     Model: Model,
-    Collection: Collection
+    Cursor: Cursor,
+    Collection: Collection,
+    Predicate: Predicate,
+    PaginatedCollection: PaginatedCollection,
+    Controller: Controller,
+    Router: Router,
+    View: View
 };
 
 export default Viking;
