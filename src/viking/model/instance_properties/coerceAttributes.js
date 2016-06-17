@@ -1,3 +1,7 @@
+import { global } from '../../global';
+import Model from '../../model';
+import Type from '../type';
+
 export const coerceAttributes = function(attrs) {
     
     _.each(this.associations, function(association) {
@@ -6,12 +10,12 @@ export const coerceAttributes = function(attrs) {
         
         if (!attrs[association.name]) { return; }
         
-        if (polymorphic && (attrs[association.name] instanceof Viking.Model)) {
+        if (polymorphic && (attrs[association.name] instanceof Model)) {
             // TODO: remove setting the id?
             attrs[association.name + '_id'] = attrs[association.name].id;
             attrs[association.name + '_type'] = attrs[association.name].modelName.name;
         } else if (polymorphic && attrs[association.name + '_type']) {
-            Type = attrs[association.name + '_type'].camelize().constantize();
+            Type = attrs[association.name + '_type'].camelize().constantize(global);
             attrs[association.name] = new Type(attrs[association.name]);
         } else if (!(attrs[association.name] instanceof association.klass())) {
             Type = association.klass();
@@ -23,8 +27,7 @@ export const coerceAttributes = function(attrs) {
         if (attrs[key] || attrs[key] === false) {
             let tmp, klass;
             
-            klass = Viking.Model.Type.registry[options['type']];
-            
+            klass = Type.registry[options['type']];
             if (klass) {
                 if (options['array']) {
                     tmp = [];

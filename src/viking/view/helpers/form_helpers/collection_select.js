@@ -15,11 +15,11 @@
 //
 // Example object structure for use with this method:
 //
-//   Post = Viking.Model.extend({
+//   Post = Viking.Model.extend('post', {
 //       belongsTo: ['author']
 //   });
 //   
-//   Author = Viking.Model.extend({
+//   Author = Viking.Model.extend('author', {
 //       hasMany: ['posts'],
 //       
 //       nameWithInitial: function() {

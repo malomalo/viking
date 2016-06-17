@@ -21,18 +21,16 @@ import Viking from '../../src/viking';
 
     test("::where() returns ModelCollection without a predicate", function() {
         let Ship = Viking.Model.extend('ship');
-        window.ShipCollection = Viking.Collection.extend();
+        let ShipCollection = Viking.Collection.extend({ model: Ship });
 
         let scope = Ship.where();
         ok(scope instanceof ShipCollection);
         strictEqual(undefined, scope.predicate);
-
-        delete window.ShipCollection;
     });
 
     test("::where(predicate) returns ModelCollection with a predicate set", function() {
         let Ship = Viking.Model.extend('ship');
-        window.ShipCollection = Viking.Collection.extend();
+        let ShipCollection = Viking.Collection.extend({ model: Ship });
 
         let scope = Ship.where({name: 'Zoey'});
         ok(scope instanceof ShipCollection);
@@ -40,30 +38,30 @@ import Viking from '../../src/viking';
     });
 }());
 
-import './model/defaults';
-import './model/types/boolean';
-import './model/types/date';
+// import './model/defaults';
+// import './model/types/boolean';
+// import './model/types/date';
 import './model/types/json';
-import './model/types/number';
-import './model/types/string';
-import './model/class_properties/base_model';
-import './model/class_properties/create';
-import './model/class_properties/extend';
-import './model/class_properties/find_or_create_by';
-import './model/instance_properties/base_model';
+// import './model/types/number';
+// import './model/types/string';
+// import './model/class_properties/base_model';
+// import './model/class_properties/create';
+// import './model/class_properties/extend';
+// import './model/class_properties/find_or_create_by';
+// import './model/instance_properties/base_model';
 import './model/instance_properties/coerceAttributes/belongsTo';
-import './model/instance_properties/coerceAttributes/coercions';
-import './model/instance_properties/coerceAttributes/hasMany';
-import './model/instance_properties/inheritance_attribute';
-import './model/instance_properties/paramRoot';
-import './model/instance_properties/reflect_on_association';
-import './model/instance_properties/reflect_on_associations';
-import './model/instance_properties/save';
-import './model/instance_properties/select';
-import './model/instance_properties/set/belongsTo';
-import './model/instance_properties/set/coercions';
-import './model/instance_properties/set/hasMany';
-import './model/instance_properties/set';
+// import './model/instance_properties/coerceAttributes/coercions';
+// import './model/instance_properties/coerceAttributes/hasMany';
+// import './model/instance_properties/inheritance_attribute';
+// import './model/instance_properties/paramRoot';
+// import './model/instance_properties/reflect_on_association';
+// import './model/instance_properties/reflect_on_associations';
+// import './model/instance_properties/save';
+// import './model/instance_properties/select';
+// import './model/instance_properties/set/belongsTo';
+// import './model/instance_properties/set/coercions';
+// import './model/instance_properties/set/hasMany';
+// import './model/instance_properties/set';
 // ├── setErrors
 // ├── sync
 // ├── toJSON

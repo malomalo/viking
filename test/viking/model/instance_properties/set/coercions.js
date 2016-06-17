@@ -4,7 +4,7 @@ import Viking from './../../../../../src/viking';
     module("Viking.Model#set - coercions");
 
     test("#set(key, val) does coercions", function() {
-        let Model = Viking.Model.extend({ schema: {
+        let Model = Viking.Model.extend('model', { schema: {
             date: {type: 'date'}
         }});
     
@@ -14,7 +14,7 @@ import Viking from './../../../../../src/viking';
     });
 
     test("#set({key, val}) does coercions", function() {
-        let Model = Viking.Model.extend({ schema: {
+        let Model = Viking.Model.extend('model', { schema: {
             date: {type: 'date'}
         }});
     

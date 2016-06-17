@@ -1,7 +1,9 @@
 (function () {
     module("Viking.Model#toJSON", {
+        // let Ship, ShipCollection;
+
         setup: function () {
-            Ship = Viking.Model.extend({
+            Ship = Viking.Model.extend('ship', {
                 hasMany: ['ships'],
                 belongsTo: ['ship'],
                 schema: {
@@ -35,7 +37,7 @@
     });
     
     test("#toJSON supports arrays", function() {
-        Ship = Viking.Model.extend({
+        Ship = Viking.Model.extend('ship', {
             coercions: {date: ['Date', {array: true}]}
         });
         

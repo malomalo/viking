@@ -5,7 +5,7 @@ import Viking from './../../../../../src/viking';
 
     // setting attributes on a model coerces relations
     test("#set(key, val) coerces belongsTo relations", function() {
-        let Ship = Viking.Model.extend({ belongsTo: ['ship'] });
+        let Ship = Viking.Model.extend('ship', { belongsTo: ['ship'] });
         
         var a = new Ship();
         a.set('ship', {});
@@ -13,7 +13,7 @@ import Viking from './../../../../../src/viking';
     });
 
     test("#set({key, val}) coerces belongsTo relations", function() {
-        let Ship = Viking.Model.extend({ belongsTo: ['ship'] });
+        let Ship = Viking.Model.extend('ship', { belongsTo: ['ship'] });
     
         var a = new Ship();
         a.set({ship: {}});
@@ -21,7 +21,7 @@ import Viking from './../../../../../src/viking';
     });
 
     test("#set(key, val) sets relation id", function() {
-        let Ship = Viking.Model.extend({ belongsTo: ['ship'] });
+        let Ship = Viking.Model.extend('ship', { belongsTo: ['ship'] });
         var a = new Ship();
         
         a.set('ship', {id: 12});
@@ -32,7 +32,7 @@ import Viking from './../../../../../src/viking';
     });
 
     test("#set({key, val}) sets relation id", function() {
-        let Ship = Viking.Model.extend({ belongsTo: ['ship'] });
+        let Ship = Viking.Model.extend('ship', { belongsTo: ['ship'] });
         var a = new Ship();
         
         a.set({ship: {id: 12}})
@@ -43,7 +43,7 @@ import Viking from './../../../../../src/viking';
     });
     
     test("#unset(key) unsets relation id", function() {
-        let Ship = Viking.Model.extend({ belongsTo: ['ship'] });
+        let Ship = Viking.Model.extend('ship', { belongsTo: ['ship'] });
         var a = new Ship();
         
         a.set('ship', {id: 12});
@@ -56,7 +56,7 @@ import Viking from './../../../../../src/viking';
     test("::set(key, val) sets polymorphic belongsTo relation & sets appropriate keys", function () {
         let Account = Viking.Model.extend('account');
         let Ship = Viking.Model.extend('ship');
-        let Photo = Viking.Model.extend({ belongsTo: [['subject', {polymorphic: true}]] });
+        let Photo = Viking.Model.extend('photo', { belongsTo: [['subject', {polymorphic: true}]] });
 
         var a = new Photo();
         var ship = new Ship({id: 10});
@@ -74,7 +74,7 @@ import Viking from './../../../../../src/viking';
     
     test("::set({key: {}, key_type: KLASS}) coerces polymorphic belongsTo relations useing type declared in model", function () {
         let Ship = Viking.Model.extend('ship');
-        let Photo = Viking.Model.extend({ belongsTo: [['subject', {polymorphic: true}]] });
+        let Photo = Viking.Model.extend('photo', { belongsTo: [['subject', {polymorphic: true}]] });
 
         var a = new Photo();
         a.set({subject: {id: 10}, subject_type: 'ship'});

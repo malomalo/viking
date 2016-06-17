@@ -3,7 +3,7 @@
 
     // setting attributes on a model coerces relations
     test("#set(key) unsets a hasMany relationship", function() {
-        Ship = Viking.Model.extend({ hasMany: ['ships'] });
+        Ship = Viking.Model.extend('ship', { hasMany: ['ships'] });
         ShipCollection = Viking.Collection.extend({ model: Ship });
 
         var a = new Ship();

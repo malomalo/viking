@@ -20,7 +20,8 @@ import Viking from '../../../../src/viking';
         let Ship = Viking.Model.extend('ship');
         var relient = new Ship({name: 'Relient'});
         
-        window.ShipCollection = Viking.Collection.extend({
+        let ShipCollection = Viking.Collection.extend({
+            model: Ship,
             fetch: function (options) {
                 options.success(new ShipCollection([relient]));
             }
@@ -31,31 +32,28 @@ import Viking from '../../../../src/viking';
                 strictEqual(model, relient);
             }
         });
-        
-        delete window.ShipCollection;
     });
     
     test("::findOrCreateBy(attributes) without a success callback finds a model that exits", function () {
         expect(0);
         
         let Ship = Viking.Model.extend('ship');
-        
-        window.ShipCollection = Viking.Collection.extend({
+        let ShipCollection = Viking.Collection.extend({
+            model: Ship,
             fetch: function (options) {
                 options.success(new ShipCollection([{name: 'Relient'}]));
             }
         });
         
         Ship.findOrCreateBy({name: 'Relient'});
-        
-        delete window.ShipCollection;
     });
     
     test("::findOrCreateBy(attributes) calls create when the model doesn't exist", function () {
         expect(2);
         
         let Ship = Viking.Model.extend('ship');
-        window.ShipCollection = Viking.Collection.extend({
+        let ShipCollection = Viking.Collection.extend({
+            model: Ship,
             fetch: function (options) {
                 options.success(new ShipCollection([]));
             }
@@ -67,8 +65,6 @@ import Viking from '../../../../src/viking';
         };
         
         Ship.findOrCreateBy({name: 'Relient'}, {option: 1});
-        
-        delete window.ShipCollection;
     });
 
 }());

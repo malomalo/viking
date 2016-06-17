@@ -1,5 +1,7 @@
 import sync from './sync';
+// import Name from './name';
 import Model from './model';
+import { global } from './global';
 import Predicate from './predicate';
 
 // Viking.Collection
@@ -211,12 +213,11 @@ export const Collection = Backbone.Collection.extend({
     extend: function(protoProps, staticProps) {
         let child = Backbone.Collection.extend.call(this, protoProps, staticProps);
 
-        // TODO: Track this in the viking global
         // Track the collection in the Viking global namespace.
         // Used in the constinize method
-        // if (collection.model.modelName) {
-        //     global[collection.model.modelName.singular] = collection;
-        // }
+        if (child.prototype.model && child.prototype.model.modelName) {
+            global[child.prototype.model.modelName.collectionName] = child;
+        }
 
         return child;
     }

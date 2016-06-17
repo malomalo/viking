@@ -112,6 +112,7 @@
 					for (i = 0, len = current_test_assertions.length; i < len; i++) {
 						console.log('    ' + current_test_assertions[i]);
 					}
+					console.log('');
 				}
 
 				current_test_assertions.length = 0;

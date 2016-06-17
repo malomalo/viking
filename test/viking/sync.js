@@ -83,7 +83,7 @@ import Viking from '../../src/viking';
     });
 
     test("ajax uses connection config info inherited from abstract model", function() {
-        let MyModel = Viking.Model.extend({
+        let MyModel = Viking.Model.extend('myModel', {
             abstract: true,
 
             connection: {

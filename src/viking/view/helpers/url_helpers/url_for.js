@@ -1,3 +1,5 @@
+import global from '../global';
+
 // urlFor(modelOrUrl, options)
 // ===========================
 //
@@ -96,14 +98,14 @@ urlFor = function (modelOrUrl, options) {
     let klass = modelOrUrl.baseModel.modelName.model();
     if (modelOrUrl instanceof klass) {
         if (modelOrUrl.isNew()) {
-            route = (klass.baseModel.modelName.plural + 'Path').constantize();
+            route = (klass.baseModel.modelName.plural + 'Path').constantize(global);
             route = route();
         } else {
-            route = (klass.baseModel.modelName.singular + 'Path').constantize();
+            route = (klass.baseModel.modelName.singular + 'Path').constantize(global);
             route = route(modelOrUrl);
         }
     } else {
-        route = (modelOrUrl.baseModel.modelName.plural + 'Path').constantize();
+        route = (modelOrUrl.baseModel.modelName.plural + 'Path').constantize(global);
         route = route();
     }
     

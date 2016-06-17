@@ -1,4 +1,5 @@
 import Name from './name';
+import global from '../global';
 
 export const Reflection = function () { };
 
@@ -17,7 +18,7 @@ _.extend(Reflection.prototype, {
     },
     
     collection: function() {
-        return this.collectionName.constantize();
+        return this.collectionName.constantize(global);
     }
 
 });

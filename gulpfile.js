@@ -31,7 +31,10 @@ gulp.task('build', ['clean'], function() {
             })
         ],
         sourceMap: true,
-        moduleName: 'Viking'
+        moduleName: 'Viking',
+        // globals: {
+        //     global: 'window'
+        // }
     })
     .pipe(source('viking.js', './src'))
     .pipe(buffer())
@@ -52,7 +55,7 @@ gulp.task('test', function () {
         sourceMap: false,
         moduleName: 'Viking.Tests',
         // globals: {
-        //     window: 'this'
+        //     global: 'window'
         // }
     })
     .pipe(source('test/test.js'))

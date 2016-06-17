@@ -1,1 +1,2 @@
 exclude = '{$exclude,test/coverage,.tm_properties}'
+excludeInFolderSearch = '{$excludeInFolderSearch,viking.js,test/test.js}'

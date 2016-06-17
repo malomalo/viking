@@ -15,7 +15,7 @@ import Viking from '../../../../src/viking';
     });
 
     test("::load coerces {} to Viking.Model with baseModel set to the JSON object", function() {
-        attribute = Viking.Model.Type.JSON.load({}, 'key');
+        let attribute = Viking.Model.Type.JSON.load({}, 'key');
     
         strictEqual(attribute.baseModel, attribute);
     });
@@ -47,7 +47,7 @@ import Viking from '../../../../src/viking';
     });
 
     test("::dump calls toJSON() with object", function() {
-        var model = {foo: 'bar'};
+        let model = {foo: 'bar'};
 
         deepEqual(Viking.Model.Type.JSON.dump(model), { foo: 'bar' });
     });

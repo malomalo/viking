@@ -16,7 +16,7 @@
     });
     
     test("::inheritanceAttribute override", function() {
-        var Ship = Viking.Model.extend({
+        let Ship = Viking.Model.extend('ship', {
             inheritanceAttribute: 'class_name'
         });
         var ship = new Ship();

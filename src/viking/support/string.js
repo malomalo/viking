@@ -1,4 +1,3 @@
-import { global } from '../global';
 import { NameError } from '../errors';
 
 // Converts the first character to uppercase
@@ -136,8 +135,6 @@ String.prototype.singularize = function() {
 String.prototype.constantize = function(context) {
 
     if (!context) {
-        // TODO: looking in viking global
-        // context = global;
         context = window;
     }
 

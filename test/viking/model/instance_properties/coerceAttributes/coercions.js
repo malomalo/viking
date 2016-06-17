@@ -5,7 +5,7 @@ import Viking from './../../../../../src/viking';
 
     // coerceAttributes modifies the object passed in ----------------------------
     test("#coerceAttributes modifies the object passed in", function() {
-        let Model = Viking.Model.extend({ schema: {
+        let Model = Viking.Model.extend('model', { schema: {
             date: { type: 'date'}
         }});
         var a = new Model();
@@ -20,7 +20,7 @@ import Viking from './../../../../../src/viking';
     test("#coerceAttributes thows error when can't coerce value", function() {
         expect(2);
 
-        let Model = Viking.Model.extend({ schema: {
+        let Model = Viking.Model.extend('model', { schema: {
             date: {type: 'Unkown'}
         }});
         var a = new Model();
@@ -36,7 +36,7 @@ import Viking from './../../../../../src/viking';
 
     // coercing dates ---------------------------------------------------------
     test("#coerceAttributes coerces iso8601 string to date", function() {
-        let Model = Viking.Model.extend({ schema: {
+        let Model = Viking.Model.extend('model', { schema: {
             date: {type: 'date'}
         }});
         var a = new Model();
@@ -49,7 +49,7 @@ import Viking from './../../../../../src/viking';
     });
 
     test("#coerceAttributes coerces int(milliseconds since epoch) to date", function() {
-        let Model = Viking.Model.extend({ schema: {
+        let Model = Viking.Model.extend('model', { schema: {
             date: {type: 'date'}
         }});
         var a = new Model();
@@ -63,7 +63,7 @@ import Viking from './../../../../../src/viking';
     
     // coercing strings -------------------------------------------------------
     test("#coerceAttributes coerces boolean to string", function() {
-        let Model = Viking.Model.extend({ schema: {
+        let Model = Viking.Model.extend('model', { schema: {
             key: {type: 'string'}
         }});
         var a = new Model();
@@ -73,7 +73,7 @@ import Viking from './../../../../../src/viking';
     });
     
     test("#coerceAttributes coerces number to string", function() {
-        let Model = Viking.Model.extend({ schema: {
+        let Model = Viking.Model.extend('model', { schema: {
             key: {type: 'string'}
         }});
         var a = new Model();
@@ -83,7 +83,7 @@ import Viking from './../../../../../src/viking';
     });
     
     test("#coerceAttributes coerces null to string", function() {
-        let Model = Viking.Model.extend({ schema: {
+        let Model = Viking.Model.extend('model', { schema: {
             key: {type: 'string'}
         }});
         var a = new Model();
@@ -93,7 +93,7 @@ import Viking from './../../../../../src/viking';
     
     // coercing numbers -------------------------------------------------------
     test("#coerceAttributes coerces string to number", function() {
-        let Model = Viking.Model.extend({ schema: {
+        let Model = Viking.Model.extend('model', { schema: {
             key: {type: 'number'}
         }});
         var a = new Model();
@@ -104,7 +104,7 @@ import Viking from './../../../../../src/viking';
 
     // coercing JSON ----------------------------------------------------------
     test("#coerceAttributes coerces {} to Viking.Model", function() {
-        let Model = Viking.Model.extend({ schema: {
+        let Model = Viking.Model.extend('model', { schema: {
             key: {type: 'json'}
         }});
         var a = new Model();
@@ -115,7 +115,7 @@ import Viking from './../../../../../src/viking';
     });
 
     test("#coerceAttributes coerces {} to Viking.Model and sets the modelName", function() {
-        let Model = Viking.Model.extend({ schema: {
+        let Model = Viking.Model.extend('model', { schema: {
             key: {type: 'json'}
         }});
         var a = new Model();
@@ -127,7 +127,7 @@ import Viking from './../../../../../src/viking';
     test("#coerceAttributes thows error when can't coerce value", function() {
         expect(2);
     
-        let Model = Viking.Model.extend({ schema: {
+        let Model = Viking.Model.extend('model', { schema: {
             date: {type: 'date'}
         }});
         var a = new Model();
@@ -143,7 +143,7 @@ import Viking from './../../../../../src/viking';
     
     // Array support
     test("#coerceAttributes support array coercion", function() {
-        let Model = Viking.Model.extend({ schema: {
+        let Model = Viking.Model.extend('model', { schema: {
             key: {type: 'number', array: true}
         }});
         var a = new Model();

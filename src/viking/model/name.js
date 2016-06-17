@@ -1,3 +1,5 @@
+import global from '../global';
+
 const Name = function (name) {
     let objectName = name.camelize(); // Namespaced.Name
 
@@ -16,10 +18,19 @@ const Name = function (name) {
             return this._model;
         }
 
-        this._model = this.name.constantize();
+        this._model = this.name.constantize(global);
         return this._model;
     }
 
 };
+
+// Name.fromCollection = function(collectionName) {
+//     if (collectionName.endsWith('Collection')) {
+//         return new Name(collectionName.substring(0, collectionName.length - 10))
+//     }
+//     return new Name(collectionName);
+// }
+
+export { Name };
 
 export default Name;

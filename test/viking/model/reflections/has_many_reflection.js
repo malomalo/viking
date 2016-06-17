@@ -28,7 +28,7 @@
     });
     
     test("::new('children', { modelName: 'Region' })", function() {
-        Region = Viking.Model.extend();
+        Region = Viking.Model.extend('region');
         RegionCollection = Viking.Collection.extend();
         
         var assocation = new Viking.Model.HasManyReflection('children', { modelName: 'Region' });
@@ -53,7 +53,7 @@
     
     test("#klass", function() {
         ChildCollection = Viking.Collection.extend();
-        MultiWordCollection = Viking.Model.extend();
+        MultiWordCollection = Viking.Model.extend('multiWord');
         
         var assocation = new Viking.Model.HasManyReflection('children');
         equal(assocation.klass(), ChildCollection);

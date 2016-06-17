@@ -3,7 +3,7 @@
     module("Viking.Model.BelongsToReflection::new");
 
     test("::new('parent')", function() {
-        Parent = Viking.Model.extend();
+        Parent = Viking.Model.extend('parent');
         
         var assocation = new Viking.Model.BelongsToReflection('parent');
         
@@ -26,7 +26,7 @@
     });
     
     test("::new('children', { modelName: 'Region' })", function() {
-        Region = Viking.Model.extend();
+        Region = Viking.Model.extend('region');
         
         var assocation = new Viking.Model.BelongsToReflection('parent', { modelName: 'Region' });
 
@@ -39,7 +39,7 @@
     });
     
     test("::new('subject', {polymorphic: true})", function () {
-        Photo = Viking.Model.extend();
+        Photo = Viking.Model.extend('photo');
         
         var assocation = new Viking.Model.BelongsToReflection('subject', {polymorphic: true});
         equal(assocation.macro, 'belongsTo');
@@ -51,8 +51,8 @@
     });
 
     test("#klass", function() {
-        Child = Viking.Model.extend();
-        MultiWord = Viking.Model.extend();
+        Child = Viking.Model.extend('child');
+        MultiWord = Viking.Model.extend('multiWord');
                 
         var assocation = new Viking.Model.BelongsToReflection('child');
         equal(assocation.klass(), Child);
@@ -65,7 +65,7 @@
     });
     
     test("#model", function() {
-        Child = Viking.Model.extend();
+        Child = Viking.Model.extend('child');
         
         var assocation = new Viking.Model.BelongsToReflection('child');
         equal(assocation.model(), Child);

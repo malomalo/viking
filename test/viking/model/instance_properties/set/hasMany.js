@@ -5,37 +5,33 @@ import Viking from './../../../../../src/viking';
 
     // setting attributes on a model coerces relations
     test("#set(key, val) coerces hasMany relations", function() {
-        let Ship = Viking.Model.extend({ hasMany: ['ships'] });
-        window.ShipCollection = Viking.Collection.extend({ model: Ship });
+        let Ship = Viking.Model.extend('ship', { hasMany: ['ships'] });
+        let ShipCollection = Viking.Collection.extend({ model: Ship });
 
         var a = new Ship();
         a.set('ships', [{}, {}]);
         ok(a.get('ships') instanceof ShipCollection);
         equal(a.get('ships').length, 2);
         ok(a.get('ships').first() instanceof Ship);
-
-        delete window.ShipCollection;
     });
 
     test("#set({key, val}) coerces hasMany relations", function() {
-        let Ship = Viking.Model.extend({ hasMany: ['ships'] });
-        window.ShipCollection = Viking.Collection.extend({ model: Ship });
+        let Ship = Viking.Model.extend('ship', { hasMany: ['ships'] });
+        let ShipCollection = Viking.Collection.extend({ model: Ship });
 
         var a = new Ship();
         a.set({ships: [{}, {}]});
         ok(a.get('ships') instanceof ShipCollection);
         equal(a.get('ships').length, 2);
         ok(a.get('ships').first() instanceof Ship);
-
-        delete window.ShipCollection;
     });
 
 
     test("#set(belongsToRelation, data) updates the current collection and doesn't create a new one", function() {
         expect(6);
 
-        let Ship = Viking.Model.extend({ hasMany: ['ships'] });
-        window.ShipCollection = Viking.Collection.extend({ model: Ship });
+        let Ship = Viking.Model.extend('ship', { hasMany: ['ships'] });
+        let ShipCollection = Viking.Collection.extend({ model: Ship });
 
         var a = new Ship();
         a.set({ships: [{id: 1}, {}, {id: 3}]});
@@ -50,27 +46,23 @@ import Viking from './../../../../../src/viking';
         deepEqual([1, 2], a.get('ships').map(function(s) { return s.id; }));
         a.get('ships').off();
         a.get('ships').get(1).off();
-
-        delete window.ShipCollection;
     });
 
     test("#set(hasManyRelation, data) updates the current collection and doesn't create a new one", function() {
-      let Ship = Viking.Model.extend({});
-      window.ShipCollection = Viking.Collection.extend({ model: Ship });
-      let Fleet = Viking.Model.extend({ hasMany: ['ships']});
+      let Ship = Viking.Model.extend('ship', {});
+      let ShipCollection = Viking.Collection.extend({ model: Ship });
+      let Fleet = Viking.Model.extend('fleet', { hasMany: ['ships']});
 
       var f = new Fleet();
       var s = new Ship();
 
       f.set({ships: [s]});
       strictEqual(s.collection, f.get('ships'));
-
-      delete window.ShipCollection;
     });
     
     test("#set({type: klass}) initilizes hasMany associations", function() {
         let Ship = Viking.Model.extend('ship');
-        window.ShipCollection = Viking.Collection.extend({ model: Ship });
+        let ShipCollection = Viking.Collection.extend({ model: Ship });
         let Account = Viking.Model.extend('account');
         let Agent   = Account.extend('agent', { hasMany: ['ships'] });
         
@@ -79,8 +71,6 @@ import Viking from './../../../../../src/viking';
         account.set({type: 'agent'});
         ok(account instanceof Agent);
         ok(account.get('ships') instanceof ShipCollection);
-        
-        delete window.ShipCollection;
     });
 
 

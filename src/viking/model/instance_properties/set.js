@@ -1,3 +1,5 @@
+import { global } from '../../global';
+
 export const set = function (key, val, options) {
     if (key === null) { return this; }
 
@@ -18,7 +20,7 @@ export const set = function (key, val, options) {
         // slow and unavoidably slows down subsequent execution in modern
         // JavaScript implementations
         // Ideas: Move to Model.new(...) method of initializing models
-        let type = attrs[this.inheritanceAttribute].camelize().constantize();
+        let type = attrs[this.inheritanceAttribute].camelize().constantize(global);
         this.constructor = type;
         this.__proto__ = type.prototype;
 		this.modelName = type.modelName;

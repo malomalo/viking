@@ -1,3 +1,5 @@
+import global from '../../global';
+
 // Below is the same code from the Backbone.Model function
 // except where there are comments
 export const constructor = function (attributes, options) {
@@ -15,7 +17,7 @@ export const constructor = function (attributes, options) {
             // slow and unavoidably slows down subsequent execution in modern
             // JavaScript implementations
             // Ideas: Move to Model.new(...) method of initializing models
-            let type = attrs[this.inheritanceAttribute].camelize().constantize();
+            let type = attrs[this.inheritanceAttribute].camelize().constantize(global);
             this.constructor = type;
             this.__proto__ = type.prototype;
         }

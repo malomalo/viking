@@ -4,8 +4,8 @@ import Viking from './../../../../../src/viking';
     module("Viking.Model#coerceAttributes - hasMany");
 
     test("#coerceAttributes initializes hasMany relation with array of hashes", function() {
-        let Ship = Viking.Model.extend({ hasMany: ['ships'] });
-        window.ShipCollection = Viking.Collection.extend({ model: Ship });
+        let Ship = Viking.Model.extend('ship', { hasMany: ['ships'] });
+        let ShipCollection = Viking.Collection.extend({ model: Ship });
     
         var a = new Ship();
 
@@ -15,13 +15,11 @@ import Viking from './../../../../../src/viking';
         ok(result.ships.models[1] instanceof Ship);
         deepEqual(result.ships.models[0].attributes.key, 'foo');
         deepEqual(result.ships.models[1].attributes.key, 'bar');
-
-        delete window.ShipCollection;
     });
 
     test("#coerceAttributes() initializes hasMany relation with array of models", function() {
-        let Ship = Viking.Model.extend({ hasMany: ['ships'] });
-        window.ShipCollection = Viking.Collection.extend({ model: Ship });
+        let Ship = Viking.Model.extend('ship', { hasMany: ['ships'] });
+        let ShipCollection = Viking.Collection.extend({ model: Ship });
     
         var a = new Ship();
         var models = [new Ship({key: 'foo'}), new Ship({key: 'bar'})];
@@ -30,8 +28,6 @@ import Viking from './../../../../../src/viking';
         ok(result.ships instanceof ShipCollection);
         ok(result.ships.models[0] === models[0]);
         ok(result.ships.models[1] === models[1]);
-    
-        delete window.ShipCollection;
     });
 
 }());

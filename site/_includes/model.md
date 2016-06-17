@@ -33,7 +33,7 @@ var Note = Viking.Model.extend('note', {
 });
 
 // Normal Backbone way also works
-var Note = Viking.Model.extend({
+var Note = Viking.Model.extend('note', {
     initialize: function() { ... }
 });
 {% endhighlight %}

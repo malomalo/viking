@@ -3,7 +3,7 @@
     module("Viking.Model.HasOneReflection::new");
 
     test("::new('parent')", function() {
-        Parent = Viking.Model.extend();
+        Parent = Viking.Model.extend('parent');
         
         var assocation = new Viking.Model.HasOneReflection('parent');
         
@@ -26,7 +26,7 @@
     });
     
     test("::new('children', { modelName: 'Region'})", function() {
-        Region = Viking.Model.extend();
+        Region = Viking.Model.extend('region');
         
         var assocation = new Viking.Model.HasOneReflection('parent', {modelName: 'Region'});
         
@@ -39,8 +39,8 @@
     });
 
     test("#klass", function() {
-        Child = Viking.Model.extend();
-        MultiWord = Viking.Model.extend();
+        Child = Viking.Model.extend('child');
+        MultiWord = Viking.Model.extend('multiWord');
         
         var assocation = new Viking.Model.HasOneReflection('child');
         equal(assocation.klass(), Child);

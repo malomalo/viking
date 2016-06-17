@@ -1,6 +1,7 @@
 import Name from '../name';
 import { global } from '../../global';
 import { Reflection } from '../reflection';
+import { ArgumentError } from '../../errors';
 
 // Overide the default extend method to support passing in the modelName
 // and support STI
@@ -11,10 +12,10 @@ import { Reflection } from '../reflection';
 //
 // `name` is optional, and must be a string
 export const extend = function(name, protoProps, staticProps) {
-    if(typeof name !== 'string') {
-        staticProps = protoProps;
-        protoProps = name;
-    }
+    // if (typeof name !== 'string' || arguments.length < 1 || arguments.length > 3) {
+    //     throw new ArgumentError('extend takes 1 - 3 arguments (name: String, protoProps: Object, staticProps: Object?)');
+    // }
+
     protoProps || (protoProps = {});
 
     let child = Backbone.Model.extend.call(this, protoProps, staticProps);
@@ -65,12 +66,11 @@ export const extend = function(name, protoProps, staticProps) {
         });
     }
 
-    // TODO: 
     // Track the model in the Viking global namespace.
     // Used in the constinize method
-    // if (child.modelName) {
-    //     global[child.modelName.singular] = child;
-    // }
+    if (child.modelName) {
+        global[child.modelName.singular] = child;
+    }
 
     return child;
 };

@@ -16,7 +16,7 @@ import Viking from '../../../../src/viking';
     });
     
     test("::inheritanceAttribute override", function() {
-        var Ship = Viking.Model.extend({
+        var Ship = Viking.Model.extend('ship', {
             inheritanceAttribute: 'class_name'
         });
         
@@ -24,7 +24,7 @@ import Viking from '../../../../src/viking';
     });
     
     test("::inheritanceAttribute set to false disabled STI", function() {
-        var Ship = Viking.Model.extend({
+        var Ship = Viking.Model.extend('ship', {
             inheritanceAttribute: false
         });
         var Battleship = Ship.extend('battleship');
