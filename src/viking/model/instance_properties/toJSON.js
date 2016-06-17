@@ -1,3 +1,5 @@
+import Type from '../type';
+
 // similar to Rails as_json method
 export const toJSON = function (options) {
     let data = _.clone(this.attributes);
@@ -48,7 +50,7 @@ export const toJSON = function (options) {
         if (data[key] || data[key] === false) {
             let tmp, klass;
             
-            klass = Viking.Model.Type.registry[options.type];
+            klass = Type.registry[options.type];
 
             if (klass) {
                 if (options.array) {

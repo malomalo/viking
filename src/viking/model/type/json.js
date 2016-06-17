@@ -6,18 +6,12 @@ const JSONType = {
     load: function(value, key, klass) {
 
         if (typeof value === 'object') {
-            // if (klass) {
-            //     let model = new global[klass](value);
-                let AnonModel = Model.extend({
-                    inheritanceAttribute: false
-                });
-                let model = new AnonModel(value);
-                model.modelName = key;
-                model.baseModel = model;
+            if (klass) {
+                let model = new global[klass](value);
                 return model;
-            // } else {
-            //     // return value;
-            // }
+            } else {
+                return value;
+            }
         }
 
         throw new TypeError(typeof value + " can't be coerced into JSON");
