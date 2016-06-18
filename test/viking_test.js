@@ -1,11 +1,9 @@
-// import './viking/sync';
+import './viking/collection';
+import './viking/controller';
+import './viking/cursor';
 import './viking/model';
-// import './viking/cursor';
-// import './viking/collection';
-// import './viking/paginated_collection';
-//
-// // import './viking/router';
-// // import './viking/controller';
-// // import './viking/view';
-//
-//
+import './viking/paginated_collection';
+import './viking/router';
+import './viking/support';
+import './viking/sync';
+import './viking/view';

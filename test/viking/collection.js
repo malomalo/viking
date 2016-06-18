@@ -211,3 +211,9 @@ import Viking from '../../src/viking';
         f.off('change:query');
     });
 }());
+
+import './collection/fetch';
+import './collection/new';
+import './collection/order';
+import './collection/predicate';
+import './collection/sync';

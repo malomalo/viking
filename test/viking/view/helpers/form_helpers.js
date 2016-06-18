@@ -1,0 +1,12 @@
+import './form_helpers/check_box';
+import './form_helpers/check_box_group';
+import './form_helpers/collection_select';
+import './form_helpers/form_for';
+import './form_helpers/hidden_field';
+import './form_helpers/label';
+import './form_helpers/number_field';
+import './form_helpers/password_field';
+import './form_helpers/radio_button';
+import './form_helpers/select';
+import './form_helpers/text_area';
+import './form_helpers/text_field';

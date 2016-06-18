@@ -1,3 +1,5 @@
+import Viking from '../../../../../src/viking';
+
 (function () {
     module("Viking.View.Helpers#radio_button_tag");
 

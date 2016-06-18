@@ -1,3 +1,5 @@
+import Viking from '../../../src/viking';
+
 module("Viking.Model#fetch", {
     setup: function() {
         this.requests = [];

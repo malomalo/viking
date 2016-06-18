@@ -1,3 +1,5 @@
+import Viking from '../../../../../src/viking';
+
 (function () {
     module("Viking.View.Helpers#options_for_select_tag");
 

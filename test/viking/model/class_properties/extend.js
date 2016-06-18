@@ -114,11 +114,11 @@ import Viking from '../../../../src/viking';
     });
     
     test("::extend a Viking.Model unions the schema", function () {
-        window.Account = Viking.Model.extend('account', { schema: {
+        let Account = Viking.Model.extend('account', { schema: {
             created_at: {type: 'date'}
         }});
         
-        window.Agent   = Account.extend('agent', { schema: {
+        let Agent   = Account.extend('agent', { schema: {
             name: {type: 'string'}
         }});
         
@@ -129,20 +129,14 @@ import Viking from '../../../../src/viking';
             created_at: {type: 'date'},
             name: {type: 'string'}
         });
-        
-        delete window.Account;
-        delete window.Agent;
     });
     
     test("::extend a Viking.Model adds itself to the descendants", function () {
-        window.Account = Viking.Model.extend('account');
-        window.Agent   = Account.extend('agent');
+        let Account = Viking.Model.extend('account');
+        let Agent   = Account.extend('agent');
 
         deepEqual(Account.descendants, [Agent]);
         deepEqual(Agent.descendants, []);
-        
-        delete window.Account;
-        delete window.Agent;
     });
     
 }());

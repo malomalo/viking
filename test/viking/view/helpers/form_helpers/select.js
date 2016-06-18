@@ -1,3 +1,5 @@
+import Viking from '../../../../../src/viking';
+
 (function () {
     module("Viking.View.Helpers#select", {
         setup: function() {
@@ -39,14 +41,14 @@
     });
     
     test("select(model, has_many_attribute, collection) Assumes multiple select", function () {
-        Post = Viking.Model.extend('post', {
+        let Post = Viking.Model.extend('post', {
             hasMany: ['authors']
         });
         
-        Author = Viking.Model.extend('author', {
+        let Author = Viking.Model.extend('author', {
         });
 
-        AuthorCollection = Viking.Collection.extend({
+        let AuthorCollection = Viking.Collection.extend({
             model: Author
         });
                 
@@ -55,9 +57,6 @@
         equal(
             Viking.View.Helpers.select(post, 'authors', authors.map(function(a){ return [a.get('last_name'), a.get('id')]})),
             '<select id="post_authors" multiple name="post[authors][]"><option value="1">Bracy</option>\n<option value="2">O&#x27;Shea</option></select>');
-        delete Post
-        delete AuthorCollection
-        delete Author
     });
 
     //TODO: add test for model, attribute, simple_array, {selected: nil} (key set)

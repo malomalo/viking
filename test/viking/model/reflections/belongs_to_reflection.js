@@ -3,7 +3,7 @@
     module("Viking.Model.BelongsToReflection::new");
 
     test("::new('parent')", function() {
-        Parent = Viking.Model.extend('parent');
+        let Parent = Viking.Model.extend('parent');
         
         var assocation = new Viking.Model.BelongsToReflection('parent');
         
@@ -21,12 +21,10 @@
             collection: 'parents',
             collectionName: 'ParentCollection'
         });
-        
-        delete Parent;
     });
     
     test("::new('children', { modelName: 'Region' })", function() {
-        Region = Viking.Model.extend('region');
+        let Region = Viking.Model.extend('region');
         
         var assocation = new Viking.Model.BelongsToReflection('parent', { modelName: 'Region' });
 
@@ -34,43 +32,34 @@
         equal(assocation.macro, 'belongsTo');
         deepEqual(assocation.options, { modelName: 'Region'});
         deepEqual(assocation.modelName, new Viking.Model.Name('Region'));
-        
-        delete Region;
     });
     
     test("::new('subject', {polymorphic: true})", function () {
-        Photo = Viking.Model.extend('photo');
+        let Photo = Viking.Model.extend('photo');
         
         var assocation = new Viking.Model.BelongsToReflection('subject', {polymorphic: true});
         equal(assocation.macro, 'belongsTo');
         equal(assocation.name, 'subject');
         deepEqual(assocation.options, {polymorphic: true});
         equal(assocation.modelName, undefined);
-        
-        delete Photo
     });
 
     test("#klass", function() {
-        Child = Viking.Model.extend('child');
-        MultiWord = Viking.Model.extend('multiWord');
+        let Child = Viking.Model.extend('child');
+        let MultiWord = Viking.Model.extend('multiWord');
                 
         var assocation = new Viking.Model.BelongsToReflection('child');
         equal(assocation.klass(), Child);
         
         var assocation = new Viking.Model.BelongsToReflection('multi_word');
         equal(assocation.klass(), MultiWord);
-        
-        delete Child;
-        delete MultiWord;
     });
     
     test("#model", function() {
-        Child = Viking.Model.extend('child');
+        let Child = Viking.Model.extend('child');
         
         var assocation = new Viking.Model.BelongsToReflection('child');
         equal(assocation.model(), Child);
-        
-        delete Child;
     });
     
 

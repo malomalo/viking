@@ -127,3 +127,6 @@ import Viking from '../../src/viking';
     });
 
 }());
+
+import './view/helpers';
+import './view/subView';

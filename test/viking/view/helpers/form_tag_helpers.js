@@ -1,0 +1,17 @@
+import './form_tag_helpers/button_tag';
+import './form_tag_helpers/check_box_tag';
+import './form_tag_helpers/content_tag';
+import './form_tag_helpers/form_tag';
+import './form_tag_helpers/hidden_field_tag';
+import './form_tag_helpers/label_tag';
+import './form_tag_helpers/number_field_tag';
+import './form_tag_helpers/options_for_select_tag';
+import './form_tag_helpers/options_from_collection_for_select_tag';
+import './form_tag_helpers/password_field_tag';
+import './form_tag_helpers/radio_button_tag';
+import './form_tag_helpers/select_tag';
+import './form_tag_helpers/submit_tag';
+import './form_tag_helpers/tag';
+import './form_tag_helpers/text_area_tag';
+import './form_tag_helpers/text_field_tag';
+import './form_tag_helpers/time_tag';

@@ -1,3 +1,5 @@
+import Viking from '../../../../../src/viking';
+
 (function () {
     module("Viking.View - FormBuilder", {
         setup: function() {
@@ -660,9 +662,9 @@
     });
     
     test("#fieldsFor() works with a hasMany relationship", function () {
-        Fleet = Viking.Model.extend('fleet', { hasMany: ['ships']});
-        Ship = Viking.Model.extend('ship', {});
-        ShipCollection = Viking.Collection.extend({ model: Ship });
+        let Fleet = Viking.Model.extend('fleet', { hasMany: ['ships']});
+        let Ship = Viking.Model.extend('ship', {});
+        let ShipCollection = Viking.Collection.extend({ model: Ship });
 
         var a = new Fleet({'ships': [{'id': 10, 'name': 'Billabong'}, {'name': 'Wipple'}] });
         var formBuilder = new FormBuilder(a);
@@ -676,18 +678,15 @@
         equal(formBuilder.fieldsFor('ships', function(f) {
             return f.textField('name');
         }), html.join(''));
-            
-        delete Ship;
-        delete ShipCollection;
-        delete Fleet;
+
     });
 
     test("#fieldsFor() works nested in another #fieldsFor()", function () {
-        Fleet = Viking.Model.extend('fleet', { hasMany: ['ships']});
-        Ship = Viking.Model.extend('ship', { schema: { 
+        let Fleet = Viking.Model.extend('fleet', { hasMany: ['ships']});
+        let Ship = Viking.Model.extend('ship', { schema: { 
             "amenities": {type: 'json'}
         }});
-        ShipCollection = Viking.Collection.extend({ model: Ship });
+        let ShipCollection = Viking.Collection.extend({ model: Ship });
 
         var a = new Fleet({'ships': [{'id': 10, 'name': 'Billabong', 'amenities': {key: 1}}, {'name': 'Wipple', 'amenities': {key: 2}}] });
         var formBuilder = new FormBuilder(a);
@@ -703,16 +702,12 @@
                 return f.radioButton('key', true);
             });
         }), html.join(''));
-
-        delete Ship;
-        delete ShipCollection;
-        delete Fleet;
     });
 
     test("#fieldsFor(attribute, model, content)", function () {
-        Fleet = Viking.Model.extend('fleet', { hasMany: ['ships']});
-        Ship = Viking.Model.extend('ship');
-        ShipCollection = Viking.Collection.extend({ model: Ship });
+        let Fleet = Viking.Model.extend('fleet', { hasMany: ['ships']});
+        let Ship = Viking.Model.extend('ship');
+        let ShipCollection = Viking.Collection.extend({ model: Ship });
 
         var a = new Fleet({'ships': [{'id': 10, 'name': 'Billabong'}, {'name': 'Wipple'}] });
         var c = new Ship({'id': 22, 'name': 'Maximum'});
@@ -726,16 +721,12 @@
         equal(formBuilder.fieldsFor('ships', c, function(f) {
             return f.textField('name');
         }), html.join(''));
-
-        delete Ship;
-        delete ShipCollection;
-        delete Fleet;
     });
 
     test("#fieldsFor(attribute, array, content)", function () {
-        Fleet = Viking.Model.extend('fleet', { hasMany: ['ships']});
-        Ship = Viking.Model.extend('ship');
-        ShipCollection = Viking.Collection.extend({ model: Ship });
+        let Fleet = Viking.Model.extend('fleet', { hasMany: ['ships']});
+        let Ship = Viking.Model.extend('ship');
+        let ShipCollection = Viking.Collection.extend({ model: Ship });
 
         var a = new Fleet({'ships': [{'id': 10, 'name': 'Billabong'}, {'name': 'Wipple'}] });
         var c = _.map([{'id': 22, 'name': 'Maximum'}], function(attrs) { return new Ship(attrs); });
@@ -750,15 +741,12 @@
             return f.textField('name');
         }), html.join(''));
 
-        delete Ship;
-        delete ShipCollection;
-        delete Fleet;
     });
 
     test("#fieldsFor(attribute, collection, content)", function () {
-        Fleet = Viking.Model.extend('fleet', { hasMany: ['ships']});
-        Ship = Viking.Model.extend('ship');
-        ShipCollection = Viking.Collection.extend({ model: Ship });
+        let Fleet = Viking.Model.extend('fleet', { hasMany: ['ships']});
+        let Ship = Viking.Model.extend('ship');
+        let ShipCollection = Viking.Collection.extend({ model: Ship });
 
         var a = new Fleet({'ships': [{'id': 10, 'name': 'Billabong'}, {'name': 'Wipple'}] });
         var c = new ShipCollection([{'id': 22, 'name': 'Maximum'}]);
@@ -773,9 +761,6 @@
             return f.textField('name');
         }), html.join(''));
 
-        delete Ship;
-        delete ShipCollection;
-        delete Fleet;
     });
     
 }());

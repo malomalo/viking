@@ -3,7 +3,7 @@
     module("Viking.Model.HasOneReflection::new");
 
     test("::new('parent')", function() {
-        Parent = Viking.Model.extend('parent');
+        let Parent = Viking.Model.extend('parent');
         
         var assocation = new Viking.Model.HasOneReflection('parent');
         
@@ -21,12 +21,10 @@
             collection: 'parents',
             collectionName: 'ParentCollection'
         });
-        
-        delete Parent;
     });
     
     test("::new('children', { modelName: 'Region'})", function() {
-        Region = Viking.Model.extend('region');
+        let Region = Viking.Model.extend('region');
         
         var assocation = new Viking.Model.HasOneReflection('parent', {modelName: 'Region'});
         
@@ -34,22 +32,17 @@
         equal(assocation.macro, 'hasOne');
         deepEqual(assocation.options, {modelName: 'Region'});
         propEqual(assocation.modelName, new Viking.Model.Name('Region'));
-        
-        delete Region;
     });
 
     test("#klass", function() {
-        Child = Viking.Model.extend('child');
-        MultiWord = Viking.Model.extend('multiWord');
+        let Child = Viking.Model.extend('child');
+        let MultiWord = Viking.Model.extend('multiWord');
         
         var assocation = new Viking.Model.HasOneReflection('child');
         equal(assocation.klass(), Child);
         
         var assocation = new Viking.Model.HasOneReflection('multi_word');
         equal(assocation.klass(), MultiWord);
-        
-        delete Child;
-        delete MultiWord;
     });
 
 }());

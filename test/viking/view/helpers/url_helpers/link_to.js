@@ -1,3 +1,5 @@
+import Viking from '../../../../../src/viking';
+
 (function () {
     module("Viking.View.Helpers#linkTo");
 
@@ -37,16 +39,13 @@
     });
     
     test("linkTo(content, model)", function() {
-        Workshop = Viking.Model.extend('workshop');
-        workshopPath = function(m) { return '/workshops/' + m.toParam(); }
+        let Workshop = Viking.Model.extend('workshop');
+        let workshopPath = function(m) { return '/workshops/' + m.toParam(); }
         
         equal(
             Viking.View.Helpers.linkTo('Model', new Workshop({id: 10})),
             '<a href="'+ window.location.protocol + '//' + window.location.host + '/workshops/10'+'">Model</a>'
         );
-        
-        delete Workshop;
-        delete workshopPath;
     });
     
     test("linkTo(model, contentFunc)", function() {

@@ -13,7 +13,7 @@ import Viking from './../../src/viking';
     test("new sets cursor passed in options", function() {
         var cursor = new Viking.Cursor();
         var pc = new Viking.PaginatedCollection([], {cursor: cursor});
-    
+
         ok(cursor === pc.cursor);
     });
 

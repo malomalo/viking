@@ -1,3 +1,5 @@
+import Viking from '../../../src/viking';
+
 (function () {
     module("Viking.View - tag_helpers");
     
@@ -173,3 +175,11 @@
     });
     
 }());
+
+import './helpers/asset_helpers';
+import './helpers/builders';
+import './helpers/date_helpers';
+import './helpers/form_helpers';
+import './helpers/form_tag_helpers';
+import './helpers/url_helpers';
+import './helpers/render_helper';
