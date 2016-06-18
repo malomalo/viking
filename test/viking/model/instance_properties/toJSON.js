@@ -1,20 +1,20 @@
+import Viking from '../../../../src/viking';
+
 (function () {
     module("Viking.Model#toJSON", {
-        // let Ship, ShipCollection;
-
         setup: function () {
-            Ship = Viking.Model.extend('ship', {
+            this.Ship = Viking.Model.extend('ship', {
                 hasMany: ['ships'],
                 belongsTo: ['ship'],
                 schema: {
                     date: {type: 'date'}
                 }
             });
-            ShipCollection = Viking.Collection.extend({
-                model: Ship
+            this.ShipCollection = Viking.Collection.extend({
+                model: this.Ship
             });
 
-            this.ship = new Ship({
+            this.ship = new this.Ship({
                 foo: 'bar',
 
                 ship: {bat: 'baz', ship: {bing: 'bong', ships: []}},
@@ -23,10 +23,6 @@
                 date: "2013-04-10T21:24:28.000Z"
             });
         },
-        teardown: function () {
-            delete Ship;
-            delete ShipCollection;
-        }
     });
 
     test("#toJSON", function() {
@@ -37,7 +33,7 @@
     });
     
     test("#toJSON supports arrays", function() {
-        Ship = Viking.Model.extend('ship', {
+        let Ship = Viking.Model.extend('ship', {
             coercions: {date: ['Date', {array: true}]}
         });
         

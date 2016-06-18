@@ -210,13 +210,25 @@ export const Collection = Backbone.Collection.extend({
     
 }, {
 
-    extend: function(protoProps, staticProps) {
+    extend: function(name, protoProps, staticProps) {
+
+        if(typeof name !== 'string') {
+            staticProps = protoProps;
+            protoProps = name;
+        }
+        protoProps || (protoProps = {});
+
         let child = Backbone.Collection.extend.call(this, protoProps, staticProps);
 
         // Track the collection in the Viking global namespace.
         // Used in the constinize method
-        if (child.prototype.model && child.prototype.model.modelName) {
-            global[child.prototype.model.modelName.collectionName] = child;
+        if (typeof name !== 'string') {
+            if (child.prototype.model && child.prototype.model.modelName) {
+                name = child.prototype.model.modelName.collectionName;
+                global[name] = child;
+            }
+        } else {
+            global[name] = child;
         }
 
         return child;

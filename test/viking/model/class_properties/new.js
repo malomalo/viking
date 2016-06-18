@@ -5,7 +5,7 @@ import Viking from '../../../../src/viking';
 
     test("::new sets modelName on the instance", function() {
         var Ship = Viking.Model.extend('ship');
-        
+
         propEqual(_.omit((new Ship).modelName, 'model'), {
             name: 'Ship',
             element: 'ship',
@@ -32,28 +32,28 @@ import Viking from '../../../../src/viking';
             collectionName: 'Namespaced.ModelCollection'
         });
     });
-    
+
     test("::new sets associations on the instance as a refernce to the associations on the Class", function() {
-        let Ship = Viking.Model.extend('ship', { hasMany: [['ships', {collectionName: 'MyCollection'}]] });
-        let MyCollection = Viking.Collection.extend();
-        
-        var myship = new Ship();
+        let Ship = Viking.Model.extend('ship', { hasMany: [['ships', { collectionName: 'MyCollection' }]] });
+        let MyCollection = Viking.Collection.extend('MyCollection');
+
+        let myship = new Ship();
         strictEqual(myship.associations, Ship.associations);
     });
-    
+
     test("::new(attrs) does coercions", function() {
         let Model = Viking.Model.extend('model', { schema: {
             date: {type: 'date'}
         } });
-    
+
         var a = new Model({'date': "2013-04-10T21:24:28+00:00"});
         equal(a.get('date').valueOf(), new Date(1365629068000).valueOf());
     });
-    
+
     test("::new(attrs) coerces hasMany relations", function() {
         let Ship = Viking.Model.extend('ship', { hasMany: ['ships'] });
         let ShipCollection = Viking.Collection.extend({ model: Ship });
-    
+
         var a = new Ship({ships: [{}, {}]});
         ok(a.get('ships') instanceof ShipCollection);
         equal(a.get('ships').length, 2);
@@ -62,7 +62,7 @@ import Viking from '../../../../src/viking';
 
     test("::new(attrs) coerces belongsTo relations", function() {
         let Ship = Viking.Model.extend('ship', { belongsTo: ['ship'] });
-        
+
         var a = new Ship({'ship': {}});
         ok(a.get('ship') instanceof Ship);
     });
@@ -70,60 +70,48 @@ import Viking from '../../../../src/viking';
     test("::new(attrs) sets hasMany relations to an empty collection if not in attrs", function() {
         let Ship = Viking.Model.extend('ship', { hasMany: ['ships'] });
         let ShipCollection = Viking.Collection.extend({ model: Ship });
-    
+
         var a = new Ship();
         ok(a.get('ships') instanceof ShipCollection);
         equal(a.get('ships').length, 0);
     });
-    
+
     // STI
     test("::new(attrs) on subtype sets the type to the submodel type", function() {
-        Account = Viking.Model.extend('account');
-        Agent = Account.extend('agent');
-        
+        let Account = Viking.Model.extend('account');
+        let Agent = Account.extend('agent');
+
         var agent = new Agent();
         equal('Agent', agent.get('type'));
-        
-        delete Account;
-        delete Agent;
     });
-    
+
     test("::new(attrs) on model sets the type if there are submodels", function() {
-        Account = Viking.Model.extend('account');
-        Agent = Account.extend('agent');
-        
+        let Account = Viking.Model.extend('account');
+        let Agent = Account.extend('agent');
+
         var account = new Account();
         equal('Account', account.get('type'));
-        
-        delete Account;
-        delete Agent;
     });
-    
+
     test("::new(attrs) with type set to a sub-type returns subtype", function() {
-        Account = Viking.Model.extend('account');
-        Agent = Account.extend('agent');
-        
+        let Account = Viking.Model.extend('account');
+        let Agent = Account.extend('agent');
+
         var agent = new Account({type: 'agent'});
         ok(agent instanceof Agent);
         ok(agent instanceof Account);
-        
-        delete Account;
-        delete Agent;
     });
-    
+
     test("::new() with default type", function() {
-        Account = Viking.Model.extend('account', {
+        let Account = Viking.Model.extend('account', {
             defaults: {
                 type: 'agent'
             }
         });
-        Agent = Account.extend('agent');
-        
+        let Agent = Account.extend('agent');
+
         var agent = new Account();
         ok(agent instanceof Agent);
-        
-        delete Account;
-        delete Agent;
     });
-    
+
 }());

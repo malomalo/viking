@@ -3,21 +3,16 @@ import Viking from '../../../../src/viking';
 (function() {
     module("Viking.Model.Type.JSON");
 
-    test("::load coerces {} to Viking.Model", function() {
-        ok(Viking.Model.Type.JSON.load({}) instanceof Viking.Model);
-
-        deepEqual(Viking.Model.Type.JSON.load({}).attributes, {});
-        deepEqual(Viking.Model.Type.JSON.load({key: 'value'}).attributes, {key: 'value'});
+    test("::load coerces {} to {}", function() {
+        ok(Viking.Model.Type.JSON.load({}) instanceof Object);
+        deepEqual(Viking.Model.Type.JSON.load({}), {});
+        deepEqual(Viking.Model.Type.JSON.load({key: 'value'}), {key: 'value'});
     });
 
     test("::load coerces {} to Viking.Model with modelName set to key", function() {
-        equal(Viking.Model.Type.JSON.load({}, 'key').modelName, 'key');
-    });
-
-    test("::load coerces {} to Viking.Model with baseModel set to the JSON object", function() {
-        let attribute = Viking.Model.Type.JSON.load({}, 'key');
-    
-        strictEqual(attribute.baseModel, attribute);
+        let Ship = Viking.Model.extend('ship');
+        equal(Viking.Model.Type.JSON.load({}, 'ship').modelName.name, 'Ship');
+        // equal(Viking.Model.Type.JSON.load([{}], 'ship')[0].modelName.name, 'Ship');
     });
 
     test("::load thows error when can't coerce value", function() {
@@ -33,7 +28,10 @@ import Viking from '../../../../src/viking';
     });
 
     test("::load doesn't use the type key for STI", function () {
-        deepEqual(Viking.Model.Type.JSON.load({type: 'my_value'}).attributes, {type: 'my_value'});
+        let Ship = Viking.Model.extend('ship', {
+            inheritanceAttribute: false
+        });
+        deepEqual(Viking.Model.Type.JSON.load({type: 'my_value'}, 'ship').attributes, {type: 'my_value'});
     });
 
     test("::dump calls toJSON() on model", function() {
@@ -48,7 +46,7 @@ import Viking from '../../../../src/viking';
 
     test("::dump calls toJSON() with object", function() {
         let model = {foo: 'bar'};
-
         deepEqual(Viking.Model.Type.JSON.dump(model), { foo: 'bar' });
     });
+
 }());

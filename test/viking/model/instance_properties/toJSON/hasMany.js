@@ -1,12 +1,14 @@
+import Viking from '../../../../../src/viking';
+
 (function () {
     module("Viking.Model#toJSON - hasMany");
 
     // toJSON --------------------------------------------------------------------
     test("#toJSON for hasMany relation", function() {
-        Ship = Viking.Model.extend('ship', {
+        let Ship = Viking.Model.extend('ship', {
             hasMany: ['ships']
         });
-        ShipCollection = Viking.Collection.extend({
+        let ShipCollection = Viking.Collection.extend({
             model: Ship
         });
         
@@ -19,9 +21,6 @@
                 ships_attributes: []
             }]
         });
-    
-        delete Ship;
-        delete ShipCollection;
     });
 
 }());

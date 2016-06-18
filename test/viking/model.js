@@ -38,42 +38,46 @@ import Viking from '../../src/viking';
     });
 }());
 
-// import './model/defaults';
-// import './model/types/boolean';
-// import './model/types/date';
+import './model/defaults';
+import './model/types/boolean';
+import './model/types/date';
 import './model/types/json';
-// import './model/types/number';
-// import './model/types/string';
-// import './model/class_properties/base_model';
-// import './model/class_properties/create';
-// import './model/class_properties/extend';
-// import './model/class_properties/find_or_create_by';
-// import './model/instance_properties/base_model';
+import './model/types/number';
+import './model/types/string';
+import './model/class_properties/base_model';
+import './model/class_properties/create';
+import './model/class_properties/extend';
+import './model/class_properties/find_or_create_by';
+import './model/class_properties/find';
+import './model/class_properties/inheritance_attribute';
+import './model/class_properties/new';
+import './model/class_properties/reflect_on_association';
+import './model/class_properties/reflect_on_associations';
+import './model/class_properties/urlRoot';
+import './model/instance_properties/base_model';
 import './model/instance_properties/coerceAttributes/belongsTo';
-// import './model/instance_properties/coerceAttributes/coercions';
-// import './model/instance_properties/coerceAttributes/hasMany';
-// import './model/instance_properties/inheritance_attribute';
-// import './model/instance_properties/paramRoot';
-// import './model/instance_properties/reflect_on_association';
-// import './model/instance_properties/reflect_on_associations';
-// import './model/instance_properties/save';
-// import './model/instance_properties/select';
-// import './model/instance_properties/set/belongsTo';
-// import './model/instance_properties/set/coercions';
-// import './model/instance_properties/set/hasMany';
-// import './model/instance_properties/set';
-// ├── setErrors
-// ├── sync
-// ├── toJSON
-// │   ├── belongsTo
-// │   └── hasMany
-// ├── toJSON
-// ├── toParam
-// ├── touch
-// ├── unselect
-// ├── unset
-// │   └── hasMany
-// ├── update_attribute
-// ├── update_attributes
-// ├── url
-// └── urlRoot
+import './model/instance_properties/coerceAttributes/coercions';
+import './model/instance_properties/coerceAttributes/hasMany';
+import './model/instance_properties/inheritance_attribute';
+import './model/instance_properties/paramRoot';
+import './model/instance_properties/reflect_on_association';
+import './model/instance_properties/reflect_on_associations';
+import './model/instance_properties/save';
+import './model/instance_properties/select';
+import './model/instance_properties/set/belongsTo';
+import './model/instance_properties/set/coercions';
+import './model/instance_properties/set/hasMany';
+import './model/instance_properties/set';
+import './model/instance_properties/setErrors';
+import './model/instance_properties/sync';
+import './model/instance_properties/toJSON';
+import './model/instance_properties/toJSON/belongsTo';
+import './model/instance_properties/toJSON/hasMany';
+import './model/instance_properties/toParam';
+import './model/instance_properties/touch';
+import './model/instance_properties/unselect';
+import './model/instance_properties/unset/hasMany';
+import './model/instance_properties/update_attribute';
+import './model/instance_properties/update_attributes';
+import './model/instance_properties/url';
+import './model/instance_properties/urlRoot';

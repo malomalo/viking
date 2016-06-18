@@ -3,15 +3,24 @@ import Model from '../../model';
 
 const JSONType = {
 
-    load: function(value, key, klass) {
+    load: function(value, key, className) {
 
         if (typeof value === 'object') {
-            if (klass) {
-                let model = new global[klass](value);
-                return model;
-            } else {
+
+            if (key) {
+                let name = key.camelize();
+
+                if (global[name]) {
+                    let model = new global[name](value);
+                    return model;
+                }
+
                 return value;
             }
+
+            return value;
+
+            
         }
 
         throw new TypeError(typeof value + " can't be coerced into JSON");

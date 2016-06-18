@@ -1,5 +1,6 @@
 import global from '../global';
 
+// TODO: the objectName should be passed into the function
 const Name = function (name) {
     let objectName = name.camelize(); // Namespaced.Name
 
@@ -23,13 +24,6 @@ const Name = function (name) {
     }
 
 };
-
-// Name.fromCollection = function(collectionName) {
-//     if (collectionName.endsWith('Collection')) {
-//         return new Name(collectionName.substring(0, collectionName.length - 10))
-//     }
-//     return new Name(collectionName);
-// }
 
 export { Name };
 

@@ -1,3 +1,5 @@
+import Viking from '../../../../src/viking';
+
 (function () {
     module("Viking.Model#unselect");
 	

@@ -1,17 +1,16 @@
+import Viking from '../../../../src/viking'
 (function () {
     module("Viking.Model#inheritanceAttribute");
 
     test("#inheritanceAttribute get set when extending a Model", function() {
-        var Ship = Viking.Model.extend();
-        var ship = new Ship();
-        
+        let Ship = Viking.Model.extend('ship');
+        let ship = new Ship();
         ok(ship.inheritanceAttribute);
     });
     
     test("::inheritanceAttribute default to `type`", function() {
-        var Ship = Viking.Model.extend();
-        var ship = new Ship();
-                
+        let Ship = Viking.Model.extend('ship');
+        let ship = new Ship();
         equal('type', ship.inheritanceAttribute);
     });
     
@@ -19,7 +18,7 @@
         let Ship = Viking.Model.extend('ship', {
             inheritanceAttribute: 'class_name'
         });
-        var ship = new Ship();
+        let ship = new Ship();
         
         equal('class_name', ship.inheritanceAttribute);
     });

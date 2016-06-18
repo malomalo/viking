@@ -5,7 +5,7 @@ import Type from '../type';
 export const coerceAttributes = function(attrs) {
     
     _.each(this.associations, function(association) {
-        let Type;
+        let objectType;
         let polymorphic = association.options.polymorphic;
         
         if (!attrs[association.name]) { return; }
@@ -15,11 +15,11 @@ export const coerceAttributes = function(attrs) {
             attrs[association.name + '_id'] = attrs[association.name].id;
             attrs[association.name + '_type'] = attrs[association.name].modelName.name;
         } else if (polymorphic && attrs[association.name + '_type']) {
-            Type = attrs[association.name + '_type'].camelize().constantize(global);
-            attrs[association.name] = new Type(attrs[association.name]);
+            objectType = attrs[association.name + '_type'].camelize().constantize(global);
+            attrs[association.name] = new objectType(attrs[association.name]);
         } else if (!(attrs[association.name] instanceof association.klass())) {
-            Type = association.klass();
-            attrs[association.name] = new Type(attrs[association.name]);
+            objectType = association.klass();
+            attrs[association.name] = new objectType(attrs[association.name]);
         }
     });
 
@@ -27,7 +27,8 @@ export const coerceAttributes = function(attrs) {
         if (attrs[key] || attrs[key] === false) {
             let tmp, klass;
             
-            klass = Type.registry[options['type']];
+            klass = Type.registry[options.type];
+
             if (klass) {
                 if (options['array']) {
                     tmp = [];

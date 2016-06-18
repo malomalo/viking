@@ -4,8 +4,7 @@ import Viking from '../../../../src/viking';
     module("Viking.Model::inheritanceAttribute");
 
     test("::inheritanceAttribute get set when extending a Model", function() {
-        var Ship = Viking.Model.extend();
-        
+        let Ship = Viking.Model.extend('ship');
         ok(Ship.inheritanceAttribute);
     });
     

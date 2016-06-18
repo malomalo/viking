@@ -50,29 +50,23 @@
     });
     
     test("linkTo(model, contentFunc)", function() {
-        Workshop = Viking.Model.extend('workshop');
-        workshopPath = function(m) { return '/workshops/' + m.toParam(); }
+        let Workshop = Viking.Model.extend('workshop');
+        let workshopPath = function(m) { return '/workshops/' + m.toParam(); }
         
         equal(
             Viking.View.Helpers.linkTo(new Workshop({id: 10}), function () { return 'Example'; }),
             '<a href="' + window.location.protocol + '//' + window.location.host + '/workshops/10'+'">Example</a>'
         );
-        
-        delete Workshop;
-        delete workshopPath;
     });
     
     test("linkTo(model, options, contentFunc)", function() {
-        Workshop = Viking.Model.extend('workshop');
-        workshopPath = function(m) { return '/workshops/' + m.toParam(); }
+        let Workshop = Viking.Model.extend('workshop');
+        let workshopPath = function(m) { return '/workshops/' + m.toParam(); }
         
         equal(
             Viking.View.Helpers.linkTo(new Workshop({id: 10}), {'class': 'myclass'}, function () { return 'Example'; }),
             '<a class="myclass" href="'+ window.location.protocol + '//' + window.location.host + '/workshops/10'+'">Example</a>'
         );
-        
-        delete Workshop;
-        delete workshopPath;
     });
     
 }());

@@ -1,3 +1,4 @@
+import { URLError } from './errors'
 // import Collection from './collection';
 
 const noXhrPatch =
@@ -61,7 +62,10 @@ export const sync = function(method, model, options) {
 
   // Ensure that we have a URL.
   if (!options.url) {
-    params.url = _.result(model, 'url') || urlError();
+    params.url = _.result(model, 'url')
+    if (!params.url) {
+        throw new URLError();
+    }
   }
 
   // Ensure that we have the appropriate request data.

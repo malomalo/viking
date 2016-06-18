@@ -103,9 +103,20 @@ import Viking from './../../../../../src/viking';
     });
 
     // coercing JSON ----------------------------------------------------------
+    test("#coerceAttributes coerces {} to Object", function() {
+        let Model = Viking.Model.extend('model', { schema: {
+            key: { type: 'json'}
+        }});
+        var a = new Model();
+
+        ok(a.coerceAttributes({key: {}}).key instanceof Object);
+        deepEqual(a.coerceAttributes({key: {}}).key.attributes, {});
+        deepEqual(a.coerceAttributes({key: {key: 'value'}}).key.attributes, {key: 'value'});
+    });
+
     test("#coerceAttributes coerces {} to Viking.Model", function() {
         let Model = Viking.Model.extend('model', { schema: {
-            key: {type: 'json'}
+            key: { type: 'json'}
         }});
         var a = new Model();
 
@@ -115,12 +126,13 @@ import Viking from './../../../../../src/viking';
     });
 
     test("#coerceAttributes coerces {} to Viking.Model and sets the modelName", function() {
-        let Model = Viking.Model.extend('model', { schema: {
-            key: {type: 'json'}
-        }});
+        let Model = Viking.Model.extend('model', {
+            belongsTo: [['key', { modelName: 'Model' }]]
+            // schema: { key: {type: 'json'} }
+        });
         var a = new Model();
 
-        deepEqual(a.coerceAttributes({key: {}}).key.modelName, 'key');
+        deepEqual(a.coerceAttributes({key: {}}).key.modelName.name, 'Model');
     });
 
 

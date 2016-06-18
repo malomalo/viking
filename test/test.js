@@ -218,6 +218,32 @@ this.Viking = this.Viking || {};
   NameError.prototype = Object.create(Error.prototype);
   NameError.prototype.constructor = NameError;
 
+  var URLError = function URLError(message, file, lineNumber) {
+      var err = new Error();
+
+      if (typeof message === 'undefined') {
+          message = 'A "url" property or function must be specified';
+      }
+
+      if (err.stack) {
+          // Remove one stack level.
+          if (typeof Components != 'undefined') {
+              // Mozilla
+              this.stack = err.stack.substring(err.stack.indexOf('\n') + 1);
+          } else if (typeof chrome != 'undefined' || typeof process != 'undefined') {
+              // Chrome / Node.js
+              this.stack = err.stack.replace(/\n[^\n]*/, '');
+          } else {
+              this.stack = err.stack;
+          }
+      }
+
+      this.name = 'Viking.URLError';
+      this.message = message === undefined ? err.message : message;
+      this.file = file === undefined ? err.file : file;
+      this.lineNumber = lineNumber === undefined ? err.lineNumber : lineNumber;
+  };
+
   // Converts the first character to uppercase
   String.prototype.capitalize = function () {
       return this.charAt(0).toUpperCase() + this.slice(1);
@@ -513,7 +539,10 @@ this.Viking = this.Viking || {};
 
     // Ensure that we have a URL.
     if (!options.url) {
-      params.url = _.result(model, 'url') || urlError();
+      params.url = _.result(model, 'url');
+      if (!params.url) {
+        throw new URLError();
+      }
     }
 
     // Ensure that we have the appropriate request data.
@@ -1730,6 +1759,7 @@ this.Viking = this.Viking || {};
   // The Viking gloval namespace for tracking created models, collections, etc...
   var global$1 = {};
 
+  // TODO: the objectName should be passed into the function
   var Name = function Name(name) {
       var objectName = name.camelize(); // Namespaced.Name
 
@@ -1775,21 +1805,22 @@ this.Viking = this.Viking || {};
 
   var JSONType = {
 
-      load: function load(value, key, klass) {
+      load: function load(value, key, className) {
 
           if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object') {
-              if (klass) {
-                  var model = new global$1[klass](value);
-                  // let AnonModel = Model.extend({
-                  //     inheritanceAttribute: false
-                  // });
-                  // let model = new AnonModel(value);
-                  // model.modelName = key;
-                  // model.baseModel = model;
-                  return model;
-              } else {
+
+              if (key) {
+                  var name = key.camelize();
+
+                  if (global$1[name]) {
+                      var model = new global$1[name](value);
+                      return model;
+                  }
+
                   return value;
               }
+
+              return value;
           }
 
           throw new TypeError((typeof value === 'undefined' ? 'undefined' : _typeof(value)) + " can't be coerced into JSON");
@@ -1981,7 +2012,7 @@ this.Viking = this.Viking || {};
   var coerceAttributes = function coerceAttributes(attrs) {
 
       _.each(this.associations, function (association) {
-          var Type = void 0;
+          var objectType = void 0;
           var polymorphic = association.options.polymorphic;
 
           if (!attrs[association.name]) {
@@ -1993,11 +2024,11 @@ this.Viking = this.Viking || {};
               attrs[association.name + '_id'] = attrs[association.name].id;
               attrs[association.name + '_type'] = attrs[association.name].modelName.name;
           } else if (polymorphic && attrs[association.name + '_type']) {
-              Type = attrs[association.name + '_type'].camelize().constantize(global$1);
-              attrs[association.name] = new Type(attrs[association.name]);
+              objectType = attrs[association.name + '_type'].camelize().constantize(global$1);
+              attrs[association.name] = new objectType(attrs[association.name]);
           } else if (!(attrs[association.name] instanceof association.klass())) {
-              Type = association.klass();
-              attrs[association.name] = new Type(attrs[association.name]);
+              objectType = association.klass();
+              attrs[association.name] = new objectType(attrs[association.name]);
           }
       });
 
@@ -2007,7 +2038,8 @@ this.Viking = this.Viking || {};
                   var tmp = void 0,
                       klass = void 0;
 
-                  klass = Type.registry[options['type']];
+                  klass = Type.registry[options.type];
+
                   if (klass) {
                       if (options['array']) {
                           tmp = [];
@@ -2395,7 +2427,7 @@ this.Viking = this.Viking || {};
                   var tmp = void 0,
                       klass = void 0;
 
-                  klass = Viking.Model.Type.registry[options.type];
+                  klass = Type.registry[options.type];
 
                   if (klass) {
                       if (options.array) {
@@ -2476,7 +2508,11 @@ this.Viking = this.Viking || {};
 
   // Default URL for the model's representation on the server
   var url = function url() {
-      var base = _.result(this, 'urlRoot') || _.result(this.collection, 'url') || urlError();
+      var base = _.result(this, 'urlRoot') || _.result(this.collection, 'url');
+
+      if (!base) {
+          throw new URLError();
+      }
 
       if (this.isNew()) return base;
 
@@ -2604,7 +2640,10 @@ var instanceProperties = Object.freeze({
       // if (typeof name !== 'string' || arguments.length < 1 || arguments.length > 3) {
       //     throw new ArgumentError('extend takes 1 - 3 arguments (name: String, protoProps: Object, staticProps: Object?)');
       // }
-
+      if (typeof name !== 'string') {
+          staticProps = protoProps;
+          protoProps = name;
+      }
       protoProps || (protoProps = {});
 
       var child = Backbone.Model.extend.call(this, protoProps, staticProps);
@@ -2658,7 +2697,7 @@ var instanceProperties = Object.freeze({
       // Track the model in the Viking global namespace.
       // Used in the constinize method
       if (child.modelName) {
-          global$1[child.modelName.singular] = child;
+          global$1[child.modelName.name] = child;
       }
 
       return child;
@@ -3130,13 +3169,25 @@ var classProperties = Object.freeze({
 
   }, {
 
-      extend: function extend(protoProps, staticProps) {
+      extend: function extend(name, protoProps, staticProps) {
+
+          if (typeof name !== 'string') {
+              staticProps = protoProps;
+              protoProps = name;
+          }
+          protoProps || (protoProps = {});
+
           var child = Backbone.Collection.extend.call(this, protoProps, staticProps);
 
           // Track the collection in the Viking global namespace.
           // Used in the constinize method
-          if (child.prototype.model && child.prototype.model.modelName) {
-              global$1[child.prototype.model.modelName.collectionName] = child;
+          if (typeof name !== 'string') {
+              if (child.prototype.model && child.prototype.model.modelName) {
+                  name = child.prototype.model.modelName.collectionName;
+                  global$1[name] = child;
+              }
+          } else {
+              global$1[name] = child;
           }
 
           return child;
@@ -3199,23 +3250,99 @@ var classProperties = Object.freeze({
   };
 
   (function () {
+      module("Viking#defaults");
+
+      test("defaults with schema", function () {
+          var Klass = Viking$1.Model.extend('klass', {
+              schema: {
+                  foo: { 'default': 'bar' },
+                  bat: { 'default': 'bazz' }
+              }
+          });
+
+          deepEqual(_.result(Klass.prototype, 'defaults'), { foo: 'bar', bat: 'bazz' });
+      });
+  })();
+
+  (function () {
+      module("Viking.Model.Type.Boolean");
+
+      test("::load coerces the string 'true' to true", function () {
+          strictEqual(Viking$1.Model.Type.Boolean.load("true"), true);
+      });
+
+      test("::load coerces the string 'false' to false", function () {
+          strictEqual(Viking$1.Model.Type.Boolean.load("false"), false);
+      });
+
+      test("::load coerces true to true", function () {
+          strictEqual(Viking$1.Model.Type.Boolean.load(true), true);
+      });
+
+      test("::load coerces false to false", function () {
+          strictEqual(Viking$1.Model.Type.Boolean.load(false), false);
+      });
+
+      test("::dump true", function () {
+          strictEqual(Viking$1.Model.Type.Boolean.dump(true), true);
+      });
+
+      test("::dump false", function () {
+          strictEqual(Viking$1.Model.Type.Boolean.dump(false), false);
+      });
+  })();
+
+  (function () {
+      module("Viking.Model.Type.Date");
+
+      test("::load thows error when can't coerce value", function () {
+          expect(2);
+
+          throws(function () {
+              Viking$1.Model.Type.Date.load(true);
+          }, TypeError);
+
+          try {
+              Viking$1.Model.Type.Date.load(true);
+          } catch (e) {
+              equal(e.message, "boolean can't be coerced into Date");
+          }
+      });
+
+      test("::load coerces iso8601 string to date", function () {
+          deepEqual(Viking$1.Model.Type.Date.load("2013-04-10T21:24:28+00:00"), new Date(1365629068000));
+
+          equal(Viking$1.Model.Type.Date.load("2013-04-10T21:24:28+00:00").valueOf(), new Date(1365629068000).valueOf());
+      });
+
+      test("::load coerces int(milliseconds since epoch) to date", function () {
+          deepEqual(Viking$1.Model.Type.Date.load(1365629126097), new Date(1365629126097));
+
+          equal(Viking$1.Model.Type.Date.load(1365629126097).valueOf(), new Date(1365629126097).valueOf());
+      });
+
+      test("::load coerces date to date", function () {
+          equal(Viking$1.Model.Type.Date.load(new Date(1365629126097)).valueOf(), new Date(1365629126097).valueOf());
+      });
+
+      test("::dump coerces Date to ISOString", function () {
+          deepEqual(Viking$1.Model.Type.Date.dump(new Date(1365629068000)), "2013-04-10T21:24:28.000Z");
+      });
+  })();
+
+  (function () {
       module("Viking.Model.Type.JSON");
 
-      test("::load coerces {} to Viking.Model", function () {
-          ok(Viking$1.Model.Type.JSON.load({}) instanceof Viking$1.Model);
-
-          deepEqual(Viking$1.Model.Type.JSON.load({}).attributes, {});
-          deepEqual(Viking$1.Model.Type.JSON.load({ key: 'value' }).attributes, { key: 'value' });
+      test("::load coerces {} to {}", function () {
+          ok(Viking$1.Model.Type.JSON.load({}) instanceof Object);
+          deepEqual(Viking$1.Model.Type.JSON.load({}), {});
+          deepEqual(Viking$1.Model.Type.JSON.load({ key: 'value' }), { key: 'value' });
       });
 
       test("::load coerces {} to Viking.Model with modelName set to key", function () {
-          equal(Viking$1.Model.Type.JSON.load({}, 'key').modelName, 'key');
-      });
-
-      test("::load coerces {} to Viking.Model with baseModel set to the JSON object", function () {
-          var attribute = Viking$1.Model.Type.JSON.load({}, 'key');
-
-          strictEqual(attribute.baseModel, attribute);
+          var Ship = Viking$1.Model.extend('ship');
+          equal(Viking$1.Model.Type.JSON.load({}, 'ship').modelName.name, 'Ship');
+          // equal(Viking.Model.Type.JSON.load([{}], 'ship')[0].modelName.name, 'Ship');
       });
 
       test("::load thows error when can't coerce value", function () {
@@ -3233,7 +3360,10 @@ var classProperties = Object.freeze({
       });
 
       test("::load doesn't use the type key for STI", function () {
-          deepEqual(Viking$1.Model.Type.JSON.load({ type: 'my_value' }).attributes, { type: 'my_value' });
+          var Ship = Viking$1.Model.extend('ship', {
+              inheritanceAttribute: false
+          });
+          deepEqual(Viking$1.Model.Type.JSON.load({ type: 'my_value' }, 'ship').attributes, { type: 'my_value' });
       });
 
       test("::dump calls toJSON() on model", function () {
@@ -3248,8 +3378,669 @@ var classProperties = Object.freeze({
 
       test("::dump calls toJSON() with object", function () {
           var model = { foo: 'bar' };
-
           deepEqual(Viking$1.Model.Type.JSON.dump(model), { foo: 'bar' });
+      });
+  })();
+
+  (function () {
+      module("Viking.Model.Type.Number");
+
+      test("::load coerces number to number", function () {
+          equal(Viking$1.Model.Type.Number.load(10), 10);
+          equal(Viking$1.Model.Type.Number.load(10.5), 10.5);
+      });
+
+      test("::load coerces string to number", function () {
+          equal(Viking$1.Model.Type.Number.load('10'), 10);
+          equal(Viking$1.Model.Type.Number.load('10.5'), 10.5);
+      });
+
+      test("::load coerces empty string to null", function () {
+          equal(Viking$1.Model.Type.Number.load(' '), null);
+          equal(Viking$1.Model.Type.Number.load(''), null);
+      });
+
+      test("::dump coerces number to number", function () {
+          equal(Viking$1.Model.Type.Number.dump(10), 10);
+          equal(Viking$1.Model.Type.Number.dump(10.5), 10.5);
+      });
+
+      test("::dump coerces null to null", function () {
+          equal(Viking$1.Model.Type.Number.dump(null), null);
+          equal(Viking$1.Model.Type.Number.dump(null), null);
+      });
+  })();
+
+  (function () {
+      module("Viking.Model.Type.String");
+
+      test("::load coerces boolean to string", function () {
+          equal(Viking$1.Model.Type.String.load(true), 'true');
+          equal(Viking$1.Model.Type.String.load(false), 'false');
+      });
+
+      test("::load coerces number to string", function () {
+          equal(Viking$1.Model.Type.String.load(10), '10');
+          equal(Viking$1.Model.Type.String.load(10.5), '10.5');
+      });
+
+      test("::load coerces null to string", function () {
+          equal(Viking$1.Model.Type.String.load(null), null);
+      });
+
+      test("::load coerces undefined to string", function () {
+          equal(Viking$1.Model.Type.String.load(undefined), undefined);
+      });
+
+      test("::dump coerces boolean to string", function () {
+          equal(Viking$1.Model.Type.String.dump(true), 'true');
+          equal(Viking$1.Model.Type.String.dump(false), 'false');
+      });
+
+      test("::dump coerces number to string", function () {
+          equal(Viking$1.Model.Type.String.dump(10), '10');
+          equal(Viking$1.Model.Type.String.dump(10.5), '10.5');
+      });
+
+      test("::dump coerces null to string", function () {
+          equal(Viking$1.Model.Type.String.dump(null), null);
+      });
+
+      test("::dump coerces undefined to string", function () {
+          equal(Viking$1.Model.Type.String.dump(undefined), undefined);
+      });
+  })();
+
+  (function () {
+      module("Viking.Model::baseModel");
+
+      test("::baseModel get's set to self when extending Viking.Model", function () {
+          var Ship = Viking$1.Model.extend('ship');
+
+          strictEqual(Ship, Ship.baseModel);
+      });
+
+      test("::baseModel get's set to self when extending an abstract Viking.Model", function () {
+          var RussianShip = Viking$1.Model.extend('russianShip', {
+              abstract: true
+          });
+          var Ship = RussianShip.extend('ship');
+
+          strictEqual(Ship, Ship.baseModel);
+      });
+
+      test("::baseModel get's set to parent Model when extending a Viking.Model", function () {
+          var Ship = Viking$1.Model.extend('ship');
+          var Carrier = Ship.extend('carrier');
+
+          strictEqual(Ship, Carrier.baseModel);
+      });
+  })();
+
+  (function () {
+      module("Viking.Model::create", {
+          setup: function setup() {
+              this.requests = [];
+              this.xhr = sinon.useFakeXMLHttpRequest();
+              this.xhr.onCreate = _.bind(function (xhr) {
+                  this.requests.push(xhr);
+              }, this);
+          },
+          teardown: function teardown() {
+              this.xhr.restore();
+          }
+      });
+
+      test("::create returns an new model", function () {
+          var Model = Viking$1.Model.extend('model');
+
+          var m = Model.create({ name: "name" });
+          ok(m instanceof Model);
+      });
+
+      test("::create calls save with options", function () {
+          var Model = Viking$1.Model.extend('model');
+
+          Model.prototype.save = function (attributes, options) {
+              deepEqual(options, { option: 1 });
+          };
+
+          var m = Model.create({ name: "name" }, { option: 1 });
+      });
+  })();
+
+  (function () {
+      module("Viking.model::extend");
+
+      // setting attributes on a model coerces relations
+      test("::extend acts like normal Backbone.Model", function () {
+          var Model = Viking$1.Model.extend('model', { key: 'value' }, { key: 'value' });
+
+          equal(Model.key, 'value');
+          equal(new Model().key, 'value');
+      });
+
+      test("::extend with modelName", function () {
+          var Model = Viking$1.Model.extend('model');
+
+          propEqual(_.omit(Model.modelName, 'model'), {
+              name: 'Model',
+              element: 'model',
+              human: 'Model',
+              paramKey: 'model',
+              plural: 'models',
+              routeKey: 'models',
+              singular: 'model',
+              collection: 'models',
+              collectionName: 'ModelCollection'
+          });
+          propEqual(_.omit(new Model().modelName, 'model'), {
+              name: 'Model',
+              element: 'model',
+              human: 'Model',
+              paramKey: 'model',
+              plural: 'models',
+              routeKey: 'models',
+              singular: 'model',
+              collection: 'models',
+              collectionName: 'ModelCollection'
+          });
+      });
+
+      test("::extend initalizes the assocations", function () {
+          var Model = Viking$1.Model.extend('model');
+
+          deepEqual(Model.associations, {});
+      });
+
+      test("::extend adds hasMany relationships to associations", function () {
+          var Ship = Viking$1.Model.extend('ship', { hasMany: ['ships'] });
+
+          equal(Ship.associations['ships'].name, 'ships');
+          equal(Ship.associations['ships'].macro, 'hasMany');
+          deepEqual(Ship.associations['ships'].options, {});
+          equal(Ship.associations['ships'].collectionName, 'ShipCollection');
+      });
+
+      test("::extend adds hasMany relationships with options to associations", function () {
+          var Ship = Viking$1.Model.extend('ship', { hasMany: [['ships', { collectionName: 'MyCollection' }]] });
+
+          equal(Ship.associations['ships'].name, 'ships');
+          equal(Ship.associations['ships'].macro, 'hasMany');
+          deepEqual(Ship.associations['ships'].options, { collectionName: 'MyCollection' });
+          equal(Ship.associations['ships'].collectionName, 'MyCollection');
+      });
+
+      test("::extend adds belongsTo relationships to associations", function () {
+          var Ship = Viking$1.Model.extend('ship', { belongsTo: ['ship'] });
+
+          equal(Ship.associations['ship'].name, 'ship');
+          equal(Ship.associations['ship'].macro, 'belongsTo');
+          deepEqual(Ship.associations['ship'].options, {});
+          propEqual(_.omit(Ship.associations['ship'].modelName, 'model'), {
+              name: 'Ship',
+              element: 'ship',
+              human: 'Ship',
+              paramKey: 'ship',
+              plural: 'ships',
+              routeKey: 'ships',
+              singular: 'ship',
+              collection: 'ships',
+              collectionName: 'ShipCollection'
+          });
+      });
+
+      test("::extend adds belongsTo relationships with options to associations", function () {
+          var Ship = Viking$1.Model.extend('ship', { belongsTo: [['ship', { modelName: 'Carrier' }]] });
+
+          equal(Ship.associations['ship'].name, 'ship');
+          equal(Ship.associations['ship'].macro, 'belongsTo');
+          deepEqual(Ship.associations['ship'].options, { modelName: 'Carrier' });
+          propEqual(Ship.associations['ship'].modelName, new Viking$1.Model.Name('carrier'));
+      });
+
+      // STI
+      // ========================================================================
+
+      test("::extend a Viking.Model unions the hasMany relationships", function () {
+          var Key = Viking$1.Model.extend('key');
+          var Comment = Viking$1.Model.extend('comment');
+          var Account = Viking$1.Model.extend('account', { hasMany: ['comments'] });
+          var Agent = Account.extend('agent', { hasMany: ['keys'] });
+
+          deepEqual(['comments'], _.map(Account.associations, function (a) {
+              return a.name;
+          }));
+          deepEqual(['comments', 'keys'], _.map(Agent.associations, function (a) {
+              return a.name;
+          }).sort());
+      });
+
+      test("::extend a Viking.Model unions the belongsTo relationships", function () {
+          var State = Viking$1.Model.extend('state');
+          var Region = Viking$1.Model.extend('region');
+          var Account = Viking$1.Model.extend('account', { belongsTo: ['state'] });
+          var Agent = Account.extend('agent', { belongsTo: ['region'] });
+
+          deepEqual(['state'], _.map(Account.associations, function (a) {
+              return a.name;
+          }));
+          deepEqual(['region', 'state'], _.map(Agent.associations, function (a) {
+              return a.name;
+          }).sort());
+      });
+
+      test("::extend a Viking.Model unions the schema", function () {
+          window.Account = Viking$1.Model.extend('account', { schema: {
+                  created_at: { type: 'date' }
+              } });
+
+          window.Agent = Account.extend('agent', { schema: {
+                  name: { type: 'string' }
+              } });
+
+          deepEqual(Account.prototype.schema, {
+              created_at: { type: 'date' }
+          });
+          deepEqual(Agent.prototype.schema, {
+              created_at: { type: 'date' },
+              name: { type: 'string' }
+          });
+
+          delete window.Account;
+          delete window.Agent;
+      });
+
+      test("::extend a Viking.Model adds itself to the descendants", function () {
+          window.Account = Viking$1.Model.extend('account');
+          window.Agent = Account.extend('agent');
+
+          deepEqual(Account.descendants, [Agent]);
+          deepEqual(Agent.descendants, []);
+
+          delete window.Account;
+          delete window.Agent;
+      });
+  })();
+
+  (function () {
+      module("Viking.Model::findOrCreateBy", {
+          setup: function setup() {
+              this.requests = [];
+              this.xhr = sinon.useFakeXMLHttpRequest();
+              this.xhr.onCreate = _.bind(function (xhr) {
+                  this.requests.push(xhr);
+              }, this);
+          },
+          teardown: function teardown() {
+              this.xhr.restore();
+          }
+      });
+
+      test("::findOrCreateBy(attributes) find a model that exits", function () {
+          expect(1);
+
+          var Ship = Viking$1.Model.extend('ship');
+          var relient = new Ship({ name: 'Relient' });
+
+          var ShipCollection = Viking$1.Collection.extend({
+              model: Ship,
+              fetch: function fetch(options) {
+                  options.success(new ShipCollection([relient]));
+              }
+          });
+
+          Ship.findOrCreateBy({ name: 'Relient' }, {
+              success: function success(model) {
+                  strictEqual(model, relient);
+              }
+          });
+      });
+
+      test("::findOrCreateBy(attributes) without a success callback finds a model that exits", function () {
+          expect(0);
+
+          var Ship = Viking$1.Model.extend('ship');
+          var ShipCollection = Viking$1.Collection.extend({
+              model: Ship,
+              fetch: function fetch(options) {
+                  options.success(new ShipCollection([{ name: 'Relient' }]));
+              }
+          });
+
+          Ship.findOrCreateBy({ name: 'Relient' });
+      });
+
+      test("::findOrCreateBy(attributes) calls create when the model doesn't exist", function () {
+          expect(2);
+
+          var Ship = Viking$1.Model.extend('ship');
+          var ShipCollection = Viking$1.Collection.extend({
+              model: Ship,
+              fetch: function fetch(options) {
+                  options.success(new ShipCollection([]));
+              }
+          });
+
+          Ship.create = function (attributes, options) {
+              deepEqual(attributes, { name: 'Relient' });
+              deepEqual(options, { option: 1 });
+          };
+
+          Ship.findOrCreateBy({ name: 'Relient' }, { option: 1 });
+      });
+  })();
+
+  (function () {
+      module("Viking.Model::find", {
+          setup: function setup() {
+              this.requests = [];
+              this.xhr = sinon.useFakeXMLHttpRequest();
+              this.xhr.onCreate = _.bind(function (xhr) {
+                  this.requests.push(xhr);
+              }, this);
+          },
+          teardown: function teardown() {
+              this.xhr.restore();
+          }
+      });
+
+      test("::find returns an new model", function () {
+          var Model = Viking$1.Model.extend('model');
+
+          var m = Model.find(12);
+          ok(m instanceof Model);
+      });
+
+      test("::find sends get request to correct url", function () {
+          var Model = Viking$1.Model.extend('model');
+
+          Model.find(12);
+          equal(this.requests[0].method, 'GET');
+          equal(this.requests[0].url, '/models/12');
+      });
+
+      test("::find triggers success callback", function () {
+          expect(1);
+
+          var Model = Viking$1.Model.extend('model');
+          Model.find(12, {
+              success: function success(m) {
+                  equal(m.get('name'), "Viking");
+              }
+          });
+          this.requests[0].respond(200, '[]', '{"id": 12, "name": "Viking"}');
+      });
+
+      test("::find triggers error callback", function () {
+          expect(1);
+
+          var Model = Viking$1.Model.extend('model');
+          Model.find(12, {
+              error: function error(m) {
+                  ok(true);
+              }
+          });
+          this.requests[0].respond(500, '[]', 'Server Error!');
+      });
+  })();
+
+  (function () {
+      module("Viking.Model::inheritanceAttribute");
+
+      test("::inheritanceAttribute get set when extending a Model", function () {
+          var Ship = Viking$1.Model.extend('ship');
+          ok(Ship.inheritanceAttribute);
+      });
+
+      test("::inheritanceAttribute default to `type`", function () {
+          var Ship = Viking$1.Model.extend();
+
+          equal('type', Ship.inheritanceAttribute);
+      });
+
+      test("::inheritanceAttribute override", function () {
+          var Ship = Viking$1.Model.extend('ship', {
+              inheritanceAttribute: 'class_name'
+          });
+
+          equal('class_name', Ship.inheritanceAttribute);
+      });
+
+      test("::inheritanceAttribute set to false disabled STI", function () {
+          var Ship = Viking$1.Model.extend('ship', {
+              inheritanceAttribute: false
+          });
+          var Battleship = Ship.extend('battleship');
+
+          var bship = new Battleship();
+          strictEqual(false, Ship.inheritanceAttribute);
+          strictEqual(Battleship, bship.baseModel);
+      });
+  })();
+
+  (function () {
+      module("Viking.Model::new");
+
+      test("::new sets modelName on the instance", function () {
+          var Ship = Viking$1.Model.extend('ship');
+
+          propEqual(_.omit(new Ship().modelName, 'model'), {
+              name: 'Ship',
+              element: 'ship',
+              human: 'Ship',
+              paramKey: 'ship',
+              plural: 'ships',
+              routeKey: 'ships',
+              singular: 'ship',
+              collection: 'ships',
+              collectionName: 'ShipCollection'
+          });
+
+          var Namespaced = {};
+          var Model = Viking$1.Model.extend('namespaced/model');
+          propEqual(_.omit(new Model().modelName, 'model'), {
+              'name': 'Namespaced.Model',
+              singular: 'namespaced_model',
+              plural: 'namespaced_models',
+              routeKey: 'namespaced_models',
+              paramKey: 'namespaced_model',
+              human: 'Model',
+              element: 'model',
+              collection: 'namespaced_models',
+              collectionName: 'Namespaced.ModelCollection'
+          });
+      });
+
+      test("::new sets associations on the instance as a refernce to the associations on the Class", function () {
+          var Ship = Viking$1.Model.extend('ship', { hasMany: [['ships', { collectionName: 'MyCollection' }]] });
+          var MyCollection = Viking$1.Collection.extend('MyCollection');
+
+          var myship = new Ship();
+          strictEqual(myship.associations, Ship.associations);
+      });
+
+      test("::new(attrs) does coercions", function () {
+          var Model = Viking$1.Model.extend('model', { schema: {
+                  date: { type: 'date' }
+              } });
+
+          var a = new Model({ 'date': "2013-04-10T21:24:28+00:00" });
+          equal(a.get('date').valueOf(), new Date(1365629068000).valueOf());
+      });
+
+      test("::new(attrs) coerces hasMany relations", function () {
+          var Ship = Viking$1.Model.extend('ship', { hasMany: ['ships'] });
+          var ShipCollection = Viking$1.Collection.extend({ model: Ship });
+
+          var a = new Ship({ ships: [{}, {}] });
+          ok(a.get('ships') instanceof ShipCollection);
+          equal(a.get('ships').length, 2);
+          ok(a.get('ships').first() instanceof Ship);
+      });
+
+      test("::new(attrs) coerces belongsTo relations", function () {
+          var Ship = Viking$1.Model.extend('ship', { belongsTo: ['ship'] });
+
+          var a = new Ship({ 'ship': {} });
+          ok(a.get('ship') instanceof Ship);
+      });
+
+      test("::new(attrs) sets hasMany relations to an empty collection if not in attrs", function () {
+          var Ship = Viking$1.Model.extend('ship', { hasMany: ['ships'] });
+          var ShipCollection = Viking$1.Collection.extend({ model: Ship });
+
+          var a = new Ship();
+          ok(a.get('ships') instanceof ShipCollection);
+          equal(a.get('ships').length, 0);
+      });
+
+      // STI
+      test("::new(attrs) on subtype sets the type to the submodel type", function () {
+          var Account = Viking$1.Model.extend('account');
+          var Agent = Account.extend('agent');
+
+          var agent = new Agent();
+          equal('Agent', agent.get('type'));
+      });
+
+      test("::new(attrs) on model sets the type if there are submodels", function () {
+          var Account = Viking$1.Model.extend('account');
+          var Agent = Account.extend('agent');
+
+          var account = new Account();
+          equal('Account', account.get('type'));
+      });
+
+      test("::new(attrs) with type set to a sub-type returns subtype", function () {
+          var Account = Viking$1.Model.extend('account');
+          var Agent = Account.extend('agent');
+
+          var agent = new Account({ type: 'agent' });
+          ok(agent instanceof Agent);
+          ok(agent instanceof Account);
+      });
+
+      test("::new() with default type", function () {
+          var Account = Viking$1.Model.extend('account', {
+              defaults: {
+                  type: 'agent'
+              }
+          });
+          var Agent = Account.extend('agent');
+
+          var agent = new Account();
+          ok(agent instanceof Agent);
+      });
+  })();
+
+  (function () {
+      module("Viking.Model::reflectOnAssociation");
+
+      test("::reflectOnAssociation() returns the assocation", function () {
+          var Ship = Viking$1.Model.extend('ship', { hasMany: ['ships'], belongsTo: [['carrier', { modelName: 'Ship' }]] });
+          var ShipCollection = Viking$1.Collection.extend({ model: Ship });
+
+          equal('ships', Ship.reflectOnAssociation('ships').name);
+          equal('carrier', Ship.reflectOnAssociation('carrier').name);
+          equal(undefined, Ship.reflectOnAssociation('bird'));
+      });
+  })();
+
+  (function () {
+      module("Viking.Model::reflectOnAssociations");
+
+      test("::reflectOnAssociations() returns all the assocations", function () {
+          var Ship = Viking$1.Model.extend('ship', { hasMany: ['ships'], belongsTo: [['carrier', { modelName: 'Ship' }]] });
+          var ShipCollection = Viking$1.Collection.extend({ model: Ship });
+
+          deepEqual(['carrier', 'ships'], _.map(Ship.reflectOnAssociations(), function (a) {
+              return a.name;
+          }));
+      });
+
+      test("::reflectOnAssociations(macro) returns all macro assocations", function () {
+          var Ship = Viking$1.Model.extend('ship', { hasMany: ['ships'], belongsTo: [['carrier', { modelName: 'Ship' }]] });
+          var ShipCollection = Viking$1.Collection.extend({ model: Ship });
+
+          deepEqual(['ships'], _.map(Ship.reflectOnAssociations('hasMany'), function (a) {
+              return a.name;
+          }));
+      });
+  })();
+
+  (function () {
+      module("Viking.Model::urlRoot");
+
+      test("::urlRoot returns an URL based on modelName", function () {
+          var Model = Viking$1.Model.extend('model');
+          equal(Model.urlRoot(), '/models');
+
+          var Model = Viking$1.Model.extend('namespaced/model');
+          equal(Model.urlRoot(), '/namespaced_models');
+      });
+
+      test("::urlRoot returns an URL based on #urlRoot set on the model", function () {
+          var Model = Viking$1.Model.extend('model', {
+              urlRoot: '/buoys'
+          });
+          equal(Model.urlRoot(), '/buoys');
+      });
+
+      // STI test
+      test("::urlRoot returns an URL based on modelName of the baseModel", function () {
+          var Ship = Viking$1.Model.extend('ship');
+          var Carrier = Ship.extend();
+
+          equal(Carrier.urlRoot(), '/ships');
+      });
+
+      test("::urlRoot returns an URL based on #urlRoot set on the baseModel", function () {
+          var Ship = Viking$1.Model.extend('ship', {
+              urlRoot: '/myships'
+          });
+          var Carrier = Ship.extend();
+
+          equal(Carrier.urlRoot(), '/myships');
+      });
+
+      test("::urlRoot returns an URL based on #urlRoot set on the sti model", function () {
+          var Ship = Viking$1.Model.extend('ship');
+          var Carrier = Ship.extend({
+              urlRoot: '/carriers'
+          });
+
+          equal(Carrier.urlRoot(), '/carriers');
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#baseModel");
+
+      test("#baseModel get's set to self when extending Viking.Model", function () {
+          var Ship = Viking$1.Model.extend('ship');
+          var ship = new Ship();
+
+          strictEqual(Ship, ship.baseModel);
+      });
+
+      test("#baseModel get's set to self when extending an abstract Viking.Model", function () {
+          var RussianShip = Viking$1.Model.extend('russianShip', {
+              abstract: true
+          });
+          var Ship = RussianShip.extend('ship');
+
+          var ship = new Ship();
+
+          strictEqual(Ship, ship.baseModel);
+      });
+
+      test("#baseModel get's set to parent Model when extending a Viking.Model", function () {
+          var Ship = Viking$1.Model.extend('ship');
+          var Carrier = Ship.extend('carrier');
+          var carrier = new Carrier();
+
+          strictEqual(Ship, carrier.baseModel);
       });
   })();
 
@@ -3272,6 +4063,1246 @@ var classProperties = Object.freeze({
 
           var result = a.coerceAttributes({ ship: b });
           ok(result.ship === b);
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#coerceAttributes - coercions");
+
+      // coerceAttributes modifies the object passed in ----------------------------
+      test("#coerceAttributes modifies the object passed in", function () {
+          var Model = Viking$1.Model.extend('model', { schema: {
+                  date: { type: 'date' }
+              } });
+          var a = new Model();
+          var attrs = { date: "2013-04-10T21:24:28+00:00" };
+          a.coerceAttributes(attrs);
+
+          deepEqual(attrs, { date: new Date(1365629068000) });
+          equal(attrs.date.valueOf(), new Date(1365629068000).valueOf());
+      });
+
+      // coercions and unsupported data type ---------------------------------------
+      test("#coerceAttributes thows error when can't coerce value", function () {
+          expect(2);
+
+          var Model = Viking$1.Model.extend('model', { schema: {
+                  date: { type: 'Unkown' }
+              } });
+          var a = new Model();
+
+          throws(function () {
+              a.coerceAttributes({ date: true });
+          }, TypeError);
+
+          try {
+              a.coerceAttributes({ date: true });
+          } catch (e) {
+              equal(e.message, "Coercion of Unkown unsupported");
+          }
+      });
+
+      // coercing dates ---------------------------------------------------------
+      test("#coerceAttributes coerces iso8601 string to date", function () {
+          var Model = Viking$1.Model.extend('model', { schema: {
+                  date: { type: 'date' }
+              } });
+          var a = new Model();
+
+          deepEqual(a.coerceAttributes({ date: "2013-04-10T21:24:28+00:00" }), { date: new Date(1365629068000) });
+          equal(a.coerceAttributes({ date: "2013-04-10T21:24:28+00:00" }).date.valueOf(), new Date(1365629068000).valueOf());
+      });
+
+      test("#coerceAttributes coerces int(milliseconds since epoch) to date", function () {
+          var Model = Viking$1.Model.extend('model', { schema: {
+                  date: { type: 'date' }
+              } });
+          var a = new Model();
+
+          deepEqual(a.coerceAttributes({ date: 1365629126097 }), { date: new Date(1365629126097) });
+          equal(a.coerceAttributes({ date: 1365629126097 }).date.valueOf(), new Date(1365629126097).valueOf());
+      });
+
+      // coercing strings -------------------------------------------------------
+      test("#coerceAttributes coerces boolean to string", function () {
+          var Model = Viking$1.Model.extend('model', { schema: {
+                  key: { type: 'string' }
+              } });
+          var a = new Model();
+
+          equal(a.coerceAttributes({ key: true }).key, 'true');
+          equal(a.coerceAttributes({ key: false }).key, 'false');
+      });
+
+      test("#coerceAttributes coerces number to string", function () {
+          var Model = Viking$1.Model.extend('model', { schema: {
+                  key: { type: 'string' }
+              } });
+          var a = new Model();
+
+          equal(a.coerceAttributes({ key: 10 }).key, '10');
+          equal(a.coerceAttributes({ key: 10.5 }).key, '10.5');
+      });
+
+      test("#coerceAttributes coerces null to string", function () {
+          var Model = Viking$1.Model.extend('model', { schema: {
+                  key: { type: 'string' }
+              } });
+          var a = new Model();
+
+          equal(a.coerceAttributes({ key: null }).key, null);
+      });
+
+      // coercing numbers -------------------------------------------------------
+      test("#coerceAttributes coerces string to number", function () {
+          var Model = Viking$1.Model.extend('model', { schema: {
+                  key: { type: 'number' }
+              } });
+          var a = new Model();
+
+          equal(a.coerceAttributes({ key: '10.5' }).key, 10.50);
+          equal(a.coerceAttributes({ key: '10' }).key, 10);
+      });
+
+      // coercing JSON ----------------------------------------------------------
+      test("#coerceAttributes coerces {} to Object", function () {
+          var Model = Viking$1.Model.extend('model', { schema: {
+                  key: { type: 'json' }
+              } });
+          var a = new Model();
+
+          ok(a.coerceAttributes({ key: {} }).key instanceof Object);
+          deepEqual(a.coerceAttributes({ key: {} }).key.attributes, {});
+          deepEqual(a.coerceAttributes({ key: { key: 'value' } }).key.attributes, { key: 'value' });
+      });
+
+      test("#coerceAttributes coerces {} to Viking.Model", function () {
+          var Model = Viking$1.Model.extend('model', { schema: {
+                  key: { type: 'json' }
+              } });
+          var a = new Model();
+
+          ok(a.coerceAttributes({ key: {} }).key instanceof Viking$1.Model);
+          deepEqual(a.coerceAttributes({ key: {} }).key.attributes, {});
+          deepEqual(a.coerceAttributes({ key: { key: 'value' } }).key.attributes, { key: 'value' });
+      });
+
+      test("#coerceAttributes coerces {} to Viking.Model and sets the modelName", function () {
+          var Model = Viking$1.Model.extend('model', {
+              belongsTo: [['key', { modelName: 'Model' }]]
+              // schema: { key: {type: 'json'} }
+          });
+          var a = new Model();
+
+          deepEqual(a.coerceAttributes({ key: {} }).key.modelName.name, 'Model');
+      });
+
+      test("#coerceAttributes thows error when can't coerce value", function () {
+          expect(2);
+
+          var Model = Viking$1.Model.extend('model', { schema: {
+                  date: { type: 'date' }
+              } });
+          var a = new Model();
+
+          throws(function () {
+              a.coerceAttributes({ date: true });
+          }, TypeError);
+
+          try {
+              a.coerceAttributes({ date: true });
+          } catch (e) {
+              equal(e.message, "boolean can't be coerced into Date");
+          }
+      });
+
+      // Array support
+      test("#coerceAttributes support array coercion", function () {
+          var Model = Viking$1.Model.extend('model', { schema: {
+                  key: { type: 'number', array: true }
+              } });
+          var a = new Model();
+
+          deepEqual(a.coerceAttributes({ key: [10, '10.5'] }).key, [10, 10.5]);
+          deepEqual(a.coerceAttributes({ key: ['10.5'] }).key, [10.50]);
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#coerceAttributes - hasMany");
+
+      test("#coerceAttributes initializes hasMany relation with array of hashes", function () {
+          var Ship = Viking$1.Model.extend('ship', { hasMany: ['ships'] });
+          var ShipCollection = Viking$1.Collection.extend({ model: Ship });
+
+          var a = new Ship();
+
+          var result = a.coerceAttributes({ ships: [{ key: 'foo' }, { key: 'bar' }] });
+          ok(result.ships instanceof ShipCollection);
+          ok(result.ships.models[0] instanceof Ship);
+          ok(result.ships.models[1] instanceof Ship);
+          deepEqual(result.ships.models[0].attributes.key, 'foo');
+          deepEqual(result.ships.models[1].attributes.key, 'bar');
+      });
+
+      test("#coerceAttributes() initializes hasMany relation with array of models", function () {
+          var Ship = Viking$1.Model.extend('ship', { hasMany: ['ships'] });
+          var ShipCollection = Viking$1.Collection.extend({ model: Ship });
+
+          var a = new Ship();
+          var models = [new Ship({ key: 'foo' }), new Ship({ key: 'bar' })];
+
+          var result = a.coerceAttributes({ ships: models });
+          ok(result.ships instanceof ShipCollection);
+          ok(result.ships.models[0] === models[0]);
+          ok(result.ships.models[1] === models[1]);
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#inheritanceAttribute");
+
+      test("#inheritanceAttribute get set when extending a Model", function () {
+          var Ship = Viking$1.Model.extend('ship');
+          var ship = new Ship();
+          ok(ship.inheritanceAttribute);
+      });
+
+      test("::inheritanceAttribute default to `type`", function () {
+          var Ship = Viking$1.Model.extend('ship');
+          var ship = new Ship();
+          equal('type', ship.inheritanceAttribute);
+      });
+
+      test("::inheritanceAttribute override", function () {
+          var Ship = Viking$1.Model.extend('ship', {
+              inheritanceAttribute: 'class_name'
+          });
+          var ship = new Ship();
+
+          equal('class_name', ship.inheritanceAttribute);
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#paramRoot");
+
+      test("instance.paramRoot returns underscored modelName", function () {
+          var Model = Viking$1.Model.extend('model');
+          var model = new Model();
+
+          equal(model.paramRoot(), 'model');
+
+          Model = Viking$1.Model.extend('namespaced/model');
+          model = new Model();
+          equal(model.paramRoot(), 'namespaced_model');
+      });
+
+      test("instance.paramRoot returns underscored baseModel.modelName when used as STI", function () {
+          var Boat = Viking$1.Model.extend('boat');
+          var Carrier = Boat.extend('boat');
+          var model = new Carrier();
+
+          equal(model.paramRoot(), 'boat');
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#reflectOnAssociation");
+
+      test("#reflectOnAssociation() is a reference to ::reflectOnAssociation()", function () {
+          var Ship = Viking$1.Model.extend();
+
+          strictEqual(Ship.reflectOnAssociation, new Ship().reflectOnAssociation);
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#reflectOnAssociations");
+
+      test("#reflectOnAssociations() is a reference to ::reflectOnAssociations()", function () {
+          var Ship = Viking$1.Model.extend();
+
+          strictEqual(Ship.reflectOnAssociations, new Ship().reflectOnAssociations);
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#save", {
+          setup: function setup() {
+              this.requests = [];
+              this.xhr = sinon.useFakeXMLHttpRequest();
+              this.xhr.onCreate = _.bind(function (xhr) {
+                  this.requests.push(xhr);
+              }, this);
+          },
+          teardown: function teardown() {
+              this.xhr.restore();
+          }
+      });
+
+      test("#save calls setErrors when a 400 is returned", function () {
+          expect(1);
+
+          var Model = Viking$1.Model.extend('model');
+
+          var m = new Model();
+          m.setErrors = function (errors, options) {
+              deepEqual(errors, {
+                  "address": { "city": ["cant be blank"] },
+                  "agents": [{ "email": ["cant be blank", "is invalid"] }],
+                  "size": ["cant be blank", "is not a number"]
+              });
+          };
+
+          m.save();
+          this.requests[0].respond(400, '[]', JSON.stringify({
+              "errors": {
+                  "address": { "city": ["cant be blank"] },
+                  "agents": [{ "email": ["cant be blank", "is invalid"] }],
+                  "size": ["cant be blank", "is not a number"]
+              }
+          }));
+      });
+
+      test("#save calls the invalid callback when a 400 is returned", function () {
+          expect(1);
+
+          var Model = Viking$1.Model.extend('model');
+
+          var m = new Model({ foo: 'bar' });
+          m.save(null, {
+              invalid: function invalid(model, errors, options) {
+                  deepEqual(errors, {
+                      "address": { "city": ["cant be blank"] },
+                      "agents": [{ "email": ["cant be blank", "is invalid"] }],
+                      "size": ["cant be blank", "is not a number"]
+                  });
+              }
+          });
+
+          this.requests[0].respond(400, '[]', JSON.stringify({
+              "errors": {
+                  "address": { "city": ["cant be blank"] },
+                  "agents": [{ "email": ["cant be blank", "is invalid"] }],
+                  "size": ["cant be blank", "is not a number"]
+              }
+          }));
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#select");
+
+      test("#select() sets 'selected' to true on model when not in a collection", function () {
+          var model = new Viking$1.Model({});
+          model.select();
+
+          ok(model.selected);
+      });
+
+      test("#select() sets 'selected' to true on the model when in a collection", function () {
+          var c = new Viking$1.Collection([{}, {}]);
+          var model = c.models[0];
+          model.select();
+
+          ok(model.selected);
+      });
+
+      test("#select() sets 'selected' to false other models", function () {
+          var c = new Viking$1.Collection([{}, {}, {}]);
+          var models = c.models;
+          models[0].selected = true;
+          models[1].selected = true;
+          models[2].selected = true;
+
+          ok(models[0].selected);
+          ok(models[1].selected);
+          ok(models[2].selected);
+
+          models[1].select();
+
+          ok(!models[0].selected);
+          ok(models[1].selected);
+          ok(!models[2].selected);
+      });
+
+      test("#select(true) selects the model", function () {
+          var c = new Viking$1.Collection([{}, {}, {}]);
+          var models = c.models;
+
+          ok(!models[0].selected);
+          models[0].select(true);
+          ok(models[0].selected);
+      });
+
+      test("#select(false) unselects the model", function () {
+          var c = new Viking$1.Collection([{}, {}, {}]);
+          var models = c.models;
+
+          models[0].select();
+
+          ok(models[0].selected);
+          models[0].select(false);
+          ok(!models[0].selected);
+      });
+
+      test("#select({multiple: true}) doesn't unselect other models", function () {
+          var c = new Viking$1.Collection([{}, {}, {}]);
+          var models = c.models;
+
+          models[0].select();
+          models[1].select({ multiple: true });
+          models[2].select({ multiple: true });
+
+          ok(models[0].selected);
+          ok(models[1].selected);
+          ok(models[2].selected);
+      });
+
+      test("#select() triggers a 'selected' event", function () {
+          expect(1);
+
+          var c = new Viking$1.Collection([{}]);
+          var model = c.models[0];
+
+          model.on('selected', function () {
+              ok(model.selected);
+          });
+          model.select();
+          model.off('selected');
+      });
+
+      test("#select() triggers a 'selected' event on the collection", function () {
+          expect(1);
+
+          var c = new Viking$1.Collection([{}]);
+          c.on('selected', function () {
+              ok(true);
+          });
+          c.models[0].select();
+          c.off('selected');
+      });
+
+      test("#select() triggers a 'selected' event only if change", function () {
+          expect(0);
+
+          var c = new Viking$1.Collection([{}]);
+          var m = c.models[0];
+          m.selected = true;
+          m.on('selected', function () {
+              ok(true);
+          });
+          m.select();
+          m.off('selected');
+      });
+
+      test("#select() triggers a 'selected' event on collection only if change", function () {
+          expect(0);
+
+          var c = new Viking$1.Collection([{}]);
+          c.models[0].selected = true;
+          c.on('selected', function () {
+              ok(true);
+          });
+          c.models[0].select();
+          c.off('selected');
+      });
+  })();
+
+  (function () {
+      module("Viking.model#set - belongsTo");
+
+      // setting attributes on a model coerces relations
+      test("#set(key, val) coerces belongsTo relations", function () {
+          var Ship = Viking$1.Model.extend('ship', { belongsTo: ['ship'] });
+
+          var a = new Ship();
+          a.set('ship', {});
+          ok(a.get('ship') instanceof Ship);
+      });
+
+      test("#set({key, val}) coerces belongsTo relations", function () {
+          var Ship = Viking$1.Model.extend('ship', { belongsTo: ['ship'] });
+
+          var a = new Ship();
+          a.set({ ship: {} });
+          ok(a.get('ship') instanceof Ship);
+      });
+
+      test("#set(key, val) sets relation id", function () {
+          var Ship = Viking$1.Model.extend('ship', { belongsTo: ['ship'] });
+          var a = new Ship();
+
+          a.set('ship', { id: 12 });
+          equal(12, a.get('ship_id'));
+
+          a.set('ship', {});
+          equal(null, a.get('ship_id'));
+      });
+
+      test("#set({key, val}) sets relation id", function () {
+          var Ship = Viking$1.Model.extend('ship', { belongsTo: ['ship'] });
+          var a = new Ship();
+
+          a.set({ ship: { id: 12 } });
+          equal(12, a.get('ship_id'));
+
+          a.set({ ship: {} });
+          equal(null, a.get('ship_id'));
+      });
+
+      test("#unset(key) unsets relation id", function () {
+          var Ship = Viking$1.Model.extend('ship', { belongsTo: ['ship'] });
+          var a = new Ship();
+
+          a.set('ship', { id: 12 });
+          equal(12, a.get('ship_id'));
+
+          a.unset('ship');
+          equal(null, a.get('ship_id'));
+      });
+
+      test("::set(key, val) sets polymorphic belongsTo relation & sets appropriate keys", function () {
+          var Account = Viking$1.Model.extend('account');
+          var Ship = Viking$1.Model.extend('ship');
+          var Photo = Viking$1.Model.extend('photo', { belongsTo: [['subject', { polymorphic: true }]] });
+
+          var a = new Photo();
+          var ship = new Ship({ id: 10 });
+          a.set({ subject: ship });
+          ok(a.get('subject') instanceof Ship);
+          equal(a.get('subject_id'), 10);
+          equal(a.get('subject_type'), 'Ship');
+
+          var account = new Account({ id: 1 });
+          a.set({ subject: account });
+          ok(a.get('subject') instanceof Account);
+          equal(a.get('subject_id'), 1);
+          equal(a.get('subject_type'), 'Account');
+      });
+
+      test("::set({key: {}, key_type: KLASS}) coerces polymorphic belongsTo relations useing type declared in model", function () {
+          var Ship = Viking$1.Model.extend('ship');
+          var Photo = Viking$1.Model.extend('photo', { belongsTo: [['subject', { polymorphic: true }]] });
+
+          var a = new Photo();
+          a.set({ subject: { id: 10 }, subject_type: 'ship' });
+          ok(a.get('subject') instanceof Ship);
+          equal(a.get('subject').get('id'), 10);
+          equal(a.get('subject_type'), 'ship');
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#set - coercions");
+
+      test("#set(key, val) does coercions", function () {
+          var Model = Viking$1.Model.extend('model', { schema: {
+                  date: { type: 'date' }
+              } });
+
+          var a = new Model();
+          a.set('date', "2013-04-10T21:24:28+00:00");
+          equal(a.get('date').valueOf(), new Date(1365629068000).valueOf());
+      });
+
+      test("#set({key, val}) does coercions", function () {
+          var Model = Viking$1.Model.extend('model', { schema: {
+                  date: { type: 'date' }
+              } });
+
+          var a = new Model();
+          a.set({ date: "2013-04-10T21:24:28+00:00" });
+          equal(a.get('date').valueOf(), new Date(1365629068000).valueOf());
+      });
+  })();
+
+  (function () {
+      module("Viking.model#set - hasMany");
+
+      // setting attributes on a model coerces relations
+      test("#set(key, val) coerces hasMany relations", function () {
+          var Ship = Viking$1.Model.extend('ship', { hasMany: ['ships'] });
+          var ShipCollection = Viking$1.Collection.extend({ model: Ship });
+
+          var a = new Ship();
+          a.set('ships', [{}, {}]);
+          ok(a.get('ships') instanceof ShipCollection);
+          equal(a.get('ships').length, 2);
+          ok(a.get('ships').first() instanceof Ship);
+      });
+
+      test("#set({key, val}) coerces hasMany relations", function () {
+          var Ship = Viking$1.Model.extend('ship', { hasMany: ['ships'] });
+          var ShipCollection = Viking$1.Collection.extend({ model: Ship });
+
+          var a = new Ship();
+          a.set({ ships: [{}, {}] });
+          ok(a.get('ships') instanceof ShipCollection);
+          equal(a.get('ships').length, 2);
+          ok(a.get('ships').first() instanceof Ship);
+      });
+
+      test("#set(belongsToRelation, data) updates the current collection and doesn't create a new one", function () {
+          expect(6);
+
+          var Ship = Viking$1.Model.extend('ship', { hasMany: ['ships'] });
+          var ShipCollection = Viking$1.Collection.extend({ model: Ship });
+
+          var a = new Ship();
+          a.set({ ships: [{ id: 1 }, {}, { id: 3 }] });
+          a.get('ships').on("add", function () {
+              ok(true);
+          });
+          a.get('ships').get(1).on("change", function () {
+              ok(true);
+          });
+          a.get('ships').on("remove", function () {
+              ok(true);
+          });
+
+          var oldCollection = a.get('ships');
+          a.set({ ships: [{ id: 1, key: 'value' }, { id: 2 }] });
+
+          strictEqual(oldCollection, a.get('ships'));
+          deepEqual([1, 2], a.get('ships').map(function (s) {
+              return s.id;
+          }));
+          a.get('ships').off();
+          a.get('ships').get(1).off();
+      });
+
+      test("#set(hasManyRelation, data) updates the current collection and doesn't create a new one", function () {
+          var Ship = Viking$1.Model.extend('ship', {});
+          var ShipCollection = Viking$1.Collection.extend({ model: Ship });
+          var Fleet = Viking$1.Model.extend('fleet', { hasMany: ['ships'] });
+
+          var f = new Fleet();
+          var s = new Ship();
+
+          f.set({ ships: [s] });
+          strictEqual(s.collection, f.get('ships'));
+      });
+
+      test("#set({type: klass}) initilizes hasMany associations", function () {
+          var Ship = Viking$1.Model.extend('ship');
+          var ShipCollection = Viking$1.Collection.extend({ model: Ship });
+          var Account = Viking$1.Model.extend('account');
+          var Agent = Account.extend('agent', { hasMany: ['ships'] });
+
+          var account = new Account();
+          ok(!(account instanceof Agent));
+          account.set({ type: 'agent' });
+          ok(account instanceof Agent);
+          ok(account.get('ships') instanceof ShipCollection);
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#set");
+
+      test("#set({type: klass}) changes the object prototype of klass", function () {
+          var Account = Viking$1.Model.extend('account');
+          var Agent = Account.extend('agent');
+
+          var account = new Account();
+          ok(!(account instanceof Agent));
+          account.set({ type: 'agent' });
+
+          ok(account instanceof Agent);
+      });
+
+      test("#set({type: klass}) changes the modelName on instance to modelName of klass", function () {
+          var Account = Viking$1.Model.extend('account');
+          var Agent = Account.extend('agent');
+
+          var account = new Account();
+          ok(!(account instanceof Agent));
+          account.set({ type: 'agent' });
+
+          strictEqual(Agent.modelName, account.modelName);
+          propEqual(_.omit(account.modelName, 'model'), {
+              name: 'Agent',
+              element: 'agent',
+              human: 'Agent',
+              paramKey: 'agent',
+              plural: 'agents',
+              routeKey: 'agents',
+              singular: 'agent',
+              collection: 'agents',
+              collectionName: 'AgentCollection'
+          });
+      });
+
+      test("::set({type: string}) doesn't change the object prototype when inheritanceAttribute set to false", function () {
+          var Ship = Viking$1.Model.extend('ship', {
+              inheritanceAttribute: false
+          });
+          var Battleship = Ship.extend('battleship', {});
+
+          var bship = new Battleship();
+          bship.set({ type: 'ship' });
+
+          strictEqual(Battleship, bship.baseModel);
+      });
+
+      test("#set({type: klass}) doesn't change the modelName on instance to modelName of klass when inheritanceAttribute set to false", function () {
+          var Ship = Viking$1.Model.extend('ship', {
+              inheritanceAttribute: false
+          });
+          var Battleship = Ship.extend('battleship', {});
+
+          var bship = new Battleship();
+          bship.set({ type: 'ship' });
+
+          strictEqual(Battleship.modelName, bship.modelName);
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#setErrors");
+
+      test("#setErrors is a noop if the size of the errors is 0", function () {
+          expect(0);
+
+          var m = new Viking$1.Model();
+          m.on('invalid', function (model, errors, options) {
+              ok(false);
+          });
+          m.setErrors({});
+          m.off('invalid');
+      });
+
+      test("#setErrors emits invalid event errors are set", function () {
+          expect(1);
+
+          var m = new Viking$1.Model();
+          m.on('invalid', function (model, errors, options) {
+              deepEqual(errors, {
+                  "address": { "city": ["cant be blank"] },
+                  "agents": [{ "email": ["cant be blank", "is invalid"] }],
+                  "size": ["cant be blank", "is not a number"]
+              });
+          });
+
+          m.setErrors({
+              "address": { "city": ["cant be blank"] },
+              "agents": [{ "email": ["cant be blank", "is invalid"] }],
+              "size": ["cant be blank", "is not a number"]
+          });
+          m.off('invalid');
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#sync", {
+          setup: function setup() {
+              this.requests = [];
+              this.xhr = sinon.useFakeXMLHttpRequest();
+              this.xhr.onCreate = _.bind(function (xhr) {
+                  this.requests.push(xhr);
+              }, this);
+          },
+          teardown: function teardown() {
+              this.xhr.restore();
+          }
+      });
+
+      test("#sync namespaces the data to the paramRoot of the model when !options.data", function () {
+          var Model = Viking$1.Model.extend('model');
+
+          var m = new Model({ foo: 'bar' });
+          m.sync('create', m);
+          equal(this.requests[0].method, 'POST');
+          deepEqual(JSON.parse(this.requests[0].requestBody), {
+              model: { foo: 'bar' }
+          });
+      });
+
+      test("#sync doesn't set the data if options.data", function () {
+          var Model = Viking$1.Model.extend('model');
+
+          var m = new Model({ foo: 'bar' });
+          m.sync('patch', m, { data: { 'this': 'that' } });
+          equal(this.requests[0].method, 'PATCH');
+          deepEqual(this.requests[0].requestBody, {
+              'this': 'that'
+          });
+      });
+
+      test("#sync namespaces options.attrs to the paramRoot of the model if options.attrs", function () {
+          var Model = Viking$1.Model.extend('model');
+
+          var m = new Model({ foo: 'bar' });
+          m.sync('patch', m, { attrs: { 'this': 'that' } });
+          equal(this.requests[0].method, 'PATCH');
+          deepEqual(JSON.parse(this.requests[0].requestBody), {
+              model: { 'this': 'that' }
+          });
+      });
+
+      // test("#sync uses Viking.sync", function () {
+      //     expect(1);
+      //
+      //     var m = new Viking.Model();
+      //
+      //     var old = Viking.sync;
+      //     Viking.sync = function(method, model, options) {
+      //         ok(true);
+      //     }
+      //
+      //     m.sync();
+      //     Viking.sync = old;
+      // });
+  })();
+
+  (function () {
+      module("Viking.Model#toJSON", {
+          setup: function setup() {
+              this.Ship = Viking$1.Model.extend('ship', {
+                  hasMany: ['ships'],
+                  belongsTo: ['ship'],
+                  schema: {
+                      date: { type: 'date' }
+                  }
+              });
+              this.ShipCollection = Viking$1.Collection.extend({
+                  model: this.Ship
+              });
+
+              this.ship = new this.Ship({
+                  foo: 'bar',
+
+                  ship: { bat: 'baz', ship: { bing: 'bong', ships: [] } },
+                  ships: [{ ping: 'pong', ship: { bing: 'bong' } }, { ships: [] }],
+
+                  date: "2013-04-10T21:24:28.000Z"
+              });
+          }
+      });
+
+      test("#toJSON", function () {
+          deepEqual(this.ship.toJSON(), {
+              foo: 'bar',
+              date: "2013-04-10T21:24:28.000Z"
+          });
+      });
+
+      test("#toJSON supports arrays", function () {
+          var Ship = Viking$1.Model.extend('ship', {
+              coercions: { date: ['Date', { array: true }] }
+          });
+
+          var ship = new Ship({
+              date: ["2013-04-10T21:24:28.000Z"]
+          });
+
+          deepEqual(ship.toJSON(), {
+              date: ["2013-04-10T21:24:28.000Z"]
+          });
+      });
+
+      test('#toJSON include belongsTo', function () {
+          deepEqual(this.ship.toJSON({ include: 'ship' }), {
+              foo: 'bar',
+              date: "2013-04-10T21:24:28.000Z",
+              ship_attributes: { bat: 'baz' }
+          });
+      });
+
+      test("#toJSON doesn't include belongsTo that is undefined", function () {
+          // undefined means probably not loaded
+          this.ship.unset('ship');
+
+          deepEqual(this.ship.toJSON({ include: 'ship' }), {
+              foo: 'bar',
+              date: "2013-04-10T21:24:28.000Z"
+          });
+      });
+
+      test("#toJSON includes belongsTo that is null", function () {
+          // null probably means loaded, but set to null to remove
+          this.ship.set('ship', null);
+
+          deepEqual(this.ship.toJSON({ include: 'ship' }), {
+              foo: 'bar',
+              date: "2013-04-10T21:24:28.000Z",
+              ship_attributes: null
+          });
+      });
+
+      test('#toJSON include belongsTo includes belongsTo', function () {
+          deepEqual(this.ship.toJSON({ include: {
+                  ship: { include: 'ship' }
+              } }), {
+              foo: 'bar',
+              date: "2013-04-10T21:24:28.000Z",
+              ship_attributes: {
+                  bat: 'baz',
+                  ship_attributes: { bing: 'bong' }
+              }
+          });
+      });
+
+      test('#toJSON include belongsTo includes hasMany', function () {
+          deepEqual(this.ship.toJSON({ include: {
+                  ship: { include: 'ships' }
+              } }), {
+              foo: 'bar',
+              date: "2013-04-10T21:24:28.000Z",
+              ship_attributes: {
+                  bat: 'baz',
+                  ships_attributes: []
+              }
+          });
+      });
+
+      test('#toJSON include hasMany', function () {
+          deepEqual(this.ship.toJSON({ include: 'ships' }), {
+              foo: 'bar',
+              date: "2013-04-10T21:24:28.000Z",
+              ships_attributes: [{ ping: 'pong' }, {}]
+          });
+      });
+
+      test('#toJSON include hasMany includes belongsTo', function () {
+          deepEqual(this.ship.toJSON({ include: {
+                  ships: { include: 'ship' }
+              } }), {
+              foo: 'bar',
+              date: "2013-04-10T21:24:28.000Z",
+              ships_attributes: [{ ping: 'pong', ship_attributes: { bing: 'bong' } }, {}]
+          });
+      });
+
+      test('#toJSON include hasMany includes hasMany', function () {
+          deepEqual(this.ship.toJSON({ include: {
+                  ships: { include: 'ships' }
+              } }), {
+              foo: 'bar',
+              date: "2013-04-10T21:24:28.000Z",
+              ships_attributes: [{ ping: 'pong', ships_attributes: [] }, { ships_attributes: [] }]
+          });
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#toJSON - belongsTo");
+
+      test("#toJSON for belongsTo relation", function () {
+          var Ship = Viking$1.Model.extend('ship', { belongsTo: ['ship'] });
+          var a = new Ship({ 'ship': { foo: 'bar' }, bat: 'baz' });
+
+          deepEqual(a.toJSON({ include: 'ship' }), {
+              bat: 'baz',
+              ship_attributes: { foo: 'bar' }
+          });
+      });
+
+      test('#toJSON sets relation attributes to null if relation is null', function () {
+          var Ship = Viking$1.Model.extend('ship', { belongsTo: ['ship'] });
+          var a = new Ship({ 'ship': null, bat: 'baz' });
+
+          deepEqual(a.toJSON({ include: 'ship' }), {
+              bat: 'baz',
+              ship_attributes: null
+          });
+      });
+
+      test("#toJSON doesn't sets relation attributes to null if relation is falsely and not null", function () {
+          var Ship = Viking$1.Model.extend('ship', { belongsTo: ['ship'] });
+          var a = new Ship({ 'ship': null, bat: 'baz' });
+
+          deepEqual(a.toJSON({ include: 'ship' }), {
+              bat: 'baz',
+              ship_attributes: null
+          });
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#toJSON - hasMany");
+
+      // toJSON --------------------------------------------------------------------
+      test("#toJSON for hasMany relation", function () {
+          var Ship = Viking$1.Model.extend('ship', {
+              hasMany: ['ships']
+          });
+          var ShipCollection = Viking$1.Collection.extend({
+              model: Ship
+          });
+
+          var a = new Ship({ 'ships': [{ foo: 'bar' }], bat: 'baz' });
+
+          deepEqual(a.toJSON({ include: { 'ships': { include: 'ships' } } }), {
+              bat: 'baz',
+              ships_attributes: [{
+                  foo: 'bar',
+                  ships_attributes: []
+              }]
+          });
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#toParam");
+
+      test("#toParam() returns null on a model without an id", function () {
+          var model = new Viking$1.Model();
+
+          equal(null, model.toParam());
+      });
+
+      test("#toParam() returns id on a model with an id set", function () {
+          var model = new Viking$1.Model({ id: 42 });
+
+          equal(42, model.toParam());
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#touch", {
+          setup: function setup() {
+              this.clock = sinon.useFakeTimers();
+
+              this.requests = [];
+              this.xhr = sinon.useFakeXMLHttpRequest();
+              this.xhr.onCreate = _.bind(function (xhr) {
+                  this.requests.push(xhr);
+              }, this);
+          },
+          teardown: function teardown() {
+              this.clock.restore();
+              this.xhr.restore();
+          }
+      });
+
+      test("sends a PUT request to /models/:id/touch", function () {
+          var Model = Viking$1.Model.extend('model');
+
+          var m = new Model({ id: 2, foo: 'bar' });
+          m.touch();
+          equal(this.requests[0].method, 'PATCH');
+          equal(this.requests[0].url, '/models/2');
+          deepEqual(JSON.parse(this.requests[0].requestBody), {
+              model: { updated_at: new Date().toISOString(3) }
+          });
+      });
+
+      test("sends an empty body", function () {
+          var Model = Viking$1.Model.extend('model');
+
+          var m = new Model({ id: 2, foo: 'bar' });
+          m.touch();
+          deepEqual(JSON.parse(this.requests[0].requestBody), {
+              model: { updated_at: new Date().toISOString(3) }
+          });
+      });
+
+      test("sends the name of the column to be touched if specified", function () {
+          var Model = Viking$1.Model.extend('model');
+
+          var m = new Model({ id: 2, foo: 'bar' });
+          m.touch('read_at');
+          deepEqual(JSON.parse(this.requests[0].requestBody), {
+              model: {
+                  read_at: new Date().toISOString(3),
+                  updated_at: new Date().toISOString(3)
+              }
+          });
+      });
+
+      test("updates the attributes from the response", function () {
+          var Model = Viking$1.Model.extend('model', { schema: {
+                  updated_at: { type: 'date' },
+                  read_at: { type: 'date' }
+              } });
+
+          var m = new Model({ id: 2, updated_at: null, read_at: null });
+
+          equal(m.get('updated_at'), null);
+          m.touch();
+          this.requests[0].respond(200, '[]', JSON.stringify({ updated_at: "2013-04-10T21:24:28+00:00" }));
+          equal(m.get('updated_at').valueOf(), 1365629068000);
+
+          equal(m.get('read_at'), null);
+          m.touch('read_at');
+          this.requests[1].respond(200, '[]', JSON.stringify({ read_at: "2013-04-10T21:24:28+00:00" }));
+          equal(m.get('read_at').valueOf(), 1365629068000);
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#unselect");
+
+      test("#unselect() triggers a 'unselected' event", function () {
+          expect(1);
+
+          var c = new Viking$1.Collection([{}]);
+          var model = c.models[0];
+          model.selected = true;
+          model.on('unselected', function () {
+              ok(!model.selected);
+          });
+          model.unselect();
+          model.off('unselected');
+      });
+
+      test("#unselect() triggers a 'unselected' event on collection", function () {
+          expect(1);
+
+          var c = new Viking$1.Collection([{}]);
+          c.models[0].selected = true;
+          c.on('unselected', function () {
+              ok(true);
+          });
+          c.models[0].unselect();
+          c.off('unselected');
+      });
+
+      test("#unselect() triggers a 'selected' event only if change", function () {
+          expect(0);
+
+          var c = new Viking$1.Collection([{}]);
+          var m = c.models[0];
+          m.on('unselected', function () {
+              ok(true);
+          });
+          m.unselect();
+          m.off('unselected');
+      });
+
+      test("#unselect() triggers a 'unselected' event on collection only if change", function () {
+          expect(0);
+
+          var c = new Viking$1.Collection([{}]);
+          c.models[0].selected = false;
+          c.on('unselected', function () {
+              ok(true);
+          });
+          c.models[0].unselect();
+          c.off('unselected');
+      });
+  })();
+
+  (function () {
+      module("Viking.model#unset - hasMany");
+
+      // setting attributes on a model coerces relations
+      test("#set(key) unsets a hasMany relationship", function () {
+          var Ship = Viking$1.Model.extend('ship', { hasMany: ['ships'] });
+          var ShipCollection = Viking$1.Collection.extend({ model: Ship });
+
+          var a = new Ship();
+          a.set('ships', [{}, {}]);
+
+          a.unset('ships');
+          ok(a.get('ships') instanceof ShipCollection);
+          equal(0, a.get('ships').length);
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#updateAttribute");
+
+      test("#updateAttribute(key, data) calls #updateAttributes", function () {
+          expect(2);
+
+          var model = new Viking$1.Model();
+          model.updateAttributes = function (data, options) {
+              deepEqual(data, { key: 'value' });
+              equal(undefined, options);
+          };
+
+          model.updateAttribute('key', 'value');
+      });
+
+      test("#updateAttribute(key, data, options) calls #updateAttributes", function () {
+          expect(2);
+
+          var model = new Viking$1.Model();
+          model.updateAttributes = function (data, options) {
+              deepEqual(data, { key: 'value' });
+              deepEqual(options, { option: 'key' });
+          };
+
+          model.updateAttribute('key', 'value', { option: 'key' });
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#updateAttributes");
+
+      test("#updateAttributes(data) calls #save", function () {
+          expect(2);
+
+          var model = new Viking$1.Model();
+          model.save = function (data, options) {
+              deepEqual(data, { key: 'value' });
+              deepEqual(options, { patch: true });
+          };
+
+          model.updateAttributes({ key: 'value' });
+      });
+
+      test("#updateAttributes(data, options) calls #save", function () {
+          expect(2);
+
+          var model = new Viking$1.Model();
+          model.save = function (data, options) {
+              deepEqual(data, { key: 'value' });
+              deepEqual(options, { patch: true, option: 1 });
+          };
+
+          model.updateAttributes({ key: 'value' }, { option: 1 });
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#url");
+
+      test("#url /pluralModelName/id by default", function () {
+          var Model = Viking$1.Model.extend('model');
+          var model = new Model({ id: 42 });
+          equal(model.url(), '/models/42');
+
+          Model = Viking$1.Model.extend('namespaced/model');
+          model = new Model({ id: 42 });
+          equal(model.url(), '/namespaced_models/42');
+      });
+
+      test("#url /pluralModelName/slug by overriding #toParam()", function () {
+          var Model = Viking$1.Model.extend('model');
+          var model = new Model({ id: 42 });
+          model.toParam = function () {
+              return 'slug';
+          };
+
+          equal(model.url(), '/models/slug');
+      });
+
+      // STI test
+      test("#url returns an URL based on modelName of the baseModel", function () {
+          var Ship = Viking$1.Model.extend('ship');
+          var Carrier = Ship.extend();
+          var carrier = new Carrier({ id: 42 });
+
+          equal(carrier.url(), '/ships/42');
+      });
+  })();
+
+  (function () {
+      module("Viking.Model#urlRoot");
+
+      test("#urlRoot is an alias to ::urlRoot", function () {
+          var Model = Viking$1.Model.extend('model', {}, {
+              urlRoot: function urlRoot() {
+                  return 42;
+              }
+          });
+
+          equal(new Model().urlRoot(), 42);
       });
   })();
 
