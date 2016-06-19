@@ -15,7 +15,7 @@
 //   });
 //   // => <input checked id="account_roles_admin" type="checkbox" name="account[roles][]" value="admin">
 //   // => <input checked class="agent_check" id="account_roles_agent" type="checkbox" name="account[roles][]" value="agent">
-Viking.View.Helpers.checkBoxGroup = function (model, attribute, options, content) {
+export const checkBoxGroup = function (model, attribute, options, content) {
     if (typeof options === 'function') {
         content = options;
         options = {};
@@ -25,3 +25,5 @@ Viking.View.Helpers.checkBoxGroup = function (model, attribute, options, content
     
     return content(builder);
 };
+
+export default checkBoxGroup;

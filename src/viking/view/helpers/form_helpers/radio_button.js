@@ -17,7 +17,7 @@
 //   radioButton("user", "receive_newsletter", "no")
 //   // => <input type="radio" id="user_receive_newsletter_yes" name="user[receive_newsletter]" value="yes">
 //   //    <input type="radio" id="user_receive_newsletter_no" name="user[receive_newsletter]" value="no" checked>
-Viking.View.Helpers.radioButton = function (model, attribute, tagValue, options) {
+export const radioButton = function (model, attribute, tagValue, options) {
     if (options === undefined) { options = {}; }
     let name = options.name || Viking.View.tagNameForModelAttribute(model, attribute);
 
@@ -33,3 +33,5 @@ Viking.View.Helpers.radioButton = function (model, attribute, tagValue, options)
     
     return Viking.View.Helpers.radioButtonTag(name, value, tagValue === model.get(attribute), options);
 };
+
+export default radioButton;

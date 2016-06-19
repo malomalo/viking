@@ -1,4 +1,4 @@
-function FormBuilder(model, options) {
+export function FormBuilder(model, options) {
     let modelName;
 
     options = _.extend({}, options);
@@ -191,3 +191,5 @@ FormBuilder.prototype = {
     }
     
 };
+
+export default FormBuilder;

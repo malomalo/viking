@@ -10,7 +10,7 @@ import Viking from '../../../../../src/viking';
         let workshopsPath = function() { ok(true); return '/workshops'; }
 
         equal(
-            urlFor(Workshop),
+            Viking.View.urlFor(Workshop),
             window.location.protocol + '//' + window.location.host + '/workshops'
         );
     });
@@ -22,7 +22,7 @@ import Viking from '../../../../../src/viking';
         let workshopsPath = function() { ok(true); return '/workshops'; }
 
         equal(
-            urlFor(new Workshop()),
+            Viking.View.urlFor(new Workshop()),
             window.location.protocol + '//' + window.location.host + '/workshops'
         );
     });
@@ -34,7 +34,7 @@ import Viking from '../../../../../src/viking';
         let workshopPath = function(m) { ok(true); return '/workshops/' + m.toParam(); }
 
         equal(
-            urlFor(new Workshop({id: 10})),
+            Viking.View.urlFor(new Workshop({id: 10})),
             window.location.protocol + '//' + window.location.host + '/workshops/10'
         );
     });
@@ -47,7 +47,7 @@ import Viking from '../../../../../src/viking';
         let workshopPath = function(m) { ok(true); return '/workshops/' + m.toParam(); }
 
         equal(
-            urlFor(new SantaWorkshop({id: 10})),
+            Viking.View.urlFor(new SantaWorkshop({id: 10})),
             window.location.protocol + '//' + window.location.host + '/workshops/10'
         );
     });
@@ -57,7 +57,7 @@ import Viking from '../../../../../src/viking';
         let workshopPath = function(m) { return '/workshops/' + m.toParam(); }
 
         equal(
-            urlFor(new Workshop({id: 10}), {anchor: 'location'}),
+            Viking.View.urlFor(new Workshop({id: 10}), {anchor: 'location'}),
             window.location.protocol + '//' + window.location.host + '/workshops/10#location'
         );
     });
@@ -67,7 +67,7 @@ import Viking from '../../../../../src/viking';
         let workshopPath = function(m) { return '/workshops/' + m.toParam(); }
 
         equal(
-            urlFor(new Workshop({id: 10}), {onlyPath: true}),
+            Viking.View.urlFor(new Workshop({id: 10}), {onlyPath: true}),
             '/workshops/10'
         );
     });
@@ -77,7 +77,7 @@ import Viking from '../../../../../src/viking';
         let workshopPath = function(m) { return '/workshops/' + m.toParam(); }
 
         equal(
-            urlFor(new Workshop({id: 10}), {trailingSlash: true}),
+            Viking.View.urlFor(new Workshop({id: 10}), {trailingSlash: true}),
             window.location.protocol + '//' + window.location.host + '/workshops/10/'
         );
     });
@@ -87,7 +87,7 @@ import Viking from '../../../../../src/viking';
         let workshopPath = function(m) { return '/workshops/' + m.toParam(); }
 
         equal(
-            urlFor(new Workshop({id: 10}), {host: 'example.com'}),
+            Viking.View.urlFor(new Workshop({id: 10}), {host: 'example.com'}),
             window.location.protocol + '//example.com' + (window.location.port ? ':' : '') + window.location.port + '/workshops/10'
         );
     });
@@ -97,7 +97,7 @@ import Viking from '../../../../../src/viking';
         let workshopPath = function(m) { return '/workshops/' + m.toParam(); }
 
         equal(
-            urlFor(new Workshop({id: 10}), {port: 9292}),
+            Viking.View.urlFor(new Workshop({id: 10}), {port: 9292}),
             window.location.protocol + '//' + window.location.hostname + ':9292/workshops/10'
         );
     });
@@ -107,7 +107,7 @@ import Viking from '../../../../../src/viking';
         let workshopPath = function(m) { return '/workshops/' + m.toParam(); }
 
         equal(
-            urlFor(new Workshop({id: 10}), {protocol: 'custom'}),
+            Viking.View.urlFor(new Workshop({id: 10}), {protocol: 'custom'}),
             'custom://' + window.location.hostname + (window.location.port ? ':' : '') + window.location.port + '/workshops/10'
         );
     });
@@ -117,7 +117,7 @@ import Viking from '../../../../../src/viking';
         let workshopPath = function(m) { return '/workshops/' + m.toParam(); }
 
         equal(
-            urlFor(new Workshop({id: 10}), {scriptName: '/base'}),
+            Viking.View.urlFor(new Workshop({id: 10}), {scriptName: '/base'}),
             window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' : '') + window.location.port + '/base/workshops/10'
         );
     });
@@ -127,14 +127,14 @@ import Viking from '../../../../../src/viking';
         let workshopPath = function(m) { return '/workshops/' + m.toParam(); }
 
         equal(
-            urlFor(new Workshop({id: 10}), {user: 'username', password: 'password'}),
+            Viking.View.urlFor(new Workshop({id: 10}), {user: 'username', password: 'password'}),
             window.location.protocol + '//username:password@' + window.location.hostname + (window.location.port ? ':' : '') + window.location.port + '/workshops/10'
         );
     });
     
     test("urlFor(string)", function() {
         equal(
-            urlFor("http://www.example.com"),
+            Viking.View.urlFor("http://www.example.com"),
             "http://www.example.com"
         );
     });

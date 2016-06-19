@@ -30,7 +30,7 @@
 //       return 'Accept <a href="/terms">Terms</a>.';
 //   })
 //   // => <label for="post_privacy_public">Public Post</label>
-Viking.View.Helpers.label = function (model, attribute, content, options, escape) {
+export const label = function (model, attribute, content, options, escape) {
     let tmp;
     if (typeof content === 'object') {
         tmp = options;
@@ -50,3 +50,5 @@ Viking.View.Helpers.label = function (model, attribute, content, options, escape
     
     return Viking.View.Helpers.labelTag(content, options, escape);
 };
+
+export default label;

@@ -8,7 +8,7 @@
 // --------
 //   formFor(account, function (f) { return f.hiddenField('pass_confirm'); })
 //   // => <input type="hidden" name="account[pass_confirm]" value="">
-Viking.View.Helpers.formFor = function (model, options, content) {
+export const formFor = function (model, options, content) {
     if (typeof options === 'function') {
         content = options;
         options = {};
@@ -34,3 +34,5 @@ Viking.View.Helpers.formFor = function (model, options, content) {
     
     return Viking.View.Helpers.contentTag('form', content(builder), options, false);
 };
+
+export default formFor;

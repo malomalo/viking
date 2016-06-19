@@ -1,10 +1,13 @@
 import Viking from '../../src/viking';
+import templates from '../../src/viking/view/templates';
 
 (function () {
 
     module("Viking.View", {
         setup : function() {
-            Viking.View.templates = JST;
+            Object.keys(JST).forEach(function (key) {
+                Viking.View.templates[key] = JST[key];
+            });
         }
     });
     

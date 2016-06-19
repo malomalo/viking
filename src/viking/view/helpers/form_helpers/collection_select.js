@@ -39,7 +39,7 @@
 //     <option value="2">D. Thomas</option>
 //     <option value="3">M. Clark</option>
 //   </select>
-Viking.View.Helpers.collectionSelect = function (model, attribute, collection, valueAttribute, textAttribute, options) {
+export const collectionSelect = function (model, attribute, collection, valueAttribute, textAttribute, options) {
     if (options === undefined) { options = {}; }
 
     let optionOptions = _.pick(options, 'selected');
@@ -52,3 +52,5 @@ Viking.View.Helpers.collectionSelect = function (model, attribute, collection, v
     let optionsTags = Viking.View.Helpers.optionsFromCollectionForSelectTag(collection, valueAttribute, textAttribute, selectOptions);
     return Viking.View.Helpers.selectTag(name, optionsTags, selectOptions);
 };
+
+export default collectionSelect;

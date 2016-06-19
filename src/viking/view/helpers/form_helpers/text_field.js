@@ -1,3 +1,6 @@
+import { addErrorClassToOptions, tagNameForModelAttribute } from '../utils';
+import { textFieldTag } from '../form_tag_helpers/text_field_tag';
+
 // textField(model, attribute, options)
 // ====================================
 //
@@ -13,12 +16,14 @@
 //   
 //   text_field(post, "title", {class: "create_input"})
 //   // => <input class="create_input" id="post_title" name="post[title]" type="text" value="title">
-Viking.View.Helpers.textField = function (model, attribute, options) {
+export const textField = function (model, attribute, options) {
     if (options === undefined) { options = {}; }
-    Viking.View.addErrorClassToOptions(model, attribute, options);
+    addErrorClassToOptions(model, attribute, options);
 
-    let name = options['name'] || Viking.View.tagNameForModelAttribute(model, attribute);
+    let name = options['name'] || tagNameForModelAttribute(model, attribute);
     let value = model.get(attribute)
     value = value && typeof value === 'object' ? value.toString() : value
-    return Viking.View.Helpers.textFieldTag(name, value, options);
+    return textFieldTag(name, value, options);
 };
+
+export default textField;

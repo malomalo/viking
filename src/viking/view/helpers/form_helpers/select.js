@@ -55,7 +55,7 @@
 //
 // In case if you don't want the helper to generate this hidden field you can
 // specify `include_hidden: false` option.
-Viking.View.Helpers.select = function (model, attribute, collection, options) {
+export const select = function (model, attribute, collection, options) {
     if (options === undefined) { options = {}; }
 
     let name = options['name'] || Viking.View.tagNameForModelAttribute(model, attribute);
@@ -69,3 +69,5 @@ Viking.View.Helpers.select = function (model, attribute, collection, options) {
     }
     return Viking.View.Helpers.selectTag(name, Viking.View.Helpers.optionsForSelectTag(collection, optionOptions), selectOptions);
 };
+
+export default select;

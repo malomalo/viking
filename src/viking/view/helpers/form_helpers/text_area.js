@@ -26,7 +26,7 @@
 //   // => <textarea cols="20" rows="20" id="entry_body" name="entry[body]" disabled>
 //   //      entry body
 //   //    </textarea>
-Viking.View.Helpers.textArea = function (model, attribute, options) {
+export const textArea = function (model, attribute, options) {
     let name = Viking.View.tagNameForModelAttribute(model, attribute);
     
     if (options === undefined) { options = {}; }
@@ -34,3 +34,5 @@ Viking.View.Helpers.textArea = function (model, attribute, options) {
     
     return Viking.View.Helpers.textAreaTag(name, model.get(attribute), options);
 };
+
+export default textArea;

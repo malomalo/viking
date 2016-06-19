@@ -1,7 +1,8 @@
 import Helpers from '../helpers';
+import templates from '../templates';
 
 export const render = function (templatePath, locals) {
-    let template = Viking.View.templates[templatePath];
+    let template = templates[templatePath];
 
     if (!locals) {
         locals = {};

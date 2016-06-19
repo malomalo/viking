@@ -17,9 +17,11 @@
 //   
 //   hiddenField(:user, :token)
 //   // => <input type="hidden" name="user[token]" value="token">
-Viking.View.Helpers.hiddenField = function (model, attribute, options) {
+export const hiddenField = function (model, attribute, options) {
     let value = model.get(attribute);
     let name = Viking.View.tagNameForModelAttribute(model, attribute);
     
     return Viking.View.Helpers.hiddenFieldTag(name, (value || ''), options);
 };
+
+export default hiddenField;

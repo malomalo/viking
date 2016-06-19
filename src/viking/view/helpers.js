@@ -6,6 +6,16 @@
 //= require viking/view/helpers/asset_helpers
 //= require viking/view/helpers/render_helper
 
+import { imageTag } from './helpers/asset_helpers/image_tag';
+
+import {
+    CheckBoxGroupBuilder, FormBuilder
+} from './helpers/builders';
+
+import {
+    textField
+} from './helpers/form_helpers';
+
 import {
     tagOption, dataTagOption, tagOptions, sanitizeToId,
     tagNameForModelAttribute, addErrorClassToOptions,
@@ -22,6 +32,16 @@ import {
 import render from './helpers/render';
 
 export const Helpers = {
+    // Asset Helpers
+    imageTag: imageTag,
+
+    // Builders
+    CheckBoxGroupBuilder: CheckBoxGroupBuilder,
+    FormBuilder: FormBuilder,
+
+    // Form Helpers
+    textField: textField,
+
     // Utils
     tagOption: tagOption,
     dataTagOption: dataTagOption,
@@ -49,7 +69,8 @@ export const Helpers = {
     textAreaTag: textAreaTag,
     textFieldTag: textFieldTag,
     timeTag: timeTag,
-    
+
+    // Render
     render: render
 }
 

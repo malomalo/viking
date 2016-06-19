@@ -1,3 +1,5 @@
+export { textField } from './form_helpers/text_field';
+
 // TODO: make this accept model string names
 //= require viking/view/helpers/form_helpers/check_box
 //= require viking/view/helpers/form_helpers/check_box_group

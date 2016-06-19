@@ -1,3 +1,5 @@
+import { urlFor } from '../utils';
+
 // linkTo(modelOrUrl, name, options)
 // =================================
 //

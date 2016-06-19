@@ -1,1 +1,2 @@
-//= require viking/view/helpers/asset_helpers/image_tag
+export imageTag from './asset_helpers/image_tag';
+

@@ -60,7 +60,7 @@
 //   checkBox("eula", "accepted", { class: 'eula_check' }, "yes", "no")
 //   // => <input name="eula[accepted]" type="hidden" value="no">
 //   //    <input type="checkbox" class="eula_check" name="eula[accepted]" value="yes">
-Viking.View.Helpers.checkBox = function (model, attribute, options, checkedValue, uncheckedValue, escape) {
+export const checkBox = function (model, attribute, options, checkedValue, uncheckedValue, escape) {
     let output = '';
     let value = model.get(attribute);
 
@@ -75,3 +75,5 @@ Viking.View.Helpers.checkBox = function (model, attribute, options, checkedValue
     
     return output;
 };
+
+export default checkBox;

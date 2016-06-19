@@ -1,5 +1,11 @@
 import Helpers from './view/helpers';
+import templates from './view/templates';
+import {
+    tagOption, dataTagOption, tagOptions, sanitizeToId, tagNameForModelAttribute,
+    addErrorClassToOptions, methodOrAttribute, urlFor
+} from './view/helpers/utils';
 
+// TODO: Remove utils from Viking.View, not sure why they are added to it.
 // Viking.View
 // -----------
 //
@@ -82,7 +88,11 @@ export const View = Backbone.View.extend({
     // `Viking.View.templates` is used for storing templates. 
     // `Viking.View.Helpers.render` looks up templates in this
     // variable
-    templates: {},
+    templates: templates,
+
+    // registerTemplate: function (path, template) {
+    //     templates[path] = template;
+    // },
 
     // Override the original extend function to support merging events
     extend: function(protoProps, staticProps) {
@@ -91,7 +101,17 @@ export const View = Backbone.View.extend({
         }
 
         return Backbone.View.extend.call(this, protoProps, staticProps);
-    }
+    },
+
+    urlFor: urlFor,
+    tagOption: tagOption,
+    dataTagOption: dataTagOption,
+    tagOptions: tagOptions,
+    sanitizeToId: sanitizeToId,
+    tagNameForModelAttribute: tagNameForModelAttribute,
+    addErrorClassToOptions: addErrorClassToOptions,
+    methodOrAttribute: methodOrAttribute
+
 });
 
 View.Helpers = Helpers;

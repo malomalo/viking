@@ -3,7 +3,9 @@ import Viking from '../../../src/viking';
 (function () {
     module("Viking.View.subView", {
         setup : function() {
-            Viking.View.templates = JST;
+            Object.keys(JST).forEach(function (key) {
+                Viking.View.templates[key] = JST[key];
+            });
         }
     });
     

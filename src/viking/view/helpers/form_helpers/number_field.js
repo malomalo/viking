@@ -13,7 +13,7 @@
 //   
 //   numberField(account, 'requests', {class: "form_input"})
 //   // => <input class="form_input" id="account_requests" name="account[requests]" type="number" value="27">
-Viking.View.Helpers.numberField = function (model, attribute, options) {
+export const numberField = function (model, attribute, options) {
     options = _.extend({}, options);
     let name = options.name || Viking.View.tagNameForModelAttribute(model, attribute);
 
@@ -21,3 +21,5 @@ Viking.View.Helpers.numberField = function (model, attribute, options) {
     
     return Viking.View.Helpers.numberFieldTag(name, model.get(attribute), options);
 };
+
+export default numberField;

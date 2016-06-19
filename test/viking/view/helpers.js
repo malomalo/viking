@@ -125,7 +125,7 @@ import Viking from '../../../src/viking';
         equal("model[models][]", Viking.View.tagNameForModelAttribute(model, 'models'));
     });
     
-    test("tagNameForModelAttribute(model, vikingCollectionAttribute)", function() {
+    test("tagNameForModelAttribute(model, vikingCollectionAttribute) 2", function() {
         var Model = Viking.Model.extend('model');
         var ModelCollection = Viking.Collection.extend({model: Model});
         var model = new Model({models: new ModelCollection()});

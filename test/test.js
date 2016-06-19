@@ -588,1174 +588,6 @@ this.Viking = this.Viking || {};
 	  return xhr;
 	};
 
-	var booleanAttributes = ['disabled', 'readonly', 'multiple', 'checked', 'autobuffer', 'autoplay', 'controls', 'loop', 'selected', 'hidden', 'scoped', 'async', 'defer', 'reversed', 'ismap', 'seemless', 'muted', 'required', 'autofocus', 'novalidate', 'formnovalidate', 'open', 'pubdate', 'itemscope'];
-
-	var tagOption = function tagOption(key, value, escape) {
-	    if (Array.isArray(value)) {
-	        value = value.join(" ");
-	    }
-
-	    if (escape) {
-	        value = _.escape(value);
-	    }
-
-	    return key + '="' + value + '"';
-	};
-
-	var dataTagOption = function dataTagOption(key, value, escape) {
-	    key = "data-" + key;
-
-	    if (_.isObject(value)) {
-	        value = JSON.stringify(value);
-	    }
-
-	    return tagOption(key, value, escape);
-	};
-
-	var tagOptions = function tagOptions(options, escape) {
-	    if (options === undefined) {
-	        return "";
-	    }
-
-	    if (escape === undefined) {
-	        escape = true;
-	    }
-
-	    var attrs = [];
-	    _.each(options, function (value, key) {
-	        if (key === "data" && _.isObject(value)) {
-	            // TODO testme
-	            _.each(value, function (value, key) {
-	                attrs.push(dataTagOption(key, value, escape));
-	            });
-	        } else if (value === true && _.contains(booleanAttributes, key)) {
-	            attrs.push(key);
-	        } else if (value !== null && value !== undefined) {
-	            attrs.push(tagOption(key, value, escape));
-	        }
-	    });
-
-	    if (attrs.length === 0) {
-	        return '';
-	    }
-
-	    return " " + attrs.sort().join(' ');
-	};
-
-	// see http://www.w3.org/TR/html4/types.html#type-name
-	var sanitizeToId = function sanitizeToId(name) {
-	    return name.replace(/[^\-a-zA-Z0-9:.]/g, "_").replace(/_+/g, '_').replace(/_+$/, '').replace(/_+/g, '_');
-	};
-
-	// TODO: move to model_helpers?
-	var tagNameForModelAttribute = function tagNameForModelAttribute(model, attribute, options) {
-	    options || (options = {});
-
-	    var value = model.get(attribute);
-	    var name = void 0;
-
-	    if (options.namespace) {
-	        name = options.namespace + '[' + attribute + ']';
-	    } else {
-	        name = model.baseModel.modelName.paramKey + '[' + attribute + ']';
-	    }
-
-	    if (value instanceof Viking.Collection || Array.isArray(value)) {
-	        name = name + '[]';
-	    }
-
-	    return name;
-	};
-
-	// TODO: move to model_helpers?
-	var addErrorClassToOptions = function addErrorClassToOptions(model, attribute, options) {
-	    if (model.errorsOn(attribute)) {
-	        if (options['class']) {
-	            options['class'] = options['class'] + ' error';
-	        } else {
-	            options['class'] = 'error';
-	        }
-	    }
-	};
-
-	// TODO: move to model_helpers?
-	// TODO: testme
-	var methodOrAttribute = function methodOrAttribute(model, funcOrAttribute) {
-	    if (typeof funcOrAttribute !== 'function') {
-	        if (model[funcOrAttribute]) {
-	            return _.result(model, funcOrAttribute);
-	        }
-
-	        return model.get(funcOrAttribute);
-	    }
-
-	    return funcOrAttribute(model);
-	};
-
-	// contentTag(name, [content], [options], [escape=true], [&block])
-	// ================================================================
-	//
-	// Returns an HTML block tag of type name surrounding the content. Add HTML
-	// attributes by passing an attributes hash to options. Instead of passing the
-	// content as an argument, you can also use a function in which case, you pass
-	// your options as the second parameter. Set escape to false to disable attribute
-	// value escaping.
-	//
-	// Examples
-	//
-	//   contentTag("p", "Hello world & all!")
-	//   // => <p>Hello world &amp; all!</p>
-	//
-	//   contentTag("p", "Hello world & all!", false)
-	//   // => <p>Hello world & all!</p>
-	//
-	//   contentTag("div", contentTag("p", "Hello world!"), {class: "strong"})
-	//   // => <div class="strong"><p>Hello world!</p></div>
-	//
-	//   contentTag("select", options, {multiple: true})
-	//   // => <select multiple="multiple">...options...</select>
-	//  
-	//   contentTag("div", {class: "strong"}, function() {
-	//      return "Hello world!";
-	//   });
-	//   // => <div class="strong">Hello world!</div>
-	var contentTag = function contentTag(name, content, options, escape) {
-	    var tmp = void 0;
-
-	    // Handle `name, content`, `name, content, options`,
-	    // `name, content, options, escape`, `name, content, escape`, `name, block`,
-	    // `name, options, block`, `name, options, escape, block`, && `name, escape, block`
-	    // style arguments
-	    if (typeof content === "boolean") {
-	        escape = content;
-	        content = options;
-	        options = undefined;
-	    } else if ((typeof content === 'undefined' ? 'undefined' : _typeof(content)) === 'object') {
-	        if (typeof options === 'function') {
-	            tmp = options;
-	            options = content;
-	            content = tmp;
-	        } else if (typeof options === 'boolean') {
-	            tmp = content;
-	            content = escape;
-	            escape = options;
-	            options = tmp;
-	        }
-	    } else if (typeof options === 'boolean') {
-	        escape = options;
-	        options = undefined;
-	    }
-	    if (typeof content === 'function') {
-	        content = content();
-	    }
-	    if (escape || escape === undefined) {
-	        content = _.escape(content);
-	    }
-
-	    return "<" + name + tagOptions(options, escape) + ">" + content + "</" + name + ">";
-	};
-
-	// buttonTag(content, options), buttonTag(options, block)
-	// ========================================================
-	//
-	// Creates a button element that defines a submit button, reset button or a
-	// generic button which can be used in JavaScript, for example. You can use
-	// the button tag as a regular submit tag but it isn't supported in legacy
-	// browsers. However, the button tag allows richer labels such as images and
-	// emphasis.
-	//
-	// Options
-	// -------
-	//      - disabled: If true, the user will not be able to use this input.
-	//      - Any other key creates standard HTML attributes for the tag
-	//
-	// Examples
-	// --------
-	//   buttonTag("Button")
-	//   // => <button name="button" type="submit">Button</button>
-	//  
-	//   buttonTag("Checkout", { :disabled => true })
-	//   // => <button disabled name="button" type="submit">Checkout</button>
-	//  
-	//   buttonTag({type: "button"}, function() {
-	//      return "Ask me!";
-	//   });
-	//   // <button name="button" type="button"><strong>Ask me!</strong></button>
-	var buttonTag = function buttonTag(content, options) {
-	    var tmp = void 0;
-
-	    // Handle `content, options` && `options` style arguments
-	    if ((typeof content === 'undefined' ? 'undefined' : _typeof(content)) === 'object') {
-	        tmp = options;
-	        options = content;
-	        content = tmp;
-	    } else if (options === undefined) {
-	        options = {};
-	    }
-
-	    _.defaults(options, { name: 'button', type: 'submit' });
-	    return contentTag('button', content, options);
-	};
-
-	// tag(name, [options = {}, escape = true])
-	// ========================================
-	//
-	// Returns an empty HTML tag of type `name` add HTML attributes by passing
-	// an attributes hash to `options`. Set escape to `false` to disable attribute
-	// value escaping.
-	//
-	// Arguments
-	// ---------
-	// - Use `true` with boolean attributes that can render with no value, like `disabled` and `readonly`.
-	// - HTML5 data-* attributes can be set with a single data key pointing to a hash of sub-attributes.
-	// - Values are encoded to JSON, with the exception of strings and symbols.
-	//
-	// Examples
-	// --------
-	//
-	//   tag("br")
-	//   // => <br>
-	//
-	//   tag("input", {type: 'text', disabled: true})
-	//   // => <input type="text" disabled="disabled" />
-	//
-	//   tag("img", {src: "open & shut.png"})
-	//   // => <img src="open &amp; shut.png" />
-	//  
-	//   tag("img", {src: "open &amp; shut.png"}, false, false)
-	//   // => <img src="open &amp; shut.png" />
-	//  
-	//   tag("div", {data: {name: 'Stephen', city_state: ["Chicago", "IL"]}})
-	//   // => <div data-name="Stephen" data-city_state="[&quot;Chicago&quot;,&quot;IL&quot;]" />
-	var tag = function tag(name, options, escape) {
-	    return "<" + name + tagOptions(options, escape) + ">";
-	};
-
-	// checkBoxTag(name, value="1", checked=false, options)
-	// ======================================================
-	//
-	// Creates a check box form input tag.
-	//
-	// Options
-	// -------
-	//      - disabled: If true, the user will not be able to use this input.
-	//      - Any other key creates standard HTML attributes for the tag
-	//
-	// Examples
-	// --------
-	//   checkBoxTag('accept')
-	//   // => <input name="accept" type="checkbox" value="1" />
-	//  
-	//   checkBoxTag('rock', 'rock music')
-	//   // => <input name="rock" type="checkbox" value="rock music" />
-	//  
-	//   checkBoxTag('receive_email', 'yes', true)
-	//   // => <input checked="checked" name="receive_email" type="checkbox" value="yes" />
-	//  
-	//   checkBoxTag('tos', 'yes', false, class: 'accept_tos')
-	//   // => <input class="accept_tos" name="tos" type="checkbox" value="yes" />
-	//  
-	//   checkBoxTag('eula', 'accepted', false, disabled: true)
-	//   // => <input disabled="disabled" name="eula" type="checkbox" value="accepted" />
-	var checkBoxTag = function checkBoxTag(name, value, checked, options, escape) {
-	    if (value === undefined) {
-	        value = "1";
-	    }
-	    if (options === undefined) {
-	        options = {};
-	    }
-	    if (checked === true) {
-	        options.checked = true;
-	    }
-
-	    _.defaults(options, {
-	        type: "checkbox",
-	        value: value,
-	        id: sanitizeToId(name),
-	        name: name
-	    });
-
-	    return tag("input", options, escape);
-	};
-
-	// textFieldTag(name, [value], [options])
-	// ======================================
-	//
-	// Creates a standard text field. Returns the duplicated String.
-	//
-	// Arguments
-	// ---------
-	// name:    The name of the input
-	// value:   The value of the input
-	// options: A object with any of the following:
-	//      - disabled: If set to true, the user will not be able to use this input
-	//      - size: The number of visible characters that will fit in the input
-	//      - maxlength: The maximum number of characters that the browser will
-	//                   allow the user to enter
-	//      - placehoder: The text contained in the field by default, which is
-	//                    removed when the field receives focus
-	//      - Any other key creates standard HTML attributes for the tag
-	//
-	// Examples
-	// --------
-	//
-	//   textFieldTag('name')
-	//   // => <input name="name" type="text" />
-	//  
-	//   textFieldTag('query', 'Enter your search')
-	//   // => <input name="query" value="Enter your search" type="text" />
-	//  
-	//   textFieldTag('search', {placeholder: 'Enter search term...'})
-	//   // => <input name="search" placeholder="Enter search term..." type="text" />
-	//  
-	//   textFieldTag('request', {class: 'special_input'})
-	//   // => <input class="special_input" name="request" type="text" />
-	//  
-	//   textFieldTag('address', '', {size: 75})
-	//   // => <input name="address" size="75" value="" type="text" />
-	//  
-	//   textFieldTag('zip', {maxlength: 5})
-	//   // => <input maxlength="5" name="zip" type="text" />
-	//  
-	//   textFieldTag('payment_amount', '$0.00', {disabled: true})
-	//   // => <input disabled="disabled" name="payment_amount" value="$0.00" type="text" />
-	//  
-	//   textFieldTag('ip', '0.0.0.0', {maxlength: 15, size: 20, class: "ip-input"})
-	//   // => <input class="ip-input" maxlength="15" name="ip" size="20" value="0.0.0.0" type="text" />
-	var textFieldTag = function textFieldTag(name, value, options, escape) {
-
-	    // Handle both `name, value` && `name, options` style arguments
-	    if (value !== null && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' && !(value instanceof Backbone.Model)) {
-	        options = value;
-	        value = undefined;
-	    }
-
-	    return tag('input', _.extend({
-	        "type": 'text',
-	        "id": sanitizeToId(name),
-	        "name": name,
-	        "value": value
-	    }, options), escape);
-	};
-
-	// hiddenFieldTag(name, value = nil, options = {})
-	// ===============================================
-	//
-	// Creates a hidden form input field used to transmit data that would be lost
-	// due to HTTP's statelessness or data that should be hidden from the user.
-	//
-	// Options
-	// -------
-	//      - Any key creates standard HTML attributes for the tag
-	//
-	// Examples
-	// --------
-	//   hiddenFieldTag('tags_list')
-	//   // => <input name="tags_list" type="hidden">
-	//  
-	//   hiddenFieldTag('token', 'VUBJKB23UIVI1UU1VOBVI@')
-	//   // => <input name="token" type="hidden" value="VUBJKB23UIVI1UU1VOBVI@">
-	var hiddenFieldTag = function hiddenFieldTag(name, value, options, escape) {
-	    if (options === undefined) {
-	        options = {};
-	    }
-	    _.defaults(options, { type: "hidden", id: null });
-
-	    return textFieldTag(name, value, options, escape);
-	};
-
-	// formTag([options], [content])
-	// formTag([content], [options])
-	// =============================
-	//
-	// ==== Options
-	// * <tt>:action</tt> - The url the action of the form should be set to.
-	// * <tt>:multipart</tt> - If set to true, the enctype is set to "multipart/form-data".
-	// * <tt>:method</tt> - The method to use when submitting the form, usually either "get" or "post".
-	//   If "patch", "put", "delete", or another verb is used, a hidden input with name <tt>_method</tt>
-	//   is added to simulate the verb over post. The default is "POST". Only set if
-	//   :action is passed as an option.
-	//
-	// ==== Examples
-	//   formTag();
-	//   // => <form>
-	//
-	//   formTag({action: '/posts'});
-	//   // => <form action="/posts" method="post">
-	//
-	//   formTag({action: '/posts/1', method: "put"});
-	//   // => <form action="/posts/1" method="post"><input name="_method" type="hidden" value="put" />
-	//
-	//   formTag({action: '/upload', multipart: true});
-	//   // => <form action="/upload" method="post" enctype="multipart/form-data">
-	//
-	//   formTag({action: '/posts'}, function() {
-	//      return submitTag('Save');
-	//   });
-	//   // => <form action="/posts" method="post"><input type="submit" name="commit" value="Save" /></form>
-	var formTag = function formTag(options, content) {
-	    var tmp = void 0,
-	        methodOverride = '';
-
-	    if (typeof options === 'function' || typeof options === 'string') {
-	        tmp = content;
-	        content = options;
-	        options = tmp;
-	    }
-	    options || (options = {});
-
-	    if (options.action && !options.method) {
-	        options.method = 'post';
-	    } else if (options.method && options.method !== 'get' && options.method !== 'post') {
-	        methodOverride = hiddenFieldTag('_method', options.method);
-	        options.method = 'post';
-	    }
-
-	    if (options.multipart) {
-	        options.enctype = "multipart/form-data";
-	        delete options.multipart;
-	    }
-
-	    if (content !== undefined) {
-	        content = methodOverride + (typeof content === 'function' ? content() : content);
-
-	        return contentTag('form', content, options, false);
-	    }
-
-	    return tag('form', options, false) + methodOverride;
-	};
-
-	// labelTag(content, options)
-	// ========================================================
-	//
-	// Creates a label element. Accepts a block.
-	//
-	// Options - Creates standard HTML attributes for the tag.
-	//
-	// Examples
-	// --------
-	//   labelTag('Name')
-	//   // => <label>Name</label>
-	//  
-	//   labelTag('name', 'Your name')
-	//   // => <label for="name">Your name</label>
-	//  
-	//   labelTag('name', nil, {for: 'id'})
-	//   // => <label for="name" class="small_label">Name</label>
-	var labelTag = function labelTag(content, options, escape) {
-	    var tmp = void 0;
-
-	    if (typeof options === 'function') {
-	        tmp = content;
-	        content = options;
-	        options = tmp;
-	    }
-
-	    return contentTag('label', content, options, escape);
-	};
-
-	// numberFieldTag(name, value = nil, options = {})
-	// ===============================================
-	//
-	// Creates a number field.
-	//
-	// Options
-	// -------
-	//      - min:  The minimum acceptable value.
-	//      - max:  The maximum acceptable value.
-	//      - step: The acceptable value granularity.
-	//      - Otherwise accepts the same options as text_field_tag.
-	//
-	// Examples
-	// --------
-	//  
-	//   numberFieldTag('count')
-	//   // => <input name="count" type="number">
-	//  
-	//   nubmerFieldTag('count', 10)
-	//   // => <input" name="count" type="number" value="10">
-	//  
-	//   numberFieldTag('count', 4, {min: 1, max: 9})
-	//   // => <input min="1" max="9" name="count" type="number" value="4">
-	//  
-	//   passwordFieldTag('count', {step: 25})
-	//   # => <input name="count" step="25" type="number">
-	var numberFieldTag = function numberFieldTag(name, value, options) {
-
-	    // Handle both `name, value, options`, and `name, options` syntax
-	    if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object') {
-	        options = value;
-	        value = undefined;
-	    }
-
-	    options = _.extend({ type: 'number' }, options);
-	    if (value) {
-	        options.value = value;
-	    }
-
-	    return textFieldTag(name, value, options);
-	};
-
-	// optionsForSelectTag(container[, selected])
-	// =======================================
-	//
-	// Accepts a container (hash, array, collection, your type) and returns a
-	// string of option tags. Given a container where the elements respond to
-	// first and last (such as a two-element array), the "lasts" serve as option
-	// values and the "firsts" as option text. Hashes are turned into this
-	// form automatically, so the keys become "firsts" and values become lasts.
-	// If +selected+ is specified, the matching "last" or element will get the
-	// selected option-tag. +selected+ may also be an array of values to be
-	// selected when using a multiple select.
-	//
-	//   optionsForSelectTag([["Dollar", "$"], ["Kroner", "DKK"]])
-	//   // => <option value="$">Dollar</option>
-	//   // => <option value="DKK">Kroner</option>
-	//
-	//   optionsForSelectTag([ "VISA", "MasterCard" ], "MasterCard")
-	//   // => <option>VISA</option>
-	//   // => <option selected>MasterCard</option>
-	//
-	//   optionsForSelectTag({ "Basic" => "$20", "Plus" => "$40" }, "$40")
-	//   // => <option value="$20">Basic</option>
-	//   // => <option value="$40" selected>Plus</option>
-	//
-	//   optionsForSelectTag([ "VISA", "MasterCard", "Discover" ], ["VISA", "Discover"])
-	//   // => <option selected>VISA</option>
-	//   // => <option>MasterCard</option>
-	//   // => <option selected>Discover</option>
-	//
-	// You can optionally provide html attributes as the last element of the array.
-	//
-	//   optionsForSelectTag([ "Denmark", ["USA", {class: 'bold'}], "Sweden" ], ["USA", "Sweden"])
-	//   // => <option value="Denmark">Denmark</option>
-	//   // => <option value="USA" class="bold" selected>USA</option>
-	//   // => <option value="Sweden" selected>Sweden</option>
-	//
-	//   optionsForSelectTag([["Dollar", "$", {class: "bold"}], ["Kroner", "DKK", {class: "alert"}]])
-	//   // => <option value="$" class="bold">Dollar</option>
-	//   // => <option value="DKK" class="alert">Kroner</option>
-	//
-	// If you wish to specify disabled option tags, set +selected+ to be a hash,
-	// with <tt>:disabled</tt> being either a value or array of values to be
-	// disabled. In this case, you can use <tt>:selected</tt> to specify selected
-	// option tags.
-	//
-	//   optionsForSelectTag(["Free", "Basic", "Advanced", "Super Platinum"], {disabled: "Super Platinum"})
-	//   // => <option value="Free">Free</option>
-	//   // => <option value="Basic">Basic</option>
-	//   // => <option value="Advanced">Advanced</option>
-	//   // => <option value="Super Platinum" disabled>Super Platinum</option>
-	//
-	//   optionsForSelectTag(["Free", "Basic", "Advanced", "Super Platinum"], {disabled: ["Advanced", "Super Platinum"]})
-	//   // => <option value="Free">Free</option>
-	//   // => <option value="Basic">Basic</option>
-	//   // => <option value="Advanced" disabled>Advanced</option>
-	//   // => <option value="Super Platinum" disabled>Super Platinum</option>
-	//
-	//   optionsForSelectTag(["Free", "Basic", "Advanced", "Super Platinum"], {selected: "Free", disabled: "Super Platinum"})
-	//   // => <option value="Free" selected>Free</option>
-	//   // => <option value="Basic">Basic</option>
-	//   // => <option value="Advanced">Advanced</option>
-	//   // => <option value="Super Platinum" disabled>Super Platinum</option>
-	//
-	// NOTE: Only the option tags are returned, you have to wrap this call in a
-	// regular HTML select tag.
-	var optionsForSelectTag = function optionsForSelectTag(container, selected) {
-	    var disabled = void 0;
-	    var arrayWrap = function arrayWrap(data) {
-	        if (_.isArray(data)) {
-	            return data;
-	        }
-	        return [data];
-	    };
-
-	    if ((typeof selected === 'undefined' ? 'undefined' : _typeof(selected)) !== 'object' && typeof selected !== 'function') {
-	        selected = arrayWrap(selected);
-	    } else if (!_.isArray(selected) && typeof selected !== 'function') {
-	        disabled = typeof selected.disabled === 'function' ? selected.disabled : arrayWrap(selected.disabled);
-	        selected = typeof selected.selected === 'function' ? selected.selected : arrayWrap(selected.selected);
-	    }
-
-	    if (_.isArray(container)) {
-	        return _.map(container, function (text) {
-	            var value = void 0,
-	                options = {};
-	            if (_.isArray(text)) {
-	                if (_typeof(_.last(text)) === 'object') {
-	                    options = text.pop();
-	                }
-	                if (text.length === 2) {
-	                    options.value = value = text[1];
-	                    text = text[0];
-	                } else {
-	                    value = text = text[0];
-	                }
-	            } else {
-	                value = text;
-	            }
-
-	            if (typeof selected === 'function') {
-	                if (selected(value)) {
-	                    options.selected = true;
-	                }
-	            } else if (_.contains(selected, value)) {
-	                options.selected = true;
-	            }
-	            if (typeof disabled === 'function') {
-	                if (disabled(value)) {
-	                    options.disabled = true;
-	                }
-	            } else if (_.contains(disabled, value)) {
-	                options.disabled = true;
-	            }
-
-	            return contentTag('option', text, options);
-	        }).join("\n");
-	    }
-
-	    return _.map(container, function (value, text) {
-	        var options = { value: value };
-
-	        if (typeof selected === 'function') {
-	            if (selected(value)) {
-	                options.selected = true;
-	            }
-	        } else if (_.contains(selected, value)) {
-	            options.selected = true;
-	        }
-	        if (typeof disabled === 'function') {
-	            if (disabled(value)) {
-	                options.disabled = true;
-	            }
-	        } else if (_.contains(disabled, value)) {
-	            options.disabled = true;
-	        }
-
-	        return contentTag('option', text, options);
-	    }).join("\n");
-	};
-
-	// optionsFromCollectionForSelectTag(collection, valueMethod, textMethod, selected)
-	// =============================================================================
-	//
-	// Returns a string of option tags that have been compiled by iterating over
-	// the collection and assigning the result of a call to the valueMethod as
-	// the option value and the textMethod as the option text.
-	//
-	//   optionsFromCollectionForSelectTag(people, 'id', 'name')
-	//   // => <option value="person's id">person's name</option>
-	//
-	// This is more often than not used inside a selectTag like this example:
-	//
-	//   selectTag(person, optionsFromCollectionForSelectTag(people, 'id', 'name'))
-	//
-	// If selected is specified as a value or array of values, the element(s)
-	// returning a match on valueMethod will be selected option tag(s).
-	//
-	// If selected is specified as a Proc, those members of the collection that
-	// return true for the anonymous function are the selected values.
-	//
-	// selected can also be a hash, specifying both :selected and/or :disabled
-	// values as required.
-	//
-	// Be sure to specify the same class as the valueMethod when specifying
-	// selected or disabled options. Failure to do this will produce undesired
-	// results. Example:
-	//
-	//   optionsFromCollectionForSelectTag(people, 'id', 'name', '1')
-	//
-	// Will not select a person with the id of 1 because 1 (an Integer) is not
-	// the same as '1' (a string)
-	//
-	//   optionsFromCollectionForSelectTag(people, 'id', 'name', 1)
-	//
-	// should produce the desired results.
-	var optionsFromCollectionForSelectTag = function optionsFromCollectionForSelectTag(collection, valueAttribute, textAttribute, selected) {
-	    var selectedForSelect = void 0;
-
-	    var options = collection.map(function (model) {
-	        return [methodOrAttribute(model, textAttribute), methodOrAttribute(model, valueAttribute)];
-	    });
-
-	    if (_.isArray(selected)) {
-	        selectedForSelect = selected;
-	    } else if ((typeof selected === 'undefined' ? 'undefined' : _typeof(selected)) === 'object') {
-	        selectedForSelect = {
-	            selected: selected.selected,
-	            disabled: selected.disabled
-	        };
-	    } else {
-	        selectedForSelect = selected;
-	    }
-
-	    return optionsForSelectTag(options, selectedForSelect);
-	};
-
-	// passwordFieldTag(name = "password", value = nil, options = {})
-	// ================================================================
-	//
-	// Creates a password field, a masked text field that will hide the users input
-	// behind a mask character.
-	//
-	// Options
-	// -------
-	//      - disabled:  If true, the user will not be able to use this input.
-	//      - size:      The number of visible characters that will fit in the input.
-	//      - maxlength: The maximum number of characters that the browser will allow the user to enter.
-	//      - Any other key creates standard HTML attributes for the tag
-	//
-	// Examples
-	// --------
-	//  
-	//   passwordFieldTag('pass')
-	//   // => <input name="pass" type="password">
-	//  
-	//   passwordFieldTag('secret', 'Your secret here')
-	//   // => <input" name="secret" type="password" value="Your secret here">
-	//  
-	//   passwordFieldTag('masked', nil, {class: 'masked_input_field'})
-	//   // => <input class="masked_input_field" name="masked" type="password">
-	//  
-	//   passwordFieldTag('token', '', {size: 15})
-	//   # => <input name="token" size="15" type="password" value="">
-	//  
-	//   passwordFieldTag('key', null, {maxlength: 16})
-	//   // => <input maxlength="16" name="key" type="password">
-	//  
-	//   passwordFieldTag('confirm_pass', null, {disabled: true})
-	//   // => <input disabled name="confirm_pass" type="password">
-	//  
-	//   passwordFieldTag('pin', '1234', {maxlength: 4, size: 6, class: "pin_input"})
-	//   // => <input class="pin_input" maxlength="4" name="pin" size="6" type="password" value="1234">
-	var passwordFieldTag = function passwordFieldTag(name, value, options) {
-	    if (name === undefined) {
-	        name = 'password';
-	    }
-	    if (options === undefined) {
-	        options = {};
-	    }
-	    _.defaults(options, { type: "password" });
-
-	    return textFieldTag(name, value, options);
-	};
-
-	// radioButtonTag(name, value, checked, options)
-	// =============================================
-	//
-	// Creates a radio button; use groups of radio buttons named the same to allow
-	// users to select from a group of options.
-	//
-	// Options
-	// -------
-	//      - disabled: If true, the user will not be able to use this input.
-	//      - Any other key creates standard HTML attributes for the tag
-	//
-	// Examples
-	// --------
-	//   radioButtonTag('gender', 'male')
-	//   // => <input name="gender" type="radio" value="male">
-	//  
-	//   radioButtonTag('receive_updates', 'no', true)
-	//   // => <input checked="checked" name="receive_updates" type="radio" value="no">
-	//
-	//   radioButtonTag('time_slot', "3:00 p.m.", false, {disabled: true})
-	//   // => <input disabled name="time_slot" type="radio" value="3:00 p.m.">
-	//  
-	//   radioButtonTag('color', "green", true, {class: "color_input"})
-	//   // => <input checked class="color_input" name="color" type="radio" value="green">
-	var radioButtonTag = function radioButtonTag(name, value, checked, options) {
-	    if (options === undefined) {
-	        options = {};
-	    }
-	    if (checked === true) {
-	        options.checked = true;
-	    }
-	    _.defaults(options, {
-	        type: "radio",
-	        value: value,
-	        name: name,
-	        id: sanitizeToId(name)
-	    });
-
-	    return tag("input", options);
-	};
-
-	// selectTag(name, optionTags, options)
-	// ====================================
-	//
-	// Creates a dropdown selection box, or if the :multiple option is set to true,
-	// a multiple choice selection box.
-	//
-	// Options
-	// -------
-	//    - multiple:      If set to true the selection will allow multiple choices.
-	//    - disabled:      If set to true, the user will not be able to use this input.
-	//    - includeBlank:  If set to true, an empty option will be created, can pass a string to use as empty option content
-	//    - prompt:        Create a prompt option with blank value and the text asking user to select something
-	//    - Any other key creates standard HTML attributes for the tag.
-	//
-	// Examples
-	// --------
-	//   selectTag("people", options_for_select({ "Basic": "$20"}))
-	//   // <select name="people"><option value="$20">Basic</option></select>
-	//  
-	//   selectTag("people", "<option>David</option>")
-	//   // => <select name="people"><option>David</option></select>
-	//  
-	//   selectTag("count", "<option>1</option><option>2</option><option>3</option>")
-	//   // => <select name="count"><option>1</option><option>2</option><option>3</option></select>
-	//  
-	//   selectTag("colors", "<option>Red</option><option>Green</option><option>Blue</option>", {multiple: true})
-	//   // => <select multiple="multiple" name="colors[]"><option>Red</option>
-	//   //    <option>Green</option><option>Blue</option></select>
-	//  
-	//   selectTag("locations", "<option>Home</option><option selected='selected'>Work</option><option>Out</option>")
-	//   // => <select name="locations"><option>Home</option><option selected='selected'>Work</option>
-	//   //    <option>Out</option></select>
-	//  
-	//   selectTag("access", "<option>Read</option><option>Write</option>", {multiple: true, class: 'form_input'})
-	//   // => <select class="form_input" multiple="multiple" name="access[]"><option>Read</option>
-	//   //    <option>Write</option></select>
-	//  
-	//   selectTag("people", options_for_select({ "Basic": "$20"}), {includeBlank: true})
-	//   // => <select name="people"><option value=""></option><option value="$20">Basic</option></select>
-	//  
-	//   selectTag("people", options_for_select({"Basic": "$20"}), {prompt: "Select something"})
-	//   // => <select name="people"><option value="">Select something</option><option value="$20">Basic</option></select>
-	//  
-	//   selectTag("destination", "<option>NYC</option>", {disabled: true})
-	//   // => <select disabled name="destination"><option>NYC</option></select>
-	//  
-	//   selectTag("credit_card", options_for_select([ "VISA", "MasterCard" ], "MasterCard"))
-	//   // => <select name="credit_card"><option>VISA</option><option selected>MasterCard</option></select>
-	var selectTag = function selectTag(name, optionTags, options) {
-	    var tagName = name;
-	    if (options === undefined) {
-	        options = {};
-	    }
-	    if (options.multiple && tagName.slice(-2) !== "[]") {
-	        tagName = tagName + "[]";
-	    }
-	    _.defaults(options, {
-	        id: sanitizeToId(name),
-	        name: tagName
-	    });
-
-	    if (options.includeBlank) {
-	        var content = typeof options.includeBlank == "string" ? options.includeBlank : "";
-	        optionTags = contentTag('option', content, { value: '' }) + optionTags;
-	        delete options.includeBlank;
-	    }
-
-	    if (options.prompt) {
-	        if (options.prompt === true) {
-	            options.prompt = 'Select';
-	        }
-	        optionTags = contentTag('option', options.prompt, { value: '' }) + optionTags;
-	        delete options.prompt;
-	    }
-
-	    return contentTag('select', optionTags, options, false);
-	};
-
-	// submitTag(value="Save", options)
-	// =================================
-	//
-	// Creates a submit button with the text value as the caption.
-	//
-	// Options
-	// -------
-	//    - disabled:      If set to true, the user will not be able to use this input.
-	//    - Any other key creates standard HTML attributes for the tag.
-	//  
-	//   submitTag()
-	//   // => <input name="commit" type="submit" value="Save">
-	//  
-	//   submitTag "Edit this article"
-	//   // => <input name="commit" type="submit" value="Edit this article">
-	//  
-	//   submitTag("Save edits", {disabled: true})
-	//   // => <input disabled name="commit" type="submit" value="Save edits">
-	//  
-	//   submitTag(nil, {class: "form_submit"})
-	//   // => <input class="form_submit" name="commit" type="submit">
-	//  
-	//   submitTag("Edit", class: "edit_button")
-	//   // => <input class="edit_button" name="commit" type="submit" value="Edit">
-	var submitTag = function submitTag(value, options) {
-	    if (options === undefined) {
-	        options = {};
-	    }
-	    if (!value) {
-	        value = 'Save';
-	    }
-	    _.defaults(options, {
-	        type: 'submit',
-	        name: 'commit',
-	        id: null,
-	        value: value
-	    });
-
-	    return tag('input', options);
-	};
-
-	// textAreaTag(name, [content], [options], [escape=true])
-	// =========================================
-	//
-	// Creates a text input area; use a textarea for longer text inputs such as
-	// blog posts or descriptions.
-	//
-	// Options
-	// -------
-	//    - size: A string specifying the dimensions (columns by rows) of the textarea (e.g., "25x10").
-	//    - rows: Specify the number of rows in the textarea
-	//    - cols: Specify the number of columns in the textarea
-	//    - disabled: If set to true, the user will not be able to use this input.
-	//    - Any other key creates standard HTML attributes for the tag.
-	//
-	// Examples
-	// --------
-	//  
-	//   textAreaTag('post')
-	//   // => <textarea name="post"></textarea>
-	//  
-	//   textAreaTag('bio', user.bio)
-	//   // => <textarea name="bio">This is my biography.</textarea>
-	//  
-	//   textAreaTag('body', null, {rows: 10, cols: 25})
-	//   // => <textarea cols="25" name="body" rows="10"></textarea>
-	//  
-	//   textAreaTag('body', null, {size: "25x10"})
-	//   // => <textarea name="body" cols="25" rows="10"></textarea>
-	//  
-	//   textAreaTag('description', "Description goes here.", {disabled: true})
-	//   // => <textarea disabled name="description">Description goes here.</textarea>
-	//  
-	//   textAreaTag('comment', null, {class: 'comment_input'})
-	//   // => <textarea class="comment_input" name="comment"></textarea>
-	var textAreaTag = function textAreaTag(name, content, options, escape) {
-	    if (options === undefined) {
-	        options = {};
-	    }
-	    if (escape === undefined) {
-	        escape = true;
-	    }
-	    _.defaults(options, {
-	        id: sanitizeToId(name),
-	        name: name
-	    });
-
-	    if (options.size) {
-	        options.cols = options.size.split('x')[0];
-	        options.rows = options.size.split('x')[1];
-	        delete options.size;
-	    }
-
-	    if (escape) {
-	        content = _.escape(content);
-	    }
-
-	    return contentTag('textarea', content, options, false);
-	};
-
-	// timeTag(date, [options], [value])
-	// =================================
-	//
-	// Returns an html time tag for the given date or time.
-	//
-	// Examples
-	// --------
-	//
-	//   timeTag(Date.today)
-	//   // => <time datetime="2010-11-04">November 04, 2010</time>
-	//
-	//   timeTag(Date.now)
-	//   // => <time datetime="2010-11-04T17:55:45+01:00">November 04, 2010 17:55</time>
-	//
-	//   timeTag(Date.yesterday, 'Yesterday')
-	//   // => <time datetime="2010-11-03">Yesterday</time>
-	//
-	//   timeTag(Date.today, {pubdate: true})
-	//   // => <time datetime="2010-11-04" pubdate="pubdate">November 04, 2010</time>
-	//
-	//   timeTag(Date.today, {datetime: Date.today.strftime('%G-W%V')})
-	//   // => <time datetime="2010-W44">November 04, 2010</time>
-	//
-	//   time_tag(Date.now, function() {
-	//     return '<span>Right now</span>';
-	//   });
-	//   // => <time datetime="2010-11-04T17:55:45+01:00"><span>Right now</span></time>
-	var timeTag = function timeTag(date, content, options) {
-	    var tmp = void 0;
-
-	    // handle both (date, opts, func || str) and (date, func || str, opts)
-	    if ((typeof content === 'undefined' ? 'undefined' : _typeof(content)) === 'object') {
-	        tmp = options;
-	        options = content;
-	        content = tmp;
-	    }
-	    options || (options = {});
-
-	    if (!content) {
-	        content = options.format ? date.strftime(options.format) : date.toString();
-	    }
-	    if (options.format) {
-	        delete options.format;
-	    }
-	    if (!options.datetime) {
-	        options.datetime = date.toISOString();
-	    }
-
-	    return contentTag('time', content, options);
-	};
-
-	var render = function render(templatePath, locals) {
-	    var template = Viking.View.templates[templatePath];
-
-	    if (!locals) {
-	        locals = {};
-	    }
-
-	    if (template) {
-	        return template(_.extend(locals, Helpers));
-	    }
-
-	    throw new Error('Template does not exist: ' + templatePath);
-	};
-
-	var Helpers = {
-	    // Utils
-	    tagOption: tagOption,
-	    dataTagOption: dataTagOption,
-	    tagOptions: tagOptions,
-	    sanitizeToId: sanitizeToId,
-	    tagNameForModelAttribute: tagNameForModelAttribute,
-	    addErrorClassToOptions: addErrorClassToOptions,
-	    methodOrAttribute: methodOrAttribute,
-
-	    // Form Tag Helpers
-	    buttonTag: buttonTag,
-	    checkBoxTag: checkBoxTag,
-	    contentTag: contentTag,
-	    formTag: formTag,
-	    hiddenFieldTag: hiddenFieldTag,
-	    labelTag: labelTag,
-	    numberFieldTag: numberFieldTag,
-	    optionsForSelectTag: optionsForSelectTag,
-	    optionsFromCollectionForSelectTag: optionsFromCollectionForSelectTag,
-	    passwordFieldTag: passwordFieldTag,
-	    radioButtonTag: radioButtonTag,
-	    selectTag: selectTag,
-	    submitTag: submitTag,
-	    tag: tag,
-	    textAreaTag: textAreaTag,
-	    textFieldTag: textFieldTag,
-	    timeTag: timeTag,
-
-	    render: render
-	};
-
-	// Viking.View
-	// -----------
-	//
-	// Viking.View is a framework fro handling view template lookup and rendering.
-	// It provides view helpers that assisst when building HTML forms and more.
-	var View = Backbone.View.extend({
-
-	    template: undefined,
-
-	    renderTemplate: function renderTemplate(locals) {
-	        return Helpers.render(this.template, locals);
-	    },
-
-	    //Copied constructor from Backbone View
-	    constructor: function constructor(options) {
-	        this.cid = _.uniqueId('view');
-	        options || (options = {});
-	        _.extend(this, _.pick(options, ['model', 'collection', 'el', 'id', 'attributes', 'className', 'tagName', 'events']));
-	        this._ensureElement();
-
-	        // Add an array for storing subView attached to this view so we can remove then
-	        this.subViews = [];
-
-	        this.initialize.apply(this, arguments);
-	        this.delegateEvents();
-	    },
-
-	    // A helper method that constructs a view and adds it to the subView array
-	    subView: function subView(SubView, options) {
-	        var view = new SubView(options);
-	        this.subViews.push(view);
-	        this.listenTo(view, 'remove', this.removeSubView);
-	        return view;
-	    },
-
-	    // Removes the subview from the array and stop listening to it, and calls
-	    // #remove on the subview.
-	    removeSubView: function removeSubView(view) {
-	        this.subViews = _.without(this.subViews, view);
-	        this.stopListening(view);
-	        view.remove();
-	    },
-
-	    // Remove all subviews when remove this view. We don't call stopListening
-	    // here because this view is being removed anyways so those will get cleaned
-	    // up by Backbone.
-	    remove: function remove() {
-	        while (this.subViews.length > 0) {
-	            this.subViews.pop().remove();
-	        }
-
-	        // Emit a remove event for when a view is removed
-	        // TODO: Maybe backport this to Backbone?
-	        this.trigger('remove', this);
-
-	        Backbone.View.prototype.remove.apply(this, arguments);
-	    },
-
-	    // Listens to attribute(s) of the model of the view, on change
-	    // renders the new value to el. Optionally, pass render function to render
-	    // something different, model is passed as an arg
-	    // TODO: document me
-	    bindEl: function bindEl(attributes, selector, render) {
-	        var view = this;
-	        render || (render = function render(model) {
-	            return model.get(attributes);
-	        });
-	        if (!_.isArray(attributes)) {
-	            attributes = [attributes];
-	        }
-
-	        //TODO: might want to Debounce because of some inputs being very rapid
-	        // but maybe that should be left up to the user changes (ie textareas like description)
-	        _.each(attributes, function (attribute) {
-	            view.listenTo(view.model, 'change:' + attribute, function (model) {
-	                view.$(selector).html(render(model));
-	            });
-	        });
-	    }
-
-	    //TODO: Default render can just render template
-	}, {
-
-	    // `Viking.View.templates` is used for storing templates.
-	    // `Viking.View.Helpers.render` looks up templates in this
-	    // variable
-	    templates: {},
-
-	    // Override the original extend function to support merging events
-	    extend: function extend(protoProps, staticProps) {
-	        if (protoProps && protoProps.events) {
-	            _.defaults(protoProps.events, this.prototype.events);
-	        }
-
-	        return Backbone.View.extend.call(this, protoProps, staticProps);
-	    }
-	});
-
-	View.Helpers = Helpers;
-
 	// The Viking gloval namespace for tracking created models, collections, etc...
 	var global$1 = {};
 
@@ -2731,212 +1563,6 @@ var classProperties = Object.freeze({
 	Model.Type = Type;
 	Model.Reflection = Reflection;
 
-	var Cursor = Backbone.Model.extend({
-	    defaults: {
-	        "page": 1,
-	        "per_page": 25
-	    },
-
-	    reset: function reset(options) {
-	        this.set({
-	            page: 1
-	        }, { silent: true });
-
-	        if (!(options && options.silent) && this.requiresRefresh()) {
-	            this.trigger('reset', this, options);
-	        }
-	    },
-
-	    incrementPage: function incrementPage(options) {
-	        this.set('page', this.get('page') + 1, options);
-	    },
-
-	    decrementPage: function decrementPage(options) {
-	        this.set('page', this.get('page') - 1, options);
-	    },
-
-	    goToPage: function goToPage(pageNumber, options) {
-	        this.set('page', pageNumber, options);
-	    },
-
-	    limit: function limit() {
-	        return this.get('per_page');
-	    },
-
-	    offset: function offset() {
-	        return this.get('per_page') * (this.get('page') - 1);
-	    },
-
-	    totalPages: function totalPages() {
-	        return Math.ceil(this.get('total_count') / this.limit());
-	    },
-
-	    requiresRefresh: function requiresRefresh() {
-	        var changedAttributes = this.changedAttributes();
-	        if (changedAttributes) {
-	            var triggers = ['page', 'per_page'];
-	            return _.intersection(_.keys(changedAttributes), triggers).length > 0;
-	        }
-
-	        return false;
-	    }
-
-	});
-
-	var Controller$1 = Backbone.Model.extend({
-
-	    // Below is the same code from the Backbone.Model function
-	    // except where there are comments
-	    constructor: function constructor(attributes, options) {
-	        var attrs = attributes || {};
-	        options || (options = {});
-	        this.cid = _.uniqueId('c');
-	        this.attributes = {};
-	        if (options.collection) this.collection = options.collection;
-	        if (options.parse) attrs = this.parse(attrs, options) || {};
-	        attrs = _.defaults({}, attrs, _.result(this, 'defaults'));
-	        this.set(attrs, options);
-	        this.changed = {};
-	        this.initialize.apply(this, arguments);
-
-	        // Add a helper reference to get the model name from an model instance.
-	        this.controllerName = this.constructor.controllerName;
-	    }
-
-	}, {
-
-	    // Overide the default extend method to support passing in the controlelr name
-	    //
-	    // The name is helpful for determining the current controller and using it
-	    // as a key
-	    //
-	    // `name` is optional, and must be a string
-	    extend: function extend(controllerName, protoProps, staticProps) {
-	        if (typeof controllerName !== 'string') {
-	            staticProps = protoProps;
-	            protoProps = controllerName;
-	        }
-	        protoProps || (protoProps = {});
-
-	        var child = Backbone.Model.extend.call(this, protoProps, staticProps);
-
-	        if (typeof controllerName === 'string') {
-	            child.controllerName = controllerName;
-	        }
-
-	        _.each(protoProps, function (value, key) {
-	            if (typeof value === 'function') {
-	                child.prototype[key].controller = child;
-	            }
-	        });
-
-	        return child;
-	    }
-
-	});
-
-	// export let currentController;
-
-	var Router = Backbone.Router.extend({
-
-	    currentController: undefined,
-
-	    route: function route(_route, name, callback) {
-	        var router = void 0,
-	            controller = void 0,
-	            action = void 0;
-
-	        if (!_.isRegExp(_route)) {
-	            if (/^r\/.*\/$/.test(_route)) {
-	                _route = new RegExp(_route.slice(2, -1));
-	            } else {
-	                _route = this._routeToRegExp(_route);
-	            }
-	        }
-
-	        if (_.isFunction(name)) {
-	            callback = name;
-	            name = '';
-	        } else if (_.isString(name) && name.match(/^(\w+)#(\w+)$/)) {
-	            controller = /^(\w+)#(\w+)$/.exec(name);
-	            action = controller[2];
-	            controller = controller[1];
-	            callback = { controller: controller, action: action };
-	        } else if (_.isObject(name)) {
-	            // TODO: maybe this should be Controller::action since it's not
-	            // an instance method
-	            controller = /^(\w+)#(\w+)$/.exec(name.to);
-	            action = controller[2];
-	            controller = controller[1];
-	            name = name.name;
-
-	            callback = { controller: controller, action: action };
-	        }
-
-	        if (!callback) {
-	            callback = this[name];
-	        }
-
-	        router = this;
-	        Backbone.history.route(_route, function (fragment) {
-	            var controllerClass = void 0;
-	            var args = router._extractParameters(_route, fragment);
-	            var previousController = router.currentController;
-	            router.currentController = undefined;
-
-	            if (!callback) {
-	                return;
-	            }
-
-	            if (_.isFunction(callback)) {
-	                callback.apply(router, args);
-	            } else if (window[callback.controller]) {
-	                controllerClass = window[callback.controller];
-
-	                if (controllerClass.__super__ === Controller$1.prototype) {
-	                    if (!(previousController instanceof controllerClass)) {
-	                        router.currentController = new controllerClass();
-	                    } else {
-	                        router.currentController = previousController;
-	                    }
-	                } else {
-	                    router.currentController = controllerClass;
-	                }
-
-	                if (router.currentController && router.currentController[callback.action]) {
-	                    router.currentController[callback.action].apply(router.currentController, args);
-	                }
-	            }
-
-	            router.trigger.apply(router, ['route:' + name].concat(args));
-	            router.trigger('route', name, args);
-	            Backbone.history.trigger('route', router, name, args);
-	        });
-	        return this;
-	    },
-
-	    // Calls Backbone.history.start, with the default options {pushState: true}
-	    start: function start(options) {
-	        options = _.extend({ pushState: true }, options);
-
-	        return Backbone.history.start(options);
-	    },
-
-	    stop: function stop() {
-	        Backbone.history.stop();
-	    },
-
-	    navigate: function navigate(fragment, args) {
-	        var root_url = window.location.protocol + '//' + window.location.host;
-	        if (fragment.indexOf(root_url) === 0) {
-	            fragment = fragment.replace(root_url, '');
-	        }
-
-	        Backbone.Router.prototype.navigate.call(this, fragment, args);
-	    }
-
-	});
-
 	var Predicate = Backbone.Model;
 
 	// Viking.Collection
@@ -3191,6 +1817,1932 @@ var classProperties = Object.freeze({
 	        }
 
 	        return child;
+	    }
+
+	});
+
+	var booleanAttributes = ['disabled', 'readonly', 'multiple', 'checked', 'autobuffer', 'autoplay', 'controls', 'loop', 'selected', 'hidden', 'scoped', 'async', 'defer', 'reversed', 'ismap', 'seemless', 'muted', 'required', 'autofocus', 'novalidate', 'formnovalidate', 'open', 'pubdate', 'itemscope'];
+
+	var tagOption = function tagOption(key, value, escape) {
+	    if (Array.isArray(value)) {
+	        value = value.join(" ");
+	    }
+
+	    if (escape) {
+	        value = _.escape(value);
+	    }
+
+	    return key + '="' + value + '"';
+	};
+
+	var dataTagOption = function dataTagOption(key, value, escape) {
+	    key = "data-" + key;
+
+	    if (_.isObject(value)) {
+	        value = JSON.stringify(value);
+	    }
+
+	    return tagOption(key, value, escape);
+	};
+
+	var tagOptions = function tagOptions(options, escape) {
+	    if (options === undefined) {
+	        return "";
+	    }
+
+	    if (escape === undefined) {
+	        escape = true;
+	    }
+
+	    var attrs = [];
+	    _.each(options, function (value, key) {
+	        if (key === "data" && _.isObject(value)) {
+	            // TODO testme
+	            _.each(value, function (value, key) {
+	                attrs.push(dataTagOption(key, value, escape));
+	            });
+	        } else if (value === true && _.contains(booleanAttributes, key)) {
+	            attrs.push(key);
+	        } else if (value !== null && value !== undefined) {
+	            attrs.push(tagOption(key, value, escape));
+	        }
+	    });
+
+	    if (attrs.length === 0) {
+	        return '';
+	    }
+
+	    return " " + attrs.sort().join(' ');
+	};
+
+	// see http://www.w3.org/TR/html4/types.html#type-name
+	var sanitizeToId = function sanitizeToId(name) {
+	    return name.replace(/[^\-a-zA-Z0-9:.]/g, "_").replace(/_+/g, '_').replace(/_+$/, '').replace(/_+/g, '_');
+	};
+
+	// TODO: move to model_helpers?
+	var tagNameForModelAttribute = function tagNameForModelAttribute(model, attribute, options) {
+	    options || (options = {});
+
+	    var value = model.get(attribute);
+	    var name = void 0;
+
+	    if (options.namespace) {
+	        name = options.namespace + '[' + attribute + ']';
+	    } else {
+	        name = model.baseModel.modelName.paramKey + '[' + attribute + ']';
+	    }
+
+	    if (value instanceof Collection || Array.isArray(value)) {
+	        name = name + '[]';
+	    }
+
+	    return name;
+	};
+
+	// TODO: move to model_helpers?
+	var addErrorClassToOptions = function addErrorClassToOptions(model, attribute, options) {
+	    if (model.errorsOn(attribute)) {
+	        if (options['class']) {
+	            options['class'] = options['class'] + ' error';
+	        } else {
+	            options['class'] = 'error';
+	        }
+	    }
+	};
+
+	// TODO: move to model_helpers?
+	// TODO: testme
+	var methodOrAttribute = function methodOrAttribute(model, funcOrAttribute) {
+	    if (typeof funcOrAttribute !== 'function') {
+	        if (model[funcOrAttribute]) {
+	            return _.result(model, funcOrAttribute);
+	        }
+
+	        return model.get(funcOrAttribute);
+	    }
+
+	    return funcOrAttribute(model);
+	};
+
+	// urlFor(modelOrUrl, options)
+	// ===========================
+	//
+	// Returns the URL for the model. Note that by default +:onlyPath+ is +true+ so
+	// you'll get the relative "/controller/action" instead of the fully qualified
+	// URL like "http://example.com/controller/action".
+	//
+	// Passing the model will trigger the named route for that record. The lookup
+	// will happen on the name of the class. So passing a Workshop object will attempt
+	// to use the +workshopPath+ route. If you have a nested route, such as
+	// +adminWorkshopPath+ you'll have to call that explicitly (it's impossible
+	// for +urlFor+ to guess that route).
+	//
+	// If a string is passed instead of a model, the string is simply returned.
+	//
+	// ==== Options
+	//   - anchor: Specifies the anchor name to be appended to the path.
+	//   - onlyPath: If +true+, returns the relative URL (omitting the protocol,
+	//               host name, and port) (+false+ by default).
+	//   - trailingSlash: If true, adds a trailing slash, as in "/archive/2005/".
+	//                     Note that this is currently not recommended since it
+	//                     breaks caching.
+	//   - host: Overrides the default (current) host if provided.
+	//   - port: Optionally specify the port to connect to
+	//   - protocol: Overrides the default (current) protocol if provided.
+	//   - scriptName: Specifies application path relative to domain root. If
+	//                 provided, prepends application path
+	//   - user: Inline HTTP authentication (only plucked out if +:password+ is also present).
+	//   - password: Inline HTTP authentication (only plucked out if +:user+ is also present).
+	//
+	// ==== Examples
+	//   urlFor(Workshop)
+	//   // uses +workshopsUrl()+
+	//   # => http://www.example.com/workshops
+	//
+	//   urlFor(new Workshop())
+	//   // relies on Workshop answering isNew() (and in this case returning true)
+	//   # => http://www.example.com/workshops
+	//
+	//   urlFor(workshop)
+	//   // uses +workshopUrl(model)+
+	//   // which calls workshop.toParam() which by default returns the id
+	//   // => http://www.example.com/workshops/5
+	//
+	//   // toParam() can be re-defined in a model to provide different URL names:
+	//   // => http://www.example.com/workshops/1-workshop-name
+	//
+	//   urlFor(workshop, {anchor: 'location'})
+	//   // => http://www.example.com/workshops/5#location
+	//
+	//   urlFor(workshop, {onlyPath: true})
+	//   // => /workshops/5
+	//
+	//   urlFor(workshop, {trailingSlash: true})
+	//   // => http://www.example.com/workshops/5/
+	//
+	//   urlFor(workshop, {host: 'myhost'})
+	//   // => http://myhost.com/workshops/5
+	//
+	//   urlFor(workshop, {port: 9292})
+	//   // => http://www.example.com:9292/workshops/5
+	//
+	//   urlFor(workshop, {protocol: 'https'})
+	//   // => https://www.example.com/workshops/5
+	//
+	//   urlFor(workshop, {scriptName: '/location'})
+	//   // => http://example.com/location/workshops/5
+	//
+	//   urlFor(workshop, {user: 'username', password: 'password'})
+	//   // => http://username:password@example.com/workshops/5
+	//
+	//   urlFor("http://www.example.com")
+	//   // => http://www.example.com
+	//
+	// TODO: support polymorhic_paths... ie [blog, post] => /blogs/1/posts/3
+	//       polymorphic_url([blog, post]) # => "http://example.com/blogs/1/posts/1"
+	//       polymorphic_url([:admin, blog, post]) # => "http://example.com/admin/blogs/1/posts/1"
+	//       polymorphic_url([user, :blog, post]) # => "http://example.com/users/1/blog/posts/1"
+	//       polymorphic_url(Comment) # => "http://example.com/comments"
+	//
+	var urlFor = function urlFor(modelOrUrl, options) {
+	    if (typeof modelOrUrl === 'string') {
+	        return modelOrUrl;
+	    }
+
+	    options = _.extend({
+	        onlyPath: false,
+	        trailingSlash: false,
+	        host: window.location.hostname,
+	        port: window.location.port,
+	        scriptName: '',
+	        protocol: window.location.protocol.replace(':', '')
+	    }, options);
+
+	    var route = void 0;
+	    var klass = modelOrUrl.baseModel.modelName.model();
+	    if (modelOrUrl instanceof klass) {
+	        if (modelOrUrl.isNew()) {
+	            route = (klass.baseModel.modelName.plural + 'Path').constantize(global$1);
+	            route = route();
+	        } else {
+	            route = (klass.baseModel.modelName.singular + 'Path').constantize(global$1);
+	            route = route(modelOrUrl);
+	        }
+	    } else {
+	        route = (modelOrUrl.baseModel.modelName.plural + 'Path').constantize(global$1);
+	        route = route();
+	    }
+
+	    if (!options.onlyPath) {
+	        route = options.protocol + '://' + options.host + (options.port ? ':' : '') + options.port + options.scriptName + route;
+
+	        if (options.user && options.password) {
+	            route = route.replace('://', '://' + options.user + ':' + options.password + '@');
+	        }
+	    }
+
+	    if (options.trailingSlash) {
+	        route += '/';
+	    }
+
+	    if (options.anchor) {
+	        route += '#' + options.anchor;
+	    }
+
+	    return route;
+	};
+
+	// tag(name, [options = {}, escape = true])
+	// ========================================
+	//
+	// Returns an empty HTML tag of type `name` add HTML attributes by passing
+	// an attributes hash to `options`. Set escape to `false` to disable attribute
+	// value escaping.
+	//
+	// Arguments
+	// ---------
+	// - Use `true` with boolean attributes that can render with no value, like `disabled` and `readonly`.
+	// - HTML5 data-* attributes can be set with a single data key pointing to a hash of sub-attributes.
+	// - Values are encoded to JSON, with the exception of strings and symbols.
+	//
+	// Examples
+	// --------
+	//
+	//   tag("br")
+	//   // => <br>
+	//
+	//   tag("input", {type: 'text', disabled: true})
+	//   // => <input type="text" disabled="disabled" />
+	//
+	//   tag("img", {src: "open & shut.png"})
+	//   // => <img src="open &amp; shut.png" />
+	//  
+	//   tag("img", {src: "open &amp; shut.png"}, false, false)
+	//   // => <img src="open &amp; shut.png" />
+	//  
+	//   tag("div", {data: {name: 'Stephen', city_state: ["Chicago", "IL"]}})
+	//   // => <div data-name="Stephen" data-city_state="[&quot;Chicago&quot;,&quot;IL&quot;]" />
+	var tag = function tag(name, options, escape) {
+	    return "<" + name + tagOptions(options, escape) + ">";
+	};
+
+	// Returns an HTML image tag for the +source+. The +source+ can be a full
+	// path or a file.
+	//
+	// ==== Options
+	//
+	// You can add HTML attributes using the +options+. The +options+ supports
+	// two additional keys for convenience and conformance:
+	//
+	// * <tt>:alt</tt>  - If no alt text is given, the file name part of the
+	//   +source+ is used (capitalized and without the extension)
+	// * <tt>:size</tt> - Supplied as "{Width}x{Height}" or "{Number}", so "30x45" becomes
+	//   width="30" and height="45", and "50" becomes width="50" and height="50".
+	//   <tt>:size</tt> will be ignored if the value is not in the correct format.
+	//
+	// ==== Examples
+	//
+	//   imageTag("/assets/icon.png")
+	//   // => <img alt="Icon" src="/assets/icon.png">
+	//   imageTag("/assets/icon.png", {size: "16x10", alt: "A caption"})
+	//   // => <img src="/assets/icon.png" width="16" height="10" alt="A caption">
+	//   imageTag("/icons/icon.gif", size: "16")
+	//   // => <img src="/icons/icon.gif" width="16" height="16" alt="Icon">
+	//   imageTag("/icons/icon.gif", height: '32', width: '32')
+	//   // => <img alt="Icon" height="32" src="/icons/icon.gif" width="32">
+	//   imageTag("/icons/icon.gif", class: "menu_icon")
+	//   // => <img alt="Icon" class="menu_icon" src="/icons/icon.gif">
+
+	var imageTag = function imageTag(source, options) {
+	    var separator = /x/i,
+	        size = void 0,
+	        alt = void 0;
+
+	    if (!options) {
+	        options = {};
+	    }
+
+	    if (source) {
+	        options.src = source;
+	    }
+
+	    if (options.size) {
+	        size = options.size.search(separator) > 0 ? options.size.split(separator) : [options.size, options.size];
+	        options.width = size[0];
+	        options.height = size[1];
+	        delete options.size;
+	    }
+
+	    if (!options.alt) {
+	        alt = options.src.replace(/^.*[\\\/]/, '').split(/\./)[0];
+	        alt = alt.charAt(0).toUpperCase() + alt.slice(1);
+	        options.alt = alt;
+	    }
+
+	    return tag('img', options);
+	};
+
+	// checkBoxTag(name, value="1", checked=false, options)
+	// ======================================================
+	//
+	// Creates a check box form input tag.
+	//
+	// Options
+	// -------
+	//      - disabled: If true, the user will not be able to use this input.
+	//      - Any other key creates standard HTML attributes for the tag
+	//
+	// Examples
+	// --------
+	//   checkBoxTag('accept')
+	//   // => <input name="accept" type="checkbox" value="1" />
+	//  
+	//   checkBoxTag('rock', 'rock music')
+	//   // => <input name="rock" type="checkbox" value="rock music" />
+	//  
+	//   checkBoxTag('receive_email', 'yes', true)
+	//   // => <input checked="checked" name="receive_email" type="checkbox" value="yes" />
+	//  
+	//   checkBoxTag('tos', 'yes', false, class: 'accept_tos')
+	//   // => <input class="accept_tos" name="tos" type="checkbox" value="yes" />
+	//  
+	//   checkBoxTag('eula', 'accepted', false, disabled: true)
+	//   // => <input disabled="disabled" name="eula" type="checkbox" value="accepted" />
+	var checkBoxTag = function checkBoxTag(name, value, checked, options, escape) {
+	    if (value === undefined) {
+	        value = "1";
+	    }
+	    if (options === undefined) {
+	        options = {};
+	    }
+	    if (checked === true) {
+	        options.checked = true;
+	    }
+
+	    _.defaults(options, {
+	        type: "checkbox",
+	        value: value,
+	        id: sanitizeToId(name),
+	        name: name
+	    });
+
+	    return tag("input", options, escape);
+	};
+
+	// label(model, attribute, content, options)
+	// =========================================
+	//
+	// Returns a label tag tailored for labelling an input field for a specified
+	// attribute (identified by method) on an object assigned to the template
+	// (identified by object). The text of label will default to the attribute
+	// name unless a translation is found in the current I18n locale (through
+	// helpers.label.<modelname>.<attribute>) or you specify it explicitly.
+	// Additional options on the label tag can be passed as a hash with options.
+	// These options will be tagged onto the HTML as an HTML element attribute as
+	// in the example shown, except for the :value option, which is designed to
+	// target labels for #radioButton tags (where the value is used in the ID
+	// of the input tag).
+	//
+	// Examples
+	// --------
+	//   label(post, "title")
+	//   // => <label for="post_title">Title</label>
+	//  
+	//   label(post, "title", "A short title")
+	//   // => <label for="post_title">A short title</label>
+	//  
+	//   label(post, "title", "A short title", {class: "title_label"})
+	//   // => <label for="post_title" class="title_label">A short title</label>
+	//  
+	//   label(post, "privacy", "Public Post", {value: "public"})
+	//   // => <label for="post_privacy_public">Public Post</label>
+	//  
+	//   label(post, "terms", function() {
+	//       return 'Accept <a href="/terms">Terms</a>.';
+	//   })
+	//   // => <label for="post_privacy_public">Public Post</label>
+	var label = function label(model, attribute, content, options, escape) {
+	    var tmp = void 0;
+	    if ((typeof content === 'undefined' ? 'undefined' : _typeof(content)) === 'object') {
+	        tmp = options;
+	        options = content;
+	        content = tmp;
+	    }
+
+	    if (options === undefined) {
+	        options = {};
+	    }
+	    if (content === undefined) {
+	        content = attribute.humanize();
+	    }
+	    if (typeof content === 'function') {
+	        content = content();
+	    }
+	    if (!options['for']) {
+	        var name = Viking.View.tagNameForModelAttribute(model, attribute);
+	        options['for'] = Viking.View.sanitizeToId(name);
+	    }
+
+	    Viking.View.addErrorClassToOptions(model, attribute, options);
+
+	    return Viking.View.Helpers.labelTag(content, options, escape);
+	};
+
+	function CheckBoxGroupBuilder(model, attribute, options) {
+	    var modelName = void 0;
+	    options = _.extend({}, options);
+
+	    this.model = model;
+	    this.attribute = attribute;
+	    this.options = options;
+
+	    modelName = _.has(options, 'as') ? options.as : this.model.baseModel.modelName.paramKey;
+	    if (options.namespace) {
+	        if (options.as !== null) {
+	            this.options.namespace = options.namespace + '[' + modelName + ']';
+	        }
+	    } else {
+	        this.options.namespace = modelName;
+	    }
+	}
+
+	// TODO: options passed to the helpers can be made into a helper
+	CheckBoxGroupBuilder.prototype = {
+
+	    checkBox: function checkBox(checkedValue, options) {
+	        var values = this.model.get(this.attribute);
+	        options || (options = {});
+
+	        if (!options.name && this.options.namespace) {
+	            options.name = tagNameForModelAttribute(this.model, this.attribute, { namespace: this.options.namespace });
+	        } else if (!options.name) {
+	            options.name = tagNameForModelAttribute(this.model, this.attribute);
+	        }
+
+	        if (!options.id) {
+	            options.id = sanitizeToId(options.name) + '_' + checkedValue;
+	        }
+
+	        return checkBoxTag(options.name, checkedValue, _.contains(values, checkedValue), options);
+	    },
+
+	    label: function label$$(value, content, options, escape) {
+	        options || (options = {});
+
+	        //TODO shouldn't options.name be options.for?
+	        if (!options.name && !options['for']) {
+	            options['for'] = tagNameForModelAttribute(this.model, this.attribute, { namespace: this.options.namespace });
+	            options['for'] = sanitizeToId(options['for']) + '_' + value;
+	        }
+
+	        return label(this.model, this.attribute, content, options, escape);
+	    }
+
+	};
+
+	function FormBuilder(model, options) {
+	    var modelName = void 0;
+
+	    options = _.extend({}, options);
+
+	    this.model = model;
+	    this.options = options;
+
+	    modelName = _.has(options, 'as') ? options.as : this.model.baseModel.modelName.paramKey;
+	    if (options.namespace) {
+	        if (options.as !== null) {
+	            this.options.namespace = options.namespace + '[' + modelName + ']';
+	        }
+	    } else {
+	        this.options.namespace = modelName;
+	    }
+	}
+
+	// TODO: options passed to the helpers can be made into a helper
+	FormBuilder.prototype = {
+
+	    checkBox: function checkBox(attribute, options, checkedValue, uncheckedValue, escape) {
+	        options || (options = {});
+
+	        if (!options.name && this.options.namespace) {
+	            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, { namespace: this.options.namespace });
+	        }
+
+	        return Viking.View.Helpers.checkBox(this.model, attribute, options, checkedValue, uncheckedValue, escape);
+	    },
+
+	    collectionSelect: function collectionSelect(attribute, collection, valueAttribute, textAttribute, options) {
+	        options || (options = {});
+
+	        if (!options.name && this.options.namespace) {
+	            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, { namespace: this.options.namespace });
+	        }
+
+	        return Viking.View.Helpers.collectionSelect(this.model, attribute, collection, valueAttribute, textAttribute, options);
+	    },
+
+	    hiddenField: function hiddenField(attribute, options) {
+	        options || (options = {});
+
+	        if (!options.name && this.options.namespace) {
+	            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, { namespace: this.options.namespace });
+	        }
+
+	        return Viking.View.Helpers.hiddenField(this.model, attribute, options);
+	    },
+
+	    label: function label(attribute, content, options, escape) {
+	        options || (options = {});
+
+	        //TODO shouldn't options.name be options.for?
+	        if (!options['for'] && !options.name && this.options.namespace) {
+	            options['for'] = Viking.View.tagNameForModelAttribute(this.model, attribute, { namespace: this.options.namespace });
+	            options['for'] = Viking.View.sanitizeToId(options['for']);
+	        }
+
+	        return Viking.View.Helpers.label(this.model, attribute, content, options, escape);
+	    },
+
+	    number: function number(attribute, options) {
+	        options || (options = {});
+
+	        if (!options.name && this.options.namespace) {
+	            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, { namespace: this.options.namespace });
+	        }
+
+	        return Viking.View.Helpers.numberField(this.model, attribute, options);
+	    },
+
+	    passwordField: function passwordField(attribute, options) {
+	        options || (options = {});
+
+	        if (!options.name && this.options.namespace) {
+	            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, { namespace: this.options.namespace });
+	        }
+
+	        return Viking.View.Helpers.passwordField(this.model, attribute, options);
+	    },
+
+	    radioButton: function radioButton(attribute, tagValue, options) {
+	        options || (options = {});
+
+	        if (!options.name && this.options.namespace) {
+	            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, { namespace: this.options.namespace });
+	        }
+
+	        return Viking.View.Helpers.radioButton(this.model, attribute, tagValue, options);
+	    },
+
+	    select: function select(attribute, collection, options) {
+	        options || (options = {});
+
+	        if (!options.name && this.options.namespace) {
+	            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, { namespace: this.options.namespace });
+	        }
+
+	        return Viking.View.Helpers.select(this.model, attribute, collection, options);
+	    },
+
+	    textArea: function textArea(attribute, options) {
+	        options || (options = {});
+
+	        if (!options.name && this.options.namespace) {
+	            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, { namespace: this.options.namespace });
+	        }
+
+	        return Viking.View.Helpers.textArea(this.model, attribute, options);
+	    },
+
+	    textField: function textField(attribute, options) {
+	        options || (options = {});
+
+	        if (!options.name && this.options.namespace) {
+	            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, { namespace: this.options.namespace });
+	        }
+
+	        return Viking.View.Helpers.textField(this.model, attribute, options);
+	    },
+
+	    checkBoxGroup: function checkBoxGroup(attribute, options, content) {
+	        if (typeof options === 'function') {
+	            content = options;
+	            options = {};
+	        }
+
+	        if (!options.namespace && this.options.namespace) {
+	            options.namespace = this.options.namespace;
+	        }
+
+	        return Viking.View.Helpers.checkBoxGroup(this.model, attribute, options, content);
+	    },
+
+	    fieldsFor: function fieldsFor(attribute, records, options, content) {
+	        var _this = this;
+
+	        var builder = void 0;
+
+	        if (records instanceof Viking.Model) {
+	            records = [records];
+	        }
+
+	        if (!_.isArray(records) && !(records instanceof Viking.Collection)) {
+	            content = options;
+	            options = records;
+	            records = undefined;
+	        }
+
+	        if (typeof options === 'function') {
+	            content = options;
+	            options = {};
+	        }
+
+	        if (this.model.get(attribute) instanceof Viking.Collection) {
+	            var _ret = function () {
+	                var superOptions = _this.options;
+	                var parentModel = _this.model;
+	                records || (records = _this.model.get(attribute));
+	                if (records instanceof Viking.Collection) {
+	                    records = records.models;
+	                }
+
+	                return {
+	                    v: _.map(records, function (model) {
+	                        var localOptions = _.extend({ 'as': null }, options);
+	                        if (!options.namespace) {
+	                            if (superOptions.namespace) {
+	                                localOptions.namespace = superOptions.namespace + '[' + attribute + '][' + model.cid + ']';
+	                            } else {
+	                                localOptions.namespace = parentModel.baseModel.modelName.paramKey + '[' + attribute + '][' + model.cid + ']';
+	                            }
+	                        }
+
+	                        builder = new FormBuilder(model, localOptions);
+
+	                        if (model.id) {
+	                            return builder.hiddenField('id') + content(builder);
+	                        } else {
+	                            return content(builder);
+	                        }
+	                    }).join('')
+	                };
+	            }();
+
+	            if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+	        } else {
+	            if (!options.namespace && this.options.namespace) {
+	                options.namespace = this.options.namespace;
+	            }
+	            options.as = attribute;
+
+	            builder = new FormBuilder(this.model.get(attribute), options);
+	            return content(builder);
+	        }
+	    }
+
+	};
+
+	// textFieldTag(name, [value], [options])
+	// ======================================
+	//
+	// Creates a standard text field. Returns the duplicated String.
+	//
+	// Arguments
+	// ---------
+	// name:    The name of the input
+	// value:   The value of the input
+	// options: A object with any of the following:
+	//      - disabled: If set to true, the user will not be able to use this input
+	//      - size: The number of visible characters that will fit in the input
+	//      - maxlength: The maximum number of characters that the browser will
+	//                   allow the user to enter
+	//      - placehoder: The text contained in the field by default, which is
+	//                    removed when the field receives focus
+	//      - Any other key creates standard HTML attributes for the tag
+	//
+	// Examples
+	// --------
+	//
+	//   textFieldTag('name')
+	//   // => <input name="name" type="text" />
+	//  
+	//   textFieldTag('query', 'Enter your search')
+	//   // => <input name="query" value="Enter your search" type="text" />
+	//  
+	//   textFieldTag('search', {placeholder: 'Enter search term...'})
+	//   // => <input name="search" placeholder="Enter search term..." type="text" />
+	//  
+	//   textFieldTag('request', {class: 'special_input'})
+	//   // => <input class="special_input" name="request" type="text" />
+	//  
+	//   textFieldTag('address', '', {size: 75})
+	//   // => <input name="address" size="75" value="" type="text" />
+	//  
+	//   textFieldTag('zip', {maxlength: 5})
+	//   // => <input maxlength="5" name="zip" type="text" />
+	//  
+	//   textFieldTag('payment_amount', '$0.00', {disabled: true})
+	//   // => <input disabled="disabled" name="payment_amount" value="$0.00" type="text" />
+	//  
+	//   textFieldTag('ip', '0.0.0.0', {maxlength: 15, size: 20, class: "ip-input"})
+	//   // => <input class="ip-input" maxlength="15" name="ip" size="20" value="0.0.0.0" type="text" />
+	var textFieldTag = function textFieldTag(name, value, options, escape) {
+
+	    // Handle both `name, value` && `name, options` style arguments
+	    if (value !== null && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' && !(value instanceof Backbone.Model)) {
+	        options = value;
+	        value = undefined;
+	    }
+
+	    return tag('input', _.extend({
+	        "type": 'text',
+	        "id": sanitizeToId(name),
+	        "name": name,
+	        "value": value
+	    }, options), escape);
+	};
+
+	// textField(model, attribute, options)
+	// ====================================
+	//
+	// Returns an input tag of the "text" type tailored for accessing a specified
+	// attribute on a model. Additional options on the input tag can be passed as
+	// a hash with options. These options will be tagged onto the HTML as an HTML
+	// element attribute as in the example shown.
+	//
+	// Examples
+	// ========
+	//   text_field(post, "title", {size: 20})
+	//   // => <input id="post_title" name="post[title]" size="20" type="text" value="title">
+	//  
+	//   text_field(post, "title", {class: "create_input"})
+	//   // => <input class="create_input" id="post_title" name="post[title]" type="text" value="title">
+	var textField = function textField(model, attribute, options) {
+	    if (options === undefined) {
+	        options = {};
+	    }
+	    addErrorClassToOptions(model, attribute, options);
+
+	    var name = options['name'] || tagNameForModelAttribute(model, attribute);
+	    var value = model.get(attribute);
+	    value = value && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' ? value.toString() : value;
+	    return textFieldTag(name, value, options);
+	};
+
+	// contentTag(name, [content], [options], [escape=true], [&block])
+	// ================================================================
+	//
+	// Returns an HTML block tag of type name surrounding the content. Add HTML
+	// attributes by passing an attributes hash to options. Instead of passing the
+	// content as an argument, you can also use a function in which case, you pass
+	// your options as the second parameter. Set escape to false to disable attribute
+	// value escaping.
+	//
+	// Examples
+	//
+	//   contentTag("p", "Hello world & all!")
+	//   // => <p>Hello world &amp; all!</p>
+	//
+	//   contentTag("p", "Hello world & all!", false)
+	//   // => <p>Hello world & all!</p>
+	//
+	//   contentTag("div", contentTag("p", "Hello world!"), {class: "strong"})
+	//   // => <div class="strong"><p>Hello world!</p></div>
+	//
+	//   contentTag("select", options, {multiple: true})
+	//   // => <select multiple="multiple">...options...</select>
+	//  
+	//   contentTag("div", {class: "strong"}, function() {
+	//      return "Hello world!";
+	//   });
+	//   // => <div class="strong">Hello world!</div>
+	var contentTag = function contentTag(name, content, options, escape) {
+	    var tmp = void 0;
+
+	    // Handle `name, content`, `name, content, options`,
+	    // `name, content, options, escape`, `name, content, escape`, `name, block`,
+	    // `name, options, block`, `name, options, escape, block`, && `name, escape, block`
+	    // style arguments
+	    if (typeof content === "boolean") {
+	        escape = content;
+	        content = options;
+	        options = undefined;
+	    } else if ((typeof content === 'undefined' ? 'undefined' : _typeof(content)) === 'object') {
+	        if (typeof options === 'function') {
+	            tmp = options;
+	            options = content;
+	            content = tmp;
+	        } else if (typeof options === 'boolean') {
+	            tmp = content;
+	            content = escape;
+	            escape = options;
+	            options = tmp;
+	        }
+	    } else if (typeof options === 'boolean') {
+	        escape = options;
+	        options = undefined;
+	    }
+	    if (typeof content === 'function') {
+	        content = content();
+	    }
+	    if (escape || escape === undefined) {
+	        content = _.escape(content);
+	    }
+
+	    return "<" + name + tagOptions(options, escape) + ">" + content + "</" + name + ">";
+	};
+
+	// buttonTag(content, options), buttonTag(options, block)
+	// ========================================================
+	//
+	// Creates a button element that defines a submit button, reset button or a
+	// generic button which can be used in JavaScript, for example. You can use
+	// the button tag as a regular submit tag but it isn't supported in legacy
+	// browsers. However, the button tag allows richer labels such as images and
+	// emphasis.
+	//
+	// Options
+	// -------
+	//      - disabled: If true, the user will not be able to use this input.
+	//      - Any other key creates standard HTML attributes for the tag
+	//
+	// Examples
+	// --------
+	//   buttonTag("Button")
+	//   // => <button name="button" type="submit">Button</button>
+	//  
+	//   buttonTag("Checkout", { :disabled => true })
+	//   // => <button disabled name="button" type="submit">Checkout</button>
+	//  
+	//   buttonTag({type: "button"}, function() {
+	//      return "Ask me!";
+	//   });
+	//   // <button name="button" type="button"><strong>Ask me!</strong></button>
+	var buttonTag = function buttonTag(content, options) {
+	    var tmp = void 0;
+
+	    // Handle `content, options` && `options` style arguments
+	    if ((typeof content === 'undefined' ? 'undefined' : _typeof(content)) === 'object') {
+	        tmp = options;
+	        options = content;
+	        content = tmp;
+	    } else if (options === undefined) {
+	        options = {};
+	    }
+
+	    _.defaults(options, { name: 'button', type: 'submit' });
+	    return contentTag('button', content, options);
+	};
+
+	// hiddenFieldTag(name, value = nil, options = {})
+	// ===============================================
+	//
+	// Creates a hidden form input field used to transmit data that would be lost
+	// due to HTTP's statelessness or data that should be hidden from the user.
+	//
+	// Options
+	// -------
+	//      - Any key creates standard HTML attributes for the tag
+	//
+	// Examples
+	// --------
+	//   hiddenFieldTag('tags_list')
+	//   // => <input name="tags_list" type="hidden">
+	//  
+	//   hiddenFieldTag('token', 'VUBJKB23UIVI1UU1VOBVI@')
+	//   // => <input name="token" type="hidden" value="VUBJKB23UIVI1UU1VOBVI@">
+	var hiddenFieldTag = function hiddenFieldTag(name, value, options, escape) {
+	    if (options === undefined) {
+	        options = {};
+	    }
+	    _.defaults(options, { type: "hidden", id: null });
+
+	    return textFieldTag(name, value, options, escape);
+	};
+
+	// formTag([options], [content])
+	// formTag([content], [options])
+	// =============================
+	//
+	// ==== Options
+	// * <tt>:action</tt> - The url the action of the form should be set to.
+	// * <tt>:multipart</tt> - If set to true, the enctype is set to "multipart/form-data".
+	// * <tt>:method</tt> - The method to use when submitting the form, usually either "get" or "post".
+	//   If "patch", "put", "delete", or another verb is used, a hidden input with name <tt>_method</tt>
+	//   is added to simulate the verb over post. The default is "POST". Only set if
+	//   :action is passed as an option.
+	//
+	// ==== Examples
+	//   formTag();
+	//   // => <form>
+	//
+	//   formTag({action: '/posts'});
+	//   // => <form action="/posts" method="post">
+	//
+	//   formTag({action: '/posts/1', method: "put"});
+	//   // => <form action="/posts/1" method="post"><input name="_method" type="hidden" value="put" />
+	//
+	//   formTag({action: '/upload', multipart: true});
+	//   // => <form action="/upload" method="post" enctype="multipart/form-data">
+	//
+	//   formTag({action: '/posts'}, function() {
+	//      return submitTag('Save');
+	//   });
+	//   // => <form action="/posts" method="post"><input type="submit" name="commit" value="Save" /></form>
+	var formTag = function formTag(options, content) {
+	    var tmp = void 0,
+	        methodOverride = '';
+
+	    if (typeof options === 'function' || typeof options === 'string') {
+	        tmp = content;
+	        content = options;
+	        options = tmp;
+	    }
+	    options || (options = {});
+
+	    if (options.action && !options.method) {
+	        options.method = 'post';
+	    } else if (options.method && options.method !== 'get' && options.method !== 'post') {
+	        methodOverride = hiddenFieldTag('_method', options.method);
+	        options.method = 'post';
+	    }
+
+	    if (options.multipart) {
+	        options.enctype = "multipart/form-data";
+	        delete options.multipart;
+	    }
+
+	    if (content !== undefined) {
+	        content = methodOverride + (typeof content === 'function' ? content() : content);
+
+	        return contentTag('form', content, options, false);
+	    }
+
+	    return tag('form', options, false) + methodOverride;
+	};
+
+	// labelTag(content, options)
+	// ========================================================
+	//
+	// Creates a label element. Accepts a block.
+	//
+	// Options - Creates standard HTML attributes for the tag.
+	//
+	// Examples
+	// --------
+	//   labelTag('Name')
+	//   // => <label>Name</label>
+	//  
+	//   labelTag('name', 'Your name')
+	//   // => <label for="name">Your name</label>
+	//  
+	//   labelTag('name', nil, {for: 'id'})
+	//   // => <label for="name" class="small_label">Name</label>
+	var labelTag = function labelTag(content, options, escape) {
+	    var tmp = void 0;
+
+	    if (typeof options === 'function') {
+	        tmp = content;
+	        content = options;
+	        options = tmp;
+	    }
+
+	    return contentTag('label', content, options, escape);
+	};
+
+	// numberFieldTag(name, value = nil, options = {})
+	// ===============================================
+	//
+	// Creates a number field.
+	//
+	// Options
+	// -------
+	//      - min:  The minimum acceptable value.
+	//      - max:  The maximum acceptable value.
+	//      - step: The acceptable value granularity.
+	//      - Otherwise accepts the same options as text_field_tag.
+	//
+	// Examples
+	// --------
+	//  
+	//   numberFieldTag('count')
+	//   // => <input name="count" type="number">
+	//  
+	//   nubmerFieldTag('count', 10)
+	//   // => <input" name="count" type="number" value="10">
+	//  
+	//   numberFieldTag('count', 4, {min: 1, max: 9})
+	//   // => <input min="1" max="9" name="count" type="number" value="4">
+	//  
+	//   passwordFieldTag('count', {step: 25})
+	//   # => <input name="count" step="25" type="number">
+	var numberFieldTag = function numberFieldTag(name, value, options) {
+
+	    // Handle both `name, value, options`, and `name, options` syntax
+	    if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object') {
+	        options = value;
+	        value = undefined;
+	    }
+
+	    options = _.extend({ type: 'number' }, options);
+	    if (value) {
+	        options.value = value;
+	    }
+
+	    return textFieldTag(name, value, options);
+	};
+
+	// optionsForSelectTag(container[, selected])
+	// =======================================
+	//
+	// Accepts a container (hash, array, collection, your type) and returns a
+	// string of option tags. Given a container where the elements respond to
+	// first and last (such as a two-element array), the "lasts" serve as option
+	// values and the "firsts" as option text. Hashes are turned into this
+	// form automatically, so the keys become "firsts" and values become lasts.
+	// If +selected+ is specified, the matching "last" or element will get the
+	// selected option-tag. +selected+ may also be an array of values to be
+	// selected when using a multiple select.
+	//
+	//   optionsForSelectTag([["Dollar", "$"], ["Kroner", "DKK"]])
+	//   // => <option value="$">Dollar</option>
+	//   // => <option value="DKK">Kroner</option>
+	//
+	//   optionsForSelectTag([ "VISA", "MasterCard" ], "MasterCard")
+	//   // => <option>VISA</option>
+	//   // => <option selected>MasterCard</option>
+	//
+	//   optionsForSelectTag({ "Basic" => "$20", "Plus" => "$40" }, "$40")
+	//   // => <option value="$20">Basic</option>
+	//   // => <option value="$40" selected>Plus</option>
+	//
+	//   optionsForSelectTag([ "VISA", "MasterCard", "Discover" ], ["VISA", "Discover"])
+	//   // => <option selected>VISA</option>
+	//   // => <option>MasterCard</option>
+	//   // => <option selected>Discover</option>
+	//
+	// You can optionally provide html attributes as the last element of the array.
+	//
+	//   optionsForSelectTag([ "Denmark", ["USA", {class: 'bold'}], "Sweden" ], ["USA", "Sweden"])
+	//   // => <option value="Denmark">Denmark</option>
+	//   // => <option value="USA" class="bold" selected>USA</option>
+	//   // => <option value="Sweden" selected>Sweden</option>
+	//
+	//   optionsForSelectTag([["Dollar", "$", {class: "bold"}], ["Kroner", "DKK", {class: "alert"}]])
+	//   // => <option value="$" class="bold">Dollar</option>
+	//   // => <option value="DKK" class="alert">Kroner</option>
+	//
+	// If you wish to specify disabled option tags, set +selected+ to be a hash,
+	// with <tt>:disabled</tt> being either a value or array of values to be
+	// disabled. In this case, you can use <tt>:selected</tt> to specify selected
+	// option tags.
+	//
+	//   optionsForSelectTag(["Free", "Basic", "Advanced", "Super Platinum"], {disabled: "Super Platinum"})
+	//   // => <option value="Free">Free</option>
+	//   // => <option value="Basic">Basic</option>
+	//   // => <option value="Advanced">Advanced</option>
+	//   // => <option value="Super Platinum" disabled>Super Platinum</option>
+	//
+	//   optionsForSelectTag(["Free", "Basic", "Advanced", "Super Platinum"], {disabled: ["Advanced", "Super Platinum"]})
+	//   // => <option value="Free">Free</option>
+	//   // => <option value="Basic">Basic</option>
+	//   // => <option value="Advanced" disabled>Advanced</option>
+	//   // => <option value="Super Platinum" disabled>Super Platinum</option>
+	//
+	//   optionsForSelectTag(["Free", "Basic", "Advanced", "Super Platinum"], {selected: "Free", disabled: "Super Platinum"})
+	//   // => <option value="Free" selected>Free</option>
+	//   // => <option value="Basic">Basic</option>
+	//   // => <option value="Advanced">Advanced</option>
+	//   // => <option value="Super Platinum" disabled>Super Platinum</option>
+	//
+	// NOTE: Only the option tags are returned, you have to wrap this call in a
+	// regular HTML select tag.
+	var optionsForSelectTag = function optionsForSelectTag(container, selected) {
+	    var disabled = void 0;
+	    var arrayWrap = function arrayWrap(data) {
+	        if (_.isArray(data)) {
+	            return data;
+	        }
+	        return [data];
+	    };
+
+	    if ((typeof selected === 'undefined' ? 'undefined' : _typeof(selected)) !== 'object' && typeof selected !== 'function') {
+	        selected = arrayWrap(selected);
+	    } else if (!_.isArray(selected) && typeof selected !== 'function') {
+	        disabled = typeof selected.disabled === 'function' ? selected.disabled : arrayWrap(selected.disabled);
+	        selected = typeof selected.selected === 'function' ? selected.selected : arrayWrap(selected.selected);
+	    }
+
+	    if (_.isArray(container)) {
+	        return _.map(container, function (text) {
+	            var value = void 0,
+	                options = {};
+	            if (_.isArray(text)) {
+	                if (_typeof(_.last(text)) === 'object') {
+	                    options = text.pop();
+	                }
+	                if (text.length === 2) {
+	                    options.value = value = text[1];
+	                    text = text[0];
+	                } else {
+	                    value = text = text[0];
+	                }
+	            } else {
+	                value = text;
+	            }
+
+	            if (typeof selected === 'function') {
+	                if (selected(value)) {
+	                    options.selected = true;
+	                }
+	            } else if (_.contains(selected, value)) {
+	                options.selected = true;
+	            }
+	            if (typeof disabled === 'function') {
+	                if (disabled(value)) {
+	                    options.disabled = true;
+	                }
+	            } else if (_.contains(disabled, value)) {
+	                options.disabled = true;
+	            }
+
+	            return contentTag('option', text, options);
+	        }).join("\n");
+	    }
+
+	    return _.map(container, function (value, text) {
+	        var options = { value: value };
+
+	        if (typeof selected === 'function') {
+	            if (selected(value)) {
+	                options.selected = true;
+	            }
+	        } else if (_.contains(selected, value)) {
+	            options.selected = true;
+	        }
+	        if (typeof disabled === 'function') {
+	            if (disabled(value)) {
+	                options.disabled = true;
+	            }
+	        } else if (_.contains(disabled, value)) {
+	            options.disabled = true;
+	        }
+
+	        return contentTag('option', text, options);
+	    }).join("\n");
+	};
+
+	// optionsFromCollectionForSelectTag(collection, valueMethod, textMethod, selected)
+	// =============================================================================
+	//
+	// Returns a string of option tags that have been compiled by iterating over
+	// the collection and assigning the result of a call to the valueMethod as
+	// the option value and the textMethod as the option text.
+	//
+	//   optionsFromCollectionForSelectTag(people, 'id', 'name')
+	//   // => <option value="person's id">person's name</option>
+	//
+	// This is more often than not used inside a selectTag like this example:
+	//
+	//   selectTag(person, optionsFromCollectionForSelectTag(people, 'id', 'name'))
+	//
+	// If selected is specified as a value or array of values, the element(s)
+	// returning a match on valueMethod will be selected option tag(s).
+	//
+	// If selected is specified as a Proc, those members of the collection that
+	// return true for the anonymous function are the selected values.
+	//
+	// selected can also be a hash, specifying both :selected and/or :disabled
+	// values as required.
+	//
+	// Be sure to specify the same class as the valueMethod when specifying
+	// selected or disabled options. Failure to do this will produce undesired
+	// results. Example:
+	//
+	//   optionsFromCollectionForSelectTag(people, 'id', 'name', '1')
+	//
+	// Will not select a person with the id of 1 because 1 (an Integer) is not
+	// the same as '1' (a string)
+	//
+	//   optionsFromCollectionForSelectTag(people, 'id', 'name', 1)
+	//
+	// should produce the desired results.
+	var optionsFromCollectionForSelectTag = function optionsFromCollectionForSelectTag(collection, valueAttribute, textAttribute, selected) {
+	    var selectedForSelect = void 0;
+
+	    var options = collection.map(function (model) {
+	        return [methodOrAttribute(model, textAttribute), methodOrAttribute(model, valueAttribute)];
+	    });
+
+	    if (_.isArray(selected)) {
+	        selectedForSelect = selected;
+	    } else if ((typeof selected === 'undefined' ? 'undefined' : _typeof(selected)) === 'object') {
+	        selectedForSelect = {
+	            selected: selected.selected,
+	            disabled: selected.disabled
+	        };
+	    } else {
+	        selectedForSelect = selected;
+	    }
+
+	    return optionsForSelectTag(options, selectedForSelect);
+	};
+
+	// passwordFieldTag(name = "password", value = nil, options = {})
+	// ================================================================
+	//
+	// Creates a password field, a masked text field that will hide the users input
+	// behind a mask character.
+	//
+	// Options
+	// -------
+	//      - disabled:  If true, the user will not be able to use this input.
+	//      - size:      The number of visible characters that will fit in the input.
+	//      - maxlength: The maximum number of characters that the browser will allow the user to enter.
+	//      - Any other key creates standard HTML attributes for the tag
+	//
+	// Examples
+	// --------
+	//  
+	//   passwordFieldTag('pass')
+	//   // => <input name="pass" type="password">
+	//  
+	//   passwordFieldTag('secret', 'Your secret here')
+	//   // => <input" name="secret" type="password" value="Your secret here">
+	//  
+	//   passwordFieldTag('masked', nil, {class: 'masked_input_field'})
+	//   // => <input class="masked_input_field" name="masked" type="password">
+	//  
+	//   passwordFieldTag('token', '', {size: 15})
+	//   # => <input name="token" size="15" type="password" value="">
+	//  
+	//   passwordFieldTag('key', null, {maxlength: 16})
+	//   // => <input maxlength="16" name="key" type="password">
+	//  
+	//   passwordFieldTag('confirm_pass', null, {disabled: true})
+	//   // => <input disabled name="confirm_pass" type="password">
+	//  
+	//   passwordFieldTag('pin', '1234', {maxlength: 4, size: 6, class: "pin_input"})
+	//   // => <input class="pin_input" maxlength="4" name="pin" size="6" type="password" value="1234">
+	var passwordFieldTag = function passwordFieldTag(name, value, options) {
+	    if (name === undefined) {
+	        name = 'password';
+	    }
+	    if (options === undefined) {
+	        options = {};
+	    }
+	    _.defaults(options, { type: "password" });
+
+	    return textFieldTag(name, value, options);
+	};
+
+	// radioButtonTag(name, value, checked, options)
+	// =============================================
+	//
+	// Creates a radio button; use groups of radio buttons named the same to allow
+	// users to select from a group of options.
+	//
+	// Options
+	// -------
+	//      - disabled: If true, the user will not be able to use this input.
+	//      - Any other key creates standard HTML attributes for the tag
+	//
+	// Examples
+	// --------
+	//   radioButtonTag('gender', 'male')
+	//   // => <input name="gender" type="radio" value="male">
+	//  
+	//   radioButtonTag('receive_updates', 'no', true)
+	//   // => <input checked="checked" name="receive_updates" type="radio" value="no">
+	//
+	//   radioButtonTag('time_slot', "3:00 p.m.", false, {disabled: true})
+	//   // => <input disabled name="time_slot" type="radio" value="3:00 p.m.">
+	//  
+	//   radioButtonTag('color', "green", true, {class: "color_input"})
+	//   // => <input checked class="color_input" name="color" type="radio" value="green">
+	var radioButtonTag = function radioButtonTag(name, value, checked, options) {
+	    if (options === undefined) {
+	        options = {};
+	    }
+	    if (checked === true) {
+	        options.checked = true;
+	    }
+	    _.defaults(options, {
+	        type: "radio",
+	        value: value,
+	        name: name,
+	        id: sanitizeToId(name)
+	    });
+
+	    return tag("input", options);
+	};
+
+	// selectTag(name, optionTags, options)
+	// ====================================
+	//
+	// Creates a dropdown selection box, or if the :multiple option is set to true,
+	// a multiple choice selection box.
+	//
+	// Options
+	// -------
+	//    - multiple:      If set to true the selection will allow multiple choices.
+	//    - disabled:      If set to true, the user will not be able to use this input.
+	//    - includeBlank:  If set to true, an empty option will be created, can pass a string to use as empty option content
+	//    - prompt:        Create a prompt option with blank value and the text asking user to select something
+	//    - Any other key creates standard HTML attributes for the tag.
+	//
+	// Examples
+	// --------
+	//   selectTag("people", options_for_select({ "Basic": "$20"}))
+	//   // <select name="people"><option value="$20">Basic</option></select>
+	//  
+	//   selectTag("people", "<option>David</option>")
+	//   // => <select name="people"><option>David</option></select>
+	//  
+	//   selectTag("count", "<option>1</option><option>2</option><option>3</option>")
+	//   // => <select name="count"><option>1</option><option>2</option><option>3</option></select>
+	//  
+	//   selectTag("colors", "<option>Red</option><option>Green</option><option>Blue</option>", {multiple: true})
+	//   // => <select multiple="multiple" name="colors[]"><option>Red</option>
+	//   //    <option>Green</option><option>Blue</option></select>
+	//  
+	//   selectTag("locations", "<option>Home</option><option selected='selected'>Work</option><option>Out</option>")
+	//   // => <select name="locations"><option>Home</option><option selected='selected'>Work</option>
+	//   //    <option>Out</option></select>
+	//  
+	//   selectTag("access", "<option>Read</option><option>Write</option>", {multiple: true, class: 'form_input'})
+	//   // => <select class="form_input" multiple="multiple" name="access[]"><option>Read</option>
+	//   //    <option>Write</option></select>
+	//  
+	//   selectTag("people", options_for_select({ "Basic": "$20"}), {includeBlank: true})
+	//   // => <select name="people"><option value=""></option><option value="$20">Basic</option></select>
+	//  
+	//   selectTag("people", options_for_select({"Basic": "$20"}), {prompt: "Select something"})
+	//   // => <select name="people"><option value="">Select something</option><option value="$20">Basic</option></select>
+	//  
+	//   selectTag("destination", "<option>NYC</option>", {disabled: true})
+	//   // => <select disabled name="destination"><option>NYC</option></select>
+	//  
+	//   selectTag("credit_card", options_for_select([ "VISA", "MasterCard" ], "MasterCard"))
+	//   // => <select name="credit_card"><option>VISA</option><option selected>MasterCard</option></select>
+	var selectTag = function selectTag(name, optionTags, options) {
+	    var tagName = name;
+	    if (options === undefined) {
+	        options = {};
+	    }
+	    if (options.multiple && tagName.slice(-2) !== "[]") {
+	        tagName = tagName + "[]";
+	    }
+	    _.defaults(options, {
+	        id: sanitizeToId(name),
+	        name: tagName
+	    });
+
+	    if (options.includeBlank) {
+	        var content = typeof options.includeBlank == "string" ? options.includeBlank : "";
+	        optionTags = contentTag('option', content, { value: '' }) + optionTags;
+	        delete options.includeBlank;
+	    }
+
+	    if (options.prompt) {
+	        if (options.prompt === true) {
+	            options.prompt = 'Select';
+	        }
+	        optionTags = contentTag('option', options.prompt, { value: '' }) + optionTags;
+	        delete options.prompt;
+	    }
+
+	    return contentTag('select', optionTags, options, false);
+	};
+
+	// submitTag(value="Save", options)
+	// =================================
+	//
+	// Creates a submit button with the text value as the caption.
+	//
+	// Options
+	// -------
+	//    - disabled:      If set to true, the user will not be able to use this input.
+	//    - Any other key creates standard HTML attributes for the tag.
+	//  
+	//   submitTag()
+	//   // => <input name="commit" type="submit" value="Save">
+	//  
+	//   submitTag "Edit this article"
+	//   // => <input name="commit" type="submit" value="Edit this article">
+	//  
+	//   submitTag("Save edits", {disabled: true})
+	//   // => <input disabled name="commit" type="submit" value="Save edits">
+	//  
+	//   submitTag(nil, {class: "form_submit"})
+	//   // => <input class="form_submit" name="commit" type="submit">
+	//  
+	//   submitTag("Edit", class: "edit_button")
+	//   // => <input class="edit_button" name="commit" type="submit" value="Edit">
+	var submitTag = function submitTag(value, options) {
+	    if (options === undefined) {
+	        options = {};
+	    }
+	    if (!value) {
+	        value = 'Save';
+	    }
+	    _.defaults(options, {
+	        type: 'submit',
+	        name: 'commit',
+	        id: null,
+	        value: value
+	    });
+
+	    return tag('input', options);
+	};
+
+	// textAreaTag(name, [content], [options], [escape=true])
+	// =========================================
+	//
+	// Creates a text input area; use a textarea for longer text inputs such as
+	// blog posts or descriptions.
+	//
+	// Options
+	// -------
+	//    - size: A string specifying the dimensions (columns by rows) of the textarea (e.g., "25x10").
+	//    - rows: Specify the number of rows in the textarea
+	//    - cols: Specify the number of columns in the textarea
+	//    - disabled: If set to true, the user will not be able to use this input.
+	//    - Any other key creates standard HTML attributes for the tag.
+	//
+	// Examples
+	// --------
+	//  
+	//   textAreaTag('post')
+	//   // => <textarea name="post"></textarea>
+	//  
+	//   textAreaTag('bio', user.bio)
+	//   // => <textarea name="bio">This is my biography.</textarea>
+	//  
+	//   textAreaTag('body', null, {rows: 10, cols: 25})
+	//   // => <textarea cols="25" name="body" rows="10"></textarea>
+	//  
+	//   textAreaTag('body', null, {size: "25x10"})
+	//   // => <textarea name="body" cols="25" rows="10"></textarea>
+	//  
+	//   textAreaTag('description', "Description goes here.", {disabled: true})
+	//   // => <textarea disabled name="description">Description goes here.</textarea>
+	//  
+	//   textAreaTag('comment', null, {class: 'comment_input'})
+	//   // => <textarea class="comment_input" name="comment"></textarea>
+	var textAreaTag = function textAreaTag(name, content, options, escape) {
+	    if (options === undefined) {
+	        options = {};
+	    }
+	    if (escape === undefined) {
+	        escape = true;
+	    }
+	    _.defaults(options, {
+	        id: sanitizeToId(name),
+	        name: name
+	    });
+
+	    if (options.size) {
+	        options.cols = options.size.split('x')[0];
+	        options.rows = options.size.split('x')[1];
+	        delete options.size;
+	    }
+
+	    if (escape) {
+	        content = _.escape(content);
+	    }
+
+	    return contentTag('textarea', content, options, false);
+	};
+
+	// timeTag(date, [options], [value])
+	// =================================
+	//
+	// Returns an html time tag for the given date or time.
+	//
+	// Examples
+	// --------
+	//
+	//   timeTag(Date.today)
+	//   // => <time datetime="2010-11-04">November 04, 2010</time>
+	//
+	//   timeTag(Date.now)
+	//   // => <time datetime="2010-11-04T17:55:45+01:00">November 04, 2010 17:55</time>
+	//
+	//   timeTag(Date.yesterday, 'Yesterday')
+	//   // => <time datetime="2010-11-03">Yesterday</time>
+	//
+	//   timeTag(Date.today, {pubdate: true})
+	//   // => <time datetime="2010-11-04" pubdate="pubdate">November 04, 2010</time>
+	//
+	//   timeTag(Date.today, {datetime: Date.today.strftime('%G-W%V')})
+	//   // => <time datetime="2010-W44">November 04, 2010</time>
+	//
+	//   time_tag(Date.now, function() {
+	//     return '<span>Right now</span>';
+	//   });
+	//   // => <time datetime="2010-11-04T17:55:45+01:00"><span>Right now</span></time>
+	var timeTag = function timeTag(date, content, options) {
+	    var tmp = void 0;
+
+	    // handle both (date, opts, func || str) and (date, func || str, opts)
+	    if ((typeof content === 'undefined' ? 'undefined' : _typeof(content)) === 'object') {
+	        tmp = options;
+	        options = content;
+	        content = tmp;
+	    }
+	    options || (options = {});
+
+	    if (!content) {
+	        content = options.format ? date.strftime(options.format) : date.toString();
+	    }
+	    if (options.format) {
+	        delete options.format;
+	    }
+	    if (!options.datetime) {
+	        options.datetime = date.toISOString();
+	    }
+
+	    return contentTag('time', content, options);
+	};
+
+	// The Viking gloval namespace for tracking created models, collections, etc...
+	var templates = {};
+
+	var render = function render(templatePath, locals) {
+	    var template = templates[templatePath];
+
+	    if (!locals) {
+	        locals = {};
+	    }
+
+	    if (template) {
+	        return template(_.extend(locals, Helpers));
+	    }
+
+	    throw new Error('Template does not exist: ' + templatePath);
+	};
+
+	var Helpers = {
+	    // Asset Helpers
+	    imageTag: imageTag,
+
+	    // Builders
+	    CheckBoxGroupBuilder: CheckBoxGroupBuilder,
+	    FormBuilder: FormBuilder,
+
+	    // Form Helpers
+	    textField: textField,
+
+	    // Utils
+	    tagOption: tagOption,
+	    dataTagOption: dataTagOption,
+	    tagOptions: tagOptions,
+	    sanitizeToId: sanitizeToId,
+	    tagNameForModelAttribute: tagNameForModelAttribute,
+	    addErrorClassToOptions: addErrorClassToOptions,
+	    methodOrAttribute: methodOrAttribute,
+
+	    // Form Tag Helpers
+	    buttonTag: buttonTag,
+	    checkBoxTag: checkBoxTag,
+	    contentTag: contentTag,
+	    formTag: formTag,
+	    hiddenFieldTag: hiddenFieldTag,
+	    labelTag: labelTag,
+	    numberFieldTag: numberFieldTag,
+	    optionsForSelectTag: optionsForSelectTag,
+	    optionsFromCollectionForSelectTag: optionsFromCollectionForSelectTag,
+	    passwordFieldTag: passwordFieldTag,
+	    radioButtonTag: radioButtonTag,
+	    selectTag: selectTag,
+	    submitTag: submitTag,
+	    tag: tag,
+	    textAreaTag: textAreaTag,
+	    textFieldTag: textFieldTag,
+	    timeTag: timeTag,
+
+	    // Render
+	    render: render
+	};
+
+	// TODO: Remove utils from Viking.View, not sure why they are added to it.
+	// Viking.View
+	// -----------
+	//
+	// Viking.View is a framework fro handling view template lookup and rendering.
+	// It provides view helpers that assisst when building HTML forms and more.
+	var View = Backbone.View.extend({
+
+	    template: undefined,
+
+	    renderTemplate: function renderTemplate(locals) {
+	        return Helpers.render(this.template, locals);
+	    },
+
+	    //Copied constructor from Backbone View
+	    constructor: function constructor(options) {
+	        this.cid = _.uniqueId('view');
+	        options || (options = {});
+	        _.extend(this, _.pick(options, ['model', 'collection', 'el', 'id', 'attributes', 'className', 'tagName', 'events']));
+	        this._ensureElement();
+
+	        // Add an array for storing subView attached to this view so we can remove then
+	        this.subViews = [];
+
+	        this.initialize.apply(this, arguments);
+	        this.delegateEvents();
+	    },
+
+	    // A helper method that constructs a view and adds it to the subView array
+	    subView: function subView(SubView, options) {
+	        var view = new SubView(options);
+	        this.subViews.push(view);
+	        this.listenTo(view, 'remove', this.removeSubView);
+	        return view;
+	    },
+
+	    // Removes the subview from the array and stop listening to it, and calls
+	    // #remove on the subview.
+	    removeSubView: function removeSubView(view) {
+	        this.subViews = _.without(this.subViews, view);
+	        this.stopListening(view);
+	        view.remove();
+	    },
+
+	    // Remove all subviews when remove this view. We don't call stopListening
+	    // here because this view is being removed anyways so those will get cleaned
+	    // up by Backbone.
+	    remove: function remove() {
+	        while (this.subViews.length > 0) {
+	            this.subViews.pop().remove();
+	        }
+
+	        // Emit a remove event for when a view is removed
+	        // TODO: Maybe backport this to Backbone?
+	        this.trigger('remove', this);
+
+	        Backbone.View.prototype.remove.apply(this, arguments);
+	    },
+
+	    // Listens to attribute(s) of the model of the view, on change
+	    // renders the new value to el. Optionally, pass render function to render
+	    // something different, model is passed as an arg
+	    // TODO: document me
+	    bindEl: function bindEl(attributes, selector, render) {
+	        var view = this;
+	        render || (render = function render(model) {
+	            return model.get(attributes);
+	        });
+	        if (!_.isArray(attributes)) {
+	            attributes = [attributes];
+	        }
+
+	        //TODO: might want to Debounce because of some inputs being very rapid
+	        // but maybe that should be left up to the user changes (ie textareas like description)
+	        _.each(attributes, function (attribute) {
+	            view.listenTo(view.model, 'change:' + attribute, function (model) {
+	                view.$(selector).html(render(model));
+	            });
+	        });
+	    }
+
+	    //TODO: Default render can just render template
+	}, {
+
+	    // `Viking.View.templates` is used for storing templates.
+	    // `Viking.View.Helpers.render` looks up templates in this
+	    // variable
+	    templates: templates,
+
+	    // registerTemplate: function (path, template) {
+	    //     templates[path] = template;
+	    // },
+
+	    // Override the original extend function to support merging events
+	    extend: function extend(protoProps, staticProps) {
+	        if (protoProps && protoProps.events) {
+	            _.defaults(protoProps.events, this.prototype.events);
+	        }
+
+	        return Backbone.View.extend.call(this, protoProps, staticProps);
+	    },
+
+	    urlFor: urlFor,
+	    tagOption: tagOption,
+	    dataTagOption: dataTagOption,
+	    tagOptions: tagOptions,
+	    sanitizeToId: sanitizeToId,
+	    tagNameForModelAttribute: tagNameForModelAttribute,
+	    addErrorClassToOptions: addErrorClassToOptions,
+	    methodOrAttribute: methodOrAttribute
+
+	});
+
+	View.Helpers = Helpers;
+
+	var Cursor = Backbone.Model.extend({
+	    defaults: {
+	        "page": 1,
+	        "per_page": 25
+	    },
+
+	    reset: function reset(options) {
+	        this.set({
+	            page: 1
+	        }, { silent: true });
+
+	        if (!(options && options.silent) && this.requiresRefresh()) {
+	            this.trigger('reset', this, options);
+	        }
+	    },
+
+	    incrementPage: function incrementPage(options) {
+	        this.set('page', this.get('page') + 1, options);
+	    },
+
+	    decrementPage: function decrementPage(options) {
+	        this.set('page', this.get('page') - 1, options);
+	    },
+
+	    goToPage: function goToPage(pageNumber, options) {
+	        this.set('page', pageNumber, options);
+	    },
+
+	    limit: function limit() {
+	        return this.get('per_page');
+	    },
+
+	    offset: function offset() {
+	        return this.get('per_page') * (this.get('page') - 1);
+	    },
+
+	    totalPages: function totalPages() {
+	        return Math.ceil(this.get('total_count') / this.limit());
+	    },
+
+	    requiresRefresh: function requiresRefresh() {
+	        var changedAttributes = this.changedAttributes();
+	        if (changedAttributes) {
+	            var triggers = ['page', 'per_page'];
+	            return _.intersection(_.keys(changedAttributes), triggers).length > 0;
+	        }
+
+	        return false;
+	    }
+
+	});
+
+	var Controller$1 = Backbone.Model.extend({
+
+	    // Below is the same code from the Backbone.Model function
+	    // except where there are comments
+	    constructor: function constructor(attributes, options) {
+	        var attrs = attributes || {};
+	        options || (options = {});
+	        this.cid = _.uniqueId('c');
+	        this.attributes = {};
+	        if (options.collection) this.collection = options.collection;
+	        if (options.parse) attrs = this.parse(attrs, options) || {};
+	        attrs = _.defaults({}, attrs, _.result(this, 'defaults'));
+	        this.set(attrs, options);
+	        this.changed = {};
+	        this.initialize.apply(this, arguments);
+
+	        // Add a helper reference to get the model name from an model instance.
+	        this.controllerName = this.constructor.controllerName;
+	    }
+
+	}, {
+
+	    // Overide the default extend method to support passing in the controlelr name
+	    //
+	    // The name is helpful for determining the current controller and using it
+	    // as a key
+	    //
+	    // `name` is optional, and must be a string
+	    extend: function extend(controllerName, protoProps, staticProps) {
+	        if (typeof controllerName !== 'string') {
+	            staticProps = protoProps;
+	            protoProps = controllerName;
+	        }
+	        protoProps || (protoProps = {});
+
+	        var child = Backbone.Model.extend.call(this, protoProps, staticProps);
+
+	        if (typeof controllerName === 'string') {
+	            child.controllerName = controllerName;
+	        }
+
+	        _.each(protoProps, function (value, key) {
+	            if (typeof value === 'function') {
+	                child.prototype[key].controller = child;
+	            }
+	        });
+
+	        return child;
+	    }
+
+	});
+
+	// export let currentController;
+
+	var Router = Backbone.Router.extend({
+
+	    currentController: undefined,
+
+	    route: function route(_route, name, callback) {
+	        var router = void 0,
+	            controller = void 0,
+	            action = void 0;
+
+	        if (!_.isRegExp(_route)) {
+	            if (/^r\/.*\/$/.test(_route)) {
+	                _route = new RegExp(_route.slice(2, -1));
+	            } else {
+	                _route = this._routeToRegExp(_route);
+	            }
+	        }
+
+	        if (_.isFunction(name)) {
+	            callback = name;
+	            name = '';
+	        } else if (_.isString(name) && name.match(/^(\w+)#(\w+)$/)) {
+	            controller = /^(\w+)#(\w+)$/.exec(name);
+	            action = controller[2];
+	            controller = controller[1];
+	            callback = { controller: controller, action: action };
+	        } else if (_.isObject(name)) {
+	            // TODO: maybe this should be Controller::action since it's not
+	            // an instance method
+	            controller = /^(\w+)#(\w+)$/.exec(name.to);
+	            action = controller[2];
+	            controller = controller[1];
+	            name = name.name;
+
+	            callback = { controller: controller, action: action };
+	        }
+
+	        if (!callback) {
+	            callback = this[name];
+	        }
+
+	        router = this;
+	        Backbone.history.route(_route, function (fragment) {
+	            var controllerClass = void 0;
+	            var args = router._extractParameters(_route, fragment);
+	            var previousController = router.currentController;
+	            router.currentController = undefined;
+
+	            if (!callback) {
+	                return;
+	            }
+
+	            if (_.isFunction(callback)) {
+	                callback.apply(router, args);
+	            } else if (window[callback.controller]) {
+	                controllerClass = window[callback.controller];
+
+	                if (controllerClass.__super__ === Controller$1.prototype) {
+	                    if (!(previousController instanceof controllerClass)) {
+	                        router.currentController = new controllerClass();
+	                    } else {
+	                        router.currentController = previousController;
+	                    }
+	                } else {
+	                    router.currentController = controllerClass;
+	                }
+
+	                if (router.currentController && router.currentController[callback.action]) {
+	                    router.currentController[callback.action].apply(router.currentController, args);
+	                }
+	            }
+
+	            router.trigger.apply(router, ['route:' + name].concat(args));
+	            router.trigger('route', name, args);
+	            Backbone.history.trigger('route', router, name, args);
+	        });
+	        return this;
+	    },
+
+	    // Calls Backbone.history.start, with the default options {pushState: true}
+	    start: function start(options) {
+	        options = _.extend({ pushState: true }, options);
+
+	        return Backbone.history.start(options);
+	    },
+
+	    stop: function stop() {
+	        Backbone.history.stop();
+	    },
+
+	    navigate: function navigate(fragment, args) {
+	        var root_url = window.location.protocol + '//' + window.location.host;
+	        if (fragment.indexOf(root_url) === 0) {
+	            fragment = fragment.replace(root_url, '');
+	        }
+
+	        Backbone.Router.prototype.navigate.call(this, fragment, args);
 	    }
 
 	});
@@ -7044,23 +7596,23 @@ var classProperties = Object.freeze({
 	    module("Viking.View.Helpers#imageTag");
 
 	    test("imageTag(src)", function () {
-	        equal(Viking.View.Helpers.imageTag('/assets/icon.png'), '<img alt="Icon" src="/assets/icon.png">');
+	        equal(Viking$1.View.Helpers.imageTag('/assets/icon.png'), '<img alt="Icon" src="/assets/icon.png">');
 	    });
 
 	    test("imageTag(src, options)", function () {
-	        equal(Viking.View.Helpers.imageTag('/assets/icon.png', { size: '16x10', alt: 'A caption' }), '<img alt="A caption" height="10" src="/assets/icon.png" width="16">');
+	        equal(Viking$1.View.Helpers.imageTag('/assets/icon.png', { size: '16x10', alt: 'A caption' }), '<img alt="A caption" height="10" src="/assets/icon.png" width="16">');
 	    });
 
 	    test("imageTag(src, options)", function () {
-	        equal(Viking.View.Helpers.imageTag('/assets/icon.gif', { size: '16' }), '<img alt="Icon" height="16" src="/assets/icon.gif" width="16">');
+	        equal(Viking$1.View.Helpers.imageTag('/assets/icon.gif', { size: '16' }), '<img alt="Icon" height="16" src="/assets/icon.gif" width="16">');
 	    });
 
 	    test("imageTag(src, options)", function () {
-	        equal(Viking.View.Helpers.imageTag('/icons/icon.gif', { height: '32', width: '32' }), '<img alt="Icon" height="32" src="/icons/icon.gif" width="32">');
+	        equal(Viking$1.View.Helpers.imageTag('/icons/icon.gif', { height: '32', width: '32' }), '<img alt="Icon" height="32" src="/icons/icon.gif" width="32">');
 	    });
 
 	    test("imageTag(src, options)", function () {
-	        equal(Viking.View.Helpers.imageTag('/icons/icon.gif', { 'class': 'menu_icon' }), '<img alt="Icon" class="menu_icon" src="/icons/icon.gif">');
+	        equal(Viking$1.View.Helpers.imageTag('/icons/icon.gif', { 'class': 'menu_icon' }), '<img alt="Icon" class="menu_icon" src="/icons/icon.gif">');
 	    });
 	})();
 
@@ -8509,7 +9061,7 @@ var classProperties = Object.freeze({
 	            ok(true);return '/workshops';
 	        };
 
-	        equal(urlFor(Workshop), window.location.protocol + '//' + window.location.host + '/workshops');
+	        equal(Viking$1.View.urlFor(Workshop), window.location.protocol + '//' + window.location.host + '/workshops');
 	    });
 
 	    test("urlFor(new Class())", function () {
@@ -8520,7 +9072,7 @@ var classProperties = Object.freeze({
 	            ok(true);return '/workshops';
 	        };
 
-	        equal(urlFor(new Workshop()), window.location.protocol + '//' + window.location.host + '/workshops');
+	        equal(Viking$1.View.urlFor(new Workshop()), window.location.protocol + '//' + window.location.host + '/workshops');
 	    });
 
 	    test("urlFor(model)", function () {
@@ -8531,7 +9083,7 @@ var classProperties = Object.freeze({
 	            ok(true);return '/workshops/' + m.toParam();
 	        };
 
-	        equal(urlFor(new Workshop({ id: 10 })), window.location.protocol + '//' + window.location.host + '/workshops/10');
+	        equal(Viking$1.View.urlFor(new Workshop({ id: 10 })), window.location.protocol + '//' + window.location.host + '/workshops/10');
 	    });
 
 	    test("urlFor(STIModel)", function () {
@@ -8543,7 +9095,7 @@ var classProperties = Object.freeze({
 	            ok(true);return '/workshops/' + m.toParam();
 	        };
 
-	        equal(urlFor(new SantaWorkshop({ id: 10 })), window.location.protocol + '//' + window.location.host + '/workshops/10');
+	        equal(Viking$1.View.urlFor(new SantaWorkshop({ id: 10 })), window.location.protocol + '//' + window.location.host + '/workshops/10');
 	    });
 
 	    test("urlFor(class, {anchor: STRING})", function () {
@@ -8552,7 +9104,7 @@ var classProperties = Object.freeze({
 	            return '/workshops/' + m.toParam();
 	        };
 
-	        equal(urlFor(new Workshop({ id: 10 }), { anchor: 'location' }), window.location.protocol + '//' + window.location.host + '/workshops/10#location');
+	        equal(Viking$1.View.urlFor(new Workshop({ id: 10 }), { anchor: 'location' }), window.location.protocol + '//' + window.location.host + '/workshops/10#location');
 	    });
 
 	    test("urlFor(class, {onlyPath: true})", function () {
@@ -8561,7 +9113,7 @@ var classProperties = Object.freeze({
 	            return '/workshops/' + m.toParam();
 	        };
 
-	        equal(urlFor(new Workshop({ id: 10 }), { onlyPath: true }), '/workshops/10');
+	        equal(Viking$1.View.urlFor(new Workshop({ id: 10 }), { onlyPath: true }), '/workshops/10');
 	    });
 
 	    test("urlFor(class, {trailingSlash: true})", function () {
@@ -8570,7 +9122,7 @@ var classProperties = Object.freeze({
 	            return '/workshops/' + m.toParam();
 	        };
 
-	        equal(urlFor(new Workshop({ id: 10 }), { trailingSlash: true }), window.location.protocol + '//' + window.location.host + '/workshops/10/');
+	        equal(Viking$1.View.urlFor(new Workshop({ id: 10 }), { trailingSlash: true }), window.location.protocol + '//' + window.location.host + '/workshops/10/');
 	    });
 
 	    test("urlFor(class, {host: STRING})", function () {
@@ -8579,7 +9131,7 @@ var classProperties = Object.freeze({
 	            return '/workshops/' + m.toParam();
 	        };
 
-	        equal(urlFor(new Workshop({ id: 10 }), { host: 'example.com' }), window.location.protocol + '//example.com' + (window.location.port ? ':' : '') + window.location.port + '/workshops/10');
+	        equal(Viking$1.View.urlFor(new Workshop({ id: 10 }), { host: 'example.com' }), window.location.protocol + '//example.com' + (window.location.port ? ':' : '') + window.location.port + '/workshops/10');
 	    });
 
 	    test("urlFor(class, {port: NUMBER})", function () {
@@ -8588,7 +9140,7 @@ var classProperties = Object.freeze({
 	            return '/workshops/' + m.toParam();
 	        };
 
-	        equal(urlFor(new Workshop({ id: 10 }), { port: 9292 }), window.location.protocol + '//' + window.location.hostname + ':9292/workshops/10');
+	        equal(Viking$1.View.urlFor(new Workshop({ id: 10 }), { port: 9292 }), window.location.protocol + '//' + window.location.hostname + ':9292/workshops/10');
 	    });
 
 	    test("urlFor(class, {protocol: STRING})", function () {
@@ -8597,7 +9149,7 @@ var classProperties = Object.freeze({
 	            return '/workshops/' + m.toParam();
 	        };
 
-	        equal(urlFor(new Workshop({ id: 10 }), { protocol: 'custom' }), 'custom://' + window.location.hostname + (window.location.port ? ':' : '') + window.location.port + '/workshops/10');
+	        equal(Viking$1.View.urlFor(new Workshop({ id: 10 }), { protocol: 'custom' }), 'custom://' + window.location.hostname + (window.location.port ? ':' : '') + window.location.port + '/workshops/10');
 	    });
 
 	    test("urlFor(class, {scriptName: STRING})", function () {
@@ -8606,7 +9158,7 @@ var classProperties = Object.freeze({
 	            return '/workshops/' + m.toParam();
 	        };
 
-	        equal(urlFor(new Workshop({ id: 10 }), { scriptName: '/base' }), window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' : '') + window.location.port + '/base/workshops/10');
+	        equal(Viking$1.View.urlFor(new Workshop({ id: 10 }), { scriptName: '/base' }), window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' : '') + window.location.port + '/base/workshops/10');
 	    });
 
 	    test("urlFor(class, {user: STRING, password: STRING})", function () {
@@ -8615,18 +9167,20 @@ var classProperties = Object.freeze({
 	            return '/workshops/' + m.toParam();
 	        };
 
-	        equal(urlFor(new Workshop({ id: 10 }), { user: 'username', password: 'password' }), window.location.protocol + '//username:password@' + window.location.hostname + (window.location.port ? ':' : '') + window.location.port + '/workshops/10');
+	        equal(Viking$1.View.urlFor(new Workshop({ id: 10 }), { user: 'username', password: 'password' }), window.location.protocol + '//username:password@' + window.location.hostname + (window.location.port ? ':' : '') + window.location.port + '/workshops/10');
 	    });
 
 	    test("urlFor(string)", function () {
-	        equal(urlFor("http://www.example.com"), "http://www.example.com");
+	        equal(Viking$1.View.urlFor("http://www.example.com"), "http://www.example.com");
 	    });
 	})();
 
 	(function () {
 	    module('Viking.View.Helpers#render', {
 	        setup: function setup() {
-	            Viking$1.View.templates = JST;
+	            Object.keys(JST).forEach(function (key) {
+	                Viking$1.View.templates[key] = JST[key];
+	            });
 	        }
 	    });
 
@@ -8782,7 +9336,7 @@ var classProperties = Object.freeze({
 	        equal("model[models][]", Viking$1.View.tagNameForModelAttribute(model, 'models'));
 	    });
 
-	    test("tagNameForModelAttribute(model, vikingCollectionAttribute)", function () {
+	    test("tagNameForModelAttribute(model, vikingCollectionAttribute) 2", function () {
 	        var Model = Viking$1.Model.extend('model');
 	        var ModelCollection = Viking$1.Collection.extend({ model: Model });
 	        var model = new Model({ models: new ModelCollection() });
@@ -8841,7 +9395,9 @@ var classProperties = Object.freeze({
 	(function () {
 	    module("Viking.View.subView", {
 	        setup: function setup() {
-	            Viking$1.View.templates = JST;
+	            Object.keys(JST).forEach(function (key) {
+	                Viking$1.View.templates[key] = JST[key];
+	            });
 	        }
 	    });
 
@@ -8915,7 +9471,9 @@ var classProperties = Object.freeze({
 
 	    module("Viking.View", {
 	        setup: function setup() {
-	            Viking$1.View.templates = JST;
+	            Object.keys(JST).forEach(function (key) {
+	                Viking$1.View.templates[key] = JST[key];
+	            });
 	        }
 	    });
 

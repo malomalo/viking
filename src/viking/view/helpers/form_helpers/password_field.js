@@ -14,7 +14,7 @@
 //   
 //   passwordField(account, 'secret', {class: "form_input", value: account.get('secret')})
 //   // => <input class="form_input" id="account_secret" name="account[secret]" type="password" value="unkown">
-Viking.View.Helpers.passwordField = function (model, attribute, options) {
+export const passwordField = function (model, attribute, options) {
     options || (options = {});
     let name = options.name || Viking.View.tagNameForModelAttribute(model, attribute);
 
@@ -23,3 +23,5 @@ Viking.View.Helpers.passwordField = function (model, attribute, options) {
     
     return Viking.View.Helpers.passwordFieldTag(name, undefined, options);
 };
+
+export default passwordField;
