@@ -1,4 +1,5 @@
-import { urlFor } from '../utils';
+import { urlFor } from './url_for';
+import { contentTag } from '../form_tag_helpers';
 
 // linkTo(modelOrUrl, name, options)
 // =================================
@@ -93,7 +94,7 @@ export const linkTo = function (content, modelOrUrl, options) {
         href: urlFor(modelOrUrl)
     }, options);
 
-    return Viking.View.Helpers.contentTag('a', content, options);
+    return contentTag('a', content, options);
 };
 
 export default linkTo;

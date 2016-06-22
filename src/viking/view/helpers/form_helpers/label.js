@@ -1,3 +1,6 @@
+import { labelTag } from '../form_tag_helpers';
+import { addErrorClassToOptions, sanitizeToId, tagNameForModelAttribute } from '../utils';
+
 // label(model, attribute, content, options)
 // =========================================
 //
@@ -42,13 +45,13 @@ export const label = function (model, attribute, content, options, escape) {
     if (content === undefined) { content = attribute.humanize(); }
     if (typeof content === 'function') { content = content(); }        
     if (!options['for']) {
-        let name = Viking.View.tagNameForModelAttribute(model, attribute);
-        options['for'] = Viking.View.sanitizeToId(name);
+        let name = tagNameForModelAttribute(model, attribute);
+        options['for'] = sanitizeToId(name);
     }
     
-    Viking.View.addErrorClassToOptions(model, attribute, options);
+    addErrorClassToOptions(model, attribute, options);
     
-    return Viking.View.Helpers.labelTag(content, options, escape);
+    return labelTag(content, options, escape);
 };
 
 export default label;

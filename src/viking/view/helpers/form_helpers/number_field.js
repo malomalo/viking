@@ -1,3 +1,6 @@
+import { numberFieldTag } from '../form_tag_helpers';
+import { addErrorClassToOptions, tagNameForModelAttribute } from '../utils';
+
 // numberField(model, attribute, options)
 // ======================================
 //
@@ -15,11 +18,11 @@
 //   // => <input class="form_input" id="account_requests" name="account[requests]" type="number" value="27">
 export const numberField = function (model, attribute, options) {
     options = _.extend({}, options);
-    let name = options.name || Viking.View.tagNameForModelAttribute(model, attribute);
+    let name = options.name || tagNameForModelAttribute(model, attribute);
 
-    Viking.View.addErrorClassToOptions(model, attribute, options);
+    addErrorClassToOptions(model, attribute, options);
     
-    return Viking.View.Helpers.numberFieldTag(name, model.get(attribute), options);
+    return numberFieldTag(name, model.get(attribute), options);
 };
 
 export default numberField;

@@ -49,7 +49,7 @@
 //   distanceOfTimeInWords(fromTime, toTime, include_seconds: true)                        # => about 6 years
 //   distanceOfTimeInWords(toTime, fromTime, include_seconds: true)                        # => about 6 years
 //   distanceOfTimeInWords(Time.now, Time.now)                                               # => less than a minute
-Viking.View.Helpers.distanceOfTimeInWords = function (fromTime, toTime, options) {
+export const distanceOfTimeInWords = function (fromTime, toTime, options) {
     let tmp;
     
     if (!(toTime instanceof Date)) {
@@ -126,4 +126,4 @@ Viking.View.Helpers.distanceOfTimeInWords = function (fromTime, toTime, options)
     }
 };
 
-Viking.View.Helpers.timeAgoInWords = Viking.View.Helpers.distanceOfTimeInWords;
+export const timeAgoInWords = distanceOfTimeInWords;

@@ -1,6 +1,7 @@
 import Viking from '../../../src/viking';
 
 (function () {
+
     module("Viking.Collection#sync", {
         setup: function() {
             this.requests = [];
@@ -18,14 +19,14 @@ import Viking from '../../../src/viking';
         var vc = new Viking.Collection(null, {order: 'size'});
 	
         vc.fetch({url: '/'});
-    	equal("/?"+encodeURI("order[][size]=asc"), this.requests[0].url);
+        equal("/?"+encodeURI("order[][size]=asc"), this.requests[0].url);
     });
 
     test("doesn't add order params when not set", function() {
         var vc = new Viking.Collection();
-	
+
         vc.fetch({url: '/'});
-    	equal("/", this.requests[0].url);
+        equal(this.requests[0].url, '/');
     });
 
 
@@ -37,12 +38,9 @@ import Viking from '../../../src/viking';
         var c = Viking.Collection.extend({model: m});
         var c = new c([], {predicate: f});
 
-        var old = Viking.sync;
-        Viking.sync = function(method, model, options) {
-            deepEqual(options.data, {where: {types: [1,2]}});
-        }
         c.fetch();
-        Viking.sync = old;
+
+        equal(this.requests[0].url, '/models?where%5Btypes%5D%5B%5D=1&where%5Btypes%5D%5B%5D=2')
     });
 
     test("doesn't add predicate params when not set", function() {
@@ -52,25 +50,8 @@ import Viking from '../../../src/viking';
         var c = Viking.Collection.extend({model: m});
         var c = new c();
 
-        var old = Viking.sync;
-        Viking.sync = function(method, model, options) {
-            equal(options.data, undefined);
-        }
         c.fetch();
-        Viking.sync = old;
+        equal(this.requests[0].url, '/models')
     });
-    
-    test("#sync uses Viking.sync", function () {
-        expect(1);
-    
-        var c = new Viking.Collection();
-    
-        var old = Viking.sync;
-        Viking.sync = function(method, model, options) {
-            ok(true);
-        }
-        c.sync();
-        Viking.sync = old;
-    });
-    
+
 }());

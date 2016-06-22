@@ -28,7 +28,7 @@
 // :format key and your attributes.
 //
 //   localTime(time, {format: '%B %e, %Y %l:%M%P', class: 'my-time'})
-Viking.View.Helpers.localTime = function (time, format, options) {
+localTime = function (time, format, options) {
     if (typeof format === 'object') {
         options = format;
         format = undefined;
@@ -38,7 +38,7 @@ Viking.View.Helpers.localTime = function (time, format, options) {
         format = '%B %e, %Y %l:%M%P';
     }
     
-    return Viking.View.Helpers.timeTag(time, {
+    return timeTag(time, {
         'data-format': format,
         'data-local':  'time',
         'title': time.strftime("%B %e, %Y at %l:%M%P %Z"),
@@ -53,7 +53,7 @@ Viking.View.Helpers.localTime = function (time, format, options) {
 // ================================
 //
 // An alias for +localTime(time, '%B %e, %Y')+
-Viking.View.Helpers.localDate = function (time, format, options) {
+export const localDate = function (time, format, options) {
     if (typeof format === 'object') {
         options = format;
         format = undefined;
@@ -63,7 +63,7 @@ Viking.View.Helpers.localDate = function (time, format, options) {
         format = '%B %e, %Y';
     }
 
-    return Viking.View.Helpers.localTime(time, format, options)
+    return localTime(time, format, options)
 };
 
 // localTimeAgo(time)
@@ -73,7 +73,7 @@ Viking.View.Helpers.localDate = function (time, format, options) {
 // transition from {quantity of seconds, minutes, or hours} to {months, and years}
 // The <time> elements are updated every 60 seconds. For examples see
 // +Viking.View.Helpers.distanceOfTimeInWords+.
-Viking.View.Helpers.localTimeAgo = function (time) {
+export const localTimeAgo = function (time) {
     
 };
 
@@ -95,13 +95,13 @@ Viking.View.Helpers.localTimeAgo = function (time) {
 // - weekday-or-date: Displays "Today", "Yesterday", the weekday (e.g. Wednesday)
 //                    if the time is within a week of today. Otherwise displays
 //                    the date.
-Viking.View.Helpers.localRelativeTime = function (time, type, options) {
+export const localRelativeTime = function (time, type, options) {
     if (typeof format === 'object') {
         options = type;
         type = options.type;
     }
 
-    return Viking.View.Helpers.timeTag(time, {
+    return timeTag(time, {
         'data-local':  type,
         'title': time.strftime("%B %e, %Y at %l:%M%P %Z")
     }, timeToRelativeTime(time));
@@ -109,7 +109,7 @@ Viking.View.Helpers.localRelativeTime = function (time, type, options) {
 
 function formatTime(time, type) {
     if ( type === 'time-ago' ) {
-        return Viking.View.Helpers.distanceOfTimeInWords(time);
+        return distanceOfTimeInWords(time);
     } else if ( type == 'date' ) {
         
     } else if ( type === 'time-or-date' ) {

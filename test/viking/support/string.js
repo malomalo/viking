@@ -74,21 +74,23 @@ import Viking from '../../../src/viking';
         equal(''.demodulize(), '');
     });
 
-	test("constantize()", function() {
-		equal("Viking".constantize(), Viking);
-		equal("Viking.Model".constantize(), Viking.Model);
-		equal("Model".constantize(Viking), Viking.Model);
-		throws(
-		    function() { "Unknown".constantize(); },
-		    Viking.NameError,
-		    "uninitialized variable Unknown"
-		);
-		throws(
-		    function() { "Unknown.Again".constantize(); },
-		    Viking.NameError,
-		    "uninitialized variable Unknown.Again"
-		);
-	});
+    test("constantize()", function() {
+        window.Viking = Viking;
+        equal("Viking".constantize(), Viking);
+        equal("Viking.Model".constantize(), Viking.Model);
+        equal("Model".constantize(Viking), Viking.Model);
+        throws(
+            function() { "Unknown".constantize(); },
+            Viking.NameError,
+            "uninitialized variable Unknown"
+        );
+        throws(
+            function() { "Unknown.Again".constantize(); },
+            Viking.NameError,
+            "uninitialized variable Unknown.Again"
+        );
+        delete window.Viking;
+    });
     
     test("rjust()", function() {
         equal('hello'.rjust(4), 'hello');
@@ -114,12 +116,12 @@ import Viking from '../../../src/viking';
         equal(string, 'hello')
     });
 	
-	test('#toParam()', function() {
-		equal("myString", ("myString").toParam());
-	});
+    test('#toParam()', function() {
+        equal("myString", ("myString").toParam());
+    });
 	
-	test('#toQuery(key)', function() {
-		equal('key=gnirts', 'gnirts'.toQuery('key'));
-	});
+    test('#toQuery(key)', function() {
+        equal('key=gnirts', 'gnirts'.toQuery('key'));
+    });
 	
 }());

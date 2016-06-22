@@ -13,7 +13,13 @@ import {
 } from './helpers/builders';
 
 import {
-    textField
+    timeAgoInWords, distanceOfTimeInWords,
+    localTime, localDate, localTimeAgo, localRelativeTime, formatTime
+} from './helpers/date_helpers';
+
+import {
+    checkBoxGroup, checkBox, collectionSelect, formFor, hiddenField, label,
+    numberField, passwordField, radioButton, select, textArea, textField
 } from './helpers/form_helpers';
 
 import {
@@ -31,6 +37,8 @@ import {
 
 import render from './helpers/render';
 
+import { linkTo, mailTo, urlFor } from './helpers/url_helpers';
+
 export const Helpers = {
     // Asset Helpers
     imageTag: imageTag,
@@ -39,7 +47,27 @@ export const Helpers = {
     CheckBoxGroupBuilder: CheckBoxGroupBuilder,
     FormBuilder: FormBuilder,
 
+    // Date Helpers
+    timeAgoInWords: timeAgoInWords,
+    distanceOfTimeInWords: distanceOfTimeInWords,
+    // localTime: localTime,
+    // localDate: localDate,
+    // localTimeAgo: localTimeAgo,
+    // localRelativeTime: localRelativeTime,
+    // formatTime: formatTime,
+    
     // Form Helpers
+    checkBoxGroup: checkBoxGroup,
+    checkBox: checkBox,
+    collectionSelect: collectionSelect,
+    formFor: formFor,
+    hiddenField: hiddenField,
+    label: label,
+    numberField: numberField,
+    passwordField: passwordField,
+    radioButton: radioButton,
+    select: select,
+    textArea: textArea,
     textField: textField,
 
     // Utils
@@ -69,6 +97,11 @@ export const Helpers = {
     textAreaTag: textAreaTag,
     textFieldTag: textFieldTag,
     timeTag: timeTag,
+
+    // URL Helpers
+    linkTo: linkTo,
+    mailTo: mailTo,
+    urlFor: urlFor,
 
     // Render
     render: render

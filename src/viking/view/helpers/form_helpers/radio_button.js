@@ -1,3 +1,6 @@
+import { radioButtonTag } from '../form_tag_helpers';
+import { addErrorClassToOptions, sanitizeToId, tagNameForModelAttribute } from '../utils';
+
 // radioButton(model, attribute, tagValue, options)
 // ==================================================
 //
@@ -19,19 +22,19 @@
 //   //    <input type="radio" id="user_receive_newsletter_no" name="user[receive_newsletter]" value="no" checked>
 export const radioButton = function (model, attribute, tagValue, options) {
     if (options === undefined) { options = {}; }
-    let name = options.name || Viking.View.tagNameForModelAttribute(model, attribute);
+    let name = options.name || tagNameForModelAttribute(model, attribute);
 
     _.defaults(options, {
-        id: Viking.View.sanitizeToId(name + "_" + tagValue)
+        id: sanitizeToId(name + "_" + tagValue)
     });
-    Viking.View.addErrorClassToOptions(model, attribute, options);
+    addErrorClassToOptions(model, attribute, options);
     
     let value = tagValue;
     if (value === undefined || value === null) {
         value = "";
     }
     
-    return Viking.View.Helpers.radioButtonTag(name, value, tagValue === model.get(attribute), options);
+    return radioButtonTag(name, value, tagValue === model.get(attribute), options);
 };
 
 export default radioButton;

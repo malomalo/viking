@@ -1,3 +1,5 @@
+import { contentTag } from '../form_tag_helpers';
+
 // mailTo(email, name, options)
 // mailTo(email, contentFunc)
 // mailTo(email, options, contentFunc)
@@ -72,7 +74,7 @@ export const mailTo = function (email, name, options) {
     
     options.href = "mailto:" + email + extras;
 
-    return Viking.View.Helpers.contentTag('a', name, options, false);
+    return contentTag('a', name, options, false);
 };
 
 export default mailTo;

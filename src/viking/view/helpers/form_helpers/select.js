@@ -1,3 +1,6 @@
+import { selectTag, optionsForSelectTag } from '../form_tag_helpers';
+import { tagNameForModelAttribute } from '../utils';
+
 // Create a select tag and a series of contained option tags for the provided
 // object and method. The option currently held by the object will be selected,
 // provided that the object is available.
@@ -58,7 +61,7 @@
 export const select = function (model, attribute, collection, options) {
     if (options === undefined) { options = {}; }
 
-    let name = options['name'] || Viking.View.tagNameForModelAttribute(model, attribute);
+    let name = options['name'] || tagNameForModelAttribute(model, attribute);
     let optionOptions = _.pick(options, 'selected');
     let selectOptions = _.omit(options, 'selected');
     if (model.get(attribute) && optionOptions.selected === undefined) {
@@ -67,7 +70,7 @@ export const select = function (model, attribute, collection, options) {
     if (selectOptions.multiple === undefined && model.associations[attribute] && model.associations[attribute].macro === "hasMany") {
         selectOptions.multiple = true;
     }
-    return Viking.View.Helpers.selectTag(name, Viking.View.Helpers.optionsForSelectTag(collection, optionOptions), selectOptions);
+    return selectTag(name, optionsForSelectTag(collection, optionOptions), selectOptions);
 };
 
 export default select;

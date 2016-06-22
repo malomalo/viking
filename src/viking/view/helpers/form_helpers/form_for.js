@@ -1,3 +1,6 @@
+import { FormBuilder } from '../builders';
+import { contentTag, hiddenFieldTag } from '../form_tag_helpers';
+
 // formFor(model, options = {}, content = func(f))
 // ===============================================
 // 
@@ -27,12 +30,12 @@ export const formFor = function (model, options, content) {
     if ( (options.method !== 'get' && options.method !== 'post') || (method && method !== options.method) ) {
         options.method = 'post';
         content = _.wrap(content, function(func, form) {
-            let hiddenInput = Viking.View.Helpers.hiddenFieldTag('_method', method);
-            return Viking.View.Helpers.contentTag('div', hiddenInput, {style: 'margin:0;padding:0;display:inline'}, false) + func(builder);
+            let hiddenInput = hiddenFieldTag('_method', method);
+            return contentTag('div', hiddenInput, {style: 'margin:0;padding:0;display:inline'}, false) + func(builder);
         });
     }
     
-    return Viking.View.Helpers.contentTag('form', content(builder), options, false);
+    return contentTag('form', content(builder), options, false);
 };
 
 export default formFor;

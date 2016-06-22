@@ -1,3 +1,10 @@
+import {
+    textArea, textField, radioButton, select, collectionSelect, passwordField,
+    checkBox, hiddenField, label, numberField, checkBoxGroup
+} from '../form_helpers';
+
+import { sanitizeToId, tagNameForModelAttribute } from '../utils';
+
 export function FormBuilder(model, options) {
     let modelName;
 
@@ -23,30 +30,30 @@ FormBuilder.prototype = {
         options || (options = {});
 
         if (!options.name && this.options.namespace) {
-            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+            options.name = tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
         }
         
-        return Viking.View.Helpers.checkBox(this.model, attribute, options, checkedValue, uncheckedValue, escape);
+        return checkBox(this.model, attribute, options, checkedValue, uncheckedValue, escape);
     },
 
     collectionSelect: function(attribute, collection, valueAttribute, textAttribute, options) {
         options || (options = {});
         
         if (!options.name && this.options.namespace) {
-            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+            options.name = tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
         }
         
-        return Viking.View.Helpers.collectionSelect(this.model, attribute, collection, valueAttribute, textAttribute, options);
+        return collectionSelect(this.model, attribute, collection, valueAttribute, textAttribute, options);
     },
 
     hiddenField: function(attribute, options) {
         options || (options = {});
         
         if (!options.name && this.options.namespace) {
-            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+            options.name = tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
         }
         
-        return Viking.View.Helpers.hiddenField(this.model, attribute, options);
+        return hiddenField(this.model, attribute, options);
     },
     
     label: function(attribute, content, options, escape) {
@@ -54,71 +61,71 @@ FormBuilder.prototype = {
         
         //TODO shouldn't options.name be options.for?
         if (!options['for'] && !options.name && this.options.namespace) {
-            options['for'] = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
-            options['for'] = Viking.View.sanitizeToId(options['for']);
+            options['for'] = tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+            options['for'] = sanitizeToId(options['for']);
         }
         
-        return Viking.View.Helpers.label(this.model, attribute, content, options, escape);
+        return label(this.model, attribute, content, options, escape);
     },
     
     number: function(attribute, options) {
         options || (options = {});
         
         if (!options.name && this.options.namespace) {
-            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+            options.name = tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
         }
         
-        return Viking.View.Helpers.numberField(this.model, attribute, options);
+        return numberField(this.model, attribute, options);
     },
 
     passwordField: function(attribute, options) {
         options || (options = {});
         
         if (!options.name && this.options.namespace) {
-            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+            options.name = tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
         }
         
-        return Viking.View.Helpers.passwordField(this.model, attribute, options);
+        return passwordField(this.model, attribute, options);
     },
     
     radioButton: function(attribute, tagValue, options) {
         options || (options = {});
         
         if (!options.name && this.options.namespace) {
-            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+            options.name = tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
         }
         
-        return Viking.View.Helpers.radioButton(this.model, attribute, tagValue, options);
+        return radioButton(this.model, attribute, tagValue, options);
     },
     
     select: function(attribute, collection, options) {
         options || (options = {});
         
         if (!options.name && this.options.namespace) {
-            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+            options.name = tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
         }
         
-        return Viking.View.Helpers.select(this.model, attribute, collection, options);
+        return select(this.model, attribute, collection, options);
     },
 
     textArea: function(attribute, options) {
         options || (options = {});
         
         if (!options.name && this.options.namespace) {
-            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+            options.name = tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
         }
         
-        return Viking.View.Helpers.textArea(this.model, attribute, options);
+        return textArea(this.model, attribute, options);
     },
 
     textField: function(attribute, options) {
         options || (options = {});
         
         if (!options.name && this.options.namespace) {
-            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+            options.name = tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
         }
         
-        return Viking.View.Helpers.textField(this.model, attribute, options);
+        return textField(this.model, attribute, options);
     },
     
     checkBoxGroup: function(attribute, options, content) {
@@ -131,7 +138,7 @@ FormBuilder.prototype = {
             options.namespace = this.options.namespace;
         }
 
-        return Viking.View.Helpers.checkBoxGroup(this.model, attribute, options, content);
+        return checkBoxGroup(this.model, attribute, options, content);
     },
     
     fieldsFor: function(attribute, records, options, content) {

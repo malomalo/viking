@@ -1,3 +1,6 @@
+import { hiddenFieldTag } from '../form_tag_helpers';
+import { tagNameForModelAttribute } from '../utils';
+
 // hiddenField(model, attribute, options = {})
 // =========================================
 // 
@@ -19,9 +22,9 @@
 //   // => <input type="hidden" name="user[token]" value="token">
 export const hiddenField = function (model, attribute, options) {
     let value = model.get(attribute);
-    let name = Viking.View.tagNameForModelAttribute(model, attribute);
+    let name = tagNameForModelAttribute(model, attribute);
     
-    return Viking.View.Helpers.hiddenFieldTag(name, (value || ''), options);
+    return hiddenFieldTag(name, (value || ''), options);
 };
 
 export default hiddenField;

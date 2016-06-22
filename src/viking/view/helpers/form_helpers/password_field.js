@@ -1,3 +1,6 @@
+import { passwordFieldTag } from '../form_tag_helpers';
+import { addErrorClassToOptions, tagNameForModelAttribute } from '../utils';
+
 // passwordField(model, attribute, options)
 // ========================================
 //
@@ -16,12 +19,12 @@
 //   // => <input class="form_input" id="account_secret" name="account[secret]" type="password" value="unkown">
 export const passwordField = function (model, attribute, options) {
     options || (options = {});
-    let name = options.name || Viking.View.tagNameForModelAttribute(model, attribute);
+    let name = options.name || tagNameForModelAttribute(model, attribute);
 
     if (options === undefined) { options = {}; }
-    Viking.View.addErrorClassToOptions(model, attribute, options);
+    addErrorClassToOptions(model, attribute, options);
     
-    return Viking.View.Helpers.passwordFieldTag(name, undefined, options);
+    return passwordFieldTag(name, undefined, options);
 };
 
 export default passwordField;

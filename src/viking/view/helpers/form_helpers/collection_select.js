@@ -1,3 +1,6 @@
+import { tagNameForModelAttribute, methodOrAttribute } from '../utils';
+import { selectTag, optionsFromCollectionForSelectTag } from '../form_tag_helpers';
+
 // collectionSelect(model, attribute, collection, valueAttribute, textAttribute, options)
 // ====================================================================================
 //
@@ -45,12 +48,12 @@ export const collectionSelect = function (model, attribute, collection, valueAtt
     let optionOptions = _.pick(options, 'selected');
     let selectOptions = _.omit(options, 'selected');
     if (model.get(attribute) && optionOptions.selected === undefined) {
-        optionOptions.selected = Viking.View.methodOrAttribute(model.get(attribute), valueAttribute);
+        optionOptions.selected = methodOrAttribute(model.get(attribute), valueAttribute);
     }
     
-    let name = options.name || Viking.View.tagNameForModelAttribute(model, attribute);
-    let optionsTags = Viking.View.Helpers.optionsFromCollectionForSelectTag(collection, valueAttribute, textAttribute, selectOptions);
-    return Viking.View.Helpers.selectTag(name, optionsTags, selectOptions);
+    let name = options.name || tagNameForModelAttribute(model, attribute);
+    let optionsTags = optionsFromCollectionForSelectTag(collection, valueAttribute, textAttribute, selectOptions);
+    return selectTag(name, optionsTags, selectOptions);
 };
 
 export default collectionSelect;

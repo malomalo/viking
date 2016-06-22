@@ -1,7 +1,18 @@
 import Viking from './../../src/viking';
 
 (function () {
-    module("Viking.PaginatedCollection");
+    module("Viking.PaginatedCollection", {
+        setup: function() {
+            this.requests = [];
+            this.xhr = sinon.useFakeXMLHttpRequest();
+            this.xhr.onCreate = _.bind(function(xhr) {
+                this.requests.push(xhr);
+            }, this);
+        },
+        teardown: function() {
+            this.xhr.restore();
+        }
+    });
 
     // Cursor -----------------------------------------------------------------------
     test("new sets new cursor", function() {
@@ -91,19 +102,14 @@ import Viking from './../../src/viking';
 
     // sync() --------------------------------------------------------------------
     test("sync() adds in cursor params", function() {
-        expect(2);
+        expect(1);
     
         var m = Viking.Model.extend('model');
         var c = Viking.PaginatedCollection.extend({model: m});
         var c = new c([]);
-    
-        var old = Viking.sync;
-        Viking.sync = function(method, model, options) {
-            equal(40, options.data.limit);
-            equal(40, options.data.offset);
-        }
+
         c.cursor.set({page: 2, per_page: 40});
-        Viking.sync = old;
+        equal(this.requests[0].url, '/models?limit=40&offset=40')
     });
 
 }());

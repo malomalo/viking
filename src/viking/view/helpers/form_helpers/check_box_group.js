@@ -1,3 +1,5 @@
+import { CheckBoxGroupBuilder } from '../builders';
+
 // checkBoxGroup(model, attribute, options = {}, content = func(f))
 // ================================================================
 // 

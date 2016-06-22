@@ -1,3 +1,6 @@
+import { textAreaTag } from '../form_tag_helpers';
+import { addErrorClassToOptions, tagNameForModelAttribute } from '../utils';
+
 // textArea(model, attribute, options)
 // ====================================
 //
@@ -27,12 +30,12 @@
 //   //      entry body
 //   //    </textarea>
 export const textArea = function (model, attribute, options) {
-    let name = Viking.View.tagNameForModelAttribute(model, attribute);
+    let name = tagNameForModelAttribute(model, attribute);
     
     if (options === undefined) { options = {}; }
-    Viking.View.addErrorClassToOptions(model, attribute, options);
+    addErrorClassToOptions(model, attribute, options);
     
-    return Viking.View.Helpers.textAreaTag(name, model.get(attribute), options);
+    return textAreaTag(name, model.get(attribute), options);
 };
 
 export default textArea;

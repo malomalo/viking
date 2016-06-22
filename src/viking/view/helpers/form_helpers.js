@@ -1,3 +1,14 @@
+export { checkBoxGroup } from './form_helpers/check_box_group';
+export { checkBox } from './form_helpers/check_box';
+export { collectionSelect } from './form_helpers/collection_select';
+export { formFor } from './form_helpers/form_for';
+export { hiddenField } from './form_helpers/hidden_field';
+export { label } from './form_helpers/label';
+export { numberField } from './form_helpers/number_field';
+export { passwordField } from './form_helpers/password_field';
+export { radioButton } from './form_helpers/radio_button';
+export { select } from './form_helpers/select';
+export { textArea } from './form_helpers/text_area';
 export { textField } from './form_helpers/text_field';
 
 // TODO: make this accept model string names

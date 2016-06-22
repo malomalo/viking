@@ -2,8 +2,9 @@ import Helpers from './view/helpers';
 import templates from './view/templates';
 import {
     tagOption, dataTagOption, tagOptions, sanitizeToId, tagNameForModelAttribute,
-    addErrorClassToOptions, methodOrAttribute, urlFor
+    addErrorClassToOptions, methodOrAttribute
 } from './view/helpers/utils';
+import { urlFor } from './view/helpers/url_helpers/url_for';
 
 // TODO: Remove utils from Viking.View, not sure why they are added to it.
 // Viking.View

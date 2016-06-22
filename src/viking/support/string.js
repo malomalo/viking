@@ -138,7 +138,7 @@ String.prototype.constantize = function(context) {
         context = window;
     }
 
-    return this.split('.').reduce(function (context, name) {
+    return this.split('.').reduce(function (context, name, index, array) {
         let v = context[name];
         if (!v) {
             throw new NameError("uninitialized variable " + name); 

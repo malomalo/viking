@@ -1,3 +1,6 @@
+import { addErrorClassToOptions, tagNameForModelAttribute } from '../utils';
+import { hiddenFieldTag, checkBoxTag } from '../form_tag_helpers';
+
 // checkBox(model, attribute, options={}, checkedValue="true", uncheckedValue="false")
 // =====================================================================================
 //
@@ -67,11 +70,11 @@ export const checkBox = function (model, attribute, options, checkedValue, unche
     if (options === undefined) { options = {}; }
     if (checkedValue === undefined) { checkedValue = true; }
     if (uncheckedValue === undefined) { uncheckedValue = false; }
-    Viking.View.addErrorClassToOptions(model, attribute, options);
+    addErrorClassToOptions(model, attribute, options);
 
-    let name = options.name || Viking.View.tagNameForModelAttribute(model, attribute);    
-    output += Viking.View.Helpers.hiddenFieldTag(name, uncheckedValue, undefined, escape);
-    output += Viking.View.Helpers.checkBoxTag(name, checkedValue, checkedValue === value, options, escape);
+    let name = options.name || tagNameForModelAttribute(model, attribute);    
+    output += hiddenFieldTag(name, uncheckedValue, undefined, escape);
+    output += checkBoxTag(name, checkedValue, checkedValue === value, options, escape);
     
     return output;
 };
