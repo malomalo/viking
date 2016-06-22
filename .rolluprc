@@ -1,0 +1,21 @@
+import babel from 'rollup-plugin-babel';
+import includePaths from 'rollup-plugin-includepaths';
+
+let ipOptions = {
+    paths: [
+        'src',
+        'test'
+    ]
+};
+
+const options = {
+    format: 'iife',
+    entry: './src/viking.js',
+    dest: './viking.js',
+    plugins: [ babel(), includePaths(ipOptions) ],
+    sourceMap: true,
+    moduleName: 'Viking',
+    exports: 'default'
+};
+
+export default options;

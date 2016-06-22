@@ -15,7 +15,7 @@ import Controller from './viking/controller';
 import Collection from './viking/collection';
 import PaginatedCollection from './viking/paginated_collection';
 
-export const Viking = {
+const Viking = {
     sync: sync,
     Model: Model,
     Cursor: Cursor,
