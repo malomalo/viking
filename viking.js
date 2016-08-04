@@ -1,4 +1,4 @@
-//     Viking.js 0.9.0 (sha:4272ab3)
+//     Viking.js 0.9.0 (sha:b026019)
 //
 //     (c) 2012-2016 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -2752,6 +2752,16 @@ FormBuilder.prototype = {
         
         return Viking.View.Helpers.numberField(this.model, attribute, options);
     },
+    
+    money: function(attribute, options) {
+        options || (options = {});
+        
+        if (!options.name && this.options.namespace) {
+            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+        }
+        
+        return Viking.View.Helpers.moneyField(this.model, attribute, options);
+    },
 
     passwordField: function(attribute, options) {
         options || (options = {});
@@ -3352,7 +3362,7 @@ Viking.View.Helpers.numberField = function (model, attribute, options) {
 // moneyField(model, attribute, options)
 //
 // same as numberField only it converts value from cents to dollars (val / 100)
-Viking.View.Helpers.numberField = function (model, attribute, options) {
+Viking.View.Helpers.moneyField = function (model, attribute, options) {
     options = _.extend({class: "viking-money-field"}, options);
     var name = options.name || Viking.View.tagNameForModelAttribute(model, attribute);
     var value = model.get(attribute) / 100;
