@@ -1,4 +1,4 @@
-//     Viking.js 0.9.0 (sha:0f9fd9b)
+//     Viking.js 0.9.0 (sha:4272ab3)
 //
 //     (c) 2012-2016 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -3349,6 +3349,18 @@ Viking.View.Helpers.numberField = function (model, attribute, options) {
     
     return Viking.View.Helpers.numberFieldTag(name, model.get(attribute), options);
 };
+// moneyField(model, attribute, options)
+//
+// same as numberField only it converts value from cents to dollars (val / 100)
+Viking.View.Helpers.numberField = function (model, attribute, options) {
+    options = _.extend({class: "viking-money-field"}, options);
+    var name = options.name || Viking.View.tagNameForModelAttribute(model, attribute);
+    var value = model.get(attribute) / 100;
+
+    Viking.View.addErrorClassToOptions(model, attribute, options);
+    
+    return Viking.View.Helpers.numberFieldTag(name, value, options);
+};  
 // passwordField(model, attribute, options)
 // ========================================
 //
@@ -3552,6 +3564,7 @@ Viking.View.Helpers.textField = function (model, attribute, options) {
 
 
 // TODO: month_field
+
 
 
 // TODO: phone_field
