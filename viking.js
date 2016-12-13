@@ -1,4 +1,4 @@
-//     Viking.js 0.9.0 (sha:b026019)
+//     Viking.js 0.9.0 (sha:c047d3d)
 //
 //     (c) 2012-2016 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -3536,7 +3536,12 @@ Viking.View.Helpers.textArea = function (model, attribute, options) {
     if (options === undefined) { options = {}; }
     Viking.View.addErrorClassToOptions(model, attribute, options);
     
-    return Viking.View.Helpers.textAreaTag(name, model.get(attribute), options);
+    var value = model.get(attribute)
+    if (model.schema[attribute] && model.schema[attribute].type == 'json') {
+        value = JSON.stringify(model.get(attribute), undefined, 4);
+    }
+    
+    return Viking.View.Helpers.textAreaTag(name, value, options);
 };
 // textField(model, attribute, options)
 // ====================================
