@@ -1,6 +1,6 @@
-//     Viking.js 0.9.0 (sha:c047d3d)
+//     Viking.js 0.9.0 (sha:b396276)
 //
-//     (c) 2012-2016 Jonathan Bracy, 42Floors Inc.
+//     (c) 2012-2017 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
 //     http://vikingjs.com
 
@@ -2152,6 +2152,36 @@ Viking.View.Helpers.numberFieldTag = function (name, value, options) {
 
     return Viking.View.Helpers.textFieldTag(name, value, options);
 };
+// colorFieldTag(name, value = nil, options = {})
+// ===============================================
+// 
+// Creates a color field.
+//
+// Options
+// -------
+//      - Accepts the same options as text_field_tag.
+//
+// Examples
+// --------
+//   
+//   colorFieldTag('accent')
+//   // => <input name="accent" type="color">
+//   
+//   colorFieldTag('accent', "#FFFFFF")
+//   // => <input" name="accent" type="color" value="#FFFFFF">
+Viking.View.Helpers.colorFieldTag = function (name, value, options) {
+    
+    // Handle both `name, value, options`, and `name, options` syntax
+    if (typeof value === 'object') {
+        options = value;
+        value = undefined;
+    }
+    
+    options = _.extend({type: 'color'}, options);
+    if (value) { options.value = value; }
+
+    return Viking.View.Helpers.textFieldTag(name, value, options);
+};
 // timeTag(date, [options], [value])
 // =================================
 //
@@ -2653,7 +2683,6 @@ Viking.View.Helpers.textAreaTag = function (name, content, options, escape) {
 
 
 
-// TODO: color_field_tag
 // TODO: date_field_tag
 // TODO: datetime_field_tag
 // TODO: datetime_local_field_tag
@@ -2663,6 +2692,7 @@ Viking.View.Helpers.textAreaTag = function (name, content, options, escape) {
 
 // TODO: image_submit_tag
 // TODO: month_field_tag
+
 
 // TODO: phone_field_tag
 // TODO: range_field_tag
@@ -2751,6 +2781,16 @@ FormBuilder.prototype = {
         }
         
         return Viking.View.Helpers.numberField(this.model, attribute, options);
+    },
+    
+    color: function(attribute, options) {
+        options || (options = {});
+        
+        if (!options.name && this.options.namespace) {
+            options.name = Viking.View.tagNameForModelAttribute(this.model, attribute, {namespace: this.options.namespace});
+        }
+        
+        return Viking.View.Helpers.colorField(this.model, attribute, options);
     },
     
     money: function(attribute, options) {
@@ -3359,6 +3399,26 @@ Viking.View.Helpers.numberField = function (model, attribute, options) {
     
     return Viking.View.Helpers.numberFieldTag(name, model.get(attribute), options);
 };
+// colorField(model, attribute, options)
+// ======================================
+//
+// Returns an input tag of the "color" type tailored for accessing a specified
+// attribute on the model. Additional options on the input tag can be passed as
+// a hash with options. These options will be tagged onto the HTML as an HTML
+// element attribute as in the example shown.
+//
+// Examples
+// --------
+//   colorField(brand, 'accent')
+//   // => <input id="brand_accent" name="brand[accent]" type="color">
+Viking.View.Helpers.colorField = function (model, attribute, options) {
+    options = _.extend({}, options);
+    var name = options.name || Viking.View.tagNameForModelAttribute(model, attribute);
+
+    Viking.View.addErrorClassToOptions(model, attribute, options);
+    
+    return Viking.View.Helpers.colorFieldTag(name, model.get(attribute), options);
+};
 // moneyField(model, attribute, options)
 //
 // same as numberField only it converts value from cents to dollars (val / 100)
@@ -3537,7 +3597,7 @@ Viking.View.Helpers.textArea = function (model, attribute, options) {
     Viking.View.addErrorClassToOptions(model, attribute, options);
     
     var value = model.get(attribute)
-    if (model.schema[attribute] && model.schema[attribute].type == 'json') {
+    if (model.schema && model.schema[attribute] && model.schema[attribute].type == 'json') {
         value = JSON.stringify(model.get(attribute), undefined, 4);
     }
     
@@ -3579,6 +3639,7 @@ Viking.View.Helpers.textField = function (model, attribute, options) {
 
 
 // TODO: month_field
+
 
 
 
