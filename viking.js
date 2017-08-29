@@ -1,4 +1,4 @@
-//     Viking.js 0.9.0 (sha:b396276)
+//     Viking.js 0.9.0 (sha:3dded8b)
 //
 //     (c) 2012-2017 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -722,7 +722,8 @@ Viking.Model.Name = function (name) {
     this.collectionName = objectName + 'Collection';
     this.singular = objectName.underscore().replace(/\//g, '_'); // namespaced_name
     this.plural = this.singular.pluralize(); // namespaced_names
-    this.human = objectName.demodulize().humanize(); // Name
+    this.human = objectName.demodulize().underscore().humanize(); // Name
+    this.title = objectName.demodulize().underscore().titleize();
     this.collection = this.singular.pluralize(); // namespaced/names
     this.paramKey = this.singular;
     this.routeKey = this.plural;
