@@ -1,4 +1,4 @@
-//     Viking.js 0.9.0 (sha:3dded8b)
+//     Viking.js 0.9.0 (sha:b4dfcdb)
 //
 //     (c) 2012-2017 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -904,7 +904,7 @@ Viking.Model.where = function(options) {
     return new Collection(undefined, {predicate: options});
 };
 Viking.Model.prototype.coerceAttributes = function(attrs) {
-    
+    var that = this;
     _.each(this.associations, function(association) {
         var Type;
         var polymorphic = association.options.polymorphic;
@@ -939,6 +939,11 @@ Viking.Model.prototype.coerceAttributes = function(attrs) {
                     attrs[key] = tmp;
                 } else {
                     attrs[key] = klass.load(attrs[key], key);
+                    if (attrs[key] instanceof Viking.Model) {
+                        that.listenTo(attrs[key], 'change', function(){
+                            that.trigger('change', arguments);
+                        })
+                    }
                 }
             } else {
                 throw new TypeError("Coercion of " + options['type'] + " unsupported");
@@ -1331,22 +1336,38 @@ Viking.Model.Type.registry['date'] = Viking.Model.Type.Date = {
 Viking.Model.Type.registry['json'] = Viking.Model.Type.JSON = {
 
     load: function(value, key) {
-        if (typeof value === 'object') {
+        if (typeof value === 'object' && !(value instanceof Viking.Model)) {
             var AnonModel = Viking.Model.extend({
                 inheritanceAttribute: false
             });
             var model = new AnonModel(value);
             model.modelName = key;
             model.baseModel = model;
+            _.each(value, function(v, k){
+                if(typeof v === 'object'){
+                    var sub_model = Viking.Model.Type.JSON.load(v, k)
+                    model.listenTo(sub_model, 'change', function(){
+                        model.trigger('change', arguments);
+                    });
+                    model.attributes[k] = sub_model;
+                }
+            })
+            
             return model;
+        } else if (!(value instanceof Viking.Model)) {
+            throw new TypeError(typeof value + " can't be coerced into JSON");
         }
-
-        throw new TypeError(typeof value + " can't be coerced into JSON");
     },
 
     dump: function(value) {
         if (value instanceof Viking.Model) {
-            return value.toJSON();
+            var output = value.toJSON();
+            _.each(output, function(v, k){
+                if (v instanceof Viking.Model){
+                    output[k] = Viking.Model.Type.JSON.dump(v)
+                }
+            })
+            return output;
         }
 
         return value;
@@ -1468,7 +1489,7 @@ Viking.Collection = Backbone.Collection.extend({
         }
         if(!model.selected) {
             model.selected = true;
-            model.trigger('selected', this.selected());
+            model.trigger('selected', model, this.selected());
         }
     },
     
@@ -3372,6 +3393,9 @@ Viking.View.Helpers.label = function (model, attribute, content, options, escape
         var name = Viking.View.tagNameForModelAttribute(model, attribute);
         options['for'] = Viking.View.sanitizeToId(name);
     }
+    if (options['value']) {
+        options['for'] += "_" + options['value'];
+    }
     
     Viking.View.addErrorClassToOptions(model, attribute, options);
     
@@ -3592,7 +3616,7 @@ Viking.View.Helpers.select = function (model, attribute, collection, options) {
 //   //      entry body
 //   //    </textarea>
 Viking.View.Helpers.textArea = function (model, attribute, options) {
-    var name = Viking.View.tagNameForModelAttribute(model, attribute);
+    var name = options['name'] || Viking.View.tagNameForModelAttribute(model, attribute);
     
     if (options === undefined) { options = {}; }
     Viking.View.addErrorClassToOptions(model, attribute, options);
