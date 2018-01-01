@@ -1,6 +1,6 @@
-//     Viking.js 0.9.0 (sha:8e0b623)
+//     Viking.js 0.9.0 (sha:17d1efb)
 //
-//     (c) 2012-2017 Jonathan Bracy, 42Floors Inc.
+//     (c) 2012-2018 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
 //     http://vikingjs.com
 
@@ -1341,7 +1341,7 @@ Viking.Model.Type.registry['json'] = Viking.Model.Type.JSON = {
                 inheritanceAttribute: false
             });
             var model = new AnonModel(value);
-            model.modelName = key;
+            model.modelName = new Viking.Model.Name(key);
             model.baseModel = model;
             _.each(value, function(v, k){
                 if(typeof v === 'object' && !_.isArray(v)){
@@ -2955,7 +2955,7 @@ function CheckBoxGroupBuilder(model, attribute, options) {
 
     modelName = _.has(options, 'as') ? options.as : this.model.baseModel.modelName.paramKey;
     if (options.namespace) {
-        if (options.as !== null) {
+        if (options.as !== null && options.namespace.indexOf(modelName) == -1) {
             this.options.namespace = options.namespace + '[' + modelName + ']';
         }
     } else {
