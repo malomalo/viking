@@ -1,4 +1,4 @@
-//     Viking.js 0.9.0 (sha:17d1efb)
+//     Viking.js 0.9.0 (sha:c010f2c)
 //
 //     (c) 2012-2018 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -1484,10 +1484,19 @@ Viking.Collection = Backbone.Collection.extend({
     select: function(model, options) {
         options || (options = {});
         
-        if(!options.multiple) {
+        if(!options.multiple && !_.isArray(model)) {
             this.clearSelected(model);
         }
-        if(!model.selected) {
+        if(_.isArray(model)){
+            _.each(model, function(model){
+                model = this.get(model.get('id'));
+                if(!model) return;
+                if(!model.selected) {
+                    model.selected = true;
+                    model.trigger('selected', model, this.selected());
+                }
+            }, this)
+        } else if(!model.selected) {
             model.selected = true;
             model.trigger('selected', model, this.selected());
         }
