@@ -1,4 +1,4 @@
-//     Viking.js 0.9.0 (sha:c010f2c)
+//     Viking.js 0.9.0 (sha:5aafa5c)
 //
 //     (c) 2012-2018 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -1344,7 +1344,7 @@ Viking.Model.Type.registry['json'] = Viking.Model.Type.JSON = {
             model.modelName = new Viking.Model.Name(key);
             model.baseModel = model;
             _.each(value, function(v, k){
-                if(typeof v === 'object' && !_.isArray(v)){
+                if(_.isObject(v) && !_.isArray(v) && !_.isDate(v)){
                     var sub_model = Viking.Model.Type.JSON.load(v, k)
                     model.listenTo(sub_model, 'change', function(){
                         model.trigger('change', arguments);
