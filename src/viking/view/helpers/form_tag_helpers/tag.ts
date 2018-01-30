@@ -1,3 +1,5 @@
+import { tagOptions } from '../../helpers';
+
 // tag(name, [options = {}, escape = true])
 // ========================================
 //
@@ -28,6 +30,6 @@
 //   
 //   tag("div", {data: {name: 'Stephen', city_state: ["Chicago", "IL"]}})
 //   // => <div data-name="Stephen" data-city_state="[&quot;Chicago&quot;,&quot;IL&quot;]" />
-Viking.View.Helpers.tag = function (name, options, escape) {
-    return "<" + name + Viking.View.tagOptions(options, escape) + ">";
+export function tag(name:string, options?, escape?) {
+    return "<" + name + tagOptions(options, escape) + ">";
 };

@@ -1,3 +1,5 @@
+import { tag } from '../form_tag_helpers/tag';
+
 // Returns an HTML image tag for the +source+. The +source+ can be a full
 // path or a file.
 //
@@ -25,7 +27,7 @@
 //   imageTag("/icons/icon.gif", class: "menu_icon")
 //   // => <img alt="Icon" class="menu_icon" src="/icons/icon.gif">
 
-Viking.View.Helpers.imageTag = function(source, options) {
+export function imageTag(source:string, options) {
     var separator = /x/i,
         size,
         alt;
@@ -51,5 +53,5 @@ Viking.View.Helpers.imageTag = function(source, options) {
         options.alt = alt;
     }
 
-    return Viking.View.Helpers.tag('img', options);
+    return tag('img', options);
 };
