@@ -5,28 +5,29 @@ import { Collection } from './collection';
 import { Cursor } from './cursor';
 
 export const PaginatedCollection = Collection.extend({
-    constructor: function (models, options) {
+
+    constructor(models, options) {
         Collection.apply(this, arguments);
         this.cursor = ((options && options.cursor) || new Cursor());
-        this.listenTo(this.cursor, 'change', function () {
+        this.listenTo(this.cursor, 'change', (...args) => {
             if (this.cursor.requiresRefresh()) {
-                this.cursorChanged.apply(this, arguments);
+                this.cursorChanged.apply(this, args);
             }
         });
     },
 
-    predicateChanged: function (predicate, options) {
+    predicateChanged(predicate, options) {
         this.cursor.reset({ silent: true });
         this.cursorChanged();
     },
 
-    cursorChanged: function (cursor, options) {
+    cursorChanged(cursor, options) {
         this.fetch();
     },
 
-    parse: function (attrs, xhr) {
+    parse(attrs, xhr) {
         this.cursor.set({
-            total_count: parseInt(xhr.xhr.getResponseHeader('Total-Count'))
+            total_count: parseInt(xhr.xhr.getResponseHeader('Total-Count'), 10)
         });
 
         return attrs;

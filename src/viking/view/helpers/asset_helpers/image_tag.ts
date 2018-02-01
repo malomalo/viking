@@ -1,4 +1,4 @@
-import { tag } from '../form_tag_helpers/tag';
+import { tag } from '../index';
 
 // Returns an HTML image tag for the +source+. The +source+ can be a full
 // path or a file.

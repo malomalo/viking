@@ -1,135 +1,105 @@
-//= require_self
-//= require viking/view/helpers/form_tag_helpers
-//= require viking/view/helpers/builders
-//= require viking/view/helpers/date_helpers
-//= require viking/view/helpers/form_helpers
-//= require viking/view/helpers/url_helpers
-//= require viking/view/helpers/asset_helpers
-//= require viking/view/helpers/render_helper
-import * as _ from 'underscore';
-import * as Backbone from 'backbone'
+import {
+    tag,
+    tagOption,
+    tagOptions,
+    dataTagOption,
+    sanitizeToId,
+    tagNameForModelAttribute,
+    addErrorClassToOptions,
+    methodOrAttribute,
+    render
+} from './helpers/index';
 
-import { Collection } from '../collection';
-import { tag } from './helpers/form_tag_helpers/tag';
+import {
+    buttonTag,
+    checkBoxTag,
+    colorFieldTag,
+    contentTag,
+    formTag,
+    hiddenFieldTag,
+    labelTag,
+    numberFieldTag,
+    optionsForSelectTag,
+    optionsFromCollectionForSelectTag,
+    passwordFieldTag,
+    radioButtonTag,
+    selectTag,
+    submitTag,
+    textAreaTag,
+    textFieldTag,
+    timeTag
+} from './helpers/form_tags';
+
+import {
+    checkBox,
+    checkBoxGroup,
+    collectionSelect,
+    colorField,
+    formFor,
+    hiddenField,
+    label,
+    moneyField,
+    numberField,
+    passwordField,
+    radioButton,
+    select,
+    textArea,
+    textField
+} from './helpers/form_helpers';
+
+import {
+    distanceOfTimeInWords
+} from './helpers/date_helpers';
+
+import {
+    linkTo,
+    mailTo
+} from './helpers/url_helpers';
+
 import { imageTag } from './helpers/asset_helpers/image_tag';
 
-const booleanAttributes = ['disabled', 'readonly', 'multiple', 'checked',
-    'autobuffer', 'autoplay', 'controls', 'loop', 'selected', 'hidden',
-    'scoped', 'async', 'defer', 'reversed', 'ismap', 'seemless', 'muted',
-    'required', 'autofocus', 'novalidate', 'formnovalidate', 'open',
-    'pubdate', 'itemscope'];
-
-export function tagOption(key:string, value, escape?) {
-    if (_.isArray(value)) { value = value.join(" "); }
-    if (escape) { value = _.escape(value); }
-
-    return key + '="' + value + '"';
-}
-
-export function tagOptions(options, escape) {
-    if (options === undefined) { return ""; }
-    if (escape === undefined) { escape = true; }
-
-    var attrs: string[] = [];
-    _.each(options, function (value: any, key: string) {
-        if (key === "data" && _.isObject(value)) {
-            // TODO testme
-            _.each(value, function (value, key) {
-                attrs.push(Helpers.dataTagOption(key, value, escape));
-            });
-        } else if (value === true && _.contains(booleanAttributes, key)) {
-            attrs.push(key);
-        } else if (value !== null && value !== undefined) {
-            attrs.push(Helpers.tagOption(key, value, escape));
-        }
-    });
-
-    if (attrs.length === 0) {
-        return '';
-    }
-
-    return " " + attrs.sort().join(' ');
-}
 
 
 export const Helpers = {
 
-    tag: tag,
-    tagOption: tagOption,
-    tagOptions: tagOptions,
+    buttonTag,
+    checkBox,
+    checkBoxGroup,
+    checkBoxTag,
+    collectionSelect,
+    colorField,
+    colorFieldTag,
+    contentTag,
+    distanceOfTimeInWords,
+    formFor,
+    formTag,
+    hiddenField,
+    hiddenFieldTag,
+    imageTag,
+    label,
+    labelTag,
+    linkTo,
+    mailTo,
+    moneyField,
+    numberField,
+    numberFieldTag,
+    optionsForSelectTag,
+    optionsFromCollectionForSelectTag,
+    passwordField,
+    passwordFieldTag,
+    radioButton,
+    radioButtonTag,
+    render,
+    select,
+    selectTag,
+    submitTag,
+    tag,
+    templates: {},
+    textArea,
+    textAreaTag,
+    textField,
+    textFieldTag,
+    timeAgoInWords: distanceOfTimeInWords,
+    timeTag
 
-    imageTag: imageTag,
-
-
-
-    dataTagOption: function (key, value, escape): string {
-        key = "data-" + key;
-        if (_.isObject(value)) { value = JSON.stringify(value); }
-
-        return Helpers.tagOption(key, value, escape);
-    },
-
-    // see http://www.w3.org/TR/html4/types.html#type-name
-    sanitizeToId: function (name) {
-        return name.replace(/[^\-a-zA-Z0-9:.]/g, "_").replace(/_+/g, '_').replace(/_+$/, '').replace(/_+/g, '_');
-    },
-
-    // TODO: move to model_helpers?
-    tagNameForModelAttribute: function (model, attribute, options) {
-        options || (options = {});
-
-        var value = model.get(attribute);
-        var name;
-
-        if (options.namespace) {
-            name = options.namespace + '[' + attribute + ']';
-        } else {
-            name = model.baseModel.modelName.paramKey + '[' + attribute + ']';
-        }
-
-        if (value instanceof Collection || _.isArray(value)) {
-            name = name + '[]';
-        }
-
-        return name;
-    },
-
-    // TODO: move to model_helpers?
-    addErrorClassToOptions: function (model, attribute, options) {
-        if (model.errorsOn(attribute)) {
-            if (options['class']) {
-                options['class'] = options['class'] + ' error';
-            } else {
-                options['class'] = 'error';
-            }
-        }
-    },
-
-    // TODO: move to model_helpers?
-    // TODO: testme
-    methodOrAttribute: function (model, funcOrAttribute) {
-        if (typeof funcOrAttribute !== 'function') {
-            if (model[funcOrAttribute]) {
-                return _.result(model, funcOrAttribute);
-            }
-
-            return model.get(funcOrAttribute);
-        }
-
-        return funcOrAttribute(model);
-    },
-
-    render: function (templatePath, locals) {
-        var template = Helpers.templates[templatePath];
-
-        if (!locals) {
-            locals = {};
-        }
-
-        if (template) {
-            return template(_.extend(locals, Helpers));
-        }
-
-        throw new Error('Template does not exist: ' + templatePath);
-    }
 }

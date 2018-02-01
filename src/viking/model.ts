@@ -1,23 +1,16 @@
-import * as _ from 'underscore';
 import * as Backbone from 'backbone';
+import * as _ from 'underscore';
 
-import { Name } from './model/name';
-import { Type } from './model/type';
-import { BelongsToReflection } from './model/reflections/belongs_to_reflection';
-import { HasOneReflection } from './model/reflections/has_one_reflection';
-import { HasManyReflection } from './model/reflections/has_many_reflection';
-import { HasAndBelongsToManyReflection } from './model/reflections/has_and_belongs_to_many_reflection';
 import { urlError } from './errors';
+import { Name } from './model/name';
+import { Reflection } from './model/reflection';
+import { BelongsToReflection } from './model/reflections/belongs_to_reflection';
+import { HasAndBelongsToManyReflection } from './model/reflections/has_and_belongs_to_many_reflection';
+import { HasManyReflection } from './model/reflections/has_many_reflection';
+import { HasOneReflection } from './model/reflections/has_one_reflection';
+import { Type } from './model/type';
 import * as string from './support/string';
-
-//= require_self
-//= require ./model/name
-//= require ./model/reflection
-//= require_tree ./model/reflections
-//= require_tree ./model/class_properties
-//= require_tree ./model/instance_properties
-//= require ./model/type
-//= require_tree ./model/types
+import { sync } from './sync';
 
 // Viking.Model
 // ------------
@@ -360,7 +353,7 @@ export const Model = Backbone.Model.extend({
             options.data = JSON.stringify(options.data);
         }
 
-        return Viking.sync.call(this, method, model, options);
+        return sync.call(this, method, model, options);
     },
 
     // similar to Rails as_json method
@@ -653,3 +646,14 @@ export const Model = Backbone.Model.extend({
 
     }
 );
+
+
+export {
+    Name,
+    Reflection,
+    BelongsToReflection,
+    HasAndBelongsToManyReflection,
+    HasManyReflection,
+    HasOneReflection,
+    Type
+}; 

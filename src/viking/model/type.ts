@@ -13,3 +13,5 @@ export const Type = {
         string: StringType
     }
 };
+
+export { BooleanType, DateType, JSONType, NumberType, StringType };

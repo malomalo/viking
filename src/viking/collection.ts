@@ -1,6 +1,8 @@
-import * as _ from 'underscore';
 import * as Backbone from 'backbone';
+import * as _ from 'underscore';
+
 import { Model } from './model';
+import { Predicate } from './predicate';
 import { sync } from './sync';
 
 // Viking.Collection
@@ -14,7 +16,7 @@ export const Collection = Backbone.Collection.extend({
     // Set the default model to a generic Viking.Model
     model: Model,
 
-    constructor: function (models, options) {
+    constructor(models, options) {
         Backbone.Collection.call(this, models, options);
 
         if (options && options.predicate) {
@@ -23,13 +25,13 @@ export const Collection = Backbone.Collection.extend({
         if (options && options.order) {
             this.order(options.order, { silent: true });
         }
-
     },
 
-    url: function () {
-        return "/" + this.model.modelName.plural;
+    url() {
+        return '/' + this.model.modelName.plural;
     },
-    paramRoot: function () {
+
+    paramRoot() {
         return this.model.modelName.plural;
     },
 
@@ -44,14 +46,14 @@ export const Collection = Backbone.Collection.extend({
     //
     // Calling #setPredicate and setting it the same object that is currently
     // the predicate will not trigger a #predicateChanged call
-    setPredicate: function (predicate, options) {
+    setPredicate(predicate, options) {
         if (this.predicate === predicate) { return false; }
 
         if (this.predicate) { this.stopListening(this.predicate); }
 
         if (predicate) {
-            if (!(predicate instanceof Viking.Predicate)) {
-                predicate = new Viking.Predicate(predicate);
+            if (!(predicate instanceof Predicate)) {
+                predicate = new Predicate(predicate);
             }
             this.predicate = predicate;
             this.listenTo(predicate, 'change', this.predicateChanged);
@@ -66,7 +68,7 @@ export const Collection = Backbone.Collection.extend({
     // when the predicate changes instead of just `fetch` allows sub
     // collections to overwrite what happens when it changes. An example
     // of this would be the `Viking.PaginatedCollection`
-    predicateChanged: function (predicate, options) {
+    predicateChanged(predicate, options) {
         this.trigger('change:predicate', this.predicate);
         this.fetch();
     },
@@ -76,16 +78,17 @@ export const Collection = Backbone.Collection.extend({
     // models will not be unselected. Triggers the `selected` event on the
     // collection. If the model is already selected the `selected` event is
     // not triggered
-    select: function (model, options) {
-        options || (options = {});
-
+    select(model, options: any = {}) {
         if (!options.multiple && !_.isArray(model)) {
             this.clearSelected(model);
         }
         if (_.isArray(model)) {
-            _.each(model, (model) => {
+            _.each(model, (model: any) => {
                 model = this.get(model);
-                if (!model) return;
+                if (!model) {
+                    return;
+                }
+
                 if (!model.selected) {
                     model.selected = true;
                     model.trigger('selected', model, this.selected());
@@ -98,16 +101,16 @@ export const Collection = Backbone.Collection.extend({
     },
 
     // returns all the models where `selected` == true
-    selected: function () {
-        return this.filter(function (m) { return m.selected; });
+    selected() {
+        return this.filter((m) => m.selected);
     },
 
     // Sets `'selected'` to `false` on all models
-    clearSelected: function (exceptModel) {
+    clearSelected(exceptModel) {
         if (exceptModel instanceof Backbone.Model) {
             exceptModel = exceptModel.cid;
         }
-        this.each(function (m) {
+        this.each((m) => {
             if (m.cid !== exceptModel) {
                 m.unselect();
             }
@@ -119,28 +122,27 @@ export const Collection = Backbone.Collection.extend({
     // changes 3 times, if the first 2 request don't return before the 3rd is
     // sent they will be canceled and only the last one will finish and update
     // the collection. You won't get the collection being updated 3 times.
-    fetch: function (options) {
-        options || (options = {});
-
-        var complete = options.complete;
+    fetch(options: any = {}) {
+        const complete = options.complete;
         options.complete = () => {
             delete this.xhr;
             if (complete) { complete(); }
-        }
+        };
 
         if (this.xhr) { this.xhr.abort(); }
         this.xhr = Backbone.Collection.prototype.fetch.call(this, options);
     },
 
     // TODO: testme?
-    sync: function (method, model, options) {
+    sync(method, model, options: any = {}) {
         if (method === 'read' && this.predicate) {
-            options.data || (options.data = {});
             options.data.where = this.predicate.attributes;
         }
 
         if (method === 'read' && this.ordering) {
-            options.data || (options.data = {});
+            if (options.data) {
+                options.data = {};
+            }
             options.data.order = this.ordering;
         }
 
@@ -171,12 +173,11 @@ export const Collection = Backbone.Collection.extend({
     // order({'listings.size': 'desc'})         => [{'listings.size': 'desc'}]
     // order([{size: 'asc'}, {size: 'desc'}])     => [{'size': 'asc'}, {'id': 'desc'}]
     // order({size: 'asc'}, {silent: true})     => [{'size': 'asc'}]
-    order: function (order, options) {
-        options || (options = {});
+    order(order, options: any = {}) {
         order = (_.isArray(order) ? order : [order]);
 
-        order = _.map(order, function (o) {
-            var normalizedOrder;
+        order = _.map(order, (o) => {
+            let normalizedOrder;
 
             if (typeof o === 'string') {
                 normalizedOrder = {};
@@ -195,7 +196,7 @@ export const Collection = Backbone.Collection.extend({
         }
 
         if (this.ordering) {
-            var orderingEqual = _.find(_.map(this.ordering, function (el, i) { return _.isEqual(el, order[i]); }), function (el) { return el; });
+            const orderingEqual = _.find(_.map(this.ordering, (el, i) => _.isEqual(el, order[i])), (el) => el);
             if (!orderingEqual) {
                 this.ordering = order;
                 if (!options.silent) { this.orderChanged(order); }
@@ -211,7 +212,7 @@ export const Collection = Backbone.Collection.extend({
     // when the predicate changes instead of just `fetch` allows sub
     // collections to overwrite what happens when it changes, similar to
     // #predicateChanged
-    orderChanged: function (order) {
+    orderChanged(order) {
         this.fetch();
     }
 

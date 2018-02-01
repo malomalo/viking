@@ -1,3 +1,6 @@
+import { ago, day } from '../../support/number';
+import { timeTag } from './form_tags';
+
 // distanceOfTimeInWords(fromTime)
 // distanceOfTimeInWords(fromTime, options)
 // distanceOfTimeInWords(fromTime, toTime)
@@ -49,33 +52,33 @@
 //   distanceOfTimeInWords(fromTime, toTime, include_seconds: true)                        # => about 6 years
 //   distanceOfTimeInWords(toTime, fromTime, include_seconds: true)                        # => about 6 years
 //   distanceOfTimeInWords(Time.now, Time.now)                                               # => less than a minute
-Viking.View.Helpers.distanceOfTimeInWords = function (fromTime, toTime, options) {
-    var tmp;
-    
+export function distanceOfTimeInWords(fromTime: Date, toTime?: any, options: any = {}) {
+    let tmp;
+
     if (!(toTime instanceof Date)) {
         options = toTime;
         toTime = new Date();
     }
-    
-    options = _.extend({}, options);
-    
-    if ( fromTime > toTime ) {
+
+    options = Object.assign({}, options);
+
+    if (fromTime > toTime) {
         tmp = fromTime;
         fromTime = toTime;
         toTime = tmp;
     }
-    
+
     var distance_in_seconds = Math.round((toTime.getTime() - fromTime.getTime()) / 1000);
     var distance_in_minutes = Math.round(distance_in_seconds / 60);
 
     if (distance_in_seconds <= 60) {
-        if ( options.includeSeconds ) {
+        if (options.includeSeconds) {
             if (distance_in_seconds < 2) {
                 return "a second";
             } else if (distance_in_seconds < 10) {
                 return distance_in_seconds + " seconds";
             } else if (distance_in_seconds < 55) {
-                return (Math.round(distance_in_seconds/10)*10) + " seconds";
+                return (Math.round(distance_in_seconds / 10) * 10) + " seconds";
             } else {
                 return "a minute";
             }
@@ -84,46 +87,186 @@ Viking.View.Helpers.distanceOfTimeInWords = function (fromTime, toTime, options)
         }
     } else if (distance_in_seconds < 90) {
         return "a minute";
-    } else if (distance_in_seconds < (59*60) + 30) {
+    } else if (distance_in_seconds < (59 * 60) + 30) {
         return distance_in_minutes + " minutes";
-    } else if (distance_in_seconds < (1*3600) + (30*60)) {
+    } else if (distance_in_seconds < (1 * 3600) + (30 * 60)) {
         return "an hour";
-    } else if (distance_in_seconds < (23*3600) + (30*60)) { // Less than 23.5 Hours
+    } else if (distance_in_seconds < (23 * 3600) + (30 * 60)) { // Less than 23.5 Hours
         return Math.round(distance_in_seconds / 3600) + " hours"
-    } else if (distance_in_seconds < (36*3600)) { // Less than 36 Hours
+    } else if (distance_in_seconds < (36 * 3600)) { // Less than 36 Hours
         return "a day";
-    } else if (distance_in_seconds < (29*86400) + (12*3600)) { // Less than 29.5 Days
+    } else if (distance_in_seconds < (29 * 86400) + (12 * 3600)) { // Less than 29.5 Days
         return Math.round(distance_in_seconds / 86400) + " days"
-    } else if (distance_in_seconds < (45*86400)) { // Less than 45 Days
+    } else if (distance_in_seconds < (45 * 86400)) { // Less than 45 Days
         return "a month";
-    } else if (distance_in_seconds < (365*86400)) { // Less than 365 Days
-        return Math.round(distance_in_seconds / (30*86400)) + " months"
+    } else if (distance_in_seconds < (365 * 86400)) { // Less than 365 Days
+        return Math.round(distance_in_seconds / (30 * 86400)) + " months"
     } else {
         // 1 year = 525949 min
         // 1 leap year = 527040 min
         // for out calculations 400 year = 97 leap years + 303 years
         // 1 year ~= (525949 * 303 + 527040 * 97) / 400 = 526213.5675 min
-        var years = Math.round((distance_in_minutes / 526213.5675)*100)/100;
+        var years = Math.round((distance_in_minutes / 526213.5675) * 100) / 100;
         var partial_years = Math.round(years % 1 * 100) / 100;
         if (years < 1 || partial_years < 0.33) {
             years = Math.round(years);
-            if (years == 1) { 
+            if (years == 1) {
                 return "a year";
             } else {
                 return years + " years";
             }
         } else if (partial_years < 0.66) {
             years = Math.floor(years);
-            if (years == 1) { 
+            if (years == 1) {
                 return "over a year";
             } else {
                 return "over " + years + " years";
             }
         } else {
             years = Math.floor(years);
-            return "almost " + (years+1) + " years";
+            return "almost " + (years + 1) + " years";
         }
     }
 };
 
-Viking.View.Helpers.timeAgoInWords = Viking.View.Helpers.distanceOfTimeInWords;
+
+
+// localTime(time)
+// localTime(time, options)
+// localTime(time, format)
+// localTime(time, format, options)
+// ================================
+//
+// Returns a html time tag for the given date or time in.
+//
+//   localTime(time)
+//
+// renders
+//
+//   <time data-format="%B %e, %Y %l:%M%P"
+//         data-local="time"
+//         datetime="2013-11-27T23:43:22Z"
+//         title="November 27, 2013 6:43pm EDT"
+//         data-localized="true">November 27, 2013 6:43pm</time>
+//
+// You can pass the format as the second option
+//
+//   localTime(time, '%B %e, %Y %l:%M%P')
+//
+// If you just need the date localDate is an alias for
+//
+//   localTime(time, '%B %e, %Y')
+//
+// To set attributes on the time tag, pass a hash as the second argument with a 
+// :format key and your attributes.
+//
+//   localTime(time, {format: '%B %e, %Y %l:%M%P', class: 'my-time'})
+export function localTime(time, format, options) {
+    if (typeof format === 'object') {
+        options = format;
+        format = undefined;
+    }
+
+    if (!format) {
+        format = '%B %e, %Y %l:%M%P';
+    }
+
+    return timeTag(time, {
+        'data-format': format,
+        'data-local': 'time',
+        'title': time.strftime("%B %e, %Y at %l:%M%P %Z"),
+        'data-localized': 'true'
+    }, time.strftime(format));
+};
+
+// localDate(time)
+// localDate(time, options)
+// localDate(time, format)
+// localDate(time, format, options)
+// ================================
+//
+// An alias for +localTime(time, '%B %e, %Y')+
+export function localDate(time, format, options) {
+    if (typeof format === 'object') {
+        options = format;
+        format = undefined;
+    }
+
+    if (!format) {
+        format = '%B %e, %Y';
+    }
+
+    return localTime(time, format, options)
+};
+
+// // // localTimeAgo(time)
+// // // ==================
+// // //
+// // // Displays the relative amount of time passed. With age, the descriptions
+// // // transition from {quantity of seconds, minutes, or hours} to {months, and years}
+// // // The <time> elements are updated every 60 seconds. For examples see
+// // // +distanceOfTimeInWords+.
+// // export function localTimeAgo (time) {
+
+// // };
+
+// // localRelativeTime(time)
+// // localRelativeTime(time, options)
+// // localRelativeTime(time, type)
+// // localRelativeTime(time, type, options)
+// // ======================================
+// //
+// // Preset time and date formats that vary with age. The available types are date,
+// // time-ago, time-or-date, and weekday-or-date. Similar to localTimeAgo the time
+// // elements get updated every 60 seconds.
+// //
+// // Types:
+// // - date: Includes the year unless it's current. "Apr 11" or "Apr 11, 2013"
+// // - time-ago: See +localTimeAgo+, +localTimeAgo+ call this with type 'time-ago'
+// // - time-or-date: Displays the time if it occurs today or the date if not. 
+// //                 "3:26pm" or "Apr 11"
+// // - weekday-or-date: Displays "Today", "Yesterday", the weekday (e.g. Wednesday)
+// //                    if the time is within a week of today. Otherwise displays
+// //                    the date.
+// export function localRelativeTime(time, type, options) {
+//     return timeTag(time, {
+//         'data-local': type,
+//         'title': time.strftime("%B %e, %Y at %l:%M%P %Z")
+//     }, timeToRelativeTime(time));
+// }
+
+export function formatTime(time, type) {
+    if (type === 'time-ago') {
+        return distanceOfTimeInWords(time);
+    } else if (type == 'date') {
+
+    } else if (type === 'time-or-date') {
+        if (time.isToday()) {
+            return time.strftime('%l:%M%P');
+        } else {
+            if (time.isThisYear()) {
+                return time.strftime('%b %e');
+            } else {
+                return time.strftime('%b %e, %Y');
+            }
+        }
+    } else if (type === 'weekday-or-date') {
+        if (time.isToday()) {
+            return 'Today';
+        }
+
+        if (time > ago(day(2))) {
+            return 'Yesterday';
+        }
+
+        if (time > ago(day(6))) {
+            return time.strftime('%A');
+        }
+
+        if (time.isThisYear()) {
+            return time.strftime('%b %e');
+        }
+        
+        return time.strftime('%b %e, %Y');
+    }
+}
