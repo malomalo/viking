@@ -1,7 +1,10 @@
-import * as _ from 'underscore';
 import * as Backbone from 'backbone';
-import { urlError } from './errors';
+import * as jQuery from 'jquery';
+import * as _ from 'underscore';
+
 import { Collection } from './collection';
+import { urlError } from './errors';
+import { toParam } from './support';
 
 // Viking.sync
 // -------------
@@ -52,11 +55,11 @@ export function sync(method: string, model: any, options: any) {
   if (params.type !== 'GET' && !options.emulateJSON) {
     params.processData = false;
   } else if (options.data && typeof options.data === 'object') {
-    options.data = options.data.toParam();
+    options.data = toParam(options.data);
   }
 
   // Make the request, allowing the user to override any Ajax options.
-  var xhr = options.xhr = ajax(model, _.extend(params, options));
+  const xhr = options.xhr = ajax(model, _.extend(params, options));
   model.trigger('request', model, xhr, options);
   return xhr;
 };
@@ -95,10 +98,10 @@ export function ajax(model, options) {
   // We only speak json
   if (options.headers) {
     _.defaults(options.headers, {
-      'Accept': 'application/json'
+      Accept: 'application/json'
     });
   } else {
-    options.headers = { 'Accept': 'application/json' };
+    options.headers = { Accept: 'application/json' };
   }
 
   return jQuery.ajax(options);

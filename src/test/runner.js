@@ -12,6 +12,5 @@ const firefoxOptions = new firefox.Options();
 		.setFirefoxOptions(firefoxOptions)
 		.build();
 
-	driver.get(`file://${path.resolve('./test/test.js')}`);
-
+	driver.get(`file://${path.resolve(__dirname, '../../src/test/index.html')}`);
 })();

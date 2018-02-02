@@ -1,5 +1,5 @@
 import * as _ from 'underscore';
-import * as strftime from 'strftime';
+// import * as strftime from 'strftime';
 
 import * as string from './string';
 
@@ -12,9 +12,9 @@ export function strftime(date: Date, fmt: string) {
 // Alias of to_s.
 export const toParam = (d) => d.toJSON();
 
-export function toQuery(key: string, d: Date): string {
-    return _.escape(string.toParam(key)) + "=" + _.escape(toParam(d));
-};
+export function toQuery(d: Date, key: string): string {
+    return encodeURI(string.toParam(key)) + '=' + encodeURI(toParam(d));
+}
 
 export function today(): Date {
     return new Date();

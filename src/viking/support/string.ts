@@ -6,26 +6,27 @@ import { NameError } from '../errors';
 // Converts the first character to uppercase
 export function capitalize(value: string): string {
     return value.charAt(0).toUpperCase() + value.slice(1);
-};
+}
 
 // Converts the first character to lowercase
 export function anticapitalize(value: string): string {
     return value.charAt(0).toLowerCase() + value.slice(1);
-};
+}
 
 // Capitalizes all the words and replaces some characters in the string to
 // create a nicer looking title. titleize is meant for creating pretty output.
 export function titleize(value: string): string {
     return humanize(underscore(value)).replace(/\b('?[a-z])/g, (m) => m.toUpperCase());
-};
+}
 
 // Capitalizes the first word and turns underscores into spaces and strips a
 // trailing "_id", if any. Like titleize, this is meant for creating pretty output.
 export function humanize(value: string): string {
-    var result = value.toLowerCase().replace(/_id$/, '').replace(/_/g, ' ');
-    result = result.replace(/([a-z\d]*)/g, function (m) { return m.toLowerCase(); });
-    return capitalize(result);
-};
+    return capitalize(value.toLowerCase()
+        .replace(/_id$/, '')
+        .replace(/_/g, ' ')
+        .replace(/([a-z\d]*)/g, (m) => m.toLowerCase()));
+}
 
 // Makes an underscored, lowercase form from the expression in the string.
 //
@@ -45,7 +46,7 @@ export function underscore(value: string): string {
     result = result.replace(/([A-Z\d]+)([A-Z][a-z])/g, "$1_$2");
     result = result.replace(/([a-z\d])([A-Z])/g, "$1_$2");
     return result.replace('-', '_').toLowerCase();
-};
+}
 
 // By default, #camelize converts strings to UpperCamelCase. If the argument
 // to camelize is set to `false` then #camelize produces lowerCamelCase.
@@ -73,11 +74,11 @@ export function camelize(value: string, uppercaseFirstLetter?: boolean) {
     }
 
     value = value.replace(/(_|(\/))([a-z\d]*)/g, (_a, _b, first, rest) => {
-        return (first || '') + rest.capitalize();
+        return (first || '') + capitalize(rest);
     });
 
     return value.replace('/', '.');
-};
+}
 
 // Convert a string to a boolean value. If the argument to #booleanize is
 // passed if the string is not 'true' or 'false' it will return the argument.
@@ -93,7 +94,7 @@ export function booleanize(value: string, defaultTo?: boolean) {
     if (value.toString() === 'false') { return false; }
 
     return (defaultTo === undefined ? false : defaultTo);
-};
+}
 
 // Replaces underscores with dashes.
 //
@@ -102,7 +103,7 @@ export function booleanize(value: string, defaultTo?: boolean) {
 //     "puni_puni"  // => "puni-puni"
 export function dasherize(value: string): string {
     return value.replace('_', '-');
-};
+}
 
 // Replaces special characters in a string so that it may be used as part of
 // a "pretty" URL.
@@ -112,17 +113,17 @@ export function dasherize(value: string): string {
 //     "Donald E. Knuth".parameterize() // => 'donald-e-knuth'
 export function parameterize(value: string, seperator?: string): string {
     return value.toLowerCase().replace(/[^a-z0-9\-_]+/g, seperator || '-');
-};
+}
 
 // Add Underscore.inflection#pluralize function on the String object
 export function pluralize(value: string, count?: number, includeNumber?: boolean) {
     return (_ as any).pluralize(value, count, includeNumber);
-};
+}
 
 // Add Underscore.inflection#singularize function on the String object
 export function singularize(value: string) {
     return (_ as any).singularize(value);
-};
+}
 
 // Tries to find a variable with the name specified in context of `context`.
 // `context` defaults to the `window` variable.
@@ -167,8 +168,8 @@ export function demodulize(value: string, seperator: string = '.'): string {
 // of length `length` with the string right justified and padded with padString;
 // otherwise, returns string
 export function rjust(value: string, length: number, padString: string = ' '): string {
-    var padding = '';
-    var paddingLength = length - value.length;
+    let padding = '';
+    const paddingLength = length - value.length;
 
     while (padding.length < paddingLength) {
         if (paddingLength - padding.length < padString.length) {
@@ -179,14 +180,14 @@ export function rjust(value: string, length: number, padString: string = ' '): s
     }
 
     return padding + value;
-};
+}
 
 // If `length` is greater than the length of the string, returns a new String
 // of length `length` with the string left justified and padded with padString;
 // otherwise, returns string
 export function ljust(value: string, length: number, padString: string = ' '): string {
-    var padding = '';
-    var paddingLength = length - value.length;
+    let padding = '';
+    const paddingLength = length - value.length;
 
     while (padding.length < paddingLength) {
         if (paddingLength - padding.length < padString.length) {
@@ -197,12 +198,12 @@ export function ljust(value: string, length: number, padString: string = ' '): s
     }
 
     return value + padding;
-};
+}
 
 export const toParam = (value: string) => value.toString();
 
-export function toQuery(key: string, value: string) {
-    return _.escape(toParam(key)) + "=" + _.escape(toParam(value));
-};
+export function toQuery(value: string, key: string): string {
+    return encodeURI(toParam(key)) + '=' + encodeURI(toParam(value));
+}
 
 export const downcase = (v: string) => v.toLowerCase();

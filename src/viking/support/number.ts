@@ -24,11 +24,11 @@ export function ordinalize(value: number): string {
 };
 
 // Alias of to_s.
-export const toParam = (v) => v.toString;
+export const toParam = (v: number): string => v.toString();
 
-export function toQuery(key: string, value: number): string {
-    return _.escape(string.toParam(key)) + "=" + _.escape(toParam(value));
-};
+export function toQuery(value: number, key: string): string {
+    return encodeURI(string.toParam(key)) + '=' + encodeURI(toParam(value));
+}
 
 export function second(value: number): number {
     return value * 1000;

@@ -1,4 +1,3 @@
-import * as _ from 'underscore';
 import * as support from '../support';
 
 // Calls `to_param` on all its elements and joins the result with slashes.
@@ -9,14 +8,14 @@ export function toParam(value: any[]): string {
 
 // Converts an array into a string suitable for use as a URL query string,
 // using the given key as the param name.
-export function toQuery(key: string, value: any[]): string {
-    let prefix = _.escape(key) + "[]";
+export function toQuery(value: any[], key: string): string {
+    const prefix = encodeURI(key) + '[]';
 
     return value.map((element) => {
-        if (value === null) {
-            _.escape(prefix) + '='
+        if (element === null || element === undefined) {
+            return encodeURI(prefix) + '=';
         } else {
-            support.toQuery(prefix, value);
+            return support.toQuery(element, prefix);
         }
     }).join('&');
 }

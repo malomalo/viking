@@ -1,4 +1,5 @@
 import * as _ from 'underscore';
+import * as support from '../support';
 
 // Returns a string representation of the receiver suitable for use as a URL
 // query string:
@@ -12,15 +13,15 @@ import * as _ from 'underscore';
 //
 // The string pairs "key=value" that conform the query string are sorted
 // lexicographically in ascending order.
-export function toParam(object: Object, namespace?: string): string {
+export function toParam(object: object, namespace?: string): string {
     return Object.keys(object).map((key) => {
-        let value = object[key],
-            namespaceWithKey = (namespace ? (namespace + "[" + key + "]") : key);
+        const value = object[key];
+        const namespaceWithKey = (namespace ? (namespace + '[' + key + ']') : key);
 
         if (value === null || value === undefined) {
-            return _.escape(namespaceWithKey);
+            return encodeURI(namespaceWithKey);
         } else {
-            return value.toQuery(namespaceWithKey);
+            return support.toQuery(value, namespaceWithKey);
         }
 
     }).join('&');
