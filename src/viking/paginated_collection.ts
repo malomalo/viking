@@ -6,7 +6,7 @@ import { Cursor } from './cursor';
 
 export const PaginatedCollection = Collection.extend({
 
-    constructor(models, options) {
+    constructor: function (models, options) {
         Collection.apply(this, arguments);
         this.cursor = ((options && options.cursor) || new Cursor());
         this.listenTo(this.cursor, 'change', (...args) => {

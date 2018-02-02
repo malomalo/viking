@@ -1,5 +1,6 @@
 import * as _ from 'underscore';
 import { Collection } from '../../collection';
+import { View } from '../../view';
 import { Helpers } from '../helpers';
 
 const booleanAttributes = ['disabled', 'readonly', 'multiple', 'checked',
@@ -130,7 +131,7 @@ export function methodOrAttribute(model, funcOrAttribute) {
 }
 
 export function render(templatePath, locals) {
-    const template = Helpers.templates[templatePath];
+    const template = View.templates[templatePath];
 
     if (!locals) {
         locals = {};

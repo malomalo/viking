@@ -17,7 +17,7 @@ export const View = Backbone.View.extend({
     },
 
     // Copied constructor from Backbone View
-    constructor(options: any = {}) {
+    constructor: function (options: any = {}) {
         this.cid = _.uniqueId('view');
         _.extend(this, _.pick(options, ['model', 'collection', 'el', 'id', 'attributes', 'className', 'tagName', 'events']));
         this._ensureElement();

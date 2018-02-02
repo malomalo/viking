@@ -303,7 +303,13 @@
     <script src="../../node_modules/jquery/dist/jquery.js"></script>
     <script src="../../node_modules/sinon/pkg/sinon.js"></script>
     <script src="../../node_modules/qunit/qunit/qunit.js"></script>
-    <script src="../../node_modules/jst/jst.js"></script>
+    <script>
+        Backbone.$ = jQuery;
+        var JST = {
+            'a/template/path': _.template('<h1>Some Title</h1>'),
+            'a/template/path/with/locals': _.template('<p><%= text %></p>')
+        };
+    </script>
     <script src="../../dist/test/bundle.js"></script>
 </head>
 

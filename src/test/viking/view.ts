@@ -49,16 +49,18 @@ module('Viking.View', {
         });
     });
 
-    test('calls the original extend', () => {
-        assert.expect(1);
-
+    test('calls the original extend', async () => {
         const originalFunction = Backbone.View.extend;
 
-        Backbone.View.extend = () => {
-            assert.ok(true);
-        };
+        await new Promise((resolve, reject) => {
+            Backbone.View.extend = () => {
+                assert.ok(true);
+                resolve();
+            };
 
-        Viking.View.extend();
+            Viking.View.extend();
+        });
+
         Backbone.View.extend = originalFunction;
     });
 
@@ -83,48 +85,59 @@ module('Viking.View', {
         );
     });
 
-    test("#remove() triggers a 'remove' event on the view", () => {
-        assert.expect(1);
-
+    test("#remove() triggers a 'remove' event on the view", async () => {
         const view = new Viking.View();
-        view.on('remove', () => { assert.ok(true); });
-        view.remove();
+
+        await new Promise((resolve) => {
+            view.on('remove', () => {
+                assert.ok(true);
+                resolve();
+            });
+
+            view.remove();
+        });
+
         view.off('remmove');
     });
 
-    test('#bindEl() with a model', () => {
-        assert.expect(2);
-
+    test('#bindEl() with a model', async () => {
         const model = new Viking.Model();
         const view = new Viking.View({ model });
 
-        view.$ = (selector) => {
-            assert.equal(selector, '.name');
-            return {
-                html: (html) => { assert.equal(html, 'Dr. DJ'); }
+        await new Promise((resolve) => {
+            view.$ = (selector) => {
+                assert.equal(selector, '.name');
+                return {
+                    html: (html) => {
+                        assert.equal(html, 'Dr. DJ');
+                        resolve();
+                    }
+                };
             };
-        };
 
-        view.bindEl('name', '.name');
-        model.set('name', 'Dr. DJ');
+            view.bindEl('name', '.name');
+            model.set('name', 'Dr. DJ');
+        });
     });
 
-    test('#bindEl() with a model with custom render', () => {
-        assert.expect(2);
-
+    test('#bindEl() with a model with custom render', async () => {
         const model = new Viking.Model();
         const view = new Viking.View({ model });
 
-        view.$ = (selector) => {
-            assert.equal(selector, '.name');
-            return {
-                html: (html) => { assert.equal(html, 'Name: Dr. DJ'); }
+        await new Promise((resolve) => {
+            view.$ = (selector) => {
+                assert.equal(selector, '.name');
+                return {
+                    html: (html) => {
+                        assert.equal(html, 'Name: Dr. DJ');
+                        resolve();
+                    }
+                };
             };
-        };
 
-        view.bindEl('name', '.name', (model) => 'Name: ' + model.get('name'));
-        model.set('name', 'Dr. DJ');
+            view.bindEl('name', '.name', (model) => 'Name: ' + model.get('name'));
+            model.set('name', 'Dr. DJ');
+        });
     });
 
 });
-

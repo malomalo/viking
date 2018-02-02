@@ -16,7 +16,7 @@ export const Collection = Backbone.Collection.extend({
     // Set the default model to a generic Viking.Model
     model: Model,
 
-    constructor(models, options) {
+    constructor: function (models, options) {
         Backbone.Collection.call(this, models, options);
 
         if (options && options.predicate) {
