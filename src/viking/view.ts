@@ -1,5 +1,5 @@
-import * as _ from 'underscore';
 import * as Backbone from 'backbone';
+import * as _ from 'underscore';
 
 import { Helpers } from './view/helpers';
 
@@ -12,14 +12,13 @@ export const View = Backbone.View.extend({
 
     template: undefined,
 
-    renderTemplate: function (locals) {
+    renderTemplate(locals) {
         return Helpers.render(this.template, locals);
     },
 
-    //Copied constructor from Backbone View
-    constructor: function (options) {
+    // Copied constructor from Backbone View
+    constructor(options: any = {}) {
         this.cid = _.uniqueId('view');
-        options || (options = {});
         _.extend(this, _.pick(options, ['model', 'collection', 'el', 'id', 'attributes', 'className', 'tagName', 'events']));
         this._ensureElement();
 
@@ -31,8 +30,8 @@ export const View = Backbone.View.extend({
     },
 
     // A helper method that constructs a view and adds it to the subView array
-    subView: function (SubView, options) {
-        var view = new SubView(options);
+    subView(SubView, options) {
+        const view = new SubView(options);
         this.subViews.push(view);
         this.listenTo(view, 'remove', this.removeSubView);
         return view;
@@ -40,7 +39,7 @@ export const View = Backbone.View.extend({
 
     // Removes the subview from the array and stop listening to it, and calls
     // #remove on the subview.
-    removeSubView: function (view) {
+    removeSubView(view) {
         this.subViews = _.without(this.subViews, view);
         this.stopListening(view);
         view.remove();
@@ -49,7 +48,7 @@ export const View = Backbone.View.extend({
     // Remove all subviews when remove this view. We don't call stopListening
     // here because this view is being removed anyways so those will get cleaned
     // up by Backbone.
-    remove: function () {
+    remove() {
         while (this.subViews.length > 0) {
             this.subViews.pop().remove();
         }
@@ -65,21 +64,28 @@ export const View = Backbone.View.extend({
     // renders the new value to el. Optionally, pass render function to render 
     // something different, model is passed as an arg
     // TODO: document me
-    bindEl: function (attributes, selector, render) {
-        var view = this;
-        render || (render = function (model) { return model.get(attributes); });
-        if (!_.isArray(attributes)) { attributes = [attributes]; }
+    bindEl(attributes: string[], selector, render?) {
+        const view = this;
 
-        //TODO: might want to Debounce because of some inputs being very rapid
+        if (!render) {
+            render = (model) => model.get(attributes);
+        }
+
+        if (!_.isArray(attributes)) {
+            attributes = [attributes];
+        }
+
+        // TODO: might want to Debounce because of some inputs being very rapid
         // but maybe that should be left up to the user changes (ie textareas like description)
-        _.each(attributes, function (attribute) {
-            view.listenTo(view.model, 'change:' + attribute, function (model) {
+        attributes.forEach((attribute) => {
+            view.listenTo(view.model, 'change:' + attribute, (model) => {
                 view.$(selector).html(render(model));
             });
         });
+
     }
 
-    //TODO: Default render can just render template
+    // TODO: Default render can just render template
 }, {
 
         // `Viking.View.templates` is used for storing templates. 
@@ -88,7 +94,7 @@ export const View = Backbone.View.extend({
         templates: {},
 
         // Override the original extend function to support merging events
-        extend: function (protoProps, staticProps) {
+        extend(protoProps, staticProps) {
             if (protoProps && protoProps.events) {
                 _.defaults(protoProps.events, this.prototype.events);
             }
