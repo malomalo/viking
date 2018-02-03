@@ -5,7 +5,7 @@ import { Viking } from '../viking';
 
 export const Router = Backbone.Router.extend({
 
-    route: function (route, name, callback) {
+    route(route, name, callback) {
         var router, controller, action;
 
         if (!_.isRegExp(route)) {
@@ -15,28 +15,39 @@ export const Router = Backbone.Router.extend({
                 route = this._routeToRegExp(route);
             }
         }
-
+// console.log(route, name, callback);
         if (_.isFunction(name)) {
             callback = name;
             name = '';
         } else if (_.isString(name) && name.match(/^(\w+)#(\w+)$/)) {
             controller = /^(\w+)#(\w+)$/.exec(name);
             action = controller[2];
-            controller = controller[1];
-            callback = { controller: controller, action: action };
+            controller = window[controller[1]];
+            callback = { controller, action };
+        } else if (Array.isArray(name)) {
+            controller = typeof name[0] === 'string' ? window[name[0]] : name[0];
+            action = name[1];
+            name = name[2] || '';
+            callback = { controller, action };
         } else if (_.isObject(name)) {
-            // TODO: maybe this should be Controller::action since it's not
-            // an instance method
-            controller = /^(\w+)#(\w+)$/.exec(name.to);
-            action = controller[2];
-            controller = controller[1];
+
+            if (typeof name.to === 'string') {
+                // TODO: maybe this should be Controller::action since it's not
+                // an instance method
+                controller = /^(\w+)#(\w+)$/.exec(name.to);
+                action = controller[2];
+                controller = window[controller[1]];
+            } else {
+                controller = name.to.controller;
+                action = name.to.action;
+            }
             name = name.name;
 
-            callback = { controller: controller, action: action };
+            callback = { controller, action };
         }
 
         if (!callback) { callback = this[name]; }
-
+// console.log(name, callback);
         router = this;
         Backbone.history.route(route, function (fragment) {
             var Controller;
@@ -48,8 +59,8 @@ export const Router = Backbone.Router.extend({
 
             if (_.isFunction(callback)) {
                 callback.apply(router, args);
-            } else if (window[callback.controller]) {
-                Controller = window[callback.controller];
+            } else if (callback.controller) {
+                Controller = callback.controller;
 
                 if (Controller.__super__ === Viking.Controller.prototype) {
                     if (!(current_controller instanceof Controller)) {
@@ -65,7 +76,7 @@ export const Router = Backbone.Router.extend({
                     Viking.controller[callback.action].apply(Viking.controller, args);
                 }
             }
-
+// console.log('route:' + name)
             router.trigger.apply(router, ['route:' + name].concat(args));
             router.trigger('route', name, args);
             Backbone.history.trigger('route', router, name, args);
@@ -74,19 +85,19 @@ export const Router = Backbone.Router.extend({
     },
 
     // Calls Backbone.history.start, with the default options {pushState: true}
-    start: function (options) {
+    start(options) {
         options = _.extend({ pushState: true }, options);
 
         return Backbone.history.start(options);
     },
 
-    stop: function () {
+    stop() {
         Backbone.history.stop();
     },
 
-    navigate: function (fragment, args) {
-        var root_url = window.location.protocol + '//' + window.location.host;
-        if (fragment.indexOf(root_url) === 0) { fragment = fragment.replace(root_url, ''); }
+    navigate(fragment, args) {
+        const rootUrl = window.location.protocol + '//' + window.location.host;
+        if (fragment.indexOf(rootUrl) === 0) { fragment = fragment.replace(rootUrl, ''); }
 
         Backbone.Router.prototype.navigate.call(this, fragment, args);
     }
