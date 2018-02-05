@@ -1,0 +1,61 @@
+import * as Backbone from 'backbone';
+import 'qunit';
+import * as sinon from 'sinon';
+
+const { module, test, assert } = QUnit;
+
+import { Viking } from '../../../../../viking';
+
+module('Viking.View.Helpers#timeTag', {}, () => {
+
+    // // timeTag(date, [options], [value])
+    // // =================================
+    test("timeTag(date)", function() {
+        var date = new Date(1395441025655);
+        
+        assert.equal(Viking.View.Helpers.timeTag(date), '<time datetime="2014-03-21T22:30:25.655Z">'+date.toString()+'</time>');
+    });
+    
+    test("timeTag(date, content)", function() {
+        var date = new Date(1395441025655);
+        
+        assert.equal(Viking.View.Helpers.timeTag(date, 'Yesterday'), '<time datetime="2014-03-21T22:30:25.655Z">Yesterday</time>');
+    });
+    
+    test("timeTag(date, options, content)", function() {
+        var date = new Date(1395441025655);
+        
+        assert.equal(Viking.View.Helpers.timeTag(date, {item: 'two'}, 'Yesterday'), '<time datetime="2014-03-21T22:30:25.655Z" item="two">Yesterday</time>');
+    });
+    
+    test("timeTag(date, {pubdate: true})", function() {
+        var date = new Date(1395441025655);
+        
+        assert.equal(Viking.View.Helpers.timeTag(date, {pubdate: true}), '<time datetime="2014-03-21T22:30:25.655Z" pubdate>'+date.toString()+'</time>');
+    });
+    
+    test("timeTag(date, {datetime: 'myvalue'})", function() {
+        var date = new Date(1395441025655);
+        
+        assert.equal(Viking.View.Helpers.timeTag(date, {datetime: 'myvalue'}), '<time datetime="myvalue">'+date.toString()+'</time>');
+    });
+
+    test("timeTag(date, options, content{format: 'myformat'})", function() {
+        var date = new Date(1395441025655);
+
+        assert.equal(Viking.View.Helpers.timeTag(date, {format: '%Y %m %d'}), '<time datetime="2014-03-21T22:30:25.655Z">2014 03 21</time>');
+    });
+    
+    test("timeTag(date, contentFunc)", function() {
+        var date = new Date(1395441025655);
+        
+        assert.equal(Viking.View.Helpers.timeTag(date, function() { return 'data'; }), '<time datetime="2014-03-21T22:30:25.655Z">data</time>');
+    });
+    
+    test("timeTag(date, options, contentFunc)", function() {
+        var date = new Date(1395441025655);
+        
+        assert.equal(Viking.View.Helpers.timeTag(date, {item: 'two'}, function() { return 'data'; }), '<time datetime="2014-03-21T22:30:25.655Z" item="two">data</time>');
+    });
+    
+});
