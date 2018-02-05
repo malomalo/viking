@@ -36,20 +36,15 @@ module('Viking.PaginatedCollection', {}, () => {
         });
     });
 
-    test("cursorChanged doesn't get called when not needed", async () => {
-        await new Promise((resolve) => {    
-    
-            var collection = Viking.PaginatedCollection.extend({
-                cursorChanged: function() {
-                    assert.ok(true);
-                    resolve();
-                }
-            });
-            var pc = new collection();
-    
-            pc.cursor.set('total_pages', 4);
+    test("cursorChanged doesn't get called when not needed", function() {
+        var collection = Viking.PaginatedCollection.extend({
+            cursorChanged: function() {
+                assert.ok(false);
+            }
         });
+        var pc = new collection();
 
+        pc.cursor.set('total_pages', 4);
     });
 
     // Predicate -----------------------------------------------------------------
@@ -116,21 +111,22 @@ module('Viking.PaginatedCollection', {}, () => {
 
     // sync() --------------------------------------------------------------------
     test("sync() adds in cursor params", async () => {
-        await new Promise((resolve) => {
-    
-            var m = Viking.Model.extend('model');
-            var c = Viking.PaginatedCollection.extend({model: m});
-            var c = new c([]);
-    
-            var old = Viking.sync;
-            Viking.sync = function(method, model, options) {
-                assert.equal(40, options.data.limit);
-                assert.equal(40, options.data.offset);
-                resolve();
-            }
-            c.cursor.set({page: 2, per_page: 40});
-            Viking.sync = old;
-        });
+        assert.ok(false);
+        // TODO
+        // await new Promise((resolve) => {
+        //     var m = Viking.Model.extend('model');
+        //     var c = Viking.PaginatedCollection.extend({model: m});
+        //     var c = new c([]);
+        //
+        //     var old = Viking.sync;
+        //     Viking.sync = function(method, model, options) {
+        //         assert.equal(40, options.data.limit);
+        //         assert.equal(40, options.data.offset);
+        //         resolve();
+        //     }
+        //     c.cursor.set({page: 2, per_page: 40});
+        //     Viking.sync = old;
+        // });
     });
 
 });

@@ -96,17 +96,14 @@ module('Viking.Collection', {}, () => {
         });
     });
 
-    test("select(model) triggers a 'selected' event on collection only if change", async () => {
-        await new Promise((resolve) => {
-            var c = new Viking.Collection([{}]);
-            c.models[0].selected = true;
-            c.on('selected', function() {
-                assert.ok(true);
-                resolve();
-            });
-            c.select(c.models[0]);
-            c.off('selected');
+    test("select(model) triggers a 'selected' event on collection only if change", function() {
+        var c = new Viking.Collection([{}]);
+        c.models[0].selected = true;
+        c.on('selected', function() {
+            assert.ok(false);
         });
+        c.select(c.models[0]);
+        c.off('selected');
     });
 
     test("model.unselect() triggers a 'unselected' event on collection", async () => {
@@ -124,17 +121,13 @@ module('Viking.Collection', {}, () => {
         });
     });
 
-    test("model.unselect() triggers a 'unselected' event on collection only if change", async () => {
-        await new Promise((resolve) => {
-    
-            var c = new Viking.Collection([{}]);
-            c.on('unselected', function() {
-                assert.ok(true);
-                resolve();
-            });
-            c.models[0].select(c.models[0]);
-            c.off('unselected');
+    test("model.unselect() triggers a 'unselected' event on collection only if change", function () {
+        var c = new Viking.Collection([{}]);
+        c.on('unselected', function() {
+            assert.ok(true);
         });
+        c.models[0].select(c.models[0]);
+        c.off('unselected');
     });
 
     test("selected() only returns selected models", function() {
@@ -182,14 +175,17 @@ module('Viking.Collection', {}, () => {
 
     test("decrementPage options get passed to callbacks", async () => {
         await new Promise((resolve) => {
+            var resolves = new Array;
             var c = new Viking.Cursor();
             c.on('change', function(model, options) {
                 assert.deepEqual({remove: false}, options);
-                resolve(); //TODO check other callbvack
+                resolves.push('t');
+                if(resolves.length == 2) resolve();
             });
             c.on('change:page', function(model, value, options) {
                 assert.deepEqual({remove: false}, options);
-                resolve(); //TODO check other callbvack
+                resolves.push('t');
+                if(resolves.length == 2) resolve();
             });
             c.decrementPage({remove: false});
             c.off('change');
@@ -200,6 +196,7 @@ module('Viking.Collection', {}, () => {
     // set -----------------------------------------------------------------------
     test("predicate.set() options get passed to predicateChanged", async () => {
         await new Promise((resolve) => {
+            var resolves = new Array;
 
             var f = new Viking.Predicate();
             var m = Viking.Model.extend('model');
@@ -207,18 +204,21 @@ module('Viking.Collection', {}, () => {
                 model: m,
                 predicateChanged: function(model, options) {
                     assert.deepEqual({remove: false}, options);
-                    resolve(); //TODO check other callback
+                    resolves.push('t');
+                    if(resolves.length == 3) resolve();
                 }
             });
             var c = new c([], {predicate: f});
 
             f.on('change', function(model, options) {
                 assert.deepEqual({remove: false}, options);
-                resolve(); //TODO check other callback
+                resolves.push('t');
+                if(resolves.length == 3) resolve();
             });
             f.on('change:query', function(model, value, options) {
                 assert.deepEqual({remove: false}, options);
-                resolve(); //TODO check other callback
+                resolves.push('t');
+                if(resolves.length == 3) resolve();
             });
             f.set('query', 'Дорогой', {remove: false});
             f.off('change');
