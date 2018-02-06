@@ -203,7 +203,9 @@ module('Viking.Router', {
 
     test('routing to a Viking.Controller then to another route changes the controller', () => {
         const Controller = Viking.Controller.extend();
-        const BController = Viking.Controller.extend();
+        const BController = Viking.Controller.extend({
+            action: () => undefined
+        });
         const Another = {};
         const router = new (Viking.Router.extend({
             routes: {
@@ -211,7 +213,8 @@ module('Viking.Router', {
                 'another': [Another, 'action', 'another'],
                 'b': [BController, 'action', 'b'],
                 'closure': () => undefined,
-                'func': 'func'
+                'func': 'func',
+                'other': { to: 'Other#action', name: 'other' }
             },
 
             func() { }
@@ -221,15 +224,15 @@ module('Viking.Router', {
         assert.ok(Viking.controller instanceof Viking.Controller);
 
         Backbone.history.handlers[0].callback('');
-        Backbone.history.handlers[1].callback('b');
+        Backbone.history.handlers[2].callback('b');
         assert.ok(Viking.controller instanceof BController);
 
         Backbone.history.handlers[0].callback('');
-        Backbone.history.handlers[2].callback('other');
+        Backbone.history.handlers[5].callback('other');
         assert.equal(undefined, Viking.controller);
 
         Backbone.history.handlers[0].callback('');
-        Backbone.history.handlers[3].callback('another');
+        Backbone.history.handlers[1].callback('another');
         assert.equal(Another, Viking.controller);
 
         Backbone.history.handlers[0].callback('');
@@ -237,7 +240,7 @@ module('Viking.Router', {
         assert.equal(undefined, Viking.controller);
 
         Backbone.history.handlers[0].callback('');
-        Backbone.history.handlers[5].callback('closure');
+        Backbone.history.handlers[3].callback('closure');
         assert.equal(undefined, Viking.controller);
 
         router.cleanup();

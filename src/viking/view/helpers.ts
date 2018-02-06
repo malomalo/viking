@@ -53,7 +53,8 @@ import {
 
 import {
     linkTo,
-    mailTo
+    mailTo,
+    urlFor
 } from './helpers/url_helpers';
 
 import { imageTag } from './helpers/asset_helpers/image_tag';
@@ -100,6 +101,7 @@ export const Helpers = {
     textField,
     textFieldTag,
     timeAgoInWords: distanceOfTimeInWords,
-    timeTag
+    timeTag,
+    urlFor
 
-}
+};

@@ -343,10 +343,8 @@ export const Model = Backbone.Model.extend({
     // Override [Backbone.Model#sync](http://backbonejs.org/#Model-sync).
     // [Ruby on Rails](http://rubyonrails.org/) expects the attributes to be
     // namespaced
-    sync: function (method, model, options) {
-        options || (options = {});
-
-        if (options.data == null && (method === 'create' || method === 'update' || method === 'patch')) {
+    sync: function (method, model, options: any = {}) {
+        if (!options.data && (method === 'create' || method === 'update' || method === 'patch')) {
             options.contentType = 'application/json';
             options.data = {};
             options.data[_.result(model, 'paramRoot')] = (options.attrs || model.toJSON(options));

@@ -1,5 +1,5 @@
-import * as _ from 'underscore';
 import * as Backbone from 'backbone';
+import * as _ from 'underscore';
 
 export const Controller = Backbone.Model.extend({
 
@@ -33,18 +33,17 @@ export const Controller = Backbone.Model.extend({
         // as a key
         //
         // `name` is optional, and must be a string
-        extend: function (controllerName, protoProps, staticProps) {
+        extend: function (controllerName, protoProps: any = {}, staticProps) {
             if (typeof controllerName !== 'string') {
                 staticProps = protoProps;
                 protoProps = controllerName;
             }
-            protoProps || (protoProps = {});
 
-            var child = Backbone.Model.extend.call(this, protoProps, staticProps);
+            const child = Backbone.Model.extend.call(this, protoProps, staticProps);
 
             if (typeof controllerName === 'string') { child.controllerName = controllerName; }
 
-            _.each(protoProps, function (value, key) {
+            _.each(protoProps, (value, key) => {
                 if (typeof value === 'function') { child.prototype[key].controller = child; }
             });
 

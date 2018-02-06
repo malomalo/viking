@@ -10,11 +10,11 @@ import { toParam } from './support';
 // -------------
 // Override Backbone.sync to process data for the ajax request with 
 // +toParam()+ as opposed to letting jQuery automatically call $.param().
-export function sync(method: string, model: any, options: any) {
+export function sync(method: string, model: any, options: any = {}) {
   var type = methodMap[method];
 
   // Default options, unless specified.
-  _.defaults(options || (options = {}), {
+  _.defaults(options, {
     emulateHTTP: Backbone.emulateHTTP,
     emulateJSON: Backbone.emulateJSON
   });
@@ -28,7 +28,7 @@ export function sync(method: string, model: any, options: any) {
   }
 
   // Ensure that we have the appropriate request data.
-  if (options.data == null && model && (method === 'create' || method === 'update' || method === 'patch')) {
+  if (!options.data && model && (method === 'create' || method === 'update' || method === 'patch')) {
     params.contentType = 'application/json';
     params.data = JSON.stringify(options.attrs || model.toJSON(options));
   }

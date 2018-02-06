@@ -9,13 +9,13 @@ let xhr: any;
 let requests: any[] = [];
 
 module('Viking.sync', {
+    afterEach() {
+        xhr.restore();
+    },
     beforeEach() {
         requests = [];
         xhr = sinon.useFakeXMLHttpRequest();
         xhr.onCreate = (xhr: any) => requests.push(xhr);
-    },
-    afterEach() {
-        xhr.restore();
     }
 }, () => {
 

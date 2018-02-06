@@ -36,6 +36,7 @@ import { Helpers, View } from './viking/view';
 export const Viking: any = {
     ajax,
     sync,
+    urlFor: Helpers.urlFor,
 
     ArgumentError,
     Collection,

@@ -33,12 +33,19 @@ export const PaginatedCollection = Collection.extend({
         return attrs;
     },
 
-    sync: function (method, model, options) {
+    sync(method, model, options: any = {}) {
         if (method === 'read') {
-            options.data || (options.data = {});
+            if (!options.data) {
+                options.data = {};
+            }
+
             options.data.limit = model.cursor.limit();
             options.data.offset = model.cursor.offset();
-            options.headers || (options.headers = {});
+
+            if (!options.headers) {
+                options.headers = {};
+            }
+
             options.headers['Total-Count'] = 'true';
         }
         return Collection.prototype.sync.call(this, method, model, options);

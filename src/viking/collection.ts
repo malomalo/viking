@@ -1,9 +1,9 @@
 import * as Backbone from 'backbone';
 import * as _ from 'underscore';
 
+import { Viking } from '../viking';
 import { Model } from './model';
 import { Predicate } from './predicate';
-import { sync } from './sync';
 
 // Viking.Collection
 // -----------------
@@ -136,17 +136,21 @@ export const Collection = Backbone.Collection.extend({
     // TODO: testme?
     sync(method, model, options: any = {}) {
         if (method === 'read' && this.predicate) {
+            if (!options.data) {
+                options.data = {};
+            }
+
             options.data.where = this.predicate.attributes;
         }
 
         if (method === 'read' && this.ordering) {
-            if (options.data) {
+            if (!options.data) {
                 options.data = {};
             }
             options.data.order = this.ordering;
         }
 
-        return sync.apply(this, arguments);
+        return Viking.sync.apply(this, arguments);
     },
 
     // If a order is set it's paramaters will be passed under the

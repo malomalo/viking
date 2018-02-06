@@ -1,14 +1,14 @@
-import * as _ from 'underscore';
 import * as Backbone from 'backbone';
+import * as _ from 'underscore';
 
 export const Cursor = Backbone.Model.extend({
 
     defaults: {
-        "page": 1,
-        "per_page": 25
+        page: 1,
+        per_page: 25
     },
 
-    reset: function (options) {
+    reset(options) {
         this.set({
             page: 1
         }, { silent: true });
@@ -18,34 +18,34 @@ export const Cursor = Backbone.Model.extend({
         }
     },
 
-    incrementPage: function (options) {
+    incrementPage(options) {
         this.set('page', this.get('page') + 1, options);
     },
 
-    decrementPage: function (options) {
+    decrementPage(options) {
         this.set('page', this.get('page') - 1, options);
     },
 
-    goToPage: function (pageNumber, options) {
+    goToPage(pageNumber, options) {
         this.set('page', pageNumber, options);
     },
 
-    limit: function () {
+    limit() {
         return this.get('per_page');
     },
 
-    offset: function () {
+    offset() {
         return this.get('per_page') * (this.get('page') - 1);
     },
 
-    totalPages: function () {
+    totalPages() {
         return Math.ceil(this.get('total_count') / this.limit());
     },
 
-    requiresRefresh: function () {
-        var changedAttributes = this.changedAttributes();
+    requiresRefresh() {
+        const changedAttributes = this.changedAttributes();
         if (changedAttributes) {
-            var triggers = ['page', 'per_page'];
+            const triggers = ['page', 'per_page'];
             return (_.intersection(_.keys(changedAttributes), triggers).length > 0);
         }
 
