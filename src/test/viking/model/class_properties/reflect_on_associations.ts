@@ -13,18 +13,30 @@ module('Viking.Model::reflectOnAssociations', {}, () => {
         let Ship = Viking.Model.extend({ hasMany: ['ships'], belongsTo: [['carrier', {modelName: 'Ship'}]] });
         let ShipCollection = Viking.Collection.extend({ model: Ship });
         
+        Viking.context['Ship'] = Ship;
+        Viking.context['ShipCollection'] = ShipCollection;
+
         assert.ok(false);
         // TODO can't access association because not in global space
         // assert.deepEqual(['carrier', 'ships'], _.map(Ship.reflectOnAssociations(), function(a) { return a.name; }));
+
+        delete Viking.context['Ship'];
+        delete Viking.context['ShipCollection'];
     });
     
     test("::reflectOnAssociations(macro) returns all macro assocations", function() {
         let Ship = Viking.Model.extend({ hasMany: ['ships'], belongsTo: [['carrier', {modelName: 'Ship'}]] });
         let ShipCollection = Viking.Collection.extend({ model: Ship });
-        
+
+        Viking.context['Ship'] = Ship;
+        Viking.context['ShipCollection'] = ShipCollection;
+
         assert.ok(false);
         // TODO can't access association because not in global space
         // assert.deepEqual(['ships'], _.map(Ship.reflectOnAssociations('hasMany'), function(a) { return a.name; }));
+
+        delete Viking.context['Ship'];
+        delete Viking.context['ShipCollection'];
     });
 
 });

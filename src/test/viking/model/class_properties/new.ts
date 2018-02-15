@@ -71,7 +71,7 @@ module('Viking.Model::new', {}, () => {
         const ShipCollection = Viking.Collection.extend({ model: Ship });
 
         Viking.context['Ship'] = Ship;
-        Viking.context['MyCollection'] = ShipCollection;
+        Viking.context['ShipCollection'] = ShipCollection;
 
         const a = new Ship({ ships: [{}, {}] });
         assert.ok(a.get('ships') instanceof ShipCollection);
@@ -95,9 +95,15 @@ module('Viking.Model::new', {}, () => {
         const Ship = Viking.Model.extend('ship', { hasMany: ['ships'] });
         const ShipCollection = Viking.Collection.extend({ model: Ship });
 
+        Viking.context['Ship'] = Ship;
+        Viking.context['ShipCollection'] = ShipCollection;
+
         const a = new Ship();
         assert.ok(a.get('ships') instanceof ShipCollection);
         assert.equal(a.get('ships').length, 0);
+
+        delete Viking.context['Ship'];
+        delete Viking.context['ShipCollection'];
     });
 
     // STI
@@ -111,19 +117,31 @@ module('Viking.Model::new', {}, () => {
 
     test('::new(attrs) on model sets the type if there are submodels', () => {
         const Account = Viking.Model.extend('account');
+        Viking.context['Account'] = Account;
+
         const Agent = Account.extend('agent');
+        Viking.context['Agent'] = Agent;
 
         const account = new Account();
         assert.equal('Account', account.get('type'));
+
+        delete Viking.context['Agent'];
+        delete Viking.context['Account'];
     });
 
     test('::new(attrs) with type set to a sub-type returns subtype', () => {
         const Account = Viking.Model.extend('account');
+        Viking.context['Account'] = Account;
+
         const Agent = Account.extend('agent');
+        Viking.context['Agent'] = Agent;
 
         const agent = new Account({ type: 'agent' });
         assert.ok(agent instanceof Agent);
         assert.ok(agent instanceof Account);
+
+        delete Viking.context['Agent'];
+        delete Viking.context['Account'];
     });
 
     test('::new() with default type', () => {
@@ -132,10 +150,16 @@ module('Viking.Model::new', {}, () => {
                 type: 'agent'
             }
         });
+        Viking.context['Account'] = Account;
+
         const Agent = Account.extend('agent');
+        Viking.context['Agent'] = Agent;
 
         const agent = new Account();
         assert.ok(agent instanceof Agent);
+
+        delete Viking.context['Agent'];
+        delete Viking.context['Account'];
     });
 
 });

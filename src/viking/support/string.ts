@@ -136,13 +136,13 @@ export function singularize(value: string) {
 //
 // Viking.NameError is raised when the variable is unknown.
 export function constantize(value: string, lookupContext?: any): any {
-    return _.reduce(value.split('.'), (context, name) => {
-        const v = context[name];
+    return _.reduce(value.split('.'), (ctx, name) => {
+        const v = ctx[name];
         if (!v) {
             throw new NameError('uninitialized variable ' + name);
         }
         return v;
-    }, lookupContext || context);
+    }, lookupContext ? lookupContext : context);
 }
 
 // Removes the module part from the expression in the string.

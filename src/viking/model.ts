@@ -54,7 +54,9 @@ export const Model = Backbone.Model.extend({
                 // slow and unavoidably slows down subsequent execution in modern
                 // JavaScript implementations
                 // Ideas: Move to Model.new(...) method of initializing models
-                var type = attrs[this.inheritanceAttribute].camelize().constantize();
+                const type = string.constantize(
+                    string.camelize(attrs[this.inheritanceAttribute])
+                );
                 this.constructor = type;
                 this.__proto__ = type.prototype;
             }
@@ -103,7 +105,7 @@ export const Model = Backbone.Model.extend({
                 attrs[association.name + '_id'] = attrs[association.name].id;
                 attrs[association.name + '_type'] = attrs[association.name].modelName.name;
             } else if (polymorphic && attrs[association.name + '_type']) {
-                Type = attrs[association.name + '_type'].camelize().constantize();
+                Type = string.constantize(string.camelize(attrs[association.name + '_type']));
                 attrs[association.name] = new Type(attrs[association.name]);
             } else if (!(attrs[association.name] instanceof association.klass())) {
                 Type = association.klass();
@@ -285,7 +287,7 @@ export const Model = Backbone.Model.extend({
             // slow and unavoidably slows down subsequent execution in modern
             // JavaScript implementations
             // Ideas: Move to Model.new(...) method of initializing models
-            var type = attrs[this.inheritanceAttribute].camelize().constantize();
+            const type = string.constantize(string.camelize(attrs[this.inheritanceAttribute]));
             this.constructor = type;
             this.__proto__ = type.prototype;
             this.modelName = type.modelName;
@@ -513,6 +515,7 @@ export const Model = Backbone.Model.extend({
             if (typeof name !== 'string') {
                 staticProps = protoProps;
                 protoProps = name;
+                name = '';
             }
             protoProps || (protoProps = {});
 
@@ -644,7 +647,6 @@ export const Model = Backbone.Model.extend({
 
     }
 );
-
 
 export {
     Name,

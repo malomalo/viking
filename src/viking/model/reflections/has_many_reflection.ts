@@ -14,7 +14,7 @@ export const HasManyReflection = Reflection.extend({
         if (this.options.modelName) {
             this.modelName = new Name(this.options.modelName);
         } else {
-            this.modelName = new Name(singularize(this.name.singularize));
+            this.modelName = new Name(singularize(this.name));
         }
 
         if (this.options.collectionName) {

@@ -11,9 +11,8 @@ module('Viking.Model.BelongsToReflection::new', {}, () => {
 
     test("::new('parent')", function() {
         let Parent = Viking.Model.extend();
-        
         var assocation = new Viking.Model.BelongsToReflection('parent');
-        
+
         assert.equal(assocation.name, 'parent');
         assert.equal(assocation.macro, 'belongsTo');
         assert.deepEqual(assocation.options, {});

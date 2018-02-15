@@ -420,7 +420,7 @@ module('Viking.Router', {
                 resolve();
                 return this;
             };
-            router.navigate(Viking.context.location.protocol + '//' + Viking.context.location.host + '/path', 'arguments');
+            router.navigate(window.location.protocol + '//' + window.location.host + '/path', 'arguments');
 
             Backbone.Router.prototype.navigate = oldnavigate;
         });
