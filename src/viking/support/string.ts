@@ -1,6 +1,7 @@
 import * as _ from 'underscore';
 import 'underscore.inflection';
 
+import { context } from '../context';
 import { NameError } from '../errors';
 
 // Converts the first character to uppercase
@@ -134,19 +135,15 @@ export function singularize(value: string) {
 //     'Unit'.constantize(Test) # => Test.Unit
 //
 // Viking.NameError is raised when the variable is unknown.
-export function constantize(value: string, context?: any): any {
-    if (!context) {
-        context = window;
-    }
-
-    return _.reduce(value.split('.'), function (context, name) {
-        var v = context[name];
+export function constantize(value: string, lookupContext?: any): any {
+    return _.reduce(value.split('.'), (context, name) => {
+        const v = context[name];
         if (!v) {
-            throw new NameError("uninitialized variable " + name);
+            throw new NameError('uninitialized variable ' + name);
         }
         return v;
-    }, context);
-};
+    }, lookupContext || context);
+}
 
 // Removes the module part from the expression in the string.
 //

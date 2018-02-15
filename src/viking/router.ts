@@ -2,6 +2,7 @@ import * as _ from 'underscore';
 import * as Backbone from 'backbone';
 
 import { Viking } from '../viking';
+import { context } from './context';
 
 export const Router = Backbone.Router.extend({
 
@@ -22,10 +23,10 @@ export const Router = Backbone.Router.extend({
         } else if (_.isString(name) && name.match(/^(\w+)#(\w+)$/)) {
             controller = /^(\w+)#(\w+)$/.exec(name);
             action = controller[2];
-            controller = window[controller[1]];
+            controller = context[controller[1]];
             callback = { controller, action };
         } else if (Array.isArray(name)) {
-            controller = typeof name[0] === 'string' ? window[name[0]] : name[0];
+            controller = typeof name[0] === 'string' ? context[name[0]] : name[0];
             action = name[1];
             name = name[2] || '';
             callback = { controller, action };
@@ -36,7 +37,7 @@ export const Router = Backbone.Router.extend({
                 // an instance method
                 controller = /^(\w+)#(\w+)$/.exec(name.to);
                 action = controller[2];
-                controller = window[controller[1]];
+                controller = context[controller[1]];
             } else {
                 controller = name.to.controller;
                 action = name.to.action;

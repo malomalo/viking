@@ -45,14 +45,14 @@ module('Viking.Model::new', {}, () => {
         const Ship = Viking.Model.extend({ hasMany: [['ships', { collectionName: 'MyCollection' }]] });
         const MyCollection = Viking.Collection.extend();
 
-        window['Ship'] = Ship;
-        window['MyCollection'] = MyCollection;
+        Viking.context['Ship'] = Ship;
+        Viking.context['MyCollection'] = MyCollection;
 
         const myship = new Ship();
         assert.strictEqual(myship.associations, Ship.associations);
 
-        delete window['Ship'];
-        delete window['MyCollection'];
+        delete Viking.context['Ship'];
+        delete Viking.context['MyCollection'];
     });
 
     test('::new(attrs) does coercions', () => {
@@ -70,25 +70,25 @@ module('Viking.Model::new', {}, () => {
         const Ship = Viking.Model.extend({ hasMany: ['ships'] });
         const ShipCollection = Viking.Collection.extend({ model: Ship });
 
-        window['Ship'] = Ship;
-        window['MyCollection'] = ShipCollection;
+        Viking.context['Ship'] = Ship;
+        Viking.context['MyCollection'] = ShipCollection;
 
         const a = new Ship({ ships: [{}, {}] });
         assert.ok(a.get('ships') instanceof ShipCollection);
         assert.equal(a.get('ships').length, 2);
         assert.ok(a.get('ships').first() instanceof Ship);
 
-        delete window['Ship'];
-        delete window['ShipCollection'];
+        delete Viking.context['Ship'];
+        delete Viking.context['ShipCollection'];
     });
 
     test('::new(attrs) coerces belongsTo relations', () => {
         const Ship = Viking.Model.extend({ belongsTo: ['ship'] });
 
-        window['Ship'] = Ship;
+        Viking.context['Ship'] = Ship;
         const a = new Ship({ ship: {} });
         assert.ok(a.get('ship') instanceof Ship);
-        delete window['Ship'];
+        delete Viking.context['Ship'];
     });
 
     test('::new(attrs) sets hasMany relations to an empty collection if not in attrs', () => {

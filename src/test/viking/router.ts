@@ -57,7 +57,7 @@ module('Viking.Router', {
 
     test('routes to a controller and action (normal obj)', async () => {
         await new Promise((resolve) => {
-            window['Controller'] = Viking.Controller.extend({
+            Viking.context['Controller'] = Viking.Controller.extend({
                 action: () => {
                     assert.ok(true);
                     resolve();
@@ -75,7 +75,7 @@ module('Viking.Router', {
             assert.ok(Backbone.history.handlers[0].route.test(''));
             Backbone.history.handlers[0].callback('');
             router.cleanup();
-            delete window['Controller'];
+            delete Viking.context['Controller'];
         });
     });
 
@@ -283,7 +283,7 @@ module('Viking.Router', {
 
     test('routes with a string', async () => {
         await new Promise((resolve) => {
-            window['Controller'] = {
+            Viking.context['Controller'] = {
                 action: () => {
                     assert.ok(true);
                     resolve();
@@ -302,7 +302,7 @@ module('Viking.Router', {
             router.cleanup();
         });
 
-        delete window['Controller'];
+        delete Viking.context['Controller'];
     });
 
     test('router.start() starts Backbone.history', async () => {
@@ -420,7 +420,7 @@ module('Viking.Router', {
                 resolve();
                 return this;
             };
-            router.navigate(window.location.protocol + '//' + window.location.host + '/path', 'arguments');
+            router.navigate(Viking.context.location.protocol + '//' + Viking.context.location.host + '/path', 'arguments');
 
             Backbone.Router.prototype.navigate = oldnavigate;
         });

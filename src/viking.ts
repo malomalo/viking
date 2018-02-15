@@ -8,6 +8,7 @@
 // -------------
 
 import { Collection } from './viking/collection';
+import { context } from './viking/context';
 import { Controller } from './viking/controller';
 import { Cursor } from './viking/cursor';
 import { ArgumentError, NameError } from './viking/errors';
@@ -35,6 +36,7 @@ import { Helpers, View } from './viking/view';
 
 export const Viking: any = {
     ajax,
+    context,
     sync,
     urlFor: Helpers.urlFor,
 

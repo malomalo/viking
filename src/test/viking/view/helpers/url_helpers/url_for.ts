@@ -131,8 +131,8 @@ module('Viking.View.Helpers#urlFor', {}, () => {
         const Workshop = Viking.Model.extend('workshop');
         const workshopPath = (m) => '/workshops/' + m.toParam();
 
-        window['Workshop'] = Workshop;
-        window['workshopPath'] = Workshop;
+        Viking.context['Workshop'] = Workshop;
+        Viking.context['workshopPath'] = Workshop;
 
         assert.equal(
             Viking.urlFor(new Workshop({ id: 10 }), { user: 'username', password: 'password' }),
@@ -143,8 +143,8 @@ module('Viking.View.Helpers#urlFor', {}, () => {
             + window.location.port + '/workshops/10'
         );
 
-        delete window['Workshop'];
-        delete window['workshopPath'];
+        delete Viking.context['Workshop'];
+        delete Viking.context['workshopPath'];
     });
 
     test('urlFor(string)', function () {

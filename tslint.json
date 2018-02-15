@@ -49,7 +49,7 @@
         "max-line-length": {
             "options": [120]
         },
-        "member-access": true,
+        "member-access": false,
         "member-ordering": {
             "options": {
                 "order": "statics-first"
@@ -232,7 +232,7 @@
         "max-line-length": {
             "options": [120]
         },
-        "member-access": true,
+        "member-access": false,
         "member-ordering": {
             "options": {
                 "order": "statics-first"

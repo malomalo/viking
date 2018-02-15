@@ -29,15 +29,15 @@ module('Viking.Model', {}, () => {
         const Ship = Viking.Model.extend('ship');
         const ShipCollection = Viking.Collection.extend();
 
-        window['Ship'] = Ship;
-        window['ShipCollection'] = ShipCollection;
+        Viking.context['Ship'] = Ship;
+        Viking.context['ShipCollection'] = ShipCollection;
 
         const scope = Ship.where();
         assert.ok(scope instanceof ShipCollection);
         assert.strictEqual(undefined, scope.predicate);
 
-        delete window['Ship'];
-        delete window['ShipCollection'];
+        delete Viking.context['Ship'];
+        delete Viking.context['ShipCollection'];
     });
 
     test('::where(predicate) returns ModelCollection with a predicate set', () => {
@@ -46,14 +46,14 @@ module('Viking.Model', {}, () => {
             model: Ship
         });
 
-        window['Ship'] = Ship;
-        window['ShipCollection'] = ShipCollection;
+        Viking.context['Ship'] = Ship;
+        Viking.context['ShipCollection'] = ShipCollection;
 
         const scope = Ship.where({ name: 'Zoey' });
         assert.ok(scope instanceof ShipCollection);
         assert.deepEqual({ name: 'Zoey' }, scope.predicate.attributes);
 
-        delete window['Ship'];
-        delete window['ShipCollection'];
+        delete Viking.context['Ship'];
+        delete Viking.context['ShipCollection'];
     });
 });

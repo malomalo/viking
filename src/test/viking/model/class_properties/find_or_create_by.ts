@@ -30,8 +30,8 @@ module('Viking.Model::findOrCreateBy', {
                 }
             });
 
-            window['Ship'] = Ship;
-            window['ShipCollection'] = ShipCollection;
+            Viking.context['Ship'] = Ship;
+            Viking.context['ShipCollection'] = ShipCollection;
 
             Ship.findOrCreateBy({ name: 'Relient' }, {
                 success(model) {
@@ -40,8 +40,8 @@ module('Viking.Model::findOrCreateBy', {
                 }
             });
 
-            delete window['Ship'];
-            delete window['ShipCollection'];
+            delete Viking.context['Ship'];
+            delete Viking.context['ShipCollection'];
         });
     });
 
@@ -54,14 +54,14 @@ module('Viking.Model::findOrCreateBy', {
             }
         });
 
-        window['Ship'] = Ship;
-        window['ShipCollection'] = ShipCollection;
+        Viking.context['Ship'] = Ship;
+        Viking.context['ShipCollection'] = ShipCollection;
 
         Ship.findOrCreateBy({ name: 'Relient' });
         assert.ok(true);
 
-        delete window['Ship'];
-        delete window['ShipCollection'];
+        delete Viking.context['Ship'];
+        delete Viking.context['ShipCollection'];
     });
 
     test('::findOrCreateBy(attributes) calls create when the model doesn\'t exist', async () => {
@@ -72,8 +72,8 @@ module('Viking.Model::findOrCreateBy', {
             }
         });
 
-        window['Ship'] = Ship;
-        window['ShipCollection'] = ShipCollection;
+        Viking.context['Ship'] = Ship;
+        Viking.context['ShipCollection'] = ShipCollection;
 
         await new Promise((resolve) => {
             Ship.create = (attributes, options) => {
@@ -85,8 +85,8 @@ module('Viking.Model::findOrCreateBy', {
             Ship.findOrCreateBy({ name: 'Relient' }, { option: 1 });
         });
 
-        delete window['Ship'];
-        delete window['ShipCollection'];
+        delete Viking.context['Ship'];
+        delete Viking.context['ShipCollection'];
 
     });
 });
