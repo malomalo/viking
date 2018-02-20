@@ -1,3 +1,4 @@
+import { strftime } from '../../support/date';
 import { ago, day } from '../../support/number';
 import { timeTag } from './form_tags';
 
@@ -174,9 +175,9 @@ export function localTime(time, format, options) {
     return timeTag(time, {
         'data-format': format,
         'data-local': 'time',
-        'title': time.strftime("%B %e, %Y at %l:%M%P %Z"),
+        'title': strftime(time, "%B %e, %Y at %l:%M%P %Z"),
         'data-localized': 'true'
-    }, time.strftime(format));
+    }, strftime(time, format));
 };
 
 // localDate(time)
@@ -238,16 +239,16 @@ export function localDate(time, format, options) {
 export function formatTime(time, type) {
     if (type === 'time-ago') {
         return distanceOfTimeInWords(time);
-    } else if (type == 'date') {
+    } else if (type === 'date') {
 
     } else if (type === 'time-or-date') {
         if (time.isToday()) {
-            return time.strftime('%l:%M%P');
+            return strftime(time, '%l:%M%P');
         } else {
             if (time.isThisYear()) {
-                return time.strftime('%b %e');
+                return strftime(time, '%b %e');
             } else {
-                return time.strftime('%b %e, %Y');
+                return strftime(time, '%b %e, %Y');
             }
         }
     } else if (type === 'weekday-or-date') {
@@ -260,13 +261,14 @@ export function formatTime(time, type) {
         }
 
         if (time > ago(day(6))) {
-            return time.strftime('%A');
+            return strftime(time, '%A');
         }
 
         if (time.isThisYear()) {
-            return time.strftime('%b %e');
+            return strftime(time, '%b %e');
         }
-        
-        return time.strftime('%b %e, %Y');
+
+        return strftime(time, '%b %e, %Y');
     }
+
 }

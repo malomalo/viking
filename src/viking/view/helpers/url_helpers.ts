@@ -272,8 +272,8 @@ export function urlFor(modelOrUrl, options?: any) {
         protocol: window.location.protocol.replace(':', '')
     }, options);
 
-    var route;
-    var klass = modelOrUrl.baseModel.modelName.model();
+    let route;
+    const klass = modelOrUrl.baseModel.modelName.model();
     if (modelOrUrl instanceof klass) {
         if (modelOrUrl.isNew()) {
             route = constantize(klass.baseModel.modelName.plural + 'Path');

@@ -8,6 +8,7 @@ import {
     tagOptions,
     tagNameForModelAttribute
 } from './index';
+import { strftime } from '../../support/date';
 
 // buttonTag(content, options), buttonTag(options, block)
 // ========================================================
@@ -78,6 +79,10 @@ export function buttonTag(content, options) {
 //   checkBoxTag('eula', 'accepted', false, disabled: true)
 //   // => <input disabled="disabled" name="eula" type="checkbox" value="accepted" />
 export function checkBoxTag(name: string, value: string = '1', checked: boolean, options: any = {}, escape: boolean = true) {
+
+    if (checked) {
+        options.checked = true;
+    }
 
     _.defaults(options, {
         type: "checkbox",
@@ -776,7 +781,7 @@ export function timeTag(date, content, options) {
     options || (options = {});
 
     if (!content) {
-        content = options.format ? date.strftime(options.format) : date.toString();
+        content = options.format ? strftime(date, options.format) : date.toString();
     }
     if (options.format) { delete options.format; }
     if (!options.datetime) { options.datetime = date.toISOString(); }

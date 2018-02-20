@@ -511,13 +511,12 @@ export const Model = Backbone.Model.extend({
         // If a Model is extended further is acts simlar to ActiveRecords STI.
         //
         // `name` is optional, and must be a string
-        extend: function (name, protoProps, staticProps) {
+        extend: function (name, protoProps: any = {}, staticProps: any = {}) {
             if (typeof name !== 'string') {
                 staticProps = protoProps;
                 protoProps = name;
                 name = '';
             }
-            protoProps || (protoProps = {});
 
             var child = Backbone.Model.extend.call(this, protoProps, staticProps);
 
@@ -566,7 +565,6 @@ export const Model = Backbone.Model.extend({
                     }
                 });
             }
-
 
             return child;
         },

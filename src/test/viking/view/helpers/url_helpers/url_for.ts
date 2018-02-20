@@ -14,10 +14,16 @@ module('Viking.View.Helpers#urlFor', {}, () => {
             assert.ok(true); return '/workshops';
         }
 
+        Viking.context['Workshop'] = Workshop;
+        Viking.context['workshopsPath'] = workshopsPath;
+
         assert.equal(
             Viking.urlFor(Workshop),
             window.location.protocol + '//' + window.location.host + '/workshops'
         );
+
+        delete Viking.context['Workshop'];
+        delete Viking.context['workshopsPath'];
     });
 
     test("urlFor(new Class())", function () {
@@ -26,10 +32,16 @@ module('Viking.View.Helpers#urlFor', {}, () => {
             assert.ok(true); return '/workshops';
         }
 
+        Viking.context['Workshop'] = Workshop;
+        Viking.context['workshopsPath'] = workshopsPath;
+
         assert.equal(
             Viking.urlFor(new Workshop()),
             window.location.protocol + '//' + window.location.host + '/workshops'
         );
+
+        delete Viking.context['Workshop'];
+        delete Viking.context['workshopsPath'];
     });
 
     test("urlFor(model)", function () {
@@ -38,10 +50,16 @@ module('Viking.View.Helpers#urlFor', {}, () => {
             assert.ok(true); return '/workshops/' + m.toParam();
         }
 
+        Viking.context['Workshop'] = Workshop;
+        Viking.context['workshopPath'] = workshopPath;
+
         assert.equal(
             Viking.urlFor(new Workshop({ id: 10 })),
             window.location.protocol + '//' + window.location.host + '/workshops/10'
         );
+
+        delete Viking.context['Workshop'];
+        delete Viking.context['workshopPath'];
     });
 
     test("urlFor(STIModel)", function () {
@@ -51,88 +69,137 @@ module('Viking.View.Helpers#urlFor', {}, () => {
             assert.ok(true); return '/workshops/' + m.toParam();
         }
 
+        Viking.context['Workshop'] = Workshop;
+        Viking.context['SantaWorkshop'] = SantaWorkshop;
+        Viking.context['workshopPath'] = workshopPath;
+
         assert.equal(
             Viking.urlFor(new SantaWorkshop({ id: 10 })),
             window.location.protocol + '//' + window.location.host + '/workshops/10'
         );
+
+        delete Viking.context['Workshop'];
+        delete Viking.context['workshopPath'];
     });
 
     test("urlFor(class, {anchor: STRING})", function () {
         let Workshop = Viking.Model.extend('workshop');
         let workshopPath = function (m) { return '/workshops/' + m.toParam(); }
 
+        Viking.context['Workshop'] = Workshop;
+        Viking.context['workshopPath'] = workshopPath;
+
         assert.equal(
             Viking.urlFor(new Workshop({ id: 10 }), { anchor: 'location' }),
             window.location.protocol + '//' + window.location.host + '/workshops/10#location'
         );
+
+        delete Viking.context['Workshop'];
+        delete Viking.context['workshopPath'];
     });
 
     test("urlFor(class, {onlyPath: true})", function () {
         let Workshop = Viking.Model.extend('workshop');
         let workshopPath = function (m) { return '/workshops/' + m.toParam(); }
 
+        Viking.context['Workshop'] = Workshop;
+        Viking.context['workshopPath'] = workshopPath;
+
         assert.equal(
             Viking.urlFor(new Workshop({ id: 10 }), { onlyPath: true }),
             '/workshops/10'
         );
+
+        delete Viking.context['Workshop'];
+        delete Viking.context['workshopPath'];
     });
 
     test("urlFor(class, {trailingSlash: true})", function () {
         let Workshop = Viking.Model.extend('workshop');
         let workshopPath = function (m) { return '/workshops/' + m.toParam(); }
 
+        Viking.context['Workshop'] = Workshop;
+        Viking.context['workshopPath'] = workshopPath;
+
         assert.equal(
             Viking.urlFor(new Workshop({ id: 10 }), { trailingSlash: true }),
             window.location.protocol + '//' + window.location.host + '/workshops/10/'
         );
+
+        delete Viking.context['Workshop'];
+        delete Viking.context['workshopPath'];
     });
 
     test("urlFor(class, {host: STRING})", function () {
         let Workshop = Viking.Model.extend('workshop');
         let workshopPath = function (m) { return '/workshops/' + m.toParam(); }
 
+        Viking.context['Workshop'] = Workshop;
+        Viking.context['workshopPath'] = workshopPath;
+
         assert.equal(
             Viking.urlFor(new Workshop({ id: 10 }), { host: 'example.com' }),
             window.location.protocol + '//example.com' + (window.location.port ? ':' : '') + window.location.port + '/workshops/10'
         );
+
+        delete Viking.context['Workshop'];
+        delete Viking.context['workshopPath'];
     });
 
     test("urlFor(class, {port: NUMBER})", function () {
         let Workshop = Viking.Model.extend('workshop');
         let workshopPath = function (m) { return '/workshops/' + m.toParam(); }
 
+        Viking.context['Workshop'] = Workshop;
+        Viking.context['workshopPath'] = workshopPath;
+
         assert.equal(
             Viking.urlFor(new Workshop({ id: 10 }), { port: 9292 }),
             window.location.protocol + '//' + window.location.hostname + ':9292/workshops/10'
         );
+
+        delete Viking.context['Workshop'];
+        delete Viking.context['workshopPath'];
     });
 
     test("urlFor(class, {protocol: STRING})", function () {
         let Workshop = Viking.Model.extend('workshop');
         let workshopPath = function (m) { return '/workshops/' + m.toParam(); }
 
+        Viking.context['Workshop'] = Workshop;
+        Viking.context['workshopPath'] = workshopPath;
+
         assert.equal(
             Viking.urlFor(new Workshop({ id: 10 }), { protocol: 'custom' }),
             'custom://' + window.location.hostname + (window.location.port ? ':' : '') + window.location.port + '/workshops/10'
         );
+
+        delete Viking.context['Workshop'];
+        delete Viking.context['workshopPath'];
     });
 
     test("urlFor(class, {scriptName: STRING})", function () {
         let Workshop = Viking.Model.extend('workshop');
         let workshopPath = function (m) { return '/workshops/' + m.toParam(); }
 
+        Viking.context['Workshop'] = Workshop;
+        Viking.context['workshopPath'] = workshopPath;
+
         assert.equal(
             Viking.urlFor(new Workshop({ id: 10 }), { scriptName: '/base' }),
             window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' : '') + window.location.port + '/base/workshops/10'
         );
+
+        delete Viking.context['Workshop'];
+        delete Viking.context['workshopPath'];
+
     });
 
     test('urlFor(class, {user: STRING, password: STRING})', () => {
         const Workshop = Viking.Model.extend('workshop');
-        const workshopPath = (m) => '/workshops/' + m.toParam();
-
+        const workshopPath = function (m) { return '/workshops/' + m.toParam(); };
         Viking.context['Workshop'] = Workshop;
-        Viking.context['workshopPath'] = Workshop;
+        Viking.context['workshopPath'] = workshopPath;
 
         assert.equal(
             Viking.urlFor(new Workshop({ id: 10 }), { user: 'username', password: 'password' }),
