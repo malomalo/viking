@@ -9,13 +9,13 @@ import { Viking } from '../../../../viking';
 module('Viking.Model::inheritanceAttribute', {}, () => {
 
     test("::inheritanceAttribute get set when extending a Model", function() {
-        var Ship = Viking.Model.extend();
+        var Ship = Viking.Model.extend('ship');
         
         assert.ok(Ship.inheritanceAttribute);
     });
     
     test("::inheritanceAttribute default to `type`", function() {
-        var Ship = Viking.Model.extend();
+        var Ship = Viking.Model.extend('ship');
         
         assert.equal('type', Ship.inheritanceAttribute);
     });

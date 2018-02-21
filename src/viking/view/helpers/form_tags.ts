@@ -541,8 +541,8 @@ export function optionsFromCollectionForSelectTag(collection, valueAttribute, te
 //   
 //   passwordFieldTag('pin', '1234', {maxlength: 4, size: 6, class: "pin_input"})
 //   // => <input class="pin_input" maxlength="4" name="pin" size="6" type="password" value="1234">
-export function passwordFieldTag(name: string, value: string = 'password', options: any = {}) {
-    _.defaults(options, { type: "password" });
+export function passwordFieldTag(name: string = 'password', value: string | null = null, options: any = {}) {
+    _.defaults(options, { type: 'password', value });
 
     return textFieldTag(name, value, options);
 };
@@ -680,7 +680,11 @@ export function selectTag(name: string, optionTags, options) {
 //   
 //   submitTag("Edit", class: "edit_button")
 //   // => <input class="edit_button" name="commit" type="submit" value="Edit">
-export function submitTag(value: string = 'Save', options: any = {}) {
+export function submitTag(value: string | null, options: any = {}) {
+    if (!value) {
+        value = 'Save';
+    }
+
     _.defaults(options, {
         type: 'submit',
         name: 'commit',

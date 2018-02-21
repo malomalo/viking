@@ -11,632 +11,657 @@ let model: any;
 let Model: any;
 
 module('Viking.View - Viking.FormBuilder', {
-    beforeEach: function() {
+    beforeEach() {
         Model = Viking.Model.extend("model");
+        Viking.context['Model'] = Model;
         model = new Model();
+    },
+    afterEach() {
+        delete Viking.context['Model'];
     }
 }, () => {
-    
+
     // new Viking.FormBuilder(model, options)
     // ===============================
-    test("new Viking.FormBuilder(model)", function() {
+    test("new Viking.FormBuilder(model)", function () {
         var form = new Viking.FormBuilder(model);
 
         assert.equal(form.model, model);
     });
 
-    test("new Viking.FormBuilder(model, options)", function() {
-        var options = {key: 'value', foo: 3};
+    test("new Viking.FormBuilder(model, options)", function () {
+        var options = { key: 'value', foo: 3 };
         var form = new Viking.FormBuilder(model, options);
 
         assert.equal(form.model, model);
         assert.deepEqual(_.pick(form.options, 'key', 'foo'), options);
     });
 
-    // checkBox()
-    // ==========
-    test("#checkBox() passes to Viking.View.Helpers.checkBox", function() {
-        var model = model;
-        var form = new Viking.FormBuilder(model)
-        var old_func = Viking.View.Helpers.checkBox
-    
-        Viking.View.Helpers.checkBox = function(m, attribute, options, checkedValue, uncheckedValue) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.deepEqual({name: 'model[key]'}, options);
-            assert.strictEqual(2, checkedValue);
-            assert.strictEqual(3, uncheckedValue);
-        }
-        form.checkBox('key', {}, 2, 3);
-    
-        Viking.View.Helpers.checkBox = old_func;
-    });
-    
-    test("#checkBox() uses namepsace on for attribute", function() {
-        var model = model;
-        var form = new Viking.FormBuilder(model, {namespace: 'ns'})
-        var old_func = Viking.View.Helpers.checkBox
-    
-        Viking.View.Helpers.checkBox = function(m, attribute, options, checkedValue, uncheckedValue) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.deepEqual({'name': 'ns[model][key]'}, options);
-            assert.strictEqual(2, checkedValue);
-            assert.strictEqual(3, uncheckedValue);
-        }
-        form.checkBox('key', {}, 2, 3);
-    
-        Viking.View.Helpers.checkBox = old_func;
-    });
-    
-    test("#checkBox() allows name attribute to overridden", function() {
-        var model = model;
-        var form = new Viking.FormBuilder(model, {namespace: 'ns'})
-        var old_func = Viking.View.Helpers.checkBox
-    
-        Viking.View.Helpers.checkBox = function(m, attribute, options, checkedValue, uncheckedValue) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.deepEqual({'name': 'overridden'}, options);
-            assert.strictEqual(2, checkedValue);
-            assert.strictEqual(3, uncheckedValue);
-        }
-        form.checkBox('key', {name: 'overridden'}, 2, 3);
-    
-        Viking.View.Helpers.checkBox = old_func;
-    });
-    
-    test("#checkBox() passes along escape", function() {
-        var model = model;
-        var form = new Viking.FormBuilder(model, {namespace: 'ns'})
-        var old_func = Viking.View.Helpers.checkBox
-    
-        Viking.View.Helpers.checkBox = function(m, attribute, options, checkedValue, uncheckedValue, escape) {
-            assert.strictEqual(escape, true);
-        }
-        form.checkBox('key', {name: 'overridden'}, 2, 3, true);
-    
-        Viking.View.Helpers.checkBox = old_func;
-    });
-    
-    // collectionSelect()
-    // ==================
-    test("#collectionSelect() passes to Viking.View.Helpers.collectionSelect", function() {
-        var model = model;
-        var form = new Viking.FormBuilder(model)
-        var old_func = Viking.View.Helpers.collectionSelect
-    
-        Viking.View.Helpers.collectionSelect = function(m, attribute, collection, valueAttribute, textAttribute, options) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.strictEqual(1, collection);
-            assert.strictEqual(2, valueAttribute);
-            assert.strictEqual(3, textAttribute);
-            assert.deepEqual({'name': 'model[key]'}, options);
-        }
-        form.collectionSelect('key', 1, 2, 3, {});
-    
-        Viking.View.Helpers.collectionSelect = old_func;
-    });
-    
-    test("#collectionSelect() obeys namespace", function() {
-        var model = model;
-        var form = new Viking.FormBuilder(model, {namespace: 'ns'})
-        var old_func = Viking.View.Helpers.collectionSelect
-    
-        Viking.View.Helpers.collectionSelect = function(m, attribute, collection, valueAttribute, textAttribute, options) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.strictEqual(1, collection);
-            assert.strictEqual(2, valueAttribute);
-            assert.strictEqual(3, textAttribute);
-            assert.deepEqual({name: 'ns[model][key]'}, options);
-        }
-        form.collectionSelect('key', 1, 2, 3, {});
-    
-        Viking.View.Helpers.collectionSelect = old_func;
-    });
-    
-    test("#collectionSelect() allows name to be overridden", function() {
-        var model = model;
-        var form = new Viking.FormBuilder(model, {namespace: 'ns'})
-        var old_func = Viking.View.Helpers.collectionSelect
-    
-        Viking.View.Helpers.collectionSelect = function(m, attribute, collection, valueAttribute, textAttribute, options) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.strictEqual(1, collection);
-            assert.strictEqual(2, valueAttribute);
-            assert.strictEqual(3, textAttribute);
-            assert.deepEqual({name: 'overridden'}, options);
-        }
-        form.collectionSelect('key', 1, 2, 3, {name: 'overridden'});
-    
-        Viking.View.Helpers.collectionSelect = old_func;
-    });
-    
-    // hiddenField()
-    // ==========
-    test("#hiddenField() passes to Viking.View.Helpers.hiddenField", function() {
-        var model = model;
-        var form = new Viking.FormBuilder(model)
-        var old_func = Viking.View.Helpers.hiddenField
-    
-        Viking.View.Helpers.hiddenField = function(m, attribute, options) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.deepEqual({name: 'model[key]'}, options);
-        }
-        form.hiddenField('key', {});
-    
-        Viking.View.Helpers.hiddenField = old_func;
-    });
-    
-    test("#hiddenField() obeys namespace", function() {
-        var model = model;
-        var form = new Viking.FormBuilder(model, {namespace: 'ns'})
-        var old_func = Viking.View.Helpers.hiddenField
-    
-        Viking.View.Helpers.hiddenField = function(m, attribute, options) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.deepEqual({name: 'ns[model][key]'}, options);
-        }
-        form.hiddenField('key', {});
-    
-        Viking.View.Helpers.hiddenField = old_func;
-    });
-    
-    test("#hiddenField() allows name to be overridden", function() {
-        var model = model;
-        var form = new Viking.FormBuilder(model, {namespace: 'ns'})
-        var old_func = Viking.View.Helpers.hiddenField
-    
-        Viking.View.Helpers.hiddenField = function(m, attribute, options) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.deepEqual({name: 'overridden'}, options);
-        }
-        form.hiddenField('key', {name: 'overridden'});
-    
-        Viking.View.Helpers.hiddenField = old_func;
-    });
-    
-    // label()
-    // ==========
-    test("#label() passes to Viking.View.Helpers.label", function() {
-        var model = model;
-        var form = new Viking.FormBuilder(model)
-        var old_func = Viking.View.Helpers.label
-    
-        Viking.View.Helpers.label = function(m, attribute, content, options) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.strictEqual(1, content);
-            assert.deepEqual({"for": 'model_key'}, options);
-        }
-        form.label('key', 1, {});
-    
-        Viking.View.Helpers.label = old_func;
-    });
-    
-    test("#label() uses namepsace on for attribute", function() {
-        var model = model;
-        var form = new Viking.FormBuilder(model, {namespace: 'ns'})
-        var old_func = Viking.View.Helpers.label
-    
-        Viking.View.Helpers.label = function(m, attribute, content, options) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.strictEqual(1, content);
-            assert.deepEqual({'for': 'ns_model_key'}, options);
-        }
-        form.label('key', 1, {});
-    
-        Viking.View.Helpers.label = old_func;
-    });
-    
-    test("#label() allows for attribute to be overridden", function() {
-        var model = model;
-        var form = new Viking.FormBuilder(model)
-        var old_func = Viking.View.Helpers.label
-    
-        Viking.View.Helpers.label = function(m, attribute, content, options) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.strictEqual(1, content);
-            assert.deepEqual({'for': 'me'}, options);
-        }
-        form.label('key', 1, {'for': 'me'});
-    
-        Viking.View.Helpers.label = old_func;
-    });
-    
-    // number()
-    // ==========
-    test("#number() passes to Viking.View.Helpers.number", function() {
-        var model = model;
-        var form = new Viking.FormBuilder(model);
-        var old_func = Viking.View.Helpers.numberField;
-    
-        Viking.View.Helpers.numberField = function(m, attribute, options) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.deepEqual({name: 'model[key]'}, options);
-        }
-        form.number('key', {});
-    
-        Viking.View.Helpers.numberField = old_func;
-    });
-    
-    test("#number() uses namepsace on for attribute", function () {
-        var model = model;
-        var form = new Viking.FormBuilder(model, {namespace: 'ns'})
-        var old_func = Viking.View.Helpers.numberField
-    
-        Viking.View.Helpers.numberField = function(m, attribute, options) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.deepEqual({'name': 'ns[model][key]'}, options);
-        }
-        form.number('key', {});
-    
-        Viking.View.Helpers.numberField = old_func;
-    });
-    
-    test("#number() allows for attribute to be overridden", function () {
-        var model = model;
-        var form = new Viking.FormBuilder(model)
-        var old_func = Viking.View.Helpers.numberField
-    
-        Viking.View.Helpers.numberField = function(m, attribute, options) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.deepEqual({'for': 'me', 'name': 'model[key]'}, options);
-        }
-        form.number('key', {'for': 'me'});
-    
-        Viking.View.Helpers.numberField = old_func;
-    });
+    // // checkBox()
+    // // ==========
+    // test("#checkBox() passes to Viking.View.Helpers.checkBox", function () {
 
-    // passwordField()
-    // ==========
-    test("#passwordField() passes to Viking.View.Helpers.passwordField", function () {
-        var model = model;
-        var form = new Viking.FormBuilder(model)
-        var old_func = Viking.View.Helpers.passwordField
-    
-        Viking.View.Helpers.passwordField = function(m, attribute, options) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.deepEqual({name: 'model[key]'}, options);
-        }
-        form.passwordField('key', {});
-    
-        Viking.View.Helpers.passwordField = old_func;
-    });
-    
-    test("#passwordField() obeys namespace", function () {
-        var model = model;
-        var form = new Viking.FormBuilder(model, {namespace: 'ns'})
-        var old_func = Viking.View.Helpers.passwordField
-    
-        Viking.View.Helpers.passwordField = function(m, attribute, options) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.deepEqual({'name': 'ns[model][key]'}, options);
-        }
-        form.passwordField('key', {});
-    
-        Viking.View.Helpers.passwordField = old_func;
-    });
-    
-    test("#passwordField() allows name to be overridden", function () {
-        var model = model;
-        var form = new Viking.FormBuilder(model, {namespace: 'ns'})
-        var old_func = Viking.View.Helpers.passwordField
-    
-        Viking.View.Helpers.passwordField = function(m, attribute, options) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.deepEqual({'name': 'overridden'}, options);
-        }
-        form.passwordField('key', {name: 'overridden'});
-    
-        Viking.View.Helpers.passwordField = old_func;
-    });
-    
-    // radioButton()
-    // =============
-    test("#radioButton() passes to Viking.View.Helpers.radioButton", function () {
-        var model = model;
-        var form = new Viking.FormBuilder(model)
-        var old_func = Viking.View.Helpers.radioButton
-    
-        Viking.View.Helpers.radioButton = function(m, attribute, tagValue, options) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.strictEqual(1, tagValue);
-            assert.deepEqual({name: 'model[key]'}, options);
-        }
-        form.radioButton('key', 1, {});
-    
-        Viking.View.Helpers.radioButton = old_func;
-    });
-    
-    test("#radioButton() obeys namespace", function () {
-        var model = model;
-        var form = new Viking.FormBuilder(model, {namespace: 'ns'})
-        var old_func = Viking.View.Helpers.radioButton
-    
-        Viking.View.Helpers.radioButton = function(m, attribute, tagValue, options) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.strictEqual(1, tagValue);
-            assert.deepEqual({'name': 'ns[model][key]'}, options);
-        }
-        form.radioButton('key', 1, {});
-    
-        Viking.View.Helpers.radioButton = old_func;
-    });
-    
-    test("#radioButton() allows name to be overridden", function () {
-        var model = model;
-        var form = new Viking.FormBuilder(model, {namespace: 'ns'})
-        var old_func = Viking.View.Helpers.radioButton
-    
-        Viking.View.Helpers.radioButton = function(m, attribute, tagValue, options) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.strictEqual(1, tagValue);
-            assert.deepEqual({'name': 'overridden'}, options);
-        }
-        form.radioButton('key', 1, {name: 'overridden'});
-    
-        Viking.View.Helpers.radioButton = old_func;
-    });
-    
-    // select()
-    // ========
-    test("#select() passes to Viking.View.Helpers.select", function () {
-        var model = model;
-        var form = new Viking.FormBuilder(model)
-        var old_func = Viking.View.Helpers.select
-    
-        Viking.View.Helpers.select = function(m, attribute, collection, options) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.strictEqual(1, collection);
-            assert.deepEqual({'name': 'model[key]'}, options);
-        }
-        form.select('key', 1, {});
-    
-        Viking.View.Helpers.select = old_func;
-    });
-    
-    test("#select() obeys namespace", function () {
-        var model = model;
-        var form = new Viking.FormBuilder(model, {namespace: 'ns'})
-        var old_func = Viking.View.Helpers.select
-    
-        Viking.View.Helpers.select = function(m, attribute, collection, options) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.strictEqual(1, collection);
-            assert.deepEqual({'name': 'ns[model][key]'}, options);
-        }
-        form.select('key', 1, {});
-    
-        Viking.View.Helpers.select = old_func;
-    });
-    
-    test("#select() allows name to be overridden", function () {
-        var model = model;
-        var form = new Viking.FormBuilder(model, {namespace: 'ns'})
-        var old_func = Viking.View.Helpers.select
-    
-        Viking.View.Helpers.select = function(m, attribute, collection, options) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.strictEqual(1, collection);
-            assert.deepEqual({'name': 'overridden'}, options);
-        }
-        form.select('key', 1, {name: 'overridden'});
-    
-        Viking.View.Helpers.select = old_func;
-    });
-    
-    // textArea()
-    // ==========
-    test("#textArea() passes to Viking.View.Helpers.textArea", function () {
-        var model = model;
-        var form = new Viking.FormBuilder(model)
-        var old_func = Viking.View.Helpers.textArea
-    
-        Viking.View.Helpers.textArea = function(m, attribute, options) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.deepEqual({'name': 'model[key]'}, options);
-        }
-        form.textArea('key', {});
-    
-        Viking.View.Helpers.textArea = old_func;
-    });
-    
-    test("#textArea() obeys namespace", function () {
-        var model = model;
-        var form = new Viking.FormBuilder(model, {namespace: 'ns'})
-        var old_func = Viking.View.Helpers.textArea
-    
-        Viking.View.Helpers.textArea = function(m, attribute, options) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.deepEqual({'name': 'ns[model][key]'}, options);
-        }
-        form.textArea('key', {});
-    
-        Viking.View.Helpers.textArea = old_func;
-    });
-    
-    test("#textArea() allows name to be overridden", function () {
-        var model = model;
-        var form = new Viking.FormBuilder(model, {namespace: 'ns'})
-        var old_func = Viking.View.Helpers.textArea
-    
-        Viking.View.Helpers.textArea = function(m, attribute, options) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.deepEqual({'name': 'overridden'}, options);
-        }
-        form.textArea('key', {name: 'overridden'});
-    
-        Viking.View.Helpers.textArea = old_func;
-    });
-    
-    // textField()
-    // ==========
-    test("#textField() passes to Viking.View.Helpers.textField", function () {
-        var model = model;
-        var form = new Viking.FormBuilder(model)
-        var old_func = Viking.View.Helpers.textField
-    
-        Viking.View.Helpers.textField = function(m, attribute, options) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.deepEqual({'name': 'model[key]'}, options);
-        }
-        form.textField('key', {});
-    
-        Viking.View.Helpers.textField = old_func;
-    });
-    
-    test("#textField() obeys namespace", function () {
-        var model = model;
-        var form = new Viking.FormBuilder(model, {namespace: 'ns'})
-        var old_func = Viking.View.Helpers.textField
-    
-        Viking.View.Helpers.textField = function(m, attribute, options) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.deepEqual({name: 'ns[model][key]'}, options);
-        }
-        form.textField('key', {});
-    
-        Viking.View.Helpers.textField = old_func;
-    });
-    
-    test("#textField() allows name to be overridden", function () {
-        var model = model;
-        var form = new Viking.FormBuilder(model, {namespace: 'ns'})
-        var old_func = Viking.View.Helpers.textField
-    
-        Viking.View.Helpers.textField = function(m, attribute, options) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.deepEqual({'name': 'overridden'}, options);
-        }
-        form.textField('key', {name: 'overridden'});
-    
-        Viking.View.Helpers.textField = old_func;
-    });
-    
-    // checkBoxGroup
-    test("#checkBoxGroup() passes to Viking.View.Helpers.checkBox", function () {
-        var model = model;
-        var form = new Viking.FormBuilder(model)
-        var old_func = Viking.View.Helpers.checkBoxGroup
-    
-        Viking.View.Helpers.checkBoxGroup = function(m, attribute, options, content) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.deepEqual({'namespace': 'model'}, options);
-            assert.strictEqual(2, content);
-        }
-        form.checkBoxGroup('key', {}, 2);
-    
-        Viking.View.Helpers.checkBoxGroup = old_func;
-    });
-    
-    test("#checkBoxGroup() uses namepsace on for attribute", function () {
-        var model = model;
-        var form = new Viking.FormBuilder(model, {namespace: 'ns'})
-        var old_func = Viking.View.Helpers.checkBoxGroup
-    
-        Viking.View.Helpers.checkBoxGroup = function(m, attribute, options, content) {
-            assert.strictEqual(model, m);
-            assert.strictEqual('key', attribute);
-            assert.deepEqual({'namespace': 'ns[model]'}, options);
-            assert.strictEqual(2, content);
-        }
-        form.checkBoxGroup('key', {}, 2);
-    
-        Viking.View.Helpers.checkBoxGroup = old_func;
-    });
-    
+    //     var form = new Viking.FormBuilder(model)
+    //     var old_func = Viking.View.Helpers.checkBox
+
+    //     Viking.View.Helpers.checkBox = function (m, attribute, options, checkedValue, uncheckedValue) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.deepEqual({ name: 'model[key]' }, options);
+    //         assert.strictEqual(2, checkedValue);
+    //         assert.strictEqual(3, uncheckedValue);
+    //     }
+    //     form.checkBox('key', {}, 2, 3);
+
+    //     Viking.View.Helpers.checkBox = old_func;
+    // });
+
+    // test("#checkBox() uses namespace on for attribute", function () {
+    //     var form = new Viking.FormBuilder(model, { namespace: 'ns' })
+    //     var old_func = Viking.View.Helpers.checkBox
+
+    //     Viking.View.Helpers.checkBox = function (m, attribute, options, checkedValue, uncheckedValue) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.deepEqual({ 'name': 'ns[model][key]' }, options);
+    //         assert.strictEqual(2, checkedValue);
+    //         assert.strictEqual(3, uncheckedValue);
+    //     }
+    //     form.checkBox('key', {}, 2, 3);
+
+    //     Viking.View.Helpers.checkBox = old_func;
+    // });
+
+    // test("#checkBox() allows name attribute to overridden", function () {
+    //     var form = new Viking.FormBuilder(model, { namespace: 'ns' })
+    //     var old_func = Viking.View.Helpers.checkBox
+
+    //     Viking.View.Helpers.checkBox = function (m, attribute, options, checkedValue, uncheckedValue) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.deepEqual({ 'name': 'overridden' }, options);
+    //         assert.strictEqual(2, checkedValue);
+    //         assert.strictEqual(3, uncheckedValue);
+    //     }
+    //     form.checkBox('key', { name: 'overridden' }, 2, 3);
+
+    //     Viking.View.Helpers.checkBox = old_func;
+    // });
+
+    // test("#checkBox() passes along escape", function () {
+    //     var form = new Viking.FormBuilder(model, { namespace: 'ns' })
+    //     var old_func = Viking.View.Helpers.checkBox
+
+    //     Viking.View.Helpers.checkBox = function (m, attribute, options, checkedValue, uncheckedValue, escape) {
+    //         assert.strictEqual(escape, true);
+    //     }
+    //     form.checkBox('key', { name: 'overridden' }, 2, 3, true);
+
+    //     Viking.View.Helpers.checkBox = old_func;
+    // });
+
+    // // collectionSelect()
+    // // ==================
+    // test("#collectionSelect() passes to Viking.View.Helpers.collectionSelect", function () {
+    //     var form = new Viking.FormBuilder(model)
+    //     var old_func = Viking.View.Helpers.collectionSelect
+    //     try {
+    //         Viking.View.Helpers.collectionSelect = function (m, attribute, collection, valueAttribute, textAttribute, options) {
+    //             assert.strictEqual(model, m);
+    //             assert.strictEqual('key', attribute);
+    //             assert.strictEqual(1, collection);
+    //             assert.strictEqual(2, valueAttribute);
+    //             assert.strictEqual(3, textAttribute);
+    //             assert.deepEqual({ name: 'model[key]' }, options);
+    //         }
+    //         form.collectionSelect('key', 1, 2, 3, {});
+    //     } finally {
+    //         Viking.View.Helpers.collectionSelect = old_func;
+    //     }
+    // });
+
+    // test("#collectionSelect() obeys namespace", function () {
+    //     var form = new Viking.FormBuilder(model, { namespace: 'ns' })
+    //     var old_func = Viking.View.Helpers.collectionSelect
+
+    //     try {
+    //         Viking.View.Helpers.collectionSelect = function (m, attribute, collection, valueAttribute, textAttribute, options) {
+    //             assert.strictEqual(model, m);
+    //             assert.strictEqual('key', attribute);
+    //             assert.strictEqual(1, collection);
+    //             assert.strictEqual(2, valueAttribute);
+    //             assert.strictEqual(3, textAttribute);
+    //             assert.deepEqual({ name: 'ns[model][key]' }, options);
+    //         }
+    //         form.collectionSelect('key', 1, 2, 3, {});
+    //     } finally {
+    //         Viking.View.Helpers.collectionSelect = old_func;
+    //     }
+    // });
+
+    // test("#collectionSelect() allows name to be overridden", function () {
+    //     var form = new Viking.FormBuilder(model, { namespace: 'ns' })
+    //     var old_func = Viking.View.Helpers.collectionSelect
+
+    //     try {
+    //         Viking.View.Helpers.collectionSelect = function (m, attribute, collection, valueAttribute, textAttribute, options) {
+    //             assert.strictEqual(model, m);
+    //             assert.strictEqual('key', attribute);
+    //             assert.strictEqual(1, collection);
+    //             assert.strictEqual(2, valueAttribute);
+    //             assert.strictEqual(3, textAttribute);
+    //             assert.deepEqual({ name: 'overridden' }, options);
+    //         }
+    //         form.collectionSelect('key', 1, 2, 3, { name: 'overridden' });
+    //     } finally {
+    //         Viking.View.Helpers.collectionSelect = old_func;
+    //     }
+    // });
+
+    // // hiddenField()
+    // // ==========
+    // test("#hiddenField() passes to Viking.View.Helpers.hiddenField", function () {
+
+    //     var form = new Viking.FormBuilder(model)
+    //     var old_func = Viking.View.Helpers.hiddenField
+
+    //     Viking.View.Helpers.hiddenField = function (m, attribute, options) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.deepEqual({ name: 'model[key]' }, options);
+    //     }
+    //     form.hiddenField('key', {});
+
+    //     Viking.View.Helpers.hiddenField = old_func;
+    // });
+
+    // test("#hiddenField() obeys namespace", function () {
+
+    //     var form = new Viking.FormBuilder(model, { namespace: 'ns' })
+    //     var old_func = Viking.View.Helpers.hiddenField
+
+    //     Viking.View.Helpers.hiddenField = function (m, attribute, options) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.deepEqual({ name: 'ns[model][key]' }, options);
+    //     }
+    //     form.hiddenField('key', {});
+
+    //     Viking.View.Helpers.hiddenField = old_func;
+    // });
+
+    // test("#hiddenField() allows name to be overridden", function () {
+
+    //     var form = new Viking.FormBuilder(model, { namespace: 'ns' })
+    //     var old_func = Viking.View.Helpers.hiddenField
+
+    //     Viking.View.Helpers.hiddenField = function (m, attribute, options) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.deepEqual({ name: 'overridden' }, options);
+    //     }
+    //     form.hiddenField('key', { name: 'overridden' });
+
+    //     Viking.View.Helpers.hiddenField = old_func;
+    // });
+
+    // // label()
+    // // ==========
+    // test("#label() passes to Viking.View.Helpers.label", function () {
+
+    //     var form = new Viking.FormBuilder(model)
+    //     var old_func = Viking.View.Helpers.label
+
+    //     Viking.View.Helpers.label = function (m, attribute, content, options) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.strictEqual(1, content);
+    //         assert.deepEqual({ "for": 'model_key' }, options);
+    //     }
+    //     form.label('key', 1, {});
+
+    //     Viking.View.Helpers.label = old_func;
+    // });
+
+    // test("#label() uses namepsace on for attribute", function () {
+
+    //     var form = new Viking.FormBuilder(model, { namespace: 'ns' })
+    //     var old_func = Viking.View.Helpers.label
+
+    //     Viking.View.Helpers.label = function (m, attribute, content, options) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.strictEqual(1, content);
+    //         assert.deepEqual({ 'for': 'ns_model_key' }, options);
+    //     }
+    //     form.label('key', 1, {});
+
+    //     Viking.View.Helpers.label = old_func;
+    // });
+
+    // test("#label() allows for attribute to be overridden", function () {
+
+    //     var form = new Viking.FormBuilder(model)
+    //     var old_func = Viking.View.Helpers.label
+
+    //     Viking.View.Helpers.label = function (m, attribute, content, options) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.strictEqual(1, content);
+    //         assert.deepEqual({ 'for': 'me' }, options);
+    //     }
+    //     form.label('key', 1, { 'for': 'me' });
+
+    //     Viking.View.Helpers.label = old_func;
+    // });
+
+    // // number()
+    // // ==========
+    // test("#number() passes to Viking.View.Helpers.number", function () {
+
+    //     var form = new Viking.FormBuilder(model);
+    //     var old_func = Viking.View.Helpers.numberField;
+
+    //     Viking.View.Helpers.numberField = function (m, attribute, options) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.deepEqual({ name: 'model[key]' }, options);
+    //     }
+    //     form.number('key', {});
+
+    //     Viking.View.Helpers.numberField = old_func;
+    // });
+
+    // test("#number() uses namepsace on for attribute", function () {
+
+    //     var form = new Viking.FormBuilder(model, { namespace: 'ns' })
+    //     var old_func = Viking.View.Helpers.numberField
+
+    //     Viking.View.Helpers.numberField = function (m, attribute, options) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.deepEqual({ 'name': 'ns[model][key]' }, options);
+    //     }
+    //     form.number('key', {});
+
+    //     Viking.View.Helpers.numberField = old_func;
+    // });
+
+    // test("#number() allows for attribute to be overridden", function () {
+
+    //     var form = new Viking.FormBuilder(model)
+    //     var old_func = Viking.View.Helpers.numberField
+
+    //     Viking.View.Helpers.numberField = function (m, attribute, options) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.deepEqual({ 'for': 'me', 'name': 'model[key]' }, options);
+    //     }
+    //     form.number('key', { 'for': 'me' });
+
+    //     Viking.View.Helpers.numberField = old_func;
+    // });
+
+    // // passwordField()
+    // // ==========
+    // test("#passwordField() passes to Viking.View.Helpers.passwordField", function () {
+
+    //     var form = new Viking.FormBuilder(model)
+    //     var old_func = Viking.View.Helpers.passwordField
+
+    //     Viking.View.Helpers.passwordField = function (m, attribute, options) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.deepEqual({ name: 'model[key]' }, options);
+    //     }
+    //     form.passwordField('key', {});
+
+    //     Viking.View.Helpers.passwordField = old_func;
+    // });
+
+    // test("#passwordField() obeys namespace", function () {
+
+    //     var form = new Viking.FormBuilder(model, { namespace: 'ns' })
+    //     var old_func = Viking.View.Helpers.passwordField
+
+    //     Viking.View.Helpers.passwordField = function (m, attribute, options) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.deepEqual({ 'name': 'ns[model][key]' }, options);
+    //     }
+    //     form.passwordField('key', {});
+
+    //     Viking.View.Helpers.passwordField = old_func;
+    // });
+
+    // test("#passwordField() allows name to be overridden", function () {
+
+    //     var form = new Viking.FormBuilder(model, { namespace: 'ns' })
+    //     var old_func = Viking.View.Helpers.passwordField
+
+    //     Viking.View.Helpers.passwordField = function (m, attribute, options) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.deepEqual({ 'name': 'overridden' }, options);
+    //     }
+    //     form.passwordField('key', { name: 'overridden' });
+
+    //     Viking.View.Helpers.passwordField = old_func;
+    // });
+
+    // // radioButton()
+    // // =============
+    // test("#radioButton() passes to Viking.View.Helpers.radioButton", function () {
+
+    //     var form = new Viking.FormBuilder(model)
+    //     var old_func = Viking.View.Helpers.radioButton
+
+    //     Viking.View.Helpers.radioButton = function (m, attribute, tagValue, options) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.strictEqual(1, tagValue);
+    //         assert.deepEqual({ name: 'model[key]' }, options);
+    //     }
+    //     form.radioButton('key', 1, {});
+
+    //     Viking.View.Helpers.radioButton = old_func;
+    // });
+
+    // test("#radioButton() obeys namespace", function () {
+
+    //     var form = new Viking.FormBuilder(model, { namespace: 'ns' })
+    //     var old_func = Viking.View.Helpers.radioButton
+
+    //     Viking.View.Helpers.radioButton = function (m, attribute, tagValue, options) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.strictEqual(1, tagValue);
+    //         assert.deepEqual({ 'name': 'ns[model][key]' }, options);
+    //     }
+    //     form.radioButton('key', 1, {});
+
+    //     Viking.View.Helpers.radioButton = old_func;
+    // });
+
+    // test("#radioButton() allows name to be overridden", function () {
+
+    //     var form = new Viking.FormBuilder(model, { namespace: 'ns' })
+    //     var old_func = Viking.View.Helpers.radioButton
+
+    //     Viking.View.Helpers.radioButton = function (m, attribute, tagValue, options) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.strictEqual(1, tagValue);
+    //         assert.deepEqual({ 'name': 'overridden' }, options);
+    //     }
+    //     form.radioButton('key', 1, { name: 'overridden' });
+
+    //     Viking.View.Helpers.radioButton = old_func;
+    // });
+
+    // // select()
+    // // ========
+    // test("#select() passes to Viking.View.Helpers.select", function () {
+
+    //     var form = new Viking.FormBuilder(model)
+    //     var old_func = Viking.View.Helpers.select
+
+    //     Viking.View.Helpers.select = function (m, attribute, collection, options) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.strictEqual(1, collection);
+    //         assert.deepEqual({ 'name': 'model[key]' }, options);
+    //     }
+    //     form.select('key', 1, {});
+
+    //     Viking.View.Helpers.select = old_func;
+    // });
+
+    // test("#select() obeys namespace", function () {
+
+    //     var form = new Viking.FormBuilder(model, { namespace: 'ns' })
+    //     var old_func = Viking.View.Helpers.select
+
+    //     Viking.View.Helpers.select = function (m, attribute, collection, options) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.strictEqual(1, collection);
+    //         assert.deepEqual({ 'name': 'ns[model][key]' }, options);
+    //     }
+    //     form.select('key', 1, {});
+
+    //     Viking.View.Helpers.select = old_func;
+    // });
+
+    // test("#select() allows name to be overridden", function () {
+
+    //     var form = new Viking.FormBuilder(model, { namespace: 'ns' })
+    //     var old_func = Viking.View.Helpers.select
+
+    //     Viking.View.Helpers.select = function (m, attribute, collection, options) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.strictEqual(1, collection);
+    //         assert.deepEqual({ 'name': 'overridden' }, options);
+    //     }
+    //     form.select('key', 1, { name: 'overridden' });
+
+    //     Viking.View.Helpers.select = old_func;
+    // });
+
+    // // textArea()
+    // // ==========
+    // test("#textArea() passes to Viking.View.Helpers.textArea", function () {
+
+    //     var form = new Viking.FormBuilder(model)
+    //     var old_func = Viking.View.Helpers.textArea
+
+    //     Viking.View.Helpers.textArea = function (m, attribute, options) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.deepEqual({ 'name': 'model[key]' }, options);
+    //     }
+    //     form.textArea('key', {});
+
+    //     Viking.View.Helpers.textArea = old_func;
+    // });
+
+    // test("#textArea() obeys namespace", function () {
+
+    //     var form = new Viking.FormBuilder(model, { namespace: 'ns' })
+    //     var old_func = Viking.View.Helpers.textArea
+
+    //     Viking.View.Helpers.textArea = function (m, attribute, options) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.deepEqual({ 'name': 'ns[model][key]' }, options);
+    //     }
+    //     form.textArea('key', {});
+
+    //     Viking.View.Helpers.textArea = old_func;
+    // });
+
+    // test("#textArea() allows name to be overridden", function () {
+
+    //     var form = new Viking.FormBuilder(model, { namespace: 'ns' })
+    //     var old_func = Viking.View.Helpers.textArea
+
+    //     Viking.View.Helpers.textArea = function (m, attribute, options) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.deepEqual({ 'name': 'overridden' }, options);
+    //     }
+    //     form.textArea('key', { name: 'overridden' });
+
+    //     Viking.View.Helpers.textArea = old_func;
+    // });
+
+    // // textField()
+    // // ==========
+    // test("#textField() passes to Viking.View.Helpers.textField", function () {
+
+    //     var form = new Viking.FormBuilder(model)
+    //     var old_func = Viking.View.Helpers.textField
+
+    //     Viking.View.Helpers.textField = function (m, attribute, options) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.deepEqual({ 'name': 'model[key]' }, options);
+    //     }
+    //     form.textField('key', {});
+
+    //     Viking.View.Helpers.textField = old_func;
+    // });
+
+    // test("#textField() obeys namespace", function () {
+
+    //     var form = new Viking.FormBuilder(model, { namespace: 'ns' })
+    //     var old_func = Viking.View.Helpers.textField
+
+    //     Viking.View.Helpers.textField = function (m, attribute, options) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.deepEqual({ name: 'ns[model][key]' }, options);
+    //     }
+    //     form.textField('key', {});
+
+    //     Viking.View.Helpers.textField = old_func;
+    // });
+
+    // test("#textField() allows name to be overridden", function () {
+
+    //     var form = new Viking.FormBuilder(model, { namespace: 'ns' })
+    //     var old_func = Viking.View.Helpers.textField
+
+    //     Viking.View.Helpers.textField = function (m, attribute, options) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.deepEqual({ 'name': 'overridden' }, options);
+    //     }
+    //     form.textField('key', { name: 'overridden' });
+
+    //     Viking.View.Helpers.textField = old_func;
+    // });
+
+    // // checkBoxGroup
+    // test("#checkBoxGroup() passes to Viking.View.Helpers.checkBox", function () {
+
+    //     var form = new Viking.FormBuilder(model)
+    //     var old_func = Viking.View.Helpers.checkBoxGroup
+
+    //     Viking.View.Helpers.checkBoxGroup = function (m, attribute, options, content) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.deepEqual({ 'namespace': 'model' }, options);
+    //         assert.strictEqual(2, content);
+    //     }
+    //     form.checkBoxGroup('key', {}, 2);
+
+    //     Viking.View.Helpers.checkBoxGroup = old_func;
+    // });
+
+    // test("#checkBoxGroup() uses namepsace on for attribute", function () {
+
+    //     var form = new Viking.FormBuilder(model, { namespace: 'ns' })
+    //     var old_func = Viking.View.Helpers.checkBoxGroup
+
+    //     Viking.View.Helpers.checkBoxGroup = function (m, attribute, options, content) {
+    //         assert.strictEqual(model, m);
+    //         assert.strictEqual('key', attribute);
+    //         assert.deepEqual({ 'namespace': 'ns[model]' }, options);
+    //         assert.strictEqual(2, content);
+    //     }
+    //     form.checkBoxGroup('key', {}, 2);
+
+    //     Viking.View.Helpers.checkBoxGroup = old_func;
+    // });
+
     // fieldsFor()
     // ===========
     test("#fieldsFor() yields a Viking.FormBuilder with the namespace set", function () {
         model.set('key', new Model());
         var formBuilder = new Viking.FormBuilder(model);
-        
-        formBuilder.fieldsFor('key', function(f) {
+
+        formBuilder.fieldsFor('key', function (f) {
             assert.equal(f.options.namespace, 'model[key]');
         });
     });
-    
+
     test("#fieldsFor() works with a Viking.FormBuilder that already has a namespace", function () {
         model.set('key', new Model());
-        var formBuilder = new Viking.FormBuilder(model, {namespace: 'ns'});
-        
-        formBuilder.fieldsFor('key', function(f) {
+        var formBuilder = new Viking.FormBuilder(model, { namespace: 'ns' });
+
+        formBuilder.fieldsFor('key', function (f) {
             assert.equal(f.options.namespace, 'ns[model][key]');
         });
     });
-    
+
     test("#fieldsFor() works with a Viking.FormBuilder that is using an STI model", function () {
         var Model = Viking.Model.extend('model');
         var SubModel = Model.extend('sub_model');
-        
+
+
+        Viking.context['Model'] = Model;
+        Viking.context['SubModel'] = SubModel;
+
         var formBuilder = new Viking.FormBuilder(new SubModel());
-        
-        formBuilder.fieldsFor('key', function(f) {
+
+        formBuilder.fieldsFor('key', function (f) {
             assert.equal(f.options.namespace, 'model[key]');
         });
+
+        delete Viking.context['Model'];
+        delete Viking.context['SubModel'];
     });
-    
+
     test("#fieldsFor() works with a hasMany relationship", function () {
-        let Fleet = Viking.Model.extend('fleet', { hasMany: ['ships']});
+        let Fleet = Viking.Model.extend('fleet', { hasMany: ['ships'] });
         let Ship = Viking.Model.extend('ship', {});
         let ShipCollection = Viking.Collection.extend({ model: Ship });
 
-        var a = new Fleet({'ships': [{'id': 10, 'name': 'Billabong'}, {'name': 'Wipple'}] });
+        Viking.context['Fleet'] = Fleet;
+        Viking.context['Ship'] = Ship;
+        Viking.context['ShipCollection'] = ShipCollection;
+
+        var a = new Fleet({ 'ships': [{ 'id': 10, 'name': 'Billabong' }, { 'name': 'Wipple' }] });
         var formBuilder = new Viking.FormBuilder(a);
 
         var html = [
-            '<input name="fleet[ships]['+a.get('ships').models[0].cid+'][id]" type="hidden" value="10">',
-            '<input id="fleet_ships_'+a.get('ships').models[0].cid+'_name" name="fleet[ships]['+a.get('ships').models[0].cid+'][name]" type="text" value="Billabong">',
-            '<input id="fleet_ships_'+a.get('ships').models[1].cid+'_name" name="fleet[ships]['+a.get('ships').models[1].cid+'][name]" type="text" value="Wipple">'
+            '<input name="fleet[ships][' + a.get('ships').models[0].cid + '][id]" type="hidden" value="10">',
+            '<input id="fleet_ships_' + a.get('ships').models[0].cid + '_name" name="fleet[ships][' + a.get('ships').models[0].cid + '][name]" type="text" value="Billabong">',
+            '<input id="fleet_ships_' + a.get('ships').models[1].cid + '_name" name="fleet[ships][' + a.get('ships').models[1].cid + '][name]" type="text" value="Wipple">'
         ];
-        
-        assert.equal(formBuilder.fieldsFor('ships', function(f) {
+
+        assert.equal(formBuilder.fieldsFor('ships', function (f) {
             return f.textField('name');
         }), html.join(''));
+
+        delete Viking.context['Fleet'];
+        delete Viking.context['Ship'];
+        delete Viking.context['ShipCollection'];
     });
 
     test("#fieldsFor() works nested in another #fieldsFor()", function () {
-        let Fleet = Viking.Model.extend('fleet', { hasMany: ['ships']});
-        let Ship = Viking.Model.extend('ship', { schema: { 
-            "amenities": {type: 'json'}
-        }});
+        let Fleet = Viking.Model.extend('fleet', { hasMany: ['ships'] });
+        let Ship = Viking.Model.extend('ship', {
+            schema: {
+                "amenities": { type: 'json' }
+            }
+        });
         let ShipCollection = Viking.Collection.extend({ model: Ship });
 
-        var a = new Fleet({'ships': [{'id': 10, 'name': 'Billabong', 'amenities': {key: 1}}, {'name': 'Wipple', 'amenities': {key: 2}}] });
+
+        Viking.context['Fleet'] = Fleet;
+        Viking.context['Ship'] = Ship;
+        Viking.context['ShipCollection'] = ShipCollection;
+
+        var a = new Fleet({ 'ships': [{ 'id': 10, 'name': 'Billabong', 'amenities': { key: 1 } }, { 'name': 'Wipple', 'amenities': { key: 2 } }] });
         var formBuilder = new Viking.FormBuilder(a);
 
         var html = [
-            '<input name="fleet[ships]['+a.get('ships').models[0].cid+'][id]" type="hidden" value="10">',
-            '<input id="fleet_ships_'+a.get('ships').models[0].cid+'_amenities_key_true" name="fleet[ships]['+a.get('ships').models[0].cid+'][amenities][key]" type="radio" value="true">',
-            '<input id="fleet_ships_'+a.get('ships').models[1].cid+'_amenities_key_true" name="fleet[ships]['+a.get('ships').models[1].cid+'][amenities][key]" type="radio" value="true">'
+            '<input name="fleet[ships][' + a.get('ships').models[0].cid + '][id]" type="hidden" value="10">',
+            '<input id="fleet_ships_' + a.get('ships').models[0].cid + '_amenities_key_true" name="fleet[ships][' + a.get('ships').models[0].cid + '][amenities][key]" type="radio" value="true">',
+            '<input id="fleet_ships_' + a.get('ships').models[1].cid + '_amenities_key_true" name="fleet[ships][' + a.get('ships').models[1].cid + '][amenities][key]" type="radio" value="true">'
         ];
 
         assert.equal(formBuilder.fieldsFor('ships', function (f) {
@@ -644,63 +669,91 @@ module('Viking.View - Viking.FormBuilder', {
                 return f.radioButton('key', true);
             });
         }), html.join(''));
+
+        delete Viking.context['Fleet'];
+        delete Viking.context['Ship'];
+        delete Viking.context['ShipCollection'];
     });
 
     test("#fieldsFor(attribute, model, content)", function () {
-        let Fleet = Viking.Model.extend('fleet', { hasMany: ['ships']});
+        let Fleet = Viking.Model.extend('fleet', { hasMany: ['ships'] });
         let Ship = Viking.Model.extend('ship');
         let ShipCollection = Viking.Collection.extend({ model: Ship });
 
-        var a = new Fleet({'ships': [{'id': 10, 'name': 'Billabong'}, {'name': 'Wipple'}] });
-        var c = new Ship({'id': 22, 'name': 'Maximum'});
+        Viking.context['Fleet'] = Fleet;
+        Viking.context['Ship'] = Ship;
+        Viking.context['ShipCollection'] = ShipCollection;
+
+        var a = new Fleet({ 'ships': [{ 'id': 10, 'name': 'Billabong' }, { 'name': 'Wipple' }] });
+        var c = new Ship({ 'id': 22, 'name': 'Maximum' });
         var formBuilder = new Viking.FormBuilder(a);
 
         var html = [
-            '<input name="fleet[ships]['+c.cid+'][id]" type="hidden" value="22">',
-            '<input id="fleet_ships_'+c.cid+'_name" name="fleet[ships]['+c.cid+'][name]" type="text" value="Maximum">'
+            '<input name="fleet[ships][' + c.cid + '][id]" type="hidden" value="22">',
+            '<input id="fleet_ships_' + c.cid + '_name" name="fleet[ships][' + c.cid + '][name]" type="text" value="Maximum">'
         ];
 
-        assert.equal(formBuilder.fieldsFor('ships', c, function(f) {
+        assert.equal(formBuilder.fieldsFor('ships', c, function (f) {
             return f.textField('name');
         }), html.join(''));
+
+        delete Viking.context['Fleet'];
+        delete Viking.context['Ship'];
+        delete Viking.context['ShipCollection'];
     });
 
     test("#fieldsFor(attribute, array, content)", function () {
-        let Fleet = Viking.Model.extend('fleet', { hasMany: ['ships']});
+        let Fleet = Viking.Model.extend('fleet', { hasMany: ['ships'] });
         let Ship = Viking.Model.extend('ship');
         let ShipCollection = Viking.Collection.extend({ model: Ship });
 
-        var a = new Fleet({'ships': [{'id': 10, 'name': 'Billabong'}, {'name': 'Wipple'}] });
-        var c = _.map([{'id': 22, 'name': 'Maximum'}], function(attrs) { return new Ship(attrs); });
+        Viking.context['Fleet'] = Fleet;
+        Viking.context['Ship'] = Ship;
+        Viking.context['ShipCollection'] = ShipCollection;
+
+        var a = new Fleet({ 'ships': [{ 'id': 10, 'name': 'Billabong' }, { 'name': 'Wipple' }] });
+        var c = _.map([{ 'id': 22, 'name': 'Maximum' }], function (attrs) { return new Ship(attrs); });
         var formBuilder = new Viking.FormBuilder(a);
 
         var html = [
-            '<input name="fleet[ships]['+c[0].cid+'][id]" type="hidden" value="22">',
-            '<input id="fleet_ships_'+c[0].cid+'_name" name="fleet[ships]['+c[0].cid+'][name]" type="text" value="Maximum">'
+            '<input name="fleet[ships][' + c[0].cid + '][id]" type="hidden" value="22">',
+            '<input id="fleet_ships_' + c[0].cid + '_name" name="fleet[ships][' + c[0].cid + '][name]" type="text" value="Maximum">'
         ];
 
-        assert.equal(formBuilder.fieldsFor('ships', c, function(f) {
+        assert.equal(formBuilder.fieldsFor('ships', c, function (f) {
             return f.textField('name');
         }), html.join(''));
+
+        delete Viking.context['Fleet'];
+        delete Viking.context['Ship'];
+        delete Viking.context['ShipCollection'];
     });
 
     test("#fieldsFor(attribute, collection, content)", function () {
-        let Fleet = Viking.Model.extend('fleet', { hasMany: ['ships']});
+        let Fleet = Viking.Model.extend('fleet', { hasMany: ['ships'] });
         let Ship = Viking.Model.extend('ship');
         let ShipCollection = Viking.Collection.extend({ model: Ship });
 
-        var a = new Fleet({'ships': [{'id': 10, 'name': 'Billabong'}, {'name': 'Wipple'}] });
-        var c = new ShipCollection([{'id': 22, 'name': 'Maximum'}]);
+        Viking.context['Fleet'] = Fleet;
+        Viking.context['Ship'] = Ship;
+        Viking.context['ShipCollection'] = ShipCollection;
+
+        var a = new Fleet({ 'ships': [{ 'id': 10, 'name': 'Billabong' }, { 'name': 'Wipple' }] });
+        var c = new ShipCollection([{ 'id': 22, 'name': 'Maximum' }]);
         var formBuilder = new Viking.FormBuilder(a);
 
         var html = [
-            '<input name="fleet[ships]['+c.models[0].cid+'][id]" type="hidden" value="22">',
-            '<input id="fleet_ships_'+c.models[0].cid+'_name" name="fleet[ships]['+c.models[0].cid+'][name]" type="text" value="Maximum">'
+            '<input name="fleet[ships][' + c.models[0].cid + '][id]" type="hidden" value="22">',
+            '<input id="fleet_ships_' + c.models[0].cid + '_name" name="fleet[ships][' + c.models[0].cid + '][name]" type="text" value="Maximum">'
         ];
 
-        assert.equal(formBuilder.fieldsFor('ships', c, function(f) {
+        assert.equal(formBuilder.fieldsFor('ships', c, function (f) {
             return f.textField('name');
         }), html.join(''));
+
+        delete Viking.context['Fleet'];
+        delete Viking.context['Ship'];
+        delete Viking.context['ShipCollection'];
     });
-    
+
 });

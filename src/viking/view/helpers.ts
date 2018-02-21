@@ -1,11 +1,11 @@
 import {
+    addErrorClassToOptions,
+    dataTagOption,
+    sanitizeToId,
     tag,
     tagOption,
     tagOptions,
-    dataTagOption,
-    sanitizeToId,
     tagNameForModelAttribute,
-    addErrorClassToOptions,
     methodOrAttribute,
     render
 } from './helpers/index';
@@ -59,10 +59,9 @@ import {
 
 import { imageTag } from './helpers/asset_helpers/image_tag';
 
-
-
 export const Helpers = {
 
+    addErrorClassToOptions,
     buttonTag,
     checkBox,
     checkBoxGroup,
@@ -71,6 +70,7 @@ export const Helpers = {
     colorField,
     colorFieldTag,
     contentTag,
+    dataTagOption,
     distanceOfTimeInWords,
     formFor,
     formTag,
@@ -91,10 +91,14 @@ export const Helpers = {
     radioButton,
     radioButtonTag,
     render,
+    sanitizeToId,
     select,
     selectTag,
     submitTag,
     tag,
+    tagNameForModelAttribute,
+    tagOption,
+    tagOptions,
     templates: {},
     textArea,
     textAreaTag,

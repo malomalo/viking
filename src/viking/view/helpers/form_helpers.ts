@@ -3,13 +3,7 @@ import * as _ from 'underscore'
 import { FormBuilder } from './builders/form_builder';
 import { CheckBoxGroupBuilder } from './builders/check_box_group_builder';
 
-import {
-    addErrorClassToOptions,
-    methodOrAttribute,
-    sanitizeToId,
-    tagNameForModelAttribute
-} from './index';
-
+import { humanize } from '../../support/string';
 import {
     checkBoxTag,
     colorFieldTag,
@@ -25,8 +19,12 @@ import {
     textAreaTag,
     textFieldTag
 } from './form_tags';
-
-
+import {
+    addErrorClassToOptions,
+    methodOrAttribute,
+    sanitizeToId,
+    tagNameForModelAttribute
+} from './index';
 
 // checkBoxGroup(model, attribute, options = {}, content = func(f))
 // ================================================================
@@ -313,7 +311,7 @@ export function label(model, attribute, content, options, escape) {
     }
 
     if (options === undefined) { options = {}; }
-    if (content === undefined) { content = attribute.humanize(); }
+    if (content === undefined) { content = humanize(attribute); }
     if (typeof content === 'function') { content = content(); }
     if (!options['for']) {
         var name = tagNameForModelAttribute(model, attribute);
@@ -527,7 +525,7 @@ export function select(model, attribute, collection, options) {
 //   // => <textarea cols="20" rows="20" id="entry_body" name="entry[body]" disabled>
 //   //      entry body
 //   //    </textarea>
-export function textArea(model, attribute, options) {
+export function textArea(model, attribute, options: any = {}) {
     var name = options['name'] || tagNameForModelAttribute(model, attribute);
 
     if (options === undefined) { options = {}; }

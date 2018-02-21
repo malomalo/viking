@@ -47,7 +47,7 @@ module('Viking.model::extend', {}, () => {
     });
 
     test("::extend initalizes the assocations", function () {
-        let Model = Viking.Model.extend();
+        let Model = Viking.Model.extend('ship');
 
         assert.deepEqual(Model.associations, {});
     });

@@ -21,6 +21,7 @@ import {
     Reflection,
     Type
 } from './viking/model';
+import { Name } from './viking/model/name';
 import {
     BooleanType,
     DateType,
@@ -33,6 +34,8 @@ import { Predicate } from './viking/predicate';
 import { Router } from './viking/router';
 import { ajax, sync } from './viking/sync';
 import { Helpers, View } from './viking/view';
+import { CheckBoxGroupBuilder } from './viking/view/helpers/builders/check_box_group_builder';
+import { FormBuilder } from './viking/view/helpers/builders/form_builder';
 
 export const Viking: any = {
     ajax,
@@ -41,14 +44,17 @@ export const Viking: any = {
     urlFor: Helpers.urlFor,
 
     ArgumentError,
+    CheckBoxGroupBuilder,
     Collection,
     Controller,
     Cursor,
+    FormBuilder,
     Model: Object.assign(Model, {
         BelongsToReflection,
         HasAndBelongsToManyReflection,
         HasManyReflection,
         HasOneReflection,
+        Name,
         Reflection,
         Type: Object.assign(Type, {
             Boolean: BooleanType,
@@ -63,7 +69,14 @@ export const Viking: any = {
     Predicate,
     Router,
     View: Object.assign(View, {
-        Helpers
+        Helpers,
+        addErrorClassToOptions: Helpers.addErrorClassToOptions,
+        dataTagOption: Helpers.dataTagOption,
+        sanitizeToId: Helpers.sanitizeToId,
+        tagNameForModelAttribute: Helpers.tagNameForModelAttribute,
+        tagOption: Helpers.tagOption,
+        tagOptions: Helpers.tagOptions
+
     })
 
 };

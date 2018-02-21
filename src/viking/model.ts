@@ -514,7 +514,7 @@ export const Model = Backbone.Model.extend({
         extend: function (name, protoProps: any = {}, staticProps: any = {}) {
             if (typeof name !== 'string') {
                 staticProps = protoProps;
-                protoProps = name;
+                protoProps = name || {};
                 name = '';
             }
 
