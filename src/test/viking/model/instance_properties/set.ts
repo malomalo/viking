@@ -47,7 +47,8 @@ module('Viking.Model#set', {}, () => {
             routeKey: 'agents',
             singular: 'agent',
             collection: 'agents',
-            collectionName: 'AgentCollection'
+            collectionName: 'AgentCollection',
+            title: "Agent"
         });
 
         delete Viking.context['Account'];

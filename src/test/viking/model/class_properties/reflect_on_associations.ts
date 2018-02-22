@@ -16,9 +16,8 @@ module('Viking.Model::reflectOnAssociations', {}, () => {
         Viking.context['Ship'] = Ship;
         Viking.context['ShipCollection'] = ShipCollection;
 
-        assert.ok(false);
         // TODO can't access association because not in global space
-        // assert.deepEqual(['carrier', 'ships'], _.map(Ship.reflectOnAssociations(), function(a) { return a.name; }));
+        assert.deepEqual(['carrier', 'ships'], _.map(Ship.reflectOnAssociations(), function(a) { return a["name"]; }));
 
         delete Viking.context['Ship'];
         delete Viking.context['ShipCollection'];
@@ -31,9 +30,8 @@ module('Viking.Model::reflectOnAssociations', {}, () => {
         Viking.context['Ship'] = Ship;
         Viking.context['ShipCollection'] = ShipCollection;
 
-        assert.ok(false);
         // TODO can't access association because not in global space
-        // assert.deepEqual(['ships'], _.map(Ship.reflectOnAssociations('hasMany'), function(a) { return a.name; }));
+        assert.deepEqual(['ships'], _.map(Ship.reflectOnAssociations('hasMany'), function(a) { return a["name"]; }));
 
         delete Viking.context['Ship'];
         delete Viking.context['ShipCollection'];

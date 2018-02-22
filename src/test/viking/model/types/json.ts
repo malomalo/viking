@@ -10,13 +10,12 @@ module('Viking.Model.Type.JSON', {}, () => {
 
     test("::load coerces {} to Viking.Model", function() {
         assert.ok(Viking.Model.Type.JSON.load({}) instanceof Viking.Model);
-
         assert.deepEqual(Viking.Model.Type.JSON.load({}).attributes, {});
         assert.deepEqual(Viking.Model.Type.JSON.load({key: 'value'}).attributes, {key: 'value'});
     });
 
     test("::load coerces {} to Viking.Model with modelName set to key", function() {
-        assert.equal(Viking.Model.Type.JSON.load({}, 'key').modelName, 'key');
+        assert.equal(Viking.Model.Type.JSON.load({}, 'key').modelName.name, 'Key');
     });
     
     test("::load coerces {} to Viking.Model with baseModel set to the JSON object", function() {

@@ -10,7 +10,7 @@ export const JSONType = {
                 inheritanceAttribute: false
             });
             var model = new AnonModel(value);
-            model.modelName = new Name(key);
+            model.modelName = new Name((key || '').toString());
             model.baseModel = model;
             _.each(value, function (v, k: string) {
                 if (_.isObject(v) && !_.isArray(v) && !_.isDate(v)) {
@@ -24,7 +24,6 @@ export const JSONType = {
 
             return model;
         }
-
         if (!(value instanceof Model)) {
             throw new TypeError(typeof value + " can't be coerced into JSON");
         }

@@ -5,160 +5,128 @@ import * as sinon from 'sinon';
 const { module, test, assert } = QUnit;
 
 import { Viking } from '../../../viking';
+import { capitalize, anticapitalize, titleize, humanize, underscore, camelize, booleanize, dasherize, parameterize, pluralize, singularize, demodulize, constantize, rjust, ljust, toParam, toQuery } from '../../../viking/support/string';
 
 module('String', {}, () => {
 
     test("capitalize()", function() {
-        assert.ok(false);
-        // TODO setup support methods        //
-        // assert.equal("test".capitalize(), 'Test');
-        // assert.equal("Test".capitalize(), 'Test');
+        assert.equal(capitalize("test"), 'Test');
+        assert.equal(capitalize("Test"), 'Test');
     });
 
     test("anticapitalize()", function() {
-        assert.ok(false);
-        // TODO setup support methods        //
-        // assert.equal("Test".anticapitalize(), 'test');
-        // assert.equal("test".anticapitalize(), 'test');
+        assert.equal(anticapitalize("Test"), 'test');
+        assert.equal(anticapitalize("test"), 'test');
     });
 
     test("titleize()", function() {
-        assert.ok(false);
-        // TODO setup support methods        //
-        // assert.equal("man from the boondocks".titleize(), "Man From The Boondocks");
-        // assert.equal("x-men: the last stand".titleize(), "X Men: The Last Stand");
-        // assert.equal("TheManWithoutAPast".titleize(), "The Man Without A Past");
-        // assert.equal("raiders_of_the_lost_ark".titleize(), "Raiders Of The Lost Ark");
+        assert.equal(titleize("man from the boondocks"), "Man From The Boondocks");
+        assert.equal(titleize("x-men: the last stand"), "X Men: The Last Stand");
+        assert.equal(titleize("TheManWithoutAPast"), "The Man Without A Past");
+        assert.equal(titleize("raiders_of_the_lost_ark"), "Raiders Of The Lost Ark");
     });
 
     test("humanize()", function() {
-        assert.ok(false);
-        // TODO setup support methods        //
-        // assert.equal("employee_salary".humanize(), "Employee salary");
-        // assert.equal("author_id".humanize(), "Author");
-        // assert.equal("the_man_without_a_past".humanize(), "The man without a past");
+        assert.equal(humanize("employee_salary"), "Employee salary");
+        assert.equal(humanize("author_id"), "Author");
+        assert.equal(humanize("the_man_without_a_past"), "The man without a past");
     });
 
     test("underscore()", function() {
-        assert.ok(false);
-        // TODO setup support methods        //
-        // assert.equal("ActiveModel".underscore(), "active_model");
-        // assert.equal("ActiveModel.Errors".underscore(), "active_model/errors");
-        // assert.equal("SSLError".underscore(), "ssl_error");
+        assert.equal(underscore("ActiveModel"), "active_model");
+        assert.equal(underscore("ActiveModel.Errors"), "active_model/errors");
+        assert.equal(underscore("SSLError"), "ssl_error");
     });
 
     test("camelize()", function() {
-        assert.ok(false);
-        // TODO setup support methods        //
-        // assert.equal("active_model".camelize(), "ActiveModel");
-        // assert.equal("active_model".camelize(true), "ActiveModel");
-        // assert.equal("active_model".camelize(false), "activeModel");
-        // assert.equal("active_model/errors".camelize(), "ActiveModel.Errors");
-        // assert.equal("active_model/errors".camelize(true), "ActiveModel.Errors");
-        // assert.equal("active_model/errors".camelize(false), "activeModel.Errors");
+        assert.equal(camelize("active_model"), "ActiveModel");
+        assert.equal(camelize("active_model", true), "ActiveModel");
+        assert.equal(camelize("active_model", false), "activeModel");
+        assert.equal(camelize("active_model/errors"), "ActiveModel.Errors");
+        assert.equal(camelize("active_model/errors", true), "ActiveModel.Errors");
+        assert.equal(camelize("active_model/errors", false), "activeModel.Errors");
     });
 
     test("booleanize()", function() {
-        assert.ok(false);
-        // TODO setup support methods        //
-        // assert.equal("true".booleanize(), true);
-        // assert.equal("false".booleanize(), false);
-        // assert.equal("other".booleanize(), false);
-        // assert.equal("other".booleanize(true), true);
+        assert.equal(booleanize("true"), true);
+        assert.equal(booleanize("false"), false);
+        assert.equal(booleanize("other"), false);
+        assert.equal(booleanize("other", true), true);
     });
 
     test("dasherize()", function() {
-        assert.ok(false);
-        // TODO setup support methods
-        // assert.equal("puni_puni".dasherize(), "puni-puni");
+        assert.equal(dasherize("puni_puni"), "puni-puni");
     });
 
     test("parameterize()", function() {
-        assert.ok(false);
-        // TODO setup support methods        //
-        // assert.equal("Donald E. Knuth".parameterize(), 'donald-e-knuth');
-        // assert.equal("Donald E. Knuth".parameterize('_'), 'donald_e_knuth');
+        assert.equal(parameterize("Donald E. Knuth"), 'donald-e-knuth');
+        assert.equal(parameterize("Donald E. Knuth", '_'), 'donald_e_knuth');
     });
 
 
     test("pluralize()", function() {
-        assert.ok(false);
-        // TODO setup support methods
-        // assert.equal("word".pluralize(), "words");
-        // assert.equal("word".pluralize(1), "word");
-        // assert.equal("word".pluralize(3, true), "3 words");
+        assert.equal(pluralize("word"), "words");
+        assert.equal(pluralize("word", 1), "word");
+        assert.equal(pluralize("word", 3, true), "3 words");
     });
 
     test("singularize()", function() {
-        assert.ok(false);
-        // TODO setup support methods
-        // assert.equal("words".singularize(), "word");
+        assert.equal(singularize("words"), "word");
     });
 
     test('demodulize()', function () {
-        assert.ok(false);
-        // TODO setup support methods
-        // assert.equal('Namespaced.Module'.demodulize(), 'Module');
-        // assert.equal('Module'.demodulize(), 'Module');
-        // assert.equal(''.demodulize(), '');
+        assert.equal(demodulize("Namespaced.Module", ), 'Module');
+        assert.equal(demodulize('Module'), 'Module');
+        assert.equal(demodulize(''), '');
     });
 
 	test("constantize()", function() {
-        assert.ok(false);
-        // TODO setup support methods
-		// assert.equal("Viking".constantize(), Viking);
-//         assert.equal("Viking.Model".constantize(), Viking.Model);
-//         assert.equal("Model".constantize(Viking), Viking.Model);
-//         assert.throws(
-//             function() { "Unknown".constantize(); },
-//             Viking.NameError,
-//             "uninitialized variable Unknown"
-//         );
-//         assert.throws(
-//             function() { "Unknown.Again".constantize(); },
-//             Viking.NameError,
-//             "uninitialized variable Unknown.Again"
-//         );
+        // TODO can't load Viking
+        // assert.equal(constantize("Viking"), Viking);
+        // assert.equal(constantize("Viking.Model"), Viking.Model);
+        // assert.equal(constantize("Model", Viking), Viking.Model);
+        assert.throws(
+            function() { constantize("Unknown"); },
+            Viking.NameError,
+            "uninitialized variable Unknown"
+        );
+        assert.throws(
+            function() { constantize("Unknown.Again"); },
+            Viking.NameError,
+            "uninitialized variable Unknown.Again"
+        );
 	});
     
     test("rjust()", function() {
-        assert.ok(false);
-        // TODO setup support methods
-        // assert.equal('hello'.rjust(4), 'hello');
-        // assert.equal('hello'.rjust(10), '     hello');
-        // assert.equal('hello'.rjust(10, '-'), '-----hello');
-        // assert.equal('hello'.rjust(10, '1234'), '12341hello');
-        
+        assert.equal(rjust("hello", 4), 'hello');
+        assert.equal(rjust("hello", 10), '     hello');
+        assert.equal(rjust('hello', 10, '-'), '-----hello');
+        assert.equal(rjust('hello', 10, '1234'), '12341hello');
+
         // Test doesn't modify original
-        // var string = 'hello'
-        // string.rjust(10)
-        // assert.equal(string, 'hello')
+        var string = 'hello'
+        rjust(string, 10)
+        assert.equal(string, 'hello')
     });
     
     test("ljust()", function() {
-        assert.ok(false);
-        // TODO setup support methods
-        // assert.equal('hello'.ljust(4), 'hello');
-        // assert.equal('hello'.ljust(10), 'hello     ');
-        // assert.equal('hello'.ljust(10, '-'), 'hello-----');
-        // assert.equal('hello'.ljust(10, '1234'), 'hello12341');
-        
+        assert.equal(ljust("hello", 4), 'hello');
+        assert.equal(ljust("hello", 10), 'hello     ');
+        assert.equal(ljust('hello', 10, '-'), 'hello-----');
+        assert.equal(ljust('hello', 10, '1234'), 'hello12341');
+
         // Test doesn't modify original
-        // var string = 'hello'
-        // string.ljust(10)
-        // assert.equal(string, 'hello')
+        var string = 'hello'
+        ljust(string, 10)
+        assert.equal(string, 'hello')
     });
 	
 	test('#toParam()', function() {
-        assert.ok(false);
-        // TODO setup support methods
-        // assert.equal("myString", ("myString").toParam());
+        assert.equal("myString", toParam("myString"));
 	});
 	
 	test('#toQuery(key)', function() {
-        assert.ok(false);
-        // TODO setup support methods
-        // assert.equal('key=gnirts', 'gnirts'.toQuery('key'));
+        assert.equal('key=gnirts', toQuery('gnirts', 'key'));
 	});
 	
 });

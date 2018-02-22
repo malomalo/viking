@@ -104,6 +104,7 @@ module('Viking.Model#select', {}, () => {
         });
         m.select();
         m.off('selected');
+        assert.ok(true);
     });
     
     test("#select() triggers a 'selected' event on collection only if change", function() {

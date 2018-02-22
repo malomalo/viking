@@ -105,23 +105,18 @@ module('Viking.PaginatedCollection', {}, () => {
     });
 
     // sync() --------------------------------------------------------------------
-    test('sync() adds in cursor params', async () => {
-        assert.ok(false);
-        // TODO
-        // await new Promise((resolve) => {
-        //     var m = Viking.Model.extend('model');
-        //     var c = Viking.PaginatedCollection.extend({model: m});
-        //     var c = new c([]);
-        //
-        //     var old = Viking.sync;
-        //     Viking.sync = function(method, model, options) {
-        //         assert.equal(40, options.data.limit);
-        //         assert.equal(40, options.data.offset);
-        //         resolve();
-        //     }
-        //     c.cursor.set({page: 2, per_page: 40});
-        //     Viking.sync = old;
-        // });
+    test('sync() adds in cursor params', () => {
+        var m = Viking.Model.extend('model');
+        var c = Viking.PaginatedCollection.extend({model: m});
+        var c = new c([]);
+
+        var old = Viking.sync;
+        Viking.sync = function(method, model, options) {
+            assert.equal(40, options.data.limit);
+            assert.equal(40, options.data.offset);
+        }
+        c.cursor.set({page: 2, per_page: 40});
+        Viking.sync = old;
     });
 
 });

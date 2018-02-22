@@ -9,6 +9,11 @@ import { Viking } from '../../../../viking';
 module('Viking.View.Helpers#render', {
     beforeEach: function() {
         // TODO is this needed, if so need to figure out how to setup JST
+        // var JST = {
+        //     'a/template/path'               : _.template('<h1>Some Title</h1>'),
+        //     'a/template/path/with/locals'   : _.template('<p><%= text %></p>')
+        // };
+        //
         // Viking.View.templates = JST;
     }
 }, () => {

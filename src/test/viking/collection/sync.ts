@@ -48,32 +48,27 @@ module('Viking.Collection#sync', {
             Viking.sync = old;
         });
     });
-    // test('adds in predicate params when set', async () => {
-    //     const m = Viking.Model.extend('model');
-    //     const f = new Viking.Predicate({ types: [1, 2] });
-    //     const c = new (Viking.Collection.extend({ model: m }))([], { predicate: f });
+    
+    test('adds in predicate params when set', () => {
+        const m = Viking.Model.extend('model');
+        const f = new Viking.Predicate({ types: [1, 2] });
+        const c = new (Viking.Collection.extend({ model: m }))([], { predicate: f });
 
-    //     c.fetch();
-    //     assert.equal(requests[0].url, '/models?where%255Btypes%255D%5B%5D=1&where%255Btypes%255D%5B%5D=2');
-    // });
+        c.fetch();
+        assert.equal(requests[0].url, '/models?where%255Btypes%255D%5B%5D=1&where%255Btypes%255D%5B%5D=2');
+    });
 
-    test('doesn\'t add predicate params when not set', async () => {
-        assert.ok(false);
-        // TODO
-        // await new Promise((resolve) => {
-        //
-        //     var m = Viking.Model.extend('model');
-        //     var c = Viking.Collection.extend({model: m});
-        //     var c = new c();
-        //
-        //     var old = Viking.sync;
-        //     Viking.sync = function(method, model, options) {
-        //         assert.equal(options.data, undefined);
-        //         resolve();
-        //     }
-        //     c.fetch();
-        //     Viking.sync = old;
-        // });
+    test('doesn\'t add predicate params when not set', () => {
+        var m = Viking.Model.extend('model');
+        var c = Viking.Collection.extend({model: m});
+        var c = new c();
+
+        var old = Viking.sync;
+        Viking.sync = function(method, model, options) {
+            assert.equal(options.data, undefined);
+        }
+        c.fetch();
+        Viking.sync = old;
     });
 
     test('#sync uses Viking.sync', async () => {

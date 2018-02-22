@@ -115,11 +115,12 @@ module('Viking.model::extend', {}, () => {
         let Comment = Viking.Model.extend('comment');
         let Account = Viking.Model.extend('account', { hasMany: ['comments'] });
         let Agent = Account.extend('agent', { hasMany: ['keys'] });
+        
+        Viking.context['Key'] = Key;
+        Viking.context['Comment'] = Comment;
 
-        assert.ok(false);
-        // TODO cannot access associations because they're not in global space
-        // assert.deepEqual(['comments'], _.map(Account.associations, function(a) { return a.name; }));
-        // assert.deepEqual(['comments', 'keys'], _.map(Agent.associations, function(a) { return a.name; }).sort());
+        assert.deepEqual(['comments'], _.map(Account.associations, function(a) { return a["name"]; }));
+        assert.deepEqual(['comments', 'keys'], _.map(Agent.associations, function(a) { return a["name"]; }).sort());
 
     });
 
@@ -129,10 +130,11 @@ module('Viking.model::extend', {}, () => {
         let Account = Viking.Model.extend('account', { belongsTo: ['state'] });
         let Agent = Account.extend('agent', { belongsTo: ['region'] });
 
-        assert.ok(false);
-        // TODO cannot access associations because they're not in global space
-        // assert.deepEqual(['state'], _.map(Account.associations, function(a) { return a.name; }));
-        // assert.deepEqual(['region', 'state'], _.map(Agent.associations, function(a) { return a.name; }).sort());
+        Viking.context['State'] = State;
+        Viking.context['Region'] = Region;
+
+        assert.deepEqual(['state'], _.map(Account.associations, function(a) { return a["name"]; }));
+        assert.deepEqual(['region', 'state'], _.map(Agent.associations, function(a) { return a["name"]; }).sort());
 
     });
 

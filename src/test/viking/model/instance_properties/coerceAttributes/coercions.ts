@@ -123,7 +123,7 @@ module('Viking.Model#coerceAttributes - coercions', {}, () => {
         }});
         var a = new Model();
 
-        assert.deepEqual(a.coerceAttributes({key: {}}).key.modelName, 'key');
+        assert.deepEqual(a.coerceAttributes({key: {}}).key.modelName.name, 'Key');
     });
 
 

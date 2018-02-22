@@ -26,7 +26,8 @@ module('Viking.Model.HasOneReflection::new', {}, () => {
             routeKey: 'parents',
             singular: 'parent',
             collection: 'parents',
-            collectionName: 'ParentCollection'
+            collectionName: 'ParentCollection',
+            title: 'Parent'
         });
     });
     
@@ -44,6 +45,8 @@ module('Viking.Model.HasOneReflection::new', {}, () => {
     test("#klass", function() {
         let Child = Viking.Model.extend();
         let MultiWord = Viking.Model.extend();
+        Viking.context['Child'] = Child;
+        Viking.context['MultiWord'] = MultiWord;
         
         var assocation = new Viking.Model.HasOneReflection('child');
         assert.equal(assocation.klass(), Child);

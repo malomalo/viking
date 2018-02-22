@@ -27,7 +27,8 @@ module('Viking.Model.BelongsToReflection::new', {}, () => {
             routeKey: 'parents',
             singular: 'parent',
             collection: 'parents',
-            collectionName: 'ParentCollection'
+            collectionName: 'ParentCollection',
+            title: 'Parent'
         });
 
         delete Viking.context['Parent'];

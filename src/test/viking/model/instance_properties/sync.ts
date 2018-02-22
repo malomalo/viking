@@ -52,19 +52,15 @@ module('Viking.Model#sync', {
         });
     });
     
-    test("#sync uses Viking.sync", async () => {
-        await new Promise((resolve) => {
-    
-            var m = new Viking.Model();
-    
-            var old = Viking.sync;
-            Viking.sync = function(method, model, options) {
-                assert.ok(true);
-                resolve();
-            }
-            m.sync();
-            Viking.sync = old;
-        });
+    test("#sync uses Viking.sync", () => {
+        var m = new Viking.Model();
+
+        var old = Viking.sync;
+        Viking.sync = function(method, model, options) {
+            assert.ok(true);
+        }
+        m.sync();
+        Viking.sync = old;
     });
 
 });

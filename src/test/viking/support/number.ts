@@ -5,57 +5,43 @@ import * as sinon from 'sinon';
 const { module, test, assert } = QUnit;
 
 import { Viking } from '../../../viking';
+import { toQuery, toParam, ordinalize } from '../../../viking/support/number';
+
 
 module('Number', {}, () => {
 
     test("1.ordinalize()", function() {
-        assert.ok(false);
-        // TODO setup support methods
-        // assert.equal('1st', (1).ordinalize());
+        assert.equal('1st', ordinalize(1));
     });
 
 
     test("2.ordinalize()", function() {
-        assert.ok(false);
-        // TODO setup support methods
-        // assert.equal('2nd', (2).ordinalize());
+        assert.equal('2nd', ordinalize(2));
     });
 
     test("3.ordinalize()", function() {
-        assert.ok(false);
-        // TODO setup support methods
-        // assert.equal('3rd', (3).ordinalize());
+        assert.equal('3rd', ordinalize(3));
     });
 
 
     test("4.ordinalize()", function() {
-        assert.ok(false);
-        // TODO setup support methods
-        // assert.equal('4th', (4).ordinalize());
+        assert.equal('4th', ordinalize(4));
     });
 
     test("100.ordinalize()", function() {
-        assert.ok(false);
-        // TODO setup support methods
-        // assert.equal('100th', (100).ordinalize());
+        assert.equal('100th', ordinalize(100));
     });
 
     test("1013.ordinalize()", function() {
-        assert.ok(false);
-        // TODO setup support methods
-        // assert.equal('1013th', (1013).ordinalize());
+        assert.equal('1013th', ordinalize(1013));
     });
 	
 	test('#toParam()', function() {
-        assert.ok(false);
-        // TODO setup support methods
-        // assert.equal('1013', (1013).toParam());
+        assert.equal('1013', toParam(1013));
 	});
 	
 	test('#toQuery(key)', function() {
-        assert.ok(false);
-        // TODO setup support methods
-        // assert.equal('key=42', (42).toQuery('key'));
+        assert.equal('key=42', toQuery(42, 'key'));
 	});
 
 });

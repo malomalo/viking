@@ -44,6 +44,7 @@ module('Viking.Model.HasManyReflection', {}, () => {
 
     test("#collection", function() {
         let ChildCollection = Viking.Collection.extend();
+        Viking.context['ChildCollection'] = ChildCollection;
         
         var assocation = new Viking.Model.HasManyReflection('children');
         assert.equal(assocation.collection(), ChildCollection);
@@ -52,6 +53,8 @@ module('Viking.Model.HasManyReflection', {}, () => {
     test("#klass", function() {
         let ChildCollection = Viking.Collection.extend();
         let MultiWordCollection = Viking.Model.extend();
+        Viking.context['ChildCollection'] = ChildCollection;
+        Viking.context['MultiWordCollection'] = MultiWordCollection;
         
         var assocation = new Viking.Model.HasManyReflection('children');
         assert.equal(assocation.klass(), ChildCollection);
