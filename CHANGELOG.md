@@ -2,6 +2,9 @@
 
 Major Changes:
 
+  - ES6 Syntax
+  - Removed usage of global namespace on Number, Date, String, etc...
+
 ## 0.9.0 (May 8th, 2016)
 
 Major Changes:
