@@ -6,11 +6,19 @@ import { Name } from './name';
 
 export class Reflection {
 
+    static extend = Backbone.Model.extend;
+
     macro: string;
 
     modelName: Name;
 
     collectionName: string;
+
+    constructor() {
+        this.macro = '';
+        this.modelName = new Name('');
+        this.collectionName = '';
+    }
 
     klass() {
         if (this.macro === 'hasMany') {
@@ -27,7 +35,5 @@ export class Reflection {
     collection(): any {
         return constantize(this.collectionName);
     }
-
-    static extend = Backbone.Model.extend;
 
 }

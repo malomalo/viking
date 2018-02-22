@@ -7,10 +7,10 @@ const firefoxOptions = new firefox.Options();
 // firefoxOptions.headless();
 
 (async () => {
-	const driver = await new Builder()
-		.forBrowser('firefox')
-		.setFirefoxOptions(firefoxOptions)
-		.build();
+    const driver = await new Builder()
+        .forBrowser('firefox')
+        .setFirefoxOptions(firefoxOptions)
+        .build();
 
-	driver.get(`file://${path.resolve(__dirname, '../../src/test/index.html')}`);
+    driver.get(`file://${path.resolve(__dirname, '../../src/test/index.html')}`);
 })();

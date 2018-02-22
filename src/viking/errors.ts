@@ -21,5 +21,3 @@ export class NameError extends Error {
     }
 
 }
-
-

@@ -1,6 +1,6 @@
 export default [{
-    name: 'Viking',
     input: 'dist/viking.js',
+    name: 'Viking',
     output: {
         file: 'dist/bundle.js',
         format: 'iife',
