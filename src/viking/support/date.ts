@@ -38,3 +38,41 @@ export function isThisYear(d: Date): boolean {
 export function past(d: Date): boolean {
     return d < (new Date());
 }
+
+class VikingDate extends Date {
+
+    static today(): VikingDate {
+        return new VikingDate();
+    }
+
+    strftime(fmt: string): string {
+        return strftime_(fmt, this);
+    }
+
+    toParam() {
+        return this.toJSON();
+    }
+
+    toQuery(key: string): string {
+        return toQuery(this, key);
+    }
+
+    isToday(d): boolean {
+        return isToday(this);
+    }
+
+    isThisMonth(): boolean {
+        return isThisMonth(this);
+    }
+
+    isThisYear(): boolean {
+        return isThisYear(this);
+    }
+
+    past(): boolean {
+        return past(this);
+    }
+
+}
+
+export { VikingDate as Date };
