@@ -5,7 +5,8 @@ import { Name } from '../../model/name';
 export const JSONType = {
 
     load: function (value: any, key: string) {
-        if (typeof value === 'object' && !(value instanceof Model)) {
+        if (typeof value === 'object') {
+            if(value instanceof Viking.Model) value = value.attributes;
             var AnonModel = Model.extend({
                 inheritanceAttribute: false
             });
@@ -24,11 +25,7 @@ export const JSONType = {
 
             return model;
         }
-        if (!(value instanceof Model)) {
-            throw new TypeError(typeof value + " can't be coerced into JSON");
-        }
-
-        return value;
+        throw new TypeError(typeof value + " can't be coerced into JSON");
     },
 
     dump: function (value) {

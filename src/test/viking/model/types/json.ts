@@ -53,4 +53,41 @@ module('Viking.Model.Type.JSON', {}, () => {
 
         assert.deepEqual(Viking.Model.Type.JSON.dump(model), { foo: 'bar' });
     });
+    
+    test("::load nested objects", function () {
+        const Datum = Viking.Model.extend({
+            schema: {
+                datum: {type: 'json'}
+            }
+        });
+        const DatumCollection = Viking.Collection.extend({model: Datum});
+        const Property = Viking.Model.extend({
+            hasMany: [
+                ['data', {model: Datum}]
+            ]
+        });
+        Viking.context['Datum'] = Datum;
+        Viking.context['DatumCollection'] = DatumCollection;
+        
+        var property = new Property({
+            data: [{
+                datum: {
+                    a: {
+                        b: 1
+                    }
+                }
+            }]
+        })
+        
+        assert.equal(1, property.get('data').first().get('datum').get('a').get('b'));
+        
+        property.set('data', [{
+            datum: {
+                a: {
+                    b: 1
+                }
+            }
+        }])
+        assert.equal(1, property.get('data').first().get('datum').get('a').get('b'));
+    })
 });
