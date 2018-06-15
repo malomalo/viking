@@ -9,7 +9,7 @@ export function toParam(value: any[]): string {
 // Converts an array into a string suitable for use as a URL query string,
 // using the given key as the param name.
 export function toQuery(value: any[], key: string): string {
-    const prefix = encodeURI(key) + '[]';
+    const prefix = key + '[]';
 
     return value.map((element) => {
         if (element === null || element === undefined) {

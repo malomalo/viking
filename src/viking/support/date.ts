@@ -1,78 +1,79 @@
-import * as _ from 'underscore';
-import { strftime as strftime_ } from '../../strftime';
+// import { strftime as strftime_ } from '../../strftime';
 
-import * as string from './string';
+import {toParam as stringToParam} from './string';
 
-// strftime relies on https://github.com/samsonjs/strftime. It supports
-// standard specifiers from C as well as some other extensions from Ruby.
-export function strftime(date: Date, fmt: string): string {
-    return strftime_(fmt, date);
+// // strftime relies on https://github.com/samsonjs/strftime. It supports
+// // standard specifiers from C as well as some other extensions from Ruby.
+// export function strftime(date: Date, fmt: string): string {
+//     return strftime_(fmt, date);
+// }
+
+// Alias of toJSON().
+export function toParam(value: Date): string {
+    return value.toJSON();
 }
 
-// Alias of to_s.
-export const toParam = (d) => d.toJSON();
-
-export function toQuery(d: Date, key: string): string {
-    return encodeURI(string.toParam(key)) + '=' + encodeURI(toParam(d));
+export function toQuery(value: Date, key: string): string {
+    return encodeURI(stringToParam(key)) + '=' + encodeURI(toParam(value));
 }
 
 export function today(): Date {
     return new Date();
 }
 
-export function isToday(d: Date): boolean {
-    return d.getUTCFullYear() == (new Date()).getUTCFullYear()
-        && d.getUTCMonth() == (new Date()).getUTCMonth()
-        && d.getUTCDate() == (new Date()).getUTCDate();
+export function isToday(value: Date): boolean {
+    return value.getUTCFullYear() === (new Date()).getUTCFullYear()
+        && value.getUTCMonth() === (new Date()).getUTCMonth()
+        && value.getUTCDate() === (new Date()).getUTCDate();
 }
 
-export function isThisMonth(d: Date): boolean {
-    return d.getUTCFullYear() == (new Date()).getUTCFullYear()
-        && d.getUTCMonth() == (new Date()).getUTCMonth();
+export function isThisMonth(value: Date): boolean {
+    return value.getUTCFullYear() === (new Date()).getUTCFullYear()
+        && value.getUTCMonth() === (new Date()).getUTCMonth();
 }
 
-export function isThisYear(d: Date): boolean {
-    return d.getUTCFullYear() == (new Date()).getUTCFullYear();
+export function isThisYear(value: Date): boolean {
+    return value.getUTCFullYear() === (new Date()).getUTCFullYear();
 }
 
-export function past(d: Date): boolean {
-    return d < (new Date());
+export function past(value: Date): boolean {
+    return value < (new Date());
 }
 
-class VikingDate extends Date {
+// class VikingDate extends Date {
 
-    static today(): VikingDate {
-        return new VikingDate();
-    }
+//     static today(): VikingDate {
+//         return new VikingDate();
+//     }
 
-    strftime(fmt: string): string {
-        return strftime_(fmt, this);
-    }
+//     strftime(fmt: string): string {
+//         return strftime_(fmt, this);
+//     }
 
-    toParam() {
-        return this.toJSON();
-    }
+//     toParam() {
+//         return this.toJSON();
+//     }
 
-    toQuery(key: string): string {
-        return toQuery(this, key);
-    }
+//     toQuery(key: string): string {
+//         return toQuery(this, key);
+//     }
 
-    isToday(d): boolean {
-        return isToday(this);
-    }
+//     isToday(d): boolean {
+//         return isToday(this);
+//     }
 
-    isThisMonth(): boolean {
-        return isThisMonth(this);
-    }
+//     isThisMonth(): boolean {
+//         return isThisMonth(this);
+//     }
 
-    isThisYear(): boolean {
-        return isThisYear(this);
-    }
+//     isThisYear(): boolean {
+//         return isThisYear(this);
+//     }
 
-    past(): boolean {
-        return past(this);
-    }
+//     past(): boolean {
+//         return past(this);
+//     }
 
-}
+// }
 
-export { VikingDate as Date };
+// export { VikingDate as Date };

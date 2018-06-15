@@ -1,8 +1,6 @@
-import * as _ from 'underscore';
-import 'underscore.inflection';
-
 import { context } from '../context';
 import { NameError } from '../errors';
+import { singularize, pluralize } from './inflector';
 
 // Converts the first character to uppercase
 export function capitalize(value: string): string {
@@ -43,7 +41,7 @@ export function humanize(value: string): string {
 //
 //     "SSLError".underscore().camelize() # => "SslError"
 export function underscore(value: string): string {
-    var result = value.replace('.', '/');
+    let result = value.replace('.', '/');
     result = result.replace(/([A-Z\d]+)([A-Z][a-z])/g, "$1_$2");
     result = result.replace(/([a-z\d])([A-Z])/g, "$1_$2");
     return result.replace('-', '_').toLowerCase();
@@ -116,18 +114,8 @@ export function parameterize(value: string, seperator?: string): string {
     return value.toLowerCase().replace(/[^a-z0-9\-_]+/g, seperator || '-');
 }
 
-// Add Underscore.inflection#pluralize function on the String object
-export function pluralize(value: string, count?: number, includeNumber?: boolean) {
-    return (_ as any).pluralize(value, count, includeNumber);
-}
-
-// Add Underscore.inflection#singularize function on the String object
-export function singularize(value: string) {
-    return (_ as any).singularize(value);
-}
-
 // Tries to find a variable with the name specified in context of `context`.
-// `context` defaults to the `window` variable.
+// `context` defaults to the `Viking.context` variable.
 //
 // Examples:
 //     'Module'.constantize     # => Module
@@ -136,12 +124,13 @@ export function singularize(value: string) {
 //
 // Viking.NameError is raised when the variable is unknown.
 export function constantize(value: string, lookupContext?: any): any {
-    return _.reduce(value.split('.'), (ctx, name) => {
+    return value.split('.').reduce((ctx, name) => {
         const v = ctx[name];
         if (!v) {
             throw new NameError('uninitialized variable ' + name);
         }
         return v;
+
     }, lookupContext ? lookupContext : context);
 }
 
@@ -152,7 +141,7 @@ export function constantize(value: string, lookupContext?: any): any {
 //     'Module'.demodulize() # => 'Module'
 //     ''.demodulize() # => ''
 export function demodulize(value: string, seperator: string = '.'): string {
-    var index = value.lastIndexOf(seperator);
+    let index = value.lastIndexOf(seperator);
 
     if (index === -1) {
         return String(value);
@@ -197,10 +186,14 @@ export function ljust(value: string, length: number, padString: string = ' '): s
     return value + padding;
 }
 
-export const toParam = (value: string) => value.toString();
+export function toParam(value: string) {
+    return value.toString();
+}
 
 export function toQuery(value: string, key: string): string {
     return encodeURI(toParam(key)) + '=' + encodeURI(toParam(value));
 }
 
-export const downcase = (v: string) => v.toLowerCase();
+
+// Add Viking.Inflector #singularize and #pluralize function on the String object
+export {singularize, pluralize}

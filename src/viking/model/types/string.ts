@@ -7,7 +7,7 @@ export const StringType = {
         return value;
     },
 
-    dump: function (value: string): any {
+    dump: function (value: string | null | undefined): any {
         if (typeof value !== 'string' && value !== undefined && value !== null) {
             return String(value);
         }
