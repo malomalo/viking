@@ -1,4 +1,4 @@
-//     Viking.js 0.9.0 (sha:c572d27)
+//     Viking.js 0.9.0 (sha:46277d0)
 //
 //     (c) 2012-2018 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -276,7 +276,7 @@ String.prototype.underscore = function() {
     var result = this.replace('.', '/');
     result = result.replace(/([A-Z\d]+)([A-Z][a-z])/g, "$1_$2");
     result = result.replace(/([a-z\d])([A-Z])/g, "$1_$2");
-    return result.replace('-', '_').toLowerCase();
+    return result.replace('-', '_').replace('-', '_').toLowerCase();
 };
 
 // By default, #camelize converts strings to UpperCamelCase. If the argument
