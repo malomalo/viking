@@ -1,4 +1,4 @@
-//     Viking.js 0.9.0 (sha:46277d0)
+//     Viking.js 0.9.0 (sha:8f0a410)
 //
 //     (c) 2012-2018 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -1792,9 +1792,10 @@ Viking.View.Helpers = {};
             name = model.baseModel.modelName.paramKey + '[' + attribute + ']';
         }
         
-         if (value instanceof Viking.Collection || _.isArray(value)) {
-             name = name + '[]';
-         }
+        var isArray = model.schema[attribute] && model.schema[attribute].array;
+        if (value instanceof Viking.Collection || _.isArray(value) || isArray) {
+            name = name + '[]';
+        }
      
          return name;
     };
