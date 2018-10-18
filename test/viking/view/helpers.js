@@ -108,6 +108,15 @@
         equal("model[names][]", Viking.View.tagNameForModelAttribute(model, 'names'));
     });
     
+    test("tagNameForModelAttribute(model, schemaArray)", function() {
+        var Model = Viking.Model.extend('model', {
+            schema: {names: {type: 'string', array: true}}
+        });
+        var model = new Model();
+
+        equal("model[names][]", Viking.View.tagNameForModelAttribute(model, 'names'));
+    });
+    
     test("tagNameForModelAttribute(model, arrayAttribute, {namespace: ...})", function() {
         var Model = Viking.Model.extend('model');
         var model = new Model({names: ["name"]});
