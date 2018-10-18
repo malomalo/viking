@@ -1,4 +1,4 @@
-//     Viking.js 0.9.0 (sha:8f0a410)
+//     Viking.js 0.9.0 (sha:98747fe)
 //
 //     (c) 2012-2018 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -1792,7 +1792,7 @@ Viking.View.Helpers = {};
             name = model.baseModel.modelName.paramKey + '[' + attribute + ']';
         }
         
-        var isArray = model.schema[attribute] && model.schema[attribute].array;
+        var isArray = model.schema && model.schema[attribute] && model.schema[attribute].array;
         if (value instanceof Viking.Collection || _.isArray(value) || isArray) {
             name = name + '[]';
         }
@@ -2541,6 +2541,7 @@ Viking.View.Helpers.passwordFieldTag = function (name, value, options) {
 Viking.View.Helpers.radioButtonTag = function (name, value, checked, options) {
     if (options === undefined) { options = {}; }
     if (checked === true) { options.checked = true; }
+    if (options.checked === false) { delete options.checked; }
     _.defaults(options, {
         type: "radio",
         value: value,

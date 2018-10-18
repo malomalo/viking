@@ -15,6 +15,9 @@
         equal( Viking.View.Helpers.radioButtonTag('gender', 'male', false, {disabled: true}), '<input disabled id="gender" name="gender" type="radio" value="male">');
         
         equal( Viking.View.Helpers.radioButtonTag('gender', 'male', false, {'class': "myClass"}), '<input class="myClass" id="gender" name="gender" type="radio" value="male">');
+        
+        equal( Viking.View.Helpers.radioButtonTag('gender', 'male', false, {checked: true}), '<input checked id="gender" name="gender" type="radio" value="male">');
+        equal( Viking.View.Helpers.radioButtonTag('gender', 'male', false, {checked: false}), '<input id="gender" name="gender" type="radio" value="male">');
     });
 
 }());
