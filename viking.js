@@ -1,4 +1,4 @@
-//     Viking.js 0.9.0 (sha:98747fe)
+//     Viking.js 0.9.0 (sha:b2a94ff)
 //
 //     (c) 2012-2018 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -4077,7 +4077,7 @@ Viking.PaginatedCollection = Viking.Collection.extend({
     },
     
     cursorChanged: function(cursor, options) {
-        this.fetch();
+        this.fetch(options);
     },
     
     parse: function(attrs, xhr) {
