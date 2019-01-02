@@ -7,7 +7,7 @@ describe('Viking.Model::limit', () => {
     class Model extends VikingModel { }
 
     it('with limit', function(done) {
-        Model.limit(12).then((models) => {
+        Model.limit(12).load((models) => {
             if (models === null) {
                 assert.fail("model expected");
                 return;
