@@ -1,9 +1,6 @@
 import * as assert from 'assert';
-// import * as sinon from 'sinon';
 import 'mocha';
 import VikingModel from 'viking/model';
-import { toQuery } from 'viking/support/object';
-import { ServerError } from 'viking/errors';
 
 
 describe('Viking.Model::limit', () => {

@@ -299,7 +299,7 @@ describe('Viking.Events', () => {
       const a = new Event();
       const b = new Event();
       const fn = () => {};
-      console.log(a.listenerId, b.listenerId);
+      // console.log(a.listenerId, b.listenerId);
       a.addEventListenerFor(b, 'event', fn);
       b.removeEventListener();
       assert.equal(Object.keys(a.bindedObjects).length, 0);
