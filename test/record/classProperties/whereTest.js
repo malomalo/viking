@@ -62,6 +62,26 @@ describe('Viking.Model::where', () => {
         });
     });
     
+    it('::where spawns on multiple uses', function(done) {
+        var fleet = Ship.where({class: 'battleship'})
+        
+        fleet.where({id: 10}).load((models) => {
+            assert.equal(models[0].readAttribute('id'), 10);
+        }).then(done, done);
+
+        this.withRequest('GET', '/ships', { where: {id: 10, class: 'battleship'}, order: {id: 'desc'} }, (xhr) => {
+            xhr.respond(200, {}, '[{"id": 10}]');
+        });
+        
+        fleet.where({id: 20}).load((models) => {
+            assert.equal(models[0].readAttribute('id'), 20);
+        }).then(done, done);
+
+        this.withRequest('GET', '/ships', { where: {id: 20, class: 'battleship'}, order: {id: 'desc'} }, (xhr) => {
+            xhr.respond(200, {}, '[{"id": 20}]');
+        });
+    });
+    
 //   test '::where(AND CONDITION)' do
 //     webmock(:get, "/ships", { where: {id: 10, name: 'name'}, limit: 1, order: [{id: :asc}] }).to_return({
 //       body: [{id: 42}].to_json
