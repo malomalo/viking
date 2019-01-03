@@ -16,6 +16,7 @@ before(function() {
         if (Object.keys(params).length > 0) { url += `?${toQuery(params)}`; }
 
         let match = this.requests.find((xhr) => {
+            // console.log(xhr.method, method);
             // console.log(decodeURIComponent(xhr.url), decodeURIComponent(url));
             return xhr.method === method && xhr.url === 'http://example.com' + url;
         });
@@ -23,7 +24,9 @@ before(function() {
         if (match) {
             callback(match);
         } else {
-
+            this.requests.forEach((xhr) => {
+                console.log(decodeURIComponent(xhr.url));
+            });
         }
     };
 });
