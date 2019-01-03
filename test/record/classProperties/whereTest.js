@@ -55,7 +55,7 @@ describe('Viking.Model::where', () => {
             assert.equal(models.length, 1);
             assert.ok(models[0] instanceof Ship);
             assert.equal(models[0].readAttribute('id'), 42);
-        }).then(done, done);
+        }).then(() => { done() }, done);
         
         this.withRequest('GET', '/ships', { where: {crew: {size: 5, class: 'first'}}, order: {id: 'desc'} }, (xhr) => {
             xhr.respond(200, {}, '[{"id": 42}]');
@@ -63,21 +63,22 @@ describe('Viking.Model::where', () => {
     });
     
     it('::where spawns on multiple uses', function(done) {
-        var fleet = Ship.where({class: 'battleship'})
+        let fleet = Ship.where({class: 'battleship'})
         
-        fleet.where({id: 10}).load((models) => {
-            assert.equal(models[0].readAttribute('id'), 10);
-        }).then(done, done);
+        Promise.all([
+            fleet.where({id: 10}).load((models) => {
+                assert.equal(models[0].readAttribute('id'), 10);
+            }),
+            fleet.where({id: 20}).load((models) => {
+                assert.equal(models[0].readAttribute('id'), 20);
+            })
+        ]).then(() => { done() }, done);
 
-        this.withRequest('GET', '/ships', { where: {id: 10, class: 'battleship'}, order: {id: 'desc'} }, (xhr) => {
+        this.withRequest('GET', '/ships', { where: {class: 'battleship', id: 10}, order: {id: 'desc'} }, (xhr) => {
             xhr.respond(200, {}, '[{"id": 10}]');
         });
-        
-        fleet.where({id: 20}).load((models) => {
-            assert.equal(models[0].readAttribute('id'), 20);
-        }).then(done, done);
 
-        this.withRequest('GET', '/ships', { where: {id: 20, class: 'battleship'}, order: {id: 'desc'} }, (xhr) => {
+        this.withRequest('GET', '/ships', { where: {class: 'battleship', id: 20}, order: {id: 'desc'} }, (xhr) => {
             xhr.respond(200, {}, '[{"id": 20}]');
         });
     });
