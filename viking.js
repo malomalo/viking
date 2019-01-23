@@ -1,6 +1,6 @@
-//     Viking.js 0.9.0 (sha:b2a94ff)
+//     Viking.js 0.9.0 (sha:31349f4)
 //
-//     (c) 2012-2018 Jonathan Bracy, 42Floors Inc.
+//     (c) 2012-2019 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
 //     http://vikingjs.com
 
@@ -236,26 +236,26 @@ Object.defineProperty(Object.prototype, 'toQuery', {
     enumerable: false
 });
 // Converts the first character to uppercase
-String.prototype.capitalize = function() {
+String.prototype.capitalize = function () {
     return this.charAt(0).toUpperCase() + this.slice(1);
 };
 
 // Converts the first character to lowercase
-String.prototype.anticapitalize = function() {
+String.prototype.anticapitalize = function () {
     return this.charAt(0).toLowerCase() + this.slice(1);
 };
 
 // Capitalizes all the words and replaces some characters in the string to
 // create a nicer looking title. titleize is meant for creating pretty output.
-String.prototype.titleize = function() {
-    return this.underscore().humanize().replace(/\b('?[a-z])/g, function(m){ return m.toUpperCase(); });
+String.prototype.titleize = function () {
+    return this.underscore().humanize().replace(/\b('?[a-z])/g, function (m) { return m.toUpperCase(); });
 };
 
 // Capitalizes the first word and turns underscores into spaces and strips a
 // trailing "_id", if any. Like titleize, this is meant for creating pretty output.
-String.prototype.humanize = function() {
+String.prototype.humanize = function () {
     var result = this.toLowerCase().replace(/_id$/, '').replace(/_/g, ' ');
-    result = result.replace(/([a-z\d]*)/g, function(m) { return m.toLowerCase(); });
+    result = result.replace(/([a-z\d]*)/g, function (m) { return m.toLowerCase(); });
     return result.capitalize();
 };
 
@@ -272,7 +272,7 @@ String.prototype.humanize = function() {
 // though there are cases where that does not hold:
 //
 //     "SSLError".underscore().camelize() # => "SslError"
-String.prototype.underscore = function() {
+String.prototype.underscore = function () {
     var result = this.replace('.', '/');
     result = result.replace(/([A-Z\d]+)([A-Z][a-z])/g, "$1_$2");
     result = result.replace(/([a-z\d])([A-Z])/g, "$1_$2");
@@ -297,7 +297,7 @@ String.prototype.underscore = function() {
 // though there are cases where that does not hold:
 //
 //     "SSLError".underscore().camelize()   // => "SslError"
-String.prototype.camelize = function(uppercase_first_letter) {
+String.prototype.camelize = function (uppercase_first_letter) {
     var result;
 
     if (uppercase_first_letter === undefined || uppercase_first_letter) {
@@ -306,7 +306,7 @@ String.prototype.camelize = function(uppercase_first_letter) {
         result = this.anticapitalize();
     }
 
-    result = result.replace(/(_|(\/))([a-z\d]*)/g, function(_a, _b, first, rest) {
+    result = result.replace(/(_|(\/))([a-z\d]*)/g, function (_a, _b, first, rest) {
         return (first || '') + rest.capitalize();
     });
 
@@ -322,10 +322,10 @@ String.prototype.camelize = function(uppercase_first_letter) {
 //     "false".booleanize()      // => false
 //     "other".booleanize()      // => false
 //     "other".booleanize(true)  // => true
-String.prototype.booleanize = function(defaultTo) {
-    if(this.toString() === 'true') { return true; }
+String.prototype.booleanize = function (defaultTo) {
+    if (this.toString() === 'true') { return true; }
     if (this.toString() === 'false') { return false; }
-    
+
     return (defaultTo === undefined ? false : defaultTo);
 };
 
@@ -334,7 +334,7 @@ String.prototype.booleanize = function(defaultTo) {
 // Example:
 //
 //     "puni_puni"  // => "puni-puni"
-String.prototype.dasherize = function() {
+String.prototype.dasherize = function () {
     return this.replace('_', '-');
 };
 
@@ -344,17 +344,17 @@ String.prototype.dasherize = function() {
 // Example:
 //
 //     "Donald E. Knuth".parameterize() // => 'donald-e-knuth'
-String.prototype.parameterize = function(seperator) {
+String.prototype.parameterize = function (seperator) {
     return this.toLowerCase().replace(/[^a-z0-9\-_]+/g, seperator || '-');
 };
 
 // Add Underscore.inflection#pluralize function on the String object
-String.prototype.pluralize = function(count, includeNumber) {
+String.prototype.pluralize = function (count, includeNumber) {
     return _.pluralize(this, count, includeNumber);
 };
 
 // Add Underscore.inflection#singularize function on the String object
-String.prototype.singularize = function() {
+String.prototype.singularize = function () {
     return _.singularize(this);
 };
 
@@ -367,14 +367,30 @@ String.prototype.singularize = function() {
 //     'Unit'.constantize(Test) # => Test.Unit
 //
 // Viking.NameError is raised when the variable is unknown.
-String.prototype.constantize = function(context) {
-	if(!context) { context = window; }
-	
-	return _.reduce(this.split('.'), function(context, name){
-		var v = context[name];
-		if (!v) { throw new Viking.NameError("uninitialized variable " + name); }
-		return v;
-	}, context);	
+String.prototype.constantize = function (context) {
+    if (!context) { context = window; }
+
+    var value = undefined;
+
+    try {
+        value = _.reduce(this.split('.'), function (context, name) {
+            var v = context[name];
+            if (!v) { throw new Viking.NameError("uninitialized variable " + name); }
+            return v;
+        }, context);
+    } catch (e) {
+        if (e instanceof Viking.NameError) {
+            value = _.reduce(this.split('::'), function (context, name) {
+                var v = context[name];
+                if (!v) { throw new Viking.NameError("uninitialized variable " + name); }
+                return v;
+            }, context);
+        } else {
+            throw e;
+        }
+    }
+
+    return value;
 };
 
 // Removes the module part from the expression in the string.
@@ -400,9 +416,9 @@ String.prototype.demodulize = function (seperator) {
 // If `length` is greater than the length of the string, returns a new String
 // of length `length` with the string right justified and padded with padString;
 // otherwise, returns string
-String.prototype.rjust = function(length, padString) {
+String.prototype.rjust = function (length, padString) {
     if (!padString) { padString = ' '; }
-    
+
     var padding = '';
     var paddingLength = length - this.length;
 
@@ -420,9 +436,9 @@ String.prototype.rjust = function(length, padString) {
 // If `length` is greater than the length of the string, returns a new String
 // of length `length` with the string left justified and padded with padString;
 // otherwise, returns string
-String.prototype.ljust = function(length, padString) {
+String.prototype.ljust = function (length, padString) {
     if (!padString) { padString = ' '; }
-    
+
     var padding = '';
     var paddingLength = length - this.length;
 
@@ -440,8 +456,8 @@ String.prototype.ljust = function(length, padString) {
 // Alias of to_s.
 String.prototype.toParam = String.prototype.toString;
 
-String.prototype.toQuery = function(key) {
-	return escape(key.toParam()) + "=" + escape(this.toParam());
+String.prototype.toQuery = function (key) {
+    return escape(key.toParam()) + "=" + escape(this.toParam());
 };
 
 String.prototype.downcase = String.prototype.toLowerCase;
