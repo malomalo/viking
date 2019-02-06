@@ -1616,7 +1616,7 @@ Viking.Collection = Backbone.Collection.extend({
         }
         
         if (this.ordering) {
-            var orderingEqual = _.find( _.map(this.ordering, function(el, i) { return _.isEqual(el, order[i]); }), function (el) { return el; } );
+            var orderingEqual = !_.contains( _.map(this.ordering, function(el, i) { return _.isEqual(el, order[i]); }), false );
             if (!orderingEqual) {
                 this.ordering = order;
                 if (!options.silent) { this.orderChanged(order); }
