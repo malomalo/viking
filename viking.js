@@ -1,4 +1,4 @@
-//     Viking.js 0.9.0 (sha:31349f4)
+//     Viking.js 0.9.0 (sha:6a67cb4)
 //
 //     (c) 2012-2019 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -1437,6 +1437,7 @@ Viking.Collection = Backbone.Collection.extend({
 
     constructor: function(models, options) {
         Backbone.Collection.call(this, models, options);
+        this.includes = undefined;
         
         if(options && options.predicate) {
             this.setPredicate(options.predicate, {silent: true});
@@ -1445,6 +1446,9 @@ Viking.Collection = Backbone.Collection.extend({
             this.order(options.order, {silent: true});
         }
 
+        if(options && options.include) {
+            this.include(options.include, {silent: true});
+        }
     },
     
     url: function() {
@@ -1565,6 +1569,11 @@ Viking.Collection = Backbone.Collection.extend({
             options.data.order = this.ordering;
         }
         
+        if(method == 'read' && this.includes){
+            options.data || (options.data = {});
+            options.data.include = this.includes;
+        }
+        
         return Viking.sync.apply(this, arguments);
     },
 
@@ -1633,6 +1642,24 @@ Viking.Collection = Backbone.Collection.extend({
     // collections to overwrite what happens when it changes, similar to
     // #predicateChanged
     orderChanged: function(order) {
+        this.fetch();
+    },
+    
+
+    
+    
+    include: function(includes, options) {
+        if(_.isEmpty(includes)) {
+            this.includes = undefined;
+            if (!options.silent) { this.includeChanged(order); }
+            return;
+        }
+        
+        this.includes = includes;
+        if (!options.silent) { this.includeChanged(order); }
+    },
+    
+    includeChanged: function(includes) {
         this.fetch();
     }
     
@@ -4079,7 +4106,15 @@ Viking.View.Helpers.render = function (templatePath, locals) {
 Viking.PaginatedCollection = Viking.Collection.extend({
     constructor: function(models, options) {
         Viking.Collection.apply(this, arguments);
-        this.cursor = ((options && options.cursor) || new Viking.Cursor());
+        if (options && options.cursor) {
+            if(options.cursor instanceof Viking.Cursor) {
+                this.cursor = options.cursor;
+            } else {
+                this.cursor = new Viking.Cursor(options.cursor);
+            }
+        } else {
+            this.cursor = new Viking.Cursor();
+        }
         this.listenTo(this.cursor, 'change', function() {
             if(this.cursor.requiresRefresh()) {
                 this.cursorChanged.apply(this, arguments);
