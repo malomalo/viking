@@ -1,4 +1,4 @@
-//     Viking.js 0.9.0 (sha:754b69f)
+//     Viking.js 0.9.0 (sha:3c6d0e8)
 //
 //     (c) 2012-2019 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -46,7 +46,7 @@ Object.defineProperty(Array.prototype, 'toParam', {
 Object.defineProperty(Array.prototype, 'toQuery', {
     value: function (key) {
         var prefix = key + "[]";
-        return _.map(this, function(value) { return value === null ? escape(prefix) + '=' : value.toQuery(prefix); }).join('&');
+        return _.map(this, function(value) { return value === null ? encodeURIComponent(prefix) + '=' : value.toQuery(prefix); }).join('&');
     },
     writable: true,
     configureable: true,
@@ -56,7 +56,7 @@ Object.defineProperty(Array.prototype, 'toQuery', {
 Boolean.prototype.toParam = Boolean.prototype.toString;
 
 Boolean.prototype.toQuery = function(key) {
-	return escape(key.toParam()) + "=" + escape(this.toParam());
+	return encodeURIComponent(key.toParam()) + "=" + encodeURIComponent(this.toParam());
 };
 // strftime relies on https://github.com/samsonjs/strftime. It supports
 // standard specifiers from C as well as some other extensions from Ruby.
@@ -106,7 +106,7 @@ Date.prototype.strftime = function(fmt) {
 Date.prototype.toParam = Date.prototype.toJSON;
 
 Date.prototype.toQuery = function(key) {
-	return escape(key.toParam()) + "=" + escape(this.toParam());
+	return encodeURIComponent(key.toParam()) + "=" + encodeURIComponent(this.toParam());
 };
 
 
@@ -157,7 +157,7 @@ Number.prototype.ordinalize = function() {
 Number.prototype.toParam = Number.prototype.toString;
 
 Number.prototype.toQuery = function(key) {
-	return escape(key.toParam()) + "=" + escape(this.toParam());
+	return encodeURIComponent(key.toParam()) + "=" + encodeURIComponent(this.toParam());
 };
 
 
@@ -212,7 +212,7 @@ Object.defineProperty(Object.prototype, 'toParam', {
             var namespaceWithKey = (namespace ? (namespace + "[" + key + "]") : key);
 
             if (value === null || value === undefined) {
-                return escape(namespaceWithKey);
+                return encodeURIComponent(namespaceWithKey);
             } else {
                 return value.toQuery(namespaceWithKey);
             }
@@ -457,7 +457,7 @@ String.prototype.ljust = function (length, padString) {
 String.prototype.toParam = String.prototype.toString;
 
 String.prototype.toQuery = function (key) {
-    return escape(key.toParam()) + "=" + escape(this.toParam());
+    return encodeURIComponent(key.toParam()) + "=" + encodeURIComponent(this.toParam());
 };
 
 String.prototype.downcase = String.prototype.toLowerCase;
@@ -3262,7 +3262,7 @@ Viking.View.Helpers.checkBox = function (model, attribute, options, checkedValue
     if (uncheckedValue === undefined) { uncheckedValue = false; }
     Viking.View.addErrorClassToOptions(model, attribute, options);
 
-    var name = options.name || Viking.View.tagNameForModelAttribute(model, attribute);    
+    var name = options.name || Viking.View.tagNameForModelAttribute(model, attribute, options);    
     output += Viking.View.Helpers.hiddenFieldTag(name, uncheckedValue, undefined, escape);
     output += Viking.View.Helpers.checkBoxTag(name, checkedValue, checkedValue === value, options, escape);
     
@@ -3345,7 +3345,7 @@ Viking.View.Helpers.collectionSelect = function (model, attribute, collection, v
         optionOptions.selected = Viking.View.methodOrAttribute(model.get(attribute), valueAttribute);
     }
     
-    var name = options.name || Viking.View.tagNameForModelAttribute(model, attribute);
+    var name = options.name || Viking.View.tagNameForModelAttribute(model, attribute, options);
     var optionsTags = Viking.View.Helpers.optionsFromCollectionForSelectTag(collection, valueAttribute, textAttribute, selectOptions);
     return Viking.View.Helpers.selectTag(name, optionsTags, selectOptions);
 };
@@ -3406,7 +3406,7 @@ Viking.View.Helpers.formFor = function (model, options, content) {
 //   // => <input type="hidden" name="user[token]" value="token">
 Viking.View.Helpers.hiddenField = function (model, attribute, options) {
     var value = model.get(attribute);
-    var name = Viking.View.tagNameForModelAttribute(model, attribute);
+    var name = Viking.View.tagNameForModelAttribute(model, attribute, options);
     
     return Viking.View.Helpers.hiddenFieldTag(name, (value || ''), options);
 };
@@ -3454,7 +3454,7 @@ Viking.View.Helpers.label = function (model, attribute, content, options, escape
     if (content === undefined) { content = attribute.humanize(); }
     if (typeof content === 'function') { content = content(); }        
     if (!options['for']) {
-        var name = Viking.View.tagNameForModelAttribute(model, attribute);
+        var name = Viking.View.tagNameForModelAttribute(model, attribute, options);
         options['for'] = Viking.View.sanitizeToId(name);
     }
     if (options['value']) {
@@ -3482,7 +3482,7 @@ Viking.View.Helpers.label = function (model, attribute, content, options, escape
 //   // => <input class="form_input" id="account_requests" name="account[requests]" type="number" value="27">
 Viking.View.Helpers.numberField = function (model, attribute, options) {
     options = _.extend({}, options);
-    var name = options.name || Viking.View.tagNameForModelAttribute(model, attribute);
+    var name = options.name || Viking.View.tagNameForModelAttribute(model, attribute, options);
 
     Viking.View.addErrorClassToOptions(model, attribute, options);
     
@@ -3502,7 +3502,7 @@ Viking.View.Helpers.numberField = function (model, attribute, options) {
 //   // => <input id="brand_accent" name="brand[accent]" type="color">
 Viking.View.Helpers.colorField = function (model, attribute, options) {
     options = _.extend({}, options);
-    var name = options.name || Viking.View.tagNameForModelAttribute(model, attribute);
+    var name = options.name || Viking.View.tagNameForModelAttribute(model, attribute, options);
 
     Viking.View.addErrorClassToOptions(model, attribute, options);
     
@@ -3513,7 +3513,7 @@ Viking.View.Helpers.colorField = function (model, attribute, options) {
 // same as numberField only it converts value from cents to dollars (val / 100)
 Viking.View.Helpers.moneyField = function (model, attribute, options) {
     options = _.extend({class: "viking-money-field"}, options);
-    var name = options.name || Viking.View.tagNameForModelAttribute(model, attribute);
+    var name = options.name || Viking.View.tagNameForModelAttribute(model, attribute, options);
     var value = model.get(attribute) / 100;
 
     Viking.View.addErrorClassToOptions(model, attribute, options);
@@ -3538,7 +3538,7 @@ Viking.View.Helpers.moneyField = function (model, attribute, options) {
 //   // => <input class="form_input" id="account_secret" name="account[secret]" type="password" value="unkown">
 Viking.View.Helpers.passwordField = function (model, attribute, options) {
     options || (options = {});
-    var name = options.name || Viking.View.tagNameForModelAttribute(model, attribute);
+    var name = options.name || Viking.View.tagNameForModelAttribute(model, attribute, options);
 
     if (options === undefined) { options = {}; }
     Viking.View.addErrorClassToOptions(model, attribute, options);
@@ -3566,7 +3566,7 @@ Viking.View.Helpers.passwordField = function (model, attribute, options) {
 //   //    <input type="radio" id="user_receive_newsletter_no" name="user[receive_newsletter]" value="no" checked>
 Viking.View.Helpers.radioButton = function (model, attribute, tagValue, options) {
     if (options === undefined) { options = {}; }
-    var name = options.name || Viking.View.tagNameForModelAttribute(model, attribute);
+    var name = options.name || Viking.View.tagNameForModelAttribute(model, attribute, options);
 
     _.defaults(options, {
         id: Viking.View.sanitizeToId(name + "_" + tagValue)
@@ -3640,7 +3640,7 @@ Viking.View.Helpers.radioButton = function (model, attribute, tagValue, options)
 Viking.View.Helpers.select = function (model, attribute, collection, options) {
     if (options === undefined) { options = {}; }
 
-    var name = options['name'] || Viking.View.tagNameForModelAttribute(model, attribute);
+    var name = options['name'] || Viking.View.tagNameForModelAttribute(model, attribute, options);
     var optionOptions = _.pick(options, 'selected');
     var selectOptions = _.omit(options, 'selected');
     if (model.get(attribute) && optionOptions.selected === undefined) {
@@ -3680,7 +3680,7 @@ Viking.View.Helpers.select = function (model, attribute, collection, options) {
 //   //      entry body
 //   //    </textarea>
 Viking.View.Helpers.textArea = function (model, attribute, options) {
-    var name = options['name'] || Viking.View.tagNameForModelAttribute(model, attribute);
+    var name = options['name'] || Viking.View.tagNameForModelAttribute(model, attribute, options);
     
     if (options === undefined) { options = {}; }
     Viking.View.addErrorClassToOptions(model, attribute, options);
@@ -3711,7 +3711,7 @@ Viking.View.Helpers.textField = function (model, attribute, options) {
     if (options === undefined) { options = {}; }
     Viking.View.addErrorClassToOptions(model, attribute, options);
 
-    var name = options['name'] || Viking.View.tagNameForModelAttribute(model, attribute);
+    var name = options['name'] || Viking.View.tagNameForModelAttribute(model, attribute, options);
     var value = model.get(attribute)
     value = value && typeof value === 'object' ? value.toString() : value
     return Viking.View.Helpers.textFieldTag(name, value, options);
