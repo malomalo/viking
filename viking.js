@@ -1,4 +1,4 @@
-//     Viking.js 0.9.0 (sha:3c6d0e8)
+//     Viking.js 0.9.0 (sha:c58cdef)
 //
 //     (c) 2012-2019 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
@@ -474,6 +474,8 @@ String.prototype.downcase = String.prototype.toLowerCase;
 // +toParam()+ as opposed to letting jQuery automatically call $.param().
 (function () {
 
+    var MAX_URI_LENGTH = 2083;
+
     Viking.sync = function(method, model, options) {
       var type = methodMap[method];
 
@@ -518,13 +520,24 @@ String.prototype.downcase = String.prototype.toLowerCase;
       // Don't process data on a non-GET request.
       if (params.type !== 'GET' && !options.emulateJSON) {
         params.processData = false;
-      } else if (options.data && typeof options.data === 'object') {
-          options.data = bin2String(msgpack.encode(options.data, {
-              codec: MsgPackCodec
-          }));
-          options.headers = options.headers || {};
-          options.headers['Query-Encoding'] = 'application/msgpack';
-      }
+    } else if (options.data && typeof options.data === 'object') {
+        var msgpackData = bin2String(msgpack.encode(options.data, {
+            codec: MsgPackCodec
+        }));
+
+        if (type === 'GET' && params.url.length + msgpackData.length > MAX_URI_LENGTH) {
+            options.type = 'POST';
+            options.headers['X-Http-Method-Override'] = 'GET';
+            options.data = JSON.stringify(options.data);
+            options.contentType = 'application/json';
+        } else {
+            options.data = msgpackData
+            options.headers = options.headers || {};
+            options.headers['Query-Encoding'] = 'application/msgpack';
+        }
+    }
+
+      
 
       // Make the request, allowing the user to override any Ajax options.
       var xhr = options.xhr = Viking.ajax(model, _.extend(params, options));
@@ -549,7 +562,7 @@ String.prototype.downcase = String.prototype.toLowerCase;
         if (model instanceof Viking.Collection) {
             model = model.model.prototype;
         }
-        
+
         if(model.connection) {
             options.url = model.connection.host + options.url;
             if (model.connection.withCredentials) {
