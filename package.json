@@ -16,22 +16,22 @@
     "browser"
   ],
   "devDependencies": {
-    "@babel/cli": "^7.0.0-rc.1",
-    "@babel/core": "^7.0.0-rc.1",
-    "@babel/plugin-proposal-class-properties": "^7.0.0-rc.1",
-    "@babel/preset-env": "^7.0.0-rc.1",
-    "@babel/register": "^7.0.0-rc.1",
-    "jsdom": "^11.10.0",
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.5",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "@babel/register": "^7.5.5",
+    "jsdom": "^15.1.1",
     "jsdom-global": "^3.0.2",
-    "mocha": "^5.2.0",
-    "sinon": "^4.5.0"
+    "mocha": "^6.2.0",
+    "sinon": "^7.4.2"
   },
   "scripts": {
     "test": "npx mocha -r @babel/register -r test/testSetup.js test/testHelper.js 'test/**/*.js'"
   },
   "version": "1.0.0",
   "dependencies": {
-    "babel-plugin-transform-class-extended-hook": "^1.0.0",
+    "babel-plugin-transform-class-extended-hook": "^1.0.3",
     "babel-plugin-transform-class-inherited-hook": "^3.2.0"
   }
 }

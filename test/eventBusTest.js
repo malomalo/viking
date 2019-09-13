@@ -743,7 +743,7 @@ describe('Viking.Events', () => {
       const obj = new Event();
       const other = {
         events: {},
-        on: function(name, callback) {
+        addEventListener: function(name, callback) {
           this.events[name] = callback;
         },
         trigger: function(name) {
@@ -761,10 +761,10 @@ describe('Viking.Events', () => {
       const obj = new Event();
       const other = {
         events: {},
-        on: function(name, callback) {
+        addEventListener: function(name, callback) {
           this.events[name] = callback;
         },
-        off: function() {
+        removeEventListener: function() {
           this.events = {};
         },
         trigger: function(name) {
