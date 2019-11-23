@@ -20,7 +20,7 @@ describe('VikingSupport.Date', () => {
     });
 
     it('#toQuery(key)', () => {
-        assert.equal('key=2013-03-21T22:26:58.448Z', toQuery(new Date(1363904818448), 'key'));
+        assert.equal('key=2013-03-21T22%3A26%3A58.448Z', toQuery(new Date(1363904818448), 'key'));
     });
 
 });

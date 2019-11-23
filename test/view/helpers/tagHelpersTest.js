@@ -610,7 +610,7 @@ describe('Helpers.tagHelpers', () => {
             assert.equal(timeTag(date, {datetime: 'myvalue'}), '<time datetime="myvalue">'+date.toString()+'</time>');
         });
 
-        it("timeTag(date, options, content{format: 'myformat'})", () => {
+        it("timeTag(date, {format: 'myformat'})", () => {
             var date = new Date(1395441025655);
 
             assert.equal(timeTag(date, {format: '%Y %m %d'}), '<time datetime="2014-03-21T22:30:25.655Z">2014 03 21</time>');

@@ -117,7 +117,7 @@ describe('Viking.View.Helpers.urlHelpers', () => {
                     cc: 'ccaddress@domain.com',
                     subject: 'This is an example email'
                 }),
-                '<a href="mailto:me@domain.com?cc=ccaddress@domain.com&subject=This%20is%20an%20example%20email">My email</a>'
+                '<a href="mailto:me@domain.com?cc=ccaddress%40domain.com&subject=This%20is%20an%20example%20email">My email</a>'
             );
         });
     
