@@ -1,4 +1,4 @@
-//     Viking.js 0.9.1 (sha:1f52916)
+//     Viking.js 0.9.1 (sha:61812ba)
 //
 //     (c) 2012-2020 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
