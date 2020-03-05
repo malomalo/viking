@@ -5,7 +5,6 @@ tasks/
 .eslintrc
 .tm_properties
 .travis.yml
-CHANGELOG.md
 docco.css
 Gemfile
 Gemfile.lock

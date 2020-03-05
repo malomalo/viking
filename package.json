@@ -23,8 +23,7 @@
     "test": "phantomjs test/runner.js http://127.0.0.1:4321/test/index.html",
     "prepack": "./prepack.sh"
   },
-  "main": "viking.js",
-  "entry": "build/viking.js",
+  "main": "build/viking.js",
   "version": "0.9.1",
   "dependencies": {
     "backbone": "^1.4.0",
