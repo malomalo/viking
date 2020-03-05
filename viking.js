@@ -1,6 +1,6 @@
-//     Viking.js 0.9.0 (sha:c58cdef)
+//     Viking.js 0.9.1 (sha:1f52916)
 //
-//     (c) 2012-2019 Jonathan Bracy, 42Floors Inc.
+//     (c) 2012-2020 Jonathan Bracy, 42Floors Inc.
 //     Viking.js may be freely distributed under the MIT license.
 //     http://vikingjs.com
 
@@ -1104,6 +1104,7 @@ Viking.Model.prototype.select = function(value, options) {
         if (this.selected) {
             this.selected = false;
             this.trigger('unselected', this);
+            if (this.collection) this.collection.trigger('unselected', this);
         }
     }
 };

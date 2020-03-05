@@ -1,3 +1,17 @@
+ext/
+lib/
+site/
+tasks/
+.eslintrc
+.tm_properties
+.travis.yml
+CHANGELOG.md
+docco.css
+Gemfile
+Gemfile.lock
+logo.jpg
+prepack.sh
+TODO
 test/
 Rakefile
 docs/
