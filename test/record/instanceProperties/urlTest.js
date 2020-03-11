@@ -1,17 +1,17 @@
 import 'mocha';
 import * as assert from 'assert';
-import VikingModel from 'viking/model';
+import VikingRecord from 'viking/record';
 
-describe('Viking.Model#url', () => {
+describe('Viking.Record#url', () => {
 
     it("/pluralModelName/id by default", () => {
-        class Model extends VikingModel { }
+        class Model extends VikingRecord { }
         let model = new Model({id: 42});
         assert.equal(model.url(), '/models/42');
     });
 
     it("/pluralModelName/slug by overriding #toParam()", () => {
-        class Model extends VikingModel {
+        class Model extends VikingRecord {
             toParam() {
                 return 'slug';
             }
@@ -22,7 +22,7 @@ describe('Viking.Model#url', () => {
     });
 
     it('id is uri encoding', () => {
-        class MyModel extends VikingModel {
+        class MyModel extends VikingRecord {
             static path = '/collection';
         }
         let model = new MyModel();
@@ -32,8 +32,8 @@ describe('Viking.Model#url', () => {
     });
 
     // STI test
-    it("returns an URL based on modelName of the baseModel", () => {
-        class Ship extends VikingModel { }
+    it("returns an URL based on modelName of the baseClass", () => {
+        class Ship extends VikingRecord { }
         class Carrier extends Ship { }
 
         let carrier = new Carrier({id: 42});
@@ -41,7 +41,7 @@ describe('Viking.Model#url', () => {
     });
 
     it('url when using urlRoot as a function to determine urlRoot at runtime', () => {
-        class Model extends VikingModel {
+        class Model extends VikingRecord {
             urlRoot = function() {
                 return '/nested/' + this.readAttribute('parentId') + '/collection';
             };

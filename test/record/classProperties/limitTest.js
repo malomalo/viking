@@ -1,10 +1,10 @@
 import * as assert from 'assert';
 import 'mocha';
-import VikingModel from 'viking/model';
+import VikingRecord from 'viking/record';
 
 
-describe('Viking.Model::limit', () => {
-    class Model extends VikingModel { }
+describe('Viking.Record::limit', () => {
+    class Model extends VikingRecord { }
 
     it('with limit', function(done) {
         Model.limit(12).load((models) => {
@@ -15,7 +15,7 @@ describe('Viking.Model::limit', () => {
             assert.ok(Array.isArray(models));
             assert.equal(1, models.length);
             let model = models[0];
-            assert.ok(model instanceof VikingModel);
+            assert.ok(model instanceof VikingRecord);
             assert.equal(model.readAttribute('id'), 12);
             assert.equal(model.readAttribute('name'), 'Viking');
         }).then(() => done(), done);

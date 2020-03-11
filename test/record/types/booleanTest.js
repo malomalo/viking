@@ -2,7 +2,7 @@ import 'mocha';
 import * as assert from 'assert';
 import BooleanType from 'viking/record/types/boolean';
 
-describe('Viking.Model.Types', () => {
+describe('Viking.Record.Types', () => {
     describe('Boolean', () => {
 
         it("::load coerces the string 'true' to true", function() {

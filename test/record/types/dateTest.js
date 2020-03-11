@@ -2,7 +2,7 @@ import 'mocha';
 import * as assert from 'assert';
 import DateType from 'viking/record/types/date';
 
-describe('Viking.Model.Types', () => {
+describe('Viking.Record.Types', () => {
     describe('Date', () => {
 
         it("::load thows error when can't coerce value", function() {

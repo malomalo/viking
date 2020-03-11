@@ -1,13 +1,13 @@
 import * as assert from 'assert';
 import 'mocha';
-import VikingModel from 'viking/model';
+import VikingRecord from 'viking/record';
 import { belongsTo } from 'viking/record/associations';
 
-describe('Viking.Model::associations', () => {
+describe('Viking.Record::associations', () => {
 
     describe('belongsTo(Parent)', () => {
-        class Parent extends VikingModel { }
-        class Model extends VikingModel {
+        class Parent extends VikingRecord { }
+        class Model extends VikingRecord {
             static associations = [belongsTo(Parent)];
         }
 
@@ -81,8 +81,8 @@ describe('Viking.Model::associations', () => {
     });
 
     describe('belongsTo(Parent, {foriegnKey: KEY})', () => {
-        class Parent extends VikingModel { }
-        class Model extends VikingModel {
+        class Parent extends VikingRecord { }
+        class Model extends VikingRecord {
             static associations = [belongsTo(Parent, {foreignKey: 'parental_id'})];
         }
 

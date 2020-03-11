@@ -16,22 +16,35 @@
     "browser"
   ],
   "devDependencies": {
-    "@babel/cli": "^7.5.5",
-    "@babel/core": "^7.5.5",
-    "@babel/plugin-proposal-class-properties": "^7.5.5",
-    "@babel/preset-env": "^7.5.5",
-    "@babel/register": "^7.5.5",
+    "@babel/cli": "^7.7.4",
+    "@babel/core": "^7.7.4",
+    "@babel/plugin-proposal-class-properties": "^7.7.4",
+    "@babel/preset-env": "^7.7.4",
+    "@babel/register": "^7.7.4",
+    "esdoc": "^1.1.0",
+    "esdoc-standard-plugin": "^1.0.0",
     "jsdom": "^15.1.1",
     "jsdom-global": "^3.0.2",
     "mocha": "^6.2.0",
     "sinon": "^7.4.2"
   },
   "scripts": {
-    "test": "npx mocha -r @babel/register -r test/testSetup.js test/testHelper.js 'test/**/*.js'"
+    "test": "npx mocha -r @babel/register -r test/testSetup.js test/testHelper.js 'test/**/*.js'",
+    "esdoc": "npx esdoc"
   },
   "version": "1.0.0",
   "dependencies": {
     "babel-plugin-transform-class-extended-hook": "^1.0.3",
-    "babel-plugin-transform-class-inherited-hook": "^3.2.0"
+    "babel-plugin-transform-class-inherited-hook": "^3.2.0",
+    "esdoc-ecmascript-proposal-plugin": "^1.0.0"
+  },
+  "type": "module",
+  "esdoc": {
+    "source": "./lib",
+    "destination": "./docs",
+    "plugins": [
+      { "name": "esdoc-standard-plugin" },
+      { "name": "esdoc-ecmascript-proposal-plugin", "option": {"all": true} }
+    ]
   }
 }

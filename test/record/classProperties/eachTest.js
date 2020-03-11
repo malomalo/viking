@@ -1,9 +1,9 @@
 import 'mocha';
 import * as assert from 'assert';
-import VikingModel from 'viking/model';
+import VikingRecord from 'viking/record';
 
-describe('Viking.Model', () => {
-    class Ship extends VikingModel { }
+describe('Viking.Record', () => {
+    class Ship extends VikingRecord { }
 
     it('::each', function(done) {
         let matches = [ {id: 32, name: 'Roger'}, {id: 92, name: 'Bob'} ];

@@ -1,8 +1,8 @@
 import 'mocha';
 import * as assert from 'assert';
-import Model from 'viking/model';
+import Model from 'viking/record';
 
-describe('Viking.Model', () => {
+describe('Viking.Record', () => {
     describe('defaults', () => {
 
         it('come from schema', () => {

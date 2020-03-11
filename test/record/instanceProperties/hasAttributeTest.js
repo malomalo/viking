@@ -1,11 +1,11 @@
 import 'mocha';
 import * as assert from 'assert';
-import VikingModel from 'viking/model';
+import VikingRecord from 'viking/record';
 
-describe('Viking.Model#hasAttribute', () => {
+describe('Viking.Record#hasAttribute', () => {
 
     it('hasAttribute', () => {
-        let model = new VikingModel();
+        let model = new VikingRecord();
 
         assert.strictEqual(model.hasAttribute('name'), false);
 

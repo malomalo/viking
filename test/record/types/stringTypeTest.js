@@ -2,7 +2,7 @@ import 'mocha';
 import * as assert from 'assert';
 import StringType from 'viking/record/types/string';
 
-describe('Viking.Model.Types', () => {
+describe('Viking.Record.Types', () => {
     describe('String', () => {
 
         it("::load coerces boolean to string", function() {

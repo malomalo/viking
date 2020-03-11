@@ -2,7 +2,7 @@ import 'mocha';
 import * as assert from 'assert';
 import NumberType from 'viking/record/types/number';
 
-describe('Viking.Model.Types', () => {
+describe('Viking.Record.Types', () => {
     describe('Number', () => {
 
         it("::load coerces number to number", () => {

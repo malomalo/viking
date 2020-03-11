@@ -1,8 +1,8 @@
 import 'mocha';
 import * as assert from 'assert';
-import Model from 'viking/model';
+import Model from 'viking/record';
 
-describe('Viking.Model::new', () => {
+describe('Viking.Record::new', () => {
 
     it('Object.prototype properties are overridden by attributes', () => {
         let model = new Model({hasOwnProperty: true});

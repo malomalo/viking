@@ -1,29 +1,29 @@
 import 'mocha';
 import * as assert from 'assert';
-import VikingModel from 'viking/model';
+import VikingRecord from 'viking/record';
 
-describe('Viking.Model::baseModel', () => {
+describe('Viking.Record::baseClass', () => {
 
-    it("return self when extending Viking.Model", () => {
-        class Ship extends VikingModel { }
+    it("return self when extending Viking.Record", () => {
+        class Ship extends VikingRecord { }
 
-        assert.strictEqual(Ship, Ship.baseModel());
+        assert.strictEqual(Ship, Ship.baseClass());
     });
 
-    it("returns self when extending an abstract Viking.Model", () => {
-        class RussianShip extends VikingModel {
+    it("returns self when extending an abstract Viking.Record", () => {
+        class RussianShip extends VikingRecord {
             static abstract = true;
         }
         class Ship extends RussianShip { }
 
-        assert.strictEqual(Ship, Ship.baseModel());
+        assert.strictEqual(Ship, Ship.baseClass());
     });
 
     it("returns the parent Model when extending after extending that Model", () => {
-        class Ship extends VikingModel { }
+        class Ship extends VikingRecord { }
         class Carrier extends Ship { }
 
-        assert.strictEqual(Ship, Carrier.baseModel());
+        assert.strictEqual(Ship, Carrier.baseClass());
     });
 
 });

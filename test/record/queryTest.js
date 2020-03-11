@@ -1,14 +1,14 @@
 // import * as assert from 'assert';
 // import * as sinon from 'sinon';
 // import 'mocha';
-// import { Model as VikingModel } from '../../src/viking/model';
-// import { Relation } from '../../src/viking/model/relation';
+// import { Model as VikingRecord } from '../../src/viking/record';
+// import { Relation } from '../../src/viking/record/relation';
 // import { toQuery } from '../../src/viking/support/object';
 // import { ServerError } from '../../src/viking/errors';
 
 
-// describe('Viking.Model', () => {
-//     class Model extends VikingModel { }
+// describe('Viking.Record', () => {
+//     class Model extends VikingRecord { }
 
 //     beforeEach(() => {
 //         this.requests = [];

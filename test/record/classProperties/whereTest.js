@@ -1,13 +1,13 @@
 import 'mocha';
 import * as assert from 'assert';
-import VikingModel from 'viking/model';
+import VikingRecord from 'viking/record';
 import Relation from 'viking/record/relation';
 import { toQuery } from 'viking/support/object';
 import { ServerError } from 'viking/errors';
 
-describe('Viking.Model::where', () => {
+describe('Viking.Record::where', () => {
 
-    class Ship extends VikingModel { }
+    class Ship extends VikingRecord { }
     
     it('::where(predicate)', function(done) {
         let relation = Ship.where({id: 10, name: 'name'});

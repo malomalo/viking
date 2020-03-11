@@ -1,11 +1,11 @@
 import 'mocha';
 import * as assert from 'assert';
-import VikingModel from 'viking/model';
+import VikingRecord from 'viking/record';
 
-describe('Viking.Model#setAttributes', () => {
+describe('Viking.Record#setAttributes', () => {
 
     describe('coercion', () => {
-        class Model extends VikingModel {
+        class Model extends VikingRecord {
             static schema = {
                 key: {type: 'number', array: true},
                 date: {type: 'date'},
@@ -142,14 +142,14 @@ describe('Viking.Model#setAttributes', () => {
     });
 
     it('set an empty string', () => {
-        let model = new VikingModel({name: 'Model'});
+        let model = new VikingRecord({name: 'Model'});
         model.setAttributes({name: ''});
         assert.equal(model.readAttribute('name'), '');
     });
 
     it('setting an object', () => {
         let counter = 0;
-        let model = new VikingModel({
+        let model = new VikingRecord({
             custom: {foo: 1}
         });
 
@@ -164,7 +164,7 @@ describe('Viking.Model#setAttributes', () => {
     });
 
     it('set and unset', () => {
-        let a = new VikingModel({id: 'id', foo: 1, bar: 2, baz: 3});
+        let a = new VikingRecord({id: 'id', foo: 1, bar: 2, baz: 3});
         let changeCount = 0;
         a.addEventListener('change:foo', () => { changeCount += 1; });
         a.setAttributes({foo: 2});
@@ -190,7 +190,7 @@ describe('Viking.Model#setAttributes', () => {
 
 
     it('changedAttributes()', () => {
-        let model = new VikingModel({name: 'Time', age: 30});
+        let model = new VikingRecord({name: 'Time', age: 30});
         assert.deepEqual(model.changedAttributes(), {
             name: [null, 'Time'],
             age: [null, 30]
@@ -212,7 +212,7 @@ describe('Viking.Model#setAttributes', () => {
     });
 
     it('hasChanged()', () => {
-        let model = new VikingModel({name: 'Time', age: 30});
+        let model = new VikingRecord({name: 'Time', age: 30});
         model.persit();
 
         assert.equal(model.hasChanged(), false);
@@ -225,7 +225,7 @@ describe('Viking.Model#setAttributes', () => {
     });
 
     it('hasChanged(attributeName)', () => {
-        let model = new VikingModel({name: 'Time', age: 30});
+        let model = new VikingRecord({name: 'Time', age: 30});
         model.persit();
         model.setAttributes({age: 28});
 
@@ -239,7 +239,7 @@ describe('Viking.Model#setAttributes', () => {
     });
 
     it('change listener', (done) => {
-        let model = new VikingModel();
+        let model = new VikingRecord();
         model.addEventListener('change', () => {
             assert.ok(model.hasChanged('name'), 'name changed');
             assert.ok(!model.hasChanged('age'), 'age did not');

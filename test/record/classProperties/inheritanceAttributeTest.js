@@ -1,17 +1,17 @@
 import 'mocha';
 import * as assert from 'assert';
-import VikingModel from 'viking/model';
+import VikingRecord from 'viking/record';
 
-describe('Viking.Model::inheritanceAttribute', () => {
+describe('Viking.Record::inheritanceAttribute', () => {
 
     it("defaults to `type`", () => {
-        class Ship extends VikingModel { }
+        class Ship extends VikingRecord { }
 
         assert.equal('type', Ship.inheritanceAttribute);
     });
 
     it("explictly set the inheritanceAttribute", () => {
-        class Ship extends VikingModel {
+        class Ship extends VikingRecord {
             static inheritanceAttribute = 'class_name';
         }
 
@@ -19,14 +19,14 @@ describe('Viking.Model::inheritanceAttribute', () => {
     });
 
     it("set inheritanceAttribute to false to disable STI", () => {
-        class Ship extends VikingModel {
+        class Ship extends VikingRecord {
             static inheritanceAttribute = false;
         }
         class Battleship extends Ship { }
 
         let battleship = new Battleship();
         assert.strictEqual(false, Ship.inheritanceAttribute);
-        assert.strictEqual(Battleship, battleship.baseModel);
+        assert.strictEqual(Battleship, battleship.baseClass);
     });
 
 });

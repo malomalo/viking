@@ -1,15 +1,15 @@
 import * as assert from 'assert';
 // import * as sinon from 'sinon';
 import 'mocha';
-import VikingModel from 'viking/model';
+import VikingRecord from 'viking/record';
 import { toQuery } from 'viking/support/object';
 import { ServerError } from 'viking/errors';
 import { hasMany, belongsTo } from 'viking/record/associations';
 
-describe('Viking.Model::instantiate', () => {
+describe('Viking.Record::instantiate', () => {
 
     it('with attributes', () => {
-        class Ship extends VikingModel { }
+        class Ship extends VikingRecord { }
         
         let ship = Ship.instantiate({
             id: 1,
@@ -21,8 +21,8 @@ describe('Viking.Model::instantiate', () => {
     });
     
     // it('with belongsTo Association', () => {
-    //     class Fleet extends VikingModel { }
-    //     class Ship extends VikingModel {
+    //     class Fleet extends VikingRecord { }
+    //     class Ship extends VikingRecord {
     //         static associations = [belongsTo(Fleet)];
     //     }
     //
@@ -43,8 +43,8 @@ describe('Viking.Model::instantiate', () => {
     // });
     
     it('with hasMany Association', (done) => {
-        class Ship extends VikingModel { }
-        class Fleet extends VikingModel {
+        class Ship extends VikingRecord { }
+        class Fleet extends VikingRecord {
             static associations = [hasMany(Ship)];
         }
 

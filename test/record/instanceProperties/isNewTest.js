@@ -1,10 +1,10 @@
 import 'mocha';
 import * as assert from 'assert';
-import VikingModel from 'viking/model';
+import VikingRecord from 'viking/record';
 
-describe('Viking.Model#isNewRecord', () => {
+describe('Viking.Record#isNewRecord', () => {
 
-    class Model extends VikingModel { }
+    class Model extends VikingRecord { }
 
     it('returns true on a newly istanicated model', () => {
         let model = new Model();

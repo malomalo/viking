@@ -1,13 +1,13 @@
 import 'mocha';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import VikingModel from 'viking/model';
+import VikingRecord from 'viking/record';
 import { toQuery } from 'viking/support/object';
 import { ServerError } from 'viking/errors';
 
 
-describe('Viking.Model', () => {
-    class Ship extends VikingModel { }
+describe('Viking.Record', () => {
+    class Ship extends VikingRecord { }
 
     it('::count', function(done) {
         Ship.count((count) => {

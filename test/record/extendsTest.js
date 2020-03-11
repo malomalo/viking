@@ -1,7 +1,7 @@
 import 'mocha';
 import * as assert from 'assert';
-import VikingModel from 'viking/model';
+import VikingRecord from 'viking/record';
 
-describe('extends Viking.Model', () => {
+describe('extends Viking.Record', () => {
 
 });

@@ -1,13 +1,13 @@
 import * as assert from 'assert';
 // import * as sinon from 'sinon';
 import 'mocha';
-import VikingModel from 'viking/model';
+import VikingRecord from 'viking/record';
 import { toQuery } from 'viking/support/object';
 import { ServerError } from 'viking/errors';
 
 
-describe('Viking.Model::find', () => {
-    class Model extends VikingModel { }
+describe('Viking.Record::find', () => {
+    class Model extends VikingRecord { }
 
     // beforeEach(() => {
     //     this.requests = [];

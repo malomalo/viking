@@ -1,11 +1,11 @@
 import 'mocha';
 import * as assert from 'assert';
-import VikingModel from 'viking/model';
+import VikingRecord from 'viking/record';
 
-describe('Viking.Model#paramRoot', () => {
+describe('Viking.Record#paramRoot', () => {
 
     it("returns underscored modelName", () => {
-        class Model extends VikingModel {
+        class Model extends VikingRecord {
 
         }
         let model = new Model();
@@ -17,8 +17,8 @@ describe('Viking.Model#paramRoot', () => {
         // assert.equal(model.paramRoot(), 'namespaced_model');
     });
 
-    it("instance.paramRoot returns underscored baseModel.modelName when used as STI", () => {
-        class Boat extends VikingModel { }
+    it("instance.paramRoot returns underscored baseClass.modelName when used as STI", () => {
+        class Boat extends VikingRecord { }
         class Carrier extends Boat { }
         let model = new Carrier();
 

@@ -1,7 +1,7 @@
 import 'mocha';
 import * as sinon from 'sinon';
 import { toQuery }  from 'viking/support/object';
-import Model        from 'viking/model';
+import Model        from 'viking/record';
 import Connection   from 'viking/record/connection';
 
 Model.connection = new Connection('http://example.com');

@@ -1,6 +1,6 @@
 import 'mocha';
 import * as assert from 'assert';
-import Model from 'viking/model';
+import Model from 'viking/record';
 import {
     addErrorClassToOptions,
     contentTag,
