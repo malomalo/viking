@@ -48,6 +48,7 @@ describe('Viking.Controller', () => {
         
         let c = new Controller();
         c.dispatch('index');
+        console.log("LC!! seq " + JSON.stringify(c.sequence))
         assert.deepStrictEqual(c.sequence, ['ba', 'index', 'aa']);
     });
 
@@ -67,7 +68,65 @@ describe('Viking.Controller', () => {
         c.dispatch('index');
         assert.deepStrictEqual(c.sequence, ['ba', 'index', 'aa']);
     });
-    
+
+    it('aroundActions with only', () => {
+        class Controller extends VController {
+            static aroundActions = [
+                {
+                    method: function (cb) { this.sequence.push('action1'); cb(); },
+                    only: 'show'
+                }
+            ];
+            sequence = [];
+            
+            index() {
+                this.sequence.push('index');
+            }
+            
+            show() {
+                this.sequence.push('show');
+            }
+        }
+        
+        let c = new Controller();
+        c.dispatch('index');
+        assert.deepStrictEqual(c.sequence, ['index']);
+        
+        c = new Controller();
+        c.dispatch('show');
+        assert.deepStrictEqual(c.sequence, ['action1', 'show']);
+    });
+
+    it('aroundActions with except', () => {
+        class Controller extends VController {
+            static aroundActions = [
+                {
+                    method: function (cb) { this.sequence.push('action1'); cb(); },
+                    except: 'show'
+                }
+            ];
+            sequence = [];
+            
+            index() {
+                this.sequence.push('index');
+            }
+
+            show() {
+                this.sequence.push('show');
+            }
+        }
+        
+        let c = new Controller();
+        c.dispatch('index');
+        console.log("LC!! seq5 " + JSON.stringify(c.sequence))
+        assert.deepStrictEqual(c.sequence, ['action1', 'index']);
+
+        c = new Controller();
+        c.dispatch('show');
+        console.log("LC!! seq6 " + JSON.stringify(c.sequence))
+        assert.deepStrictEqual(c.sequence, ['show']);
+    });
+
     // it('afterActions with string', () => {
     //     class Controller extends VController {
     //         static afterActions = ['aa'];
