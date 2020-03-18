@@ -1,8 +1,8 @@
 type ActionMethod = function(function)
-type ActionObject = {
-  method: ActionMethod | string
-}
-type Actions = [string | ActionMethod | ActionObject]
+
+type ActionTuple = [ string | ActionMethod, ActionOptions ];
+
+type Actions = Array<string | ActionMethod | ActionTuple>;
 
 declare interface ControllerSubclass {
   static aroundActions: Actions
