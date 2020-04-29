@@ -7,11 +7,12 @@ describe('Viking.Record#setAttributes', () => {
     describe('coercion', () => {
         class Model extends VikingRecord {
             static schema = {
-                key: {type: 'number', array: true},
-                date: {type: 'date'},
-                number: {type: 'number'},
-                string: {type: 'string'},
-                unkown: {type: 'anUnkownType'}
+                key:        {type: 'integer', array: true},
+                date:       {type: 'date'},
+                float:      {type: 'float'},
+                integer:    {type: 'integer'},
+                string:     {type: 'string'},
+                unkown:     {type: 'anUnkownType'}
             };
         }
 
@@ -49,15 +50,21 @@ describe('Viking.Record#setAttributes', () => {
             });
         });
 
-        describe('number', () => {
-            it("string to number", () => {
+        describe('integer', () => {
+            it("string to integer", () => {
                 let a = new Model();
 
-                a.setAttributes({number: '10'});
-                assert.equal(a.readAttribute('number'), 10);
+                a.setAttributes({integer: '10'});
+                assert.equal(a.readAttribute('integer'), 10);
+            });
+        });
 
-                a.setAttributes({number: '10.5'});
-                assert.equal(a.readAttribute('number'), 10.5);
+        describe('float', () => {
+            it("string to float", () => {
+                let a = new Model();
+
+                a.setAttributes({float: '10.5'});
+                assert.equal(a.readAttribute('float'), 10.5);
             });
         });
 

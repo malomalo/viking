@@ -90,7 +90,6 @@ describe('Viking.Record::associations', () => {
             let model = new Model({parental_id: 24});
 
             model.parent.then((model) => {
-                console.log(model);
                 assert.ok(model instanceof Parent);
                 assert.equal(model.readAttribute('id'), 24);
                 assert.equal(model.readAttribute('name'), 'Viking');
