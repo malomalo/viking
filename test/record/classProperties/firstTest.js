@@ -20,7 +20,7 @@ describe('Viking.Record', () => {
             assert.equal(model.readAttribute('name'), 'Viking');
         }).then(done, done);
 
-        this.withRequest('GET', '/ships', {order: {id: 'desc'}, limit: 1}, (xhr) => {
+        this.withRequest('GET', '/ships', { params: {order: {id: 'desc'}, limit: 1} }, (xhr) => {
             xhr.respond(200, {}, '[{"id": 12, "name": "Viking"}]');
         });
     });
@@ -46,7 +46,7 @@ describe('Viking.Record', () => {
             assert.equal(model.readAttribute('name'), 'Viking');
         }).then(done, done);
 
-        this.withRequest('GET', '/ships', {order: {id: 'asc'}, limit: 1}, (xhr) => {
+        this.withRequest('GET', '/ships', { params: {order: {id: 'asc'}, limit: 1} }, (xhr) => {
             xhr.respond(200, {}, '[{"id": 12, "name": "Viking"}]');
         });
     });

@@ -12,13 +12,21 @@ before(function() {
         this.requests.push(xhr);
     };
 
-    this.withRequest = (method, url, params, callback) => {
-        if (Object.keys(params).length > 0) { url += `?${toQuery(params)}`; }
+    this.withRequest = (method, url, {params = null, body =  null} = {}, callback) => {
+        if (params && Object.keys(params).length > 0) { url += `?${toQuery(params)}`; }
 
         let match = this.requests.find((xhr) => {
-            // console.log(xhr.method, method);
-            // console.log(decodeURIComponent(xhr.url), decodeURIComponent(url));
-            return xhr.method === method && xhr.url === 'http://example.com' + url;
+            if (xhr.method === method && xhr.url === 'http://example.com' + url) {
+                if (body) {
+                    if ((typeof body) !== 'string') {
+                        return JSON.stringify(body) === xhr.requestBody;
+                    }
+                    return body === xhr.requestBody;
+                } else {
+                    return true;
+                }
+            }
+            return ;
         });
 
         if (match) {

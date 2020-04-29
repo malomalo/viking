@@ -14,7 +14,7 @@ describe('Viking.Record', () => {
             assert.equal(count, 100);
         }).then(() => done(), done);
 
-        this.withRequest('GET', '/ships/calculate', {order: {id: 'desc'}, select: {count: '*'} }, (xhr) => {
+        this.withRequest('GET', '/ships/calculate', { params: {order: {id: 'desc'}, select: {count: '*'} } }, (xhr) => {
             xhr.respond(200, {}, '[100]');
         });
     });
@@ -24,7 +24,7 @@ describe('Viking.Record', () => {
             assert.equal(count, 100);
         }).then(() => done(), done);
 
-        this.withRequest('GET', '/ships/calculate', {order: {id: 'desc'}, select: {sum: 'size'} }, (xhr) => {
+        this.withRequest('GET', '/ships/calculate', { params: {order: {id: 'desc'}, select: {sum: 'size'} } }, (xhr) => {
             xhr.respond(200, {}, '[100]');
         });
     });

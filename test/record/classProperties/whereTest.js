@@ -14,50 +14,50 @@ describe('Viking.Record::where', () => {
         
         assert.ok(relation instanceof Relation);
         
-        relation.load((models) => {
+        relation.load().then((models) => {
             assert.equal(models.length, 1);
             assert.ok(models[0] instanceof Ship);
             assert.equal(models[0].readAttribute('id'), 42);
         }).then(done, done);
 
-        this.withRequest('GET', '/ships', { where: {id: 10, name: 'name'}, order: {id: 'desc'} }, (xhr) => {
+        this.withRequest('GET', '/ships', { params: { where: {id: 10, name: 'name'}, order: {id: 'desc'} } }, (xhr) => {
             xhr.respond(200, {}, '[{"id": 42}]');
         });
     });
     
     it('multiple additive wheres returns a query with the predicate', function(done) {
-        Ship.where({id: 10, name: 'name'}).where({slug: 'test'}).load((models) => {
+        Ship.where({id: 10, name: 'name'}).where({slug: 'test'}).load().then((models) => {
             assert.equal(models.length, 1);
             assert.ok(models[0] instanceof Ship);
             assert.equal(models[0].readAttribute('id'), 42);
         }).then(done, done);
 
-        this.withRequest('GET', '/ships', { where: {id: 10, name: 'name', slug: 'test'}, order: {id: 'desc'} }, (xhr) => {
+        this.withRequest('GET', '/ships', { params: { where: {id: 10, name: 'name', slug: 'test'}, order: {id: 'desc'} } }, (xhr) => {
             xhr.respond(200, {}, '[{"id": 42}]');
         });
     });
 
     it('::where on the same column multiple times', function(done) {
-        Ship.where({id: {gt: 10}}).where({id: {gt: 11}}).load((models) => {
+        Ship.where({id: {gt: 10}}).where({id: {gt: 11}}).load().then((models) => {
             assert.equal(models.length, 1);
             assert.ok(models[0] instanceof Ship);
             assert.equal(models[0].readAttribute('id'), 12);
             assert.equal(models[0].readAttribute('name'), 'Viking');
         }).then(done, done);
 
-        this.withRequest('GET', '/ships', { where: [{id: {gt: 10}}, 'AND', {id: {gt: 11}}], order: {id: 'desc'} }, (xhr) => {
+        this.withRequest('GET', '/ships', { params: { where: [{id: {gt: 10}}, 'AND', {id: {gt: 11}}], order: {id: 'desc'} } }, (xhr) => {
             xhr.respond(200, {}, '[{"id": 12, "name": "Viking"}]');
         });
     });
     
     it('::where on the same column multiple times that are mergable', function(done) {
-        Ship.where({crew: {size: 5}}).where({crew: {class: 'first'}}).load((models) => {
+        Ship.where({crew: {size: 5}}).where({crew: {class: 'first'}}).load().then((models) => {
             assert.equal(models.length, 1);
             assert.ok(models[0] instanceof Ship);
             assert.equal(models[0].readAttribute('id'), 42);
         }).then(() => { done() }, done);
         
-        this.withRequest('GET', '/ships', { where: {crew: {size: 5, class: 'first'}}, order: {id: 'desc'} }, (xhr) => {
+        this.withRequest('GET', '/ships', { params: { where: {crew: {size: 5, class: 'first'}}, order: {id: 'desc'} } }, (xhr) => {
             xhr.respond(200, {}, '[{"id": 42}]');
         });
     });
@@ -66,19 +66,19 @@ describe('Viking.Record::where', () => {
         let fleet = Ship.where({class: 'battleship'})
         
         Promise.all([
-            fleet.where({id: 10}).load((models) => {
+            fleet.where({id: 10}).load().then((models) => {
                 assert.equal(models[0].readAttribute('id'), 10);
             }),
-            fleet.where({id: 20}).load((models) => {
+            fleet.where({id: 20}).load().then((models) => {
                 assert.equal(models[0].readAttribute('id'), 20);
             })
         ]).then(() => { done() }, done);
 
-        this.withRequest('GET', '/ships', { where: {class: 'battleship', id: 10}, order: {id: 'desc'} }, (xhr) => {
+        this.withRequest('GET', '/ships', { params: { where: {class: 'battleship', id: 10}, order: {id: 'desc'} } }, (xhr) => {
             xhr.respond(200, {}, '[{"id": 10}]');
         });
 
-        this.withRequest('GET', '/ships', { where: {class: 'battleship', id: 20}, order: {id: 'desc'} }, (xhr) => {
+        this.withRequest('GET', '/ships', { params: { where: {class: 'battleship', id: 20}, order: {id: 'desc'} } }, (xhr) => {
             xhr.respond(200, {}, '[{"id": 20}]');
         });
     });

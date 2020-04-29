@@ -20,7 +20,7 @@ describe('Viking.Record::limit', () => {
             assert.equal(model.readAttribute('name'), 'Viking');
         }).then(() => done(), done);
 
-        this.withRequest('GET', '/models', {order: {id: 'desc'}, limit: 12}, (xhr) => {
+        this.withRequest('GET', '/models', { params: {order: {id: 'desc'}, limit: 12} }, (xhr) => {
             xhr.respond(200, {}, '[{"id": 12, "name": "Viking"}]');
         });
     });

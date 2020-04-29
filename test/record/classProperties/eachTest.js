@@ -20,7 +20,7 @@ describe('Viking.Record', () => {
 
         }).then(done, done);
 
-        this.withRequest('GET', '/ships', {order: {id: 'desc'}}, (xhr) => {
+        this.withRequest('GET', '/ships', { params: {order: {id: 'desc'}} }, (xhr) => {
             xhr.respond(200, {}, '[{"id": 32, "name": "Roger"},{"id": 92, "name": "Bob"}]');
         });
     });

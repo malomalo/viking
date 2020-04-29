@@ -41,12 +41,13 @@ describe('Viking.Record::find', () => {
                 assert.fail("model expected");
                 return;
             }
+            
             assert.ok(model instanceof Model);
             assert.equal(model.readAttribute('id'), 12);
             assert.equal(model.readAttribute('name'), 'Viking');
         }).then(done, done);
 
-        this.withRequest('GET', '/models', {where: {id: 12}, order: {id: 'desc'}, limit: 1}, (xhr) => {
+        this.withRequest('GET', '/models', { params: {where: {id: 12}, order: {id: 'desc'}, limit: 1} }, (xhr) => {
             xhr.respond(200, {}, '[{"id": 12, "name": "Viking"}]');
         });
     });

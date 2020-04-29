@@ -19,7 +19,7 @@ describe('Viking.Record::associations', () => {
                 assert.equal(model.readAttribute('id'), 24);
                 assert.equal(model.readAttribute('name'), 'Viking');
             }).then(done, done);
-            this.withRequest('GET', '/parents', {where: {id: 24}, order: {id: 'desc'}, limit: 1}, (xhr) => {
+            this.withRequest('GET', '/parents', { params: {where: {id: 24}, order: {id: 'desc'}, limit: 1} }, (xhr) => {
                 xhr.respond(200, {}, '[{"id": 24, "name": "Viking"}]');
             });
         });
@@ -90,11 +90,12 @@ describe('Viking.Record::associations', () => {
             let model = new Model({parental_id: 24});
 
             model.parent.then((model) => {
+                console.log(model);
                 assert.ok(model instanceof Parent);
                 assert.equal(model.readAttribute('id'), 24);
                 assert.equal(model.readAttribute('name'), 'Viking');
             }).then(done, done);
-            this.withRequest('GET', '/parents', {where: {id: 24}, order: {id: 'desc'}, limit: 1}, (xhr) => {
+            this.withRequest('GET', '/parents', { params: {where: {id: 24}, order: {id: 'desc'}, limit: 1} }, (xhr) => {
                 xhr.respond(200, {}, '[{"id": 24, "name": "Viking"}]');
             });
         });

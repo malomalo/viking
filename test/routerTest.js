@@ -104,55 +104,6 @@ describe('Viking.Router', () => {
         assert.equal(counter, 1);
     });
 
-    // test('routes to a controller and undefined action', () => {
-    //     const oldController = Viking.Controller;
-    //     const Controller = {};
-
-    //     let router = Viking.Router.extend({
-    //         routes: {
-    //             '': { to: [Controller, 'action', 'root'] }
-    //         }
-    //     });
-    //     router = new router();
-
-    //     assert.ok(Backbone.history.handlers[0].route.test(''));
-    //     Backbone.history.handlers[0].callback('');
-    //     router.cleanup();
-    // });
-
-    // test('routes to a undefined controller and undefined action', () => {
-    //     let router = Viking.Router.extend({
-    //         routes: {
-    //             '': { to: 'Controller#action', name: 'root' }
-    //         }
-    //     });
-    //     router = new router();
-
-    //     assert.ok(Backbone.history.handlers[0].route.test(''));
-    //     Backbone.history.handlers[0].callback('');
-    //     router.cleanup();
-    // });
-
-    // test('routes to a uninitialized controller and action (Viking.Controller)', async () => {
-    //     await new Promise((resolve) => {
-    //         const Controller = Viking.Controller.extend({
-    //             action() {
-    //                 assert.ok(true);
-    //                 resolve();
-    //             }
-    //         });
-
-    //         const router = new (Viking.Router.extend({
-    //             routes: {
-    //                 '': { to: { controller: Controller, action: 'action' }, name: 'root' }
-    //             }
-    //         }))();
-
-    //         assert.ok(Backbone.history.handlers[0].route.test(''));
-    //         Backbone.history.handlers[0].callback('');
-    //         router.cleanup();
-    //     });
-    // });
 
     // test('routes to a initialized controller and action (Viking.Controller)', async () => {
     //     await new Promise((resolve) => {
@@ -261,27 +212,25 @@ describe('Viking.Router', () => {
     //     router.cleanup();
     // });
 
-    // test('routes with a regex', async () => {
-    //     await new Promise((resolve) => {
-    //         const router = new (Viking.Router.extend({
-    //             routes: {
-    //                 'r/^([a-z][a-z])\/([^\/]+)\/([^\/]+)$/': 'func'
-    //             },
+    it('routes with a regex', function (done) {
+        let counter = 0;
 
-    //             func(state, something, another) {
-    //                 assert.equal(state, 'ca');
-    //                 assert.equal(something, 'something');
-    //                 assert.equal(another, 'another');
-    //                 resolve();
-    //             }
-    //         }))();
+        class Router extends VikingRouter {
+            static routes = {
+                'r/^\/([a-z][a-z])\/([^\\/]+)\/([^\\/]+)$/': (state, something, another) => {
+                    assert.equal(state, 'ca');
+                    assert.equal(something, 'something');
+                    assert.equal(another, 'another');
+                    done();
+                }
+            };
+        }
 
-    //         assert.ok(Backbone.history.handlers[0].route.test('ca/something/another'));
-    //         assert.ok(!Backbone.history.handlers[0].route.test('dca/something/another'));
-    //         Backbone.history.handlers[0].callback.call(router, 'ca/something/another');
-    //         router.cleanup();
-    //     });
-    // });
+        this.router = new Router();
+        this.router.start();
+
+        this.router.navigateTo('ca/something/another');
+    });
 
     // test('routes with a string', async () => {
     //     await new Promise((resolve) => {

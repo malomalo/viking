@@ -22,7 +22,7 @@ describe('Viking.Record::associations', () => {
                 assert.equal(model.readAttribute('name'), 'Viking');
             }).then(done, done);
 
-            this.withRequest('GET', '/parents', {where: {model_id: 24}, order: {id: 'desc'}}, (xhr) => {
+            this.withRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}} }, (xhr) => {
                 xhr.respond(200, {}, '[{"id": 2, "name": "Viking"}]');
             });
         });

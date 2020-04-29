@@ -20,7 +20,7 @@ describe('Viking.Record#isNewRecord', () => {
             assert.equal(model.isNewRecord(), false);
         }).then(done, done);
 
-        this.withRequest('GET', '/models', {where: {id: 12}, order: {id: 'desc'}, limit: 1}, (xhr) => {
+        this.withRequest('GET', '/models', { params: {where: {id: 12}, order: {id: 'desc'}, limit: 1} }, (xhr) => {
             xhr.respond(200, {}, '[{"id": 12, "name": "Viking"}]');
         });
     });
