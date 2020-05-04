@@ -42,7 +42,7 @@ describe('Viking.Record::instantiate', () => {
     //     assert.equal(ship.readAttribute('name'), 'Galactica');
     // });
     
-    it('with hasMany Association', (done) => {
+    it('with hasMany Association', () => {
         class Ship extends VikingRecord { }
         class Fleet extends VikingRecord {
             static associations = [hasMany(Ship)];
@@ -63,12 +63,10 @@ describe('Viking.Record::instantiate', () => {
         assert.equal(fleet.readAttribute('id'), 1);
         assert.equal(fleet.readAttribute('name'), 'Colonial Fleet');
         
-        fleet.ships.load().then((ships) => {
-            assert.equal(1, ships.length);
-            assert.equal(ships[0].readAttribute('id'), 1);
-            assert.equal(ships[0].readAttribute('name'), 'Galactica');
-        }).then(() => { done(); }, done);
-
+        let ships = fleet.ships.toArray()
+        assert.equal(1, ships.length);
+        assert.equal(ships[0].readAttribute('id'), 1);
+        assert.equal(ships[0].readAttribute('name'), 'Galactica');
     });
 
 });
