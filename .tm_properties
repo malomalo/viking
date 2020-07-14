@@ -1,1 +1,4 @@
 exclude = '{$exclude,tmp,.tm_properties,node_modules,docs}'
+
+[ *.js ]
+tabSize = 4

@@ -9,6 +9,7 @@ describe('Viking.Record#setAttributes', () => {
             static schema = {
                 key:        {type: 'integer', array: true},
                 date:       {type: 'date'},
+                datetime:       {type: 'datetime'},
                 float:      {type: 'float'},
                 integer:    {type: 'integer'},
                 string:     {type: 'string'},
@@ -38,15 +39,31 @@ describe('Viking.Record#setAttributes', () => {
             it("iso8601 string to date", () => {
                 let a = new Model();
 
-                a.setAttributes({date: "2013-04-10T21:24:28+00:00"});
-                assert.equal(a.readAttribute('date').valueOf(), new Date(1365629068000).valueOf());
+                a.setAttributes({date: "2013-04-10"});
+                assert.equal(a.readAttribute('date').valueOf(), new Date(1365570000000).valueOf());
             });
 
             it("int(milliseconds since epoch) to date", () => {
                 let a = new Model();
 
-                a.setAttributes({date: 1365629126097});
-                assert.equal(a.readAttribute('date').valueOf(), new Date(1365629126097).valueOf());
+                a.setAttributes({date: 1365570000000});
+                assert.equal(a.readAttribute('date').valueOf(), new Date(1365570000000).valueOf());
+            });
+        });
+        
+        describe('datetime', () => {
+            it("iso8601 string to datetime", () => {
+                let a = new Model();
+
+                a.setAttributes({datetime: "2013-04-10T21:24:28+00:00"});
+                assert.equal(a.readAttribute('datetime').valueOf(), new Date(1365629068000).valueOf());
+            });
+
+            it("int(milliseconds since epoch) to datetime", () => {
+                let a = new Model();
+
+                a.setAttributes({datetime: 1365629126097});
+                assert.equal(a.readAttribute('datetime').valueOf(), new Date(1365629126097).valueOf());
             });
         });
 

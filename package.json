@@ -36,15 +36,22 @@
   "dependencies": {
     "babel-plugin-transform-class-extended-hook": "^1.0.3",
     "babel-plugin-transform-class-inherited-hook": "^3.2.0",
-    "esdoc-ecmascript-proposal-plugin": "^1.0.0"
+    "esdoc-ecmascript-proposal-plugin": "^1.0.0",
+    "strftime": "^0.10.0"
   },
-  "type": "module",
   "esdoc": {
     "source": "./lib",
     "destination": "./docs",
     "plugins": [
-      { "name": "esdoc-standard-plugin" },
-      { "name": "esdoc-ecmascript-proposal-plugin", "option": {"all": true} }
+      {
+        "name": "esdoc-standard-plugin"
+      },
+      {
+        "name": "esdoc-ecmascript-proposal-plugin",
+        "option": {
+          "all": true
+        }
+      }
     ]
   }
 }
