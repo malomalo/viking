@@ -24,6 +24,18 @@ describe('Viking.Record::associations', () => {
             });
         });
 
+        it("allows chaining", function(done) {
+            let model = new Model({parent_id: 24});
+
+            model.parent.readAttribute('name').then((n) => {
+                assert.equal(n, 'Viking');
+            }).then(done, done);
+
+            this.withRequest('GET', '/parents', { params: {where: {id: 24}, order: {id: 'desc'}, limit: 1} }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 24, "name": "Viking"}]');
+            });
+        });
+
         it("doesn't send query if not foriegnKey present", function(done) {
             let model = new Model();
 
@@ -143,5 +155,4 @@ describe('Viking.Record::associations', () => {
 
     //     delete Viking.context['Photo'];
     // });
-
 });
