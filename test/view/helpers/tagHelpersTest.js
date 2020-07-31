@@ -21,15 +21,13 @@ describe('Helpers.tagHelpers', () => {
         it("tag(name)", () => {
             let t = tag("br");
             
-            assert.equal(t.tagName, 'BR');
-            assert.noTagAttributes(t);
+            assert.tag(tag('br'), 'br');
         });
     
         it("tag(name, options)", () => {
             let t = tag("input", {type: 'text'});
-            
-            assert.equal(t.tagName, 'INPUT');
-            assert.tagAttributes(t, {type: 'text'});
+
+            assert.tag(t, 'input', {type: 'text'});
         });
 
         it("tag(name, options) options are escaped by default", () => {

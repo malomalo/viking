@@ -6,6 +6,20 @@ import Model        from 'viking/record';
 import Connection   from 'viking/record/connection';
 
 
+assert.tag = function (tag, name, attrs) {
+    assert.tagName(tag, name);
+
+    if ( attrs === undefined || Object.entries(attrs).length === 0 ) {
+        assert.noTagAttributes(tag);
+    } else {
+        assert.tagAttributes(tag, attrs);
+    }
+}
+
+assert.tagName = function (tag, name) {
+    assert.equal(tag.tagName, name.toUpperCase());
+}
+
 assert.tagAttributes = function (tag, attrs) {
     Object.entries(attrs).forEach((k) => {
         assert.equal(tag.getAttribute(k[0]), k[1]);
