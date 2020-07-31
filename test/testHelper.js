@@ -1,8 +1,20 @@
 import 'mocha';
 import * as sinon from 'sinon';
+import assert from 'assert';
 import { toQuery }  from 'viking/support/object';
 import Model        from 'viking/record';
 import Connection   from 'viking/record/connection';
+
+
+assert.tagAttributes = function (tag, attrs) {
+    Object.entries(attrs).forEach((k) => {
+        assert.equal(tag.getAttribute(k[0]), k[1]);
+    });
+}
+
+assert.noTagAttributes = function (tag) {
+    assert.equal(Object.entries(tag.attributes).length, 0);
+}
 
 Model.connection = new Connection('http://example.com');
 
