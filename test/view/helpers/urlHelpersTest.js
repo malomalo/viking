@@ -6,38 +6,33 @@ describe('Viking.View.Helpers.urlHelpers', () => {
     
     describe('linkTo', () => {
         it("linkTo(content, url)", () => {
-            assert.equal(
-                linkTo('Example', 'http://example.com'),
-                '<a href="http://example.com">Example</a>'
-            );
+            const t = linkTo('Example', 'http://example.com');
+            assert.equal(t.innerHTML, 'Example');
+            assert.tag(t, 'a', {href: 'http://example.com'});
         });
 
         it("linkTo(contentFunc, url)", () => {
-            assert.equal(
-                linkTo(() => { return 'Example'; }, 'http://example.com'),
-                '<a href="http://example.com">Example</a>'
-            );
+            const t = linkTo(() => { return 'Example'; }, 'http://example.com');
+            assert.equal(t.innerHTML, 'Example');
+            assert.tag(t, 'a', {href: 'http://example.com'});
         });
 
         it("linkTo(content, url, options)", () => {
-            assert.equal(
-                linkTo('Example', 'http://example.com', { 'class': 'myclass' }),
-                '<a class="myclass" href="http://example.com">Example</a>'
-            );
+            const t = linkTo('Example', 'http://example.com', { 'class': 'myclass' });
+            assert.equal(t.innerHTML, 'Example');
+            assert.tag(t, 'a', {href: 'http://example.com', class: 'myclass'});
         });
 
         it("linkTo(contentFunc, url, options)", () => {
-            assert.equal(
-                linkTo(() => { return 'Example'; }, 'http://example.com', { 'class': 'myclass' }),
-                '<a class="myclass" href="http://example.com">Example</a>'
-            );
+            const t = linkTo(() => { return 'Example'; }, 'http://example.com', { 'class': 'myclass' });
+            assert.equal(t.innerHTML, 'Example');
+            assert.tag(t, 'a', {href: 'http://example.com', class: 'myclass'});
         });
 
         it("linkTo(url, options, contentFunc)", () => {
-            assert.equal(
-                linkTo('http://example.com', { 'class': 'myclass' }, () => { return 'Example'; }),
-                '<a class="myclass" href="http://example.com">Example</a>'
-            );
+            const t = linkTo('http://example.com', { 'class': 'myclass' }, () => { return 'Example'; });
+            assert.equal(t.innerHTML, 'Example');
+            assert.tag(t, 'a', {href: 'http://example.com', class: 'myclass'});
         });
 
         // it("linkTo(content, model)", () => {
@@ -91,61 +86,54 @@ describe('Viking.View.Helpers.urlHelpers', () => {
     
     describe('mailTo', () => {
         it("mailTo(email)", () => {
-            assert.equal(
-                mailTo('me@domain.com'),
-                '<a href="mailto:me@domain.com">me@domain.com</a>'
-            );
+            const t = mailTo('me@domain.com');
+            assert.equal(t.innerHTML, 'me@domain.com');
+            assert.tag(t, 'a', {href: 'mailto:me@domain.com'});
         });
     
         it("mailTo(email, name)", () => {
-            assert.equal(
-                mailTo('me@domain.com', 'My email'),
-                '<a href="mailto:me@domain.com">My email</a>'
-            );
+            const t = mailTo('me@domain.com', 'My email');
+            assert.equal(t.innerHTML, 'My email');
+            assert.tag(t, 'a', {href: 'mailto:me@domain.com'});
         });
     
         it("mailTo(email, options)", () => {
-            assert.equal(
-                mailTo('me@domain.com', {key: 'value'}),
-                '<a href="mailto:me@domain.com" key="value">me@domain.com</a>'
-            );
+            const t = mailTo('me@domain.com', {key: 'value'});
+            assert.equal(t.innerHTML, 'me@domain.com');
+            assert.tag(t, 'a', {href: 'mailto:me@domain.com', key: 'value'});
         });
     
         it("mailTo(email, name, options)", () => {
-            assert.equal(
-                mailTo('me@domain.com', 'My email', {
-                    cc: 'ccaddress@domain.com',
-                    subject: 'This is an example email'
-                }),
-                '<a href="mailto:me@domain.com?cc=ccaddress%40domain.com&subject=This%20is%20an%20example%20email">My email</a>'
-            );
+            const t = mailTo('me@domain.com', 'My email', {
+                cc: 'ccaddress@domain.com',
+                subject: 'This is an example email'
+            });
+            assert.equal(t.innerHTML, 'My email');
+            assert.tag(t, 'a', {href: 'mailto:me@domain.com?cc=ccaddress%40domain.com&subject=This%20is%20an%20example%20email'});
         });
     
         it("mailTo(email, contentFunc)", () => {
-            assert.equal(
-                mailTo('me@domain.com', () => {
-                    return "<strong>Email me:</strong> <span>me@domain.com</span>";
-                }),
-                '<a href="mailto:me@domain.com"><strong>Email me:</strong> <span>me@domain.com</span></a>'
-            );
+            const t = mailTo('me@domain.com', () => {
+                return "<strong>Email me:</strong> <span>me@domain.com</span>";
+            });
+            assert.equal(t.innerHTML, 'strong>Email me:</strong> <span>me@domain.com</span>');
+            assert.tag(t, 'a', {href: 'mailto:me@domain.com'});
         });
     
         it("mailTo(email, options, contentFunc)", () => {
-            assert.equal(
-                mailTo('me@domain.com', {key: 'value'}, () => {
-                    return "Email me";
-                }),
-                '<a href="mailto:me@domain.com" key="value">Email me</a>'
-            );
+            const t = mailTo('me@domain.com', {key: 'value'}, () => {
+                return "Email me";
+            });
+            assert.equal(t.innerHTML, 'Email me');
+            assert.tag(t, 'a', {href: 'mailto:me@domain.com', key: 'value'});
         });
     
         it("mailTo(email, contentFunc, options)", () => {
-            assert.equal(
-                mailTo('me@domain.com', () => {
-                    return "Email me";
-                }, {key: 'value'}),
-                '<a href="mailto:me@domain.com" key="value">Email me</a>'
-            );
+            const t = mailTo('me@domain.com', () => {
+                return "Email me";
+            }, {key: 'value'});
+            assert.equal(t.innerHTML, 'Email me');
+            assert.tag(t, 'a', {href: 'mailto:me@domain.com', key: 'value'});
         });
 
     });
