@@ -6,13 +6,26 @@ import Model        from 'viking/record';
 import Connection   from 'viking/record/connection';
 
 
-assert.tag = function (tag, name, attrs) {
+assert.tag = function (tag, name, attrsOrContent, content) {
+    var attrs;
+    
+    if (typeof attrsOrContent === 'string') {
+        content = attrsOrContent;
+        attrs = undefined;
+    } else {
+        attrs = attrsOrContent;
+    }
+    
     assert.tagName(tag, name);
 
     if ( attrs === undefined || Object.entries(attrs).length === 0 ) {
         assert.noTagAttributes(tag);
     } else {
         assert.tagAttributes(tag, attrs);
+    }
+    
+    if (content) {
+        assert.equal(tag.innerHTML, content);
     }
 }
 
@@ -22,7 +35,11 @@ assert.tagName = function (tag, name) {
 
 assert.tagAttributes = function (tag, attrs) {
     Object.entries(attrs).forEach((k) => {
-        assert.equal(tag.getAttribute(k[0]), k[1]);
+        if (k[1] === true) {
+            assert.equal(tag.getAttribute(k[0]), '');
+        } else {
+            assert.equal(tag.getAttribute(k[0]), k[1]);
+        }
     });
 }
 
