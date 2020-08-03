@@ -22,6 +22,29 @@ describe('Viking.Controller', () => {
           c.dispatch('index');
           assert.deepStrictEqual(c.sequence, ['ba', 'index', 'aa']);
       });
+      
+      it('extending inherits aroundActions', () => {
+          class ParentController extends VController {
+              static aroundActions = ['aa'];
+              sequence = [];
+              aa(callback) {
+                  this.sequence.push('a');
+                  callback();
+              }
+          }
+          class Controller extends ParentController {
+              static aroundActions = ['ab'];
+              index() { this.sequence.push('index'); }
+              ab(callback) {
+                  this.sequence.push('b');
+                  callback();
+              }
+          }
+        
+          let c = new Controller();
+          c.dispatch('index');
+          assert.deepStrictEqual(c.sequence, ['a', 'b', 'index']);
+      });
 
       describe('w/ except option', () => {
         it('as a string', () => {
