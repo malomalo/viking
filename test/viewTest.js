@@ -523,7 +523,7 @@ describe('Viking.View', () => {
             };
         }
 
-        assert.deepEqual((new MySubView()).events, {
+        assert.deepEqual(MySubView.getEvents(), {
             click: 'click',
             hover: 'hover'
         });
@@ -543,7 +543,7 @@ describe('Viking.View', () => {
             };
         }
 
-        assert.deepEqual((new SubView()).events, {
+        assert.deepEqual(SubView.getEvents(), {
             click: 'click',
             hover: 'newHover'
         });
