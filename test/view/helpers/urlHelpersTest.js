@@ -114,9 +114,13 @@ describe('Viking.View.Helpers.urlHelpers', () => {
     
         it("mailTo(email, contentFunc)", () => {
             const t = mailTo('me@domain.com', () => {
-                return "<strong>Email me:</strong> <span>me@domain.com</span>";
+                var strong = document.createElement('strong');
+                var span = document.createElement('span');
+                strong.append('Email me:');
+                span.append('me@domain.com');
+                return [strong, span];
             });
-            assert.equal(t.innerHTML, 'strong>Email me:</strong> <span>me@domain.com</span>');
+            assert.equal(t.innerHTML, '<strong>Email me:</strong><span>me@domain.com</span>');
             assert.tag(t, 'a', {href: 'mailto:me@domain.com'});
         });
     
