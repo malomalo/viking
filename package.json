@@ -1,6 +1,6 @@
 {
   "name": "viking",
-  "version": "2.0.0-rc2",
+  "version": "2.0.0-rc3",
   "author": "Jonathan Bracy <jonbracy@gmail.com>",
   "description": "Viking.js is an open-source web framework for JavaScript. Inspired by Backbone.js & Ruby on Rails; it makes it easier to write client side JavaScript applications.",
   "url": "http://vikingjs.com",
