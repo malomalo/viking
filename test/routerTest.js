@@ -62,6 +62,27 @@ describe('Viking.Router', () => {
         assert.equal(counter, 1);
     });
 
+    it('routes to a controller and action (normal class)', function () {
+        let counter = 0;
+        
+        class Controller {
+            action() { counter++; }
+        }
+
+        class Router extends VikingRouter {
+            static routes = {
+                '/': {
+                    to: { controller: Controller, action: 'action' },
+                    name: 'root'
+                }
+            };
+        }
+
+        this.router = new Router();
+        this.router.start();
+        assert.equal(counter, 1);
+    });
+
     it('routes to a controller and action (defined controller)', function () {
         let counter = 0;
         
