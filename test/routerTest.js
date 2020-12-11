@@ -252,6 +252,28 @@ describe('Viking.Router', () => {
 
         this.router.navigateTo('ca/something/another');
     });
+	
+    it('routes with a string the becomes a regex', function (done) {
+        let counter = 0;
+
+        class Router extends VikingRouter {
+            static routes = {
+                '/:country/:state/:city': (state, something, another) => {
+                    assert.equal(state, 'ca');
+                    assert.equal(something, 'something');
+                    assert.equal(another, 'another');
+                    counter++;
+                    if (counter == 2) { done(); }
+                }
+            };
+        }
+
+        this.router = new Router();
+        this.router.start();
+
+        this.router.navigateTo('/ca/something/another');
+        this.router.navigateTo('/ca/something/another/');
+    });
 
     // test('routes with a string', async () => {
     //     await new Promise((resolve) => {
