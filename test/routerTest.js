@@ -232,6 +232,24 @@ describe('Viking.Router', () => {
     //     Backbone.history.handlers[0].callback('');
     //     router.cleanup();
     // });
+    it('routes with a string', function (done) {
+        let counter = 0;
+
+        class Router extends VikingRouter {
+            static routes = {
+                '/country/state/city': () => {
+                    counter++;
+                    if (counter == 2) { done(); }
+                }
+            };
+        }
+
+        this.router = new Router();
+        this.router.start();
+
+        this.router.navigateTo('/country/state/city');
+        this.router.navigateTo('/country/state/city/');
+    });
 
     it('routes with a regex', function (done) {
         let counter = 0;
@@ -250,10 +268,10 @@ describe('Viking.Router', () => {
         this.router = new Router();
         this.router.start();
 
-        this.router.navigateTo('ca/something/another');
+        this.router.navigateTo('/ca/something/another');
     });
 	
-    it('routes with a string the becomes a regex', function (done) {
+    it('routes with a string that becomes a regex', function (done) {
         let counter = 0;
 
         class Router extends VikingRouter {
