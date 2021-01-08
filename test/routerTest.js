@@ -292,6 +292,34 @@ describe('Viking.Router', () => {
         this.router.navigateTo('/ca/something/another');
         this.router.navigateTo('/ca/something/another/');
     });
+    
+    it('asdf', function () {
+        let counter = 0;
+        class Router extends VikingRouter {
+            static routes = {
+                '/projects/:id': (project_id) => {
+                    console.log(project_id)
+                    assert.equal(project_id, counter == 3 ? '069fdb4a44b84013bca0f0f59ae9a718' : 'fdsafdsa');
+                    counter++;
+                }
+            };
+        }
+
+        this.router = new Router();
+        this.router.start();
+
+        this.router.navigateTo('/projects')
+        this.router.navigateTo('/projects/')
+        this.router.navigateTo('/projects/fdsafdsa')
+        this.router.navigateTo('/projects/fdsafdsa/')
+        this.router.navigateTo('/projects/fdsafdsa/download')
+        this.router.navigateTo('/projects/fdsafdsa?phase_id=fdsafdsa')  
+        this.router.navigateTo('/projects/069fdb4a44b84013bca0f0f59ae9a718?phase_id=7776ca11567e4b8093217bd110d20b79')
+        this.router.navigateTo('/projects/fdsafdsa/?phase_id=fdsafdsa/')
+        this.router.navigateTo('/projects/fdsafdsa?phase_id=fdsafdsa/')
+        
+        assert.equal(6, counter);
+    });
 
     // test('routes with a string', async () => {
     //     await new Promise((resolve) => {
