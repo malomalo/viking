@@ -1,25 +1,38 @@
 import 'mocha';
 import * as assert from 'assert';
-import * as Errors from 'viking/errors';
-import VView from 'viking/view';
 import VController from 'viking/controller';
+import VikingRouter from 'viking/router';
 
 describe('Viking.Controller', () => {
-  describe('params', () => {
-
-      it('params from query string are present in params', () => {
-        history.pushState({}, '', 'http://example.com?query=param&other=parameter');
+    
+    describe('params', () => {
+    
+        afterEach(function () {
+            if(this.router) { this.router.stop(); };
+        });
         
-          class Controller extends VController {
-              index() {
-                  assert.equal(this.params.query, 'param');
-                  assert.equal(this.params.other, 'parameter');
-              }
-          }
+        it('params from query string are present in params', function () {
+            class Controller extends VController {
+                index() {
+                    assert.equal(this.params.counter, '2');
+                    assert.equal(this.params.other, 'parameter');
+                }
+            }
+            class Router extends VikingRouter {
+                static routes = {
+                    '/projects': {
+                        to: [Controller, 'index']
+                    }
+                };
+            }
+          
+            this.router = new Router();
+            this.router.start()
+            this.router.navigateTo('/projects', {
+                counter: 2,
+                other: 'parameter'
+            })
+        });
 
-          let c = new Controller();
-          c.dispatch('index')
-      });
-
-  });
+    });
 });

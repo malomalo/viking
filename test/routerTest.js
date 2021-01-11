@@ -5,9 +5,10 @@ import VikingController from 'viking/controller';
 
 describe('Viking.Router', () => {
 
-    // beforeEach(() => {
-    //     window.location = 'https://example.com';
-    // });
+    
+    beforeEach(() => {
+        history.pushState({}, '', '/');
+    });
 
     afterEach(function () {
         if(this.router) { this.router.stop(); };
@@ -322,7 +323,6 @@ describe('Viking.Router', () => {
         class Router extends VikingRouter {
             static routes = {
                 '/projects/:id': (project_id) => {
-                    console.log(project_id)
                     assert.equal(project_id, counter == 3 ? '069fdb4a44b84013bca0f0f59ae9a718' : 'fdsafdsa');
                     counter++;
                 }
@@ -344,6 +344,21 @@ describe('Viking.Router', () => {
         
         assert.equal(6, counter);
     });
+    
+    it ('navigateTo passes params as query', function () {
+        class Router extends VikingRouter {
+            static routes = {
+                '/projects': (params) => {
+                    assert.equal(params.counter, 2);
+                }
+            };
+        }
+
+        this.router = new Router();
+        this.router.start();
+
+        this.router.navigateTo('/projects', {counter: 2})
+    })
 
     // test('routes with a string', async () => {
     //     await new Promise((resolve) => {
