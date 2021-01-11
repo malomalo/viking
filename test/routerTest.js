@@ -124,6 +124,30 @@ describe('Viking.Router', () => {
         this.router.start();
         assert.equal(counter, 1);
     });
+    
+    it('routes to a controller and action are correctly ordered', function () {
+        let counter = 0;
+        
+        class Controller extends VikingController {
+            static()  {counter++}
+        }
+
+        class Router extends VikingRouter {
+            static routes = {
+                '/test/static': {
+                    to: { controller: Controller, action: 'static' }
+                },
+                '/test/:id': {
+                    to: { controller: Controller, action: 'show' }
+                }
+            };
+        }
+
+        this.router = new Router();
+        this.router.start();
+        this.router.navigateTo('/test/static');
+        assert.equal(counter, 1);
+    });
 
 
     // test('routes to a initialized controller and action (Viking.Controller)', async () => {
