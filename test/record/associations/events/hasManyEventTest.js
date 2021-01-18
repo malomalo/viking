@@ -20,7 +20,7 @@ describe('Viking.Record::ssociations', () => {
                 done()
             })
         
-            model.parents = [parent]
+            model.parents.push(parent)
         })
         
         it("unsetting target fires remove event", function (done) {
