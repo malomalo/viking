@@ -5,12 +5,12 @@ import { hasAndBelongsToMany } from 'viking/record/associations';
 
 describe('Viking.Record::associations', () => {
 
-    describe('hasAndBelongsToMany(Model)', () => {
-        class Parent extends VikingRecord { }
-        class Model extends VikingRecord {
-            static associations = [hasAndBelongsToMany(Parent)];
-        }
+    class Parent extends VikingRecord { }
+    class Model extends VikingRecord {
+        static associations = [hasAndBelongsToMany(Parent)];
+    }
 
+    describe('hasAndBelongsToMany(Model)', () => {
         it("load association", function(done) {
             let model = new Model({id: 24});
 
@@ -88,5 +88,55 @@ describe('Viking.Record::associations', () => {
             });
         });
     });
+    
+    describe('addBang', () => {
+        it('sends request', function () {
+            let model = new Model({id: 24})
+            let parent = new Parent({id: 11})
+            model.association('parents').addBang(parent)
+        
+            assert.equal(this.requests[0].url, 'http://example.com/models/24/parents/11')
+            assert.equal(this.requests[0].method, 'POST')
+        })
+    
+        it('updates target', function (done) {
+            let model = new Model({id: 24})
+            let parent = new Parent({id: 11})
+
+            model.association('parents').addBang(parent).then(() => {
+                assert.equal(model.parents.toArray().map(x => x.readAttribute('id'))[0], 11)
+            }).then(done, done)
+        
+            this.withRequest('POST', '/models/24/parents/11', {}, (xhr) => {
+                xhr.respond(201, {}, null);
+            });
+        })
+    })
+
+    describe('removeBang', () => {
+        it('sends request', function () {
+            let model = new Model({id: 24})
+            let parent = new Parent({id: 11})
+            model.parent = [parent]
+            model.association('parents').removeBang(parent)
+        
+            assert.equal(this.requests[0].url, 'http://example.com/models/24/parents/11')
+            assert.equal(this.requests[0].method, 'DELETE')
+        })
+    
+        it('updates target', function (done) {
+            let model = new Model({id: 24})
+            let parent = new Parent({id: 11})
+            model.parent = [parent]
+
+            model.association('parents').removeBang(parent).then(() => {
+                assert.equal(model.parents.toArray().length, 0)
+            }).then(done, done)
+        
+            this.withRequest('DELETE', '/models/24/parents/11', {}, (xhr) => {
+                xhr.respond(201, {}, null);
+            });
+        })
+    })
 
 });
