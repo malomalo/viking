@@ -46,7 +46,7 @@ describe('Viking.Record::associations', () => {
         });
 
         describe('assigning the association', () => {
-            it('to a model with an id', function(done) {
+            it('to a model with an id', function () {
                 let model = new Model();
                 let parent = new Parent({id: 13});
                 model.parent = parent;
@@ -54,14 +54,11 @@ describe('Viking.Record::associations', () => {
                 assert.equal(model.readAttribute('parent_id'), 13);
                 assert.ok(model._associations.parent.loaded);
                 assert.strictEqual(model._associations.parent.target, parent);
-                model.parent.then((model) => {
-                    assert.strictEqual(model, parent);
-                    done();
-                });
+                assert.strictEqual(model.parent, parent);
                 assert.equal(this.requests.length, 0);
             });
 
-            it('to a model without an id', function(done) {
+            it('to a model without an id', function() {
                 let model = new Model();
                 let parent = new Parent();
                 model.parent = parent;
@@ -69,24 +66,18 @@ describe('Viking.Record::associations', () => {
                 assert.equal(model.readAttribute('parent_id'), null);
                 assert.ok(model._associations.parent.loaded);
                 assert.strictEqual(model._associations.parent.target, parent);
-                model.parent.then((model) => {
-                    assert.strictEqual(model, parent);
-                    done();
-                });
+                assert.strictEqual(model.parent, parent);
                 assert.equal(this.requests.length, 0);
             });
 
-            it('to null', function(done) {
+            it('to null', function() {
                 let model = new Model();
                 model.parent = null;
 
                 assert.equal(model.readAttribute('parent_id'), null);
                 assert.ok(model._associations.parent.loaded);
                 assert.strictEqual(model._associations.parent.target, null);
-                model.parent.then((model) => {
-                    assert.strictEqual(model, null);
-                    done();
-                });
+                assert.strictEqual(model.parent, null);
                 assert.equal(this.requests.length, 0);
             });
         });
@@ -112,7 +103,7 @@ describe('Viking.Record::associations', () => {
         });
 
         describe('assigning the association', () => {
-            it('to a model with an id', function(done) {
+            it('to a model with an id', function() {
                 let model = new Model();
                 let parent = new Parent({id: 13});
                 model.parent = parent;
@@ -120,11 +111,25 @@ describe('Viking.Record::associations', () => {
                 assert.equal(model.readAttribute('parental_id'), 13);
                 assert.ok(model._associations.parent.loaded);
                 assert.strictEqual(model._associations.parent.target, parent);
-                model.parent.then((model) => {
-                    assert.strictEqual(model, parent);
-                    done();
-                });
+                assert.strictEqual(model.parent, parent);
                 assert.equal(this.requests.length, 0);
+            });
+        });
+    });
+    
+    describe('include', () => {
+        class Parent extends VikingRecord { }
+        class Model extends VikingRecord {
+            static associations = [belongsTo(Parent, {foreignKey: 'parental_id'})];
+        }
+
+        it('instantiating null', function(done) {
+            Model.includes('parent').find(24).then(model => {
+                assert.strictEqual(model.parent, null);
+            }).then(done, done);
+            
+            this.withRequest('GET', '/models', { params: {where: {id: 24}, order: {id: 'desc'}, limit: 1, include: ['parent']} }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 24, "name": "Viking", "parent": null}]');
             });
         });
     });

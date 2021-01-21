@@ -50,7 +50,7 @@ describe('Viking.Record::associations', () => {
         });
 
         describe('assigning the association', () => {
-            it('to a model with an id', function(done) {
+            it('to a model with an id', function() {
                 let model = new Model({id: 42});
                 let parent = new Parent({id: 13});
                 model.parent = parent;
@@ -58,14 +58,11 @@ describe('Viking.Record::associations', () => {
                 assert.equal(parent.readAttribute('model_id'), 42);
                 assert.ok(model._associations.parent.loaded);
                 assert.strictEqual(model._associations.parent.target, parent);
-                model.parent.then((model) => {
-                    assert.strictEqual(model, parent);
-                    done();
-                });
+                assert.strictEqual(model.parent, parent);
                 assert.equal(this.requests.length, 0);
             });
 
-            it('to a model without an id', function(done) {
+            it('to a model without an id', function() {
                 let model = new Model();
                 let parent = new Parent();
                 model.parent = parent;
@@ -73,23 +70,17 @@ describe('Viking.Record::associations', () => {
                 assert.equal(parent.readAttribute('model_id'), null);
                 assert.ok(model._associations.parent.loaded);
                 assert.strictEqual(model._associations.parent.target, parent);
-                model.parent.then((model) => {
-                    assert.strictEqual(model, parent);
-                    done();
-                });
+                assert.strictEqual(model.parent, parent);
                 assert.equal(this.requests.length, 0);
             });
 
-            it('to null', function(done) {
+            it('to null', function() {
                 let model = new Model();
                 model.parent = null;
 
                 assert.ok(model._associations.parent.loaded);
                 assert.strictEqual(model._associations.parent.target, null);
-                model.parent.then((model) => {
-                    assert.strictEqual(model, null);
-                    done();
-                });
+                assert.strictEqual(model.parent, null);
                 assert.equal(this.requests.length, 0);
             });
         });
@@ -116,7 +107,7 @@ describe('Viking.Record::associations', () => {
         });
 
         describe('assigning the association', () => {
-            it('to a model with an id', function(done) {
+            it('to a model with an id', function() {
                 let model = new Model({id: 42});
                 let parent = new Parent({id: 13});
                 model.parent = parent;
@@ -124,10 +115,7 @@ describe('Viking.Record::associations', () => {
                 assert.equal(parent.readAttribute('child_id'), 42);
                 assert.ok(model._associations.parent.loaded);
                 assert.strictEqual(model._associations.parent.target, parent);
-                model.parent.then((model) => {
-                    assert.strictEqual(model, parent);
-                    done();
-                });
+                assert.strictEqual(model.parent, parent);
                 assert.equal(this.requests.length, 0);
             });
         });
