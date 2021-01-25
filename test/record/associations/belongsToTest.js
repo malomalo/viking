@@ -168,6 +168,7 @@ describe('Viking.Record::associations', () => {
 
             model.association('parent').removeBang(model.parent).then(() => {
                 assert.equal(model.parent, null)
+                assert.equal(model.association('parent').loaded, true)
                 done()
             }, done)
             

@@ -43,6 +43,83 @@ describe('Viking.Record::associations', () => {
             });
 
         });
+        
+        describe('addBang', () => {
+            it('sends request', function () {
+                let model = new Model({id: 24})
+                let parent = new Parent({id: 11})
+                model.association('parents').addBang(parent)
+        
+                assert.equal(this.requests[0].url, 'http://example.com/models/24/parents/11')
+                assert.equal(this.requests[0].method, 'POST')
+            })
+    
+            it('updates target when loaded and record persisted', function (done) {
+                let model = new Model({id: 24})
+                let parent1 = Parent.find(11)
+                
+                
+                model.parents.load().then(() => {
+                    parent1.then((p) => {
+                        model.association('parents').addBang(p).then(() => {
+                            assert.deepStrictEqual(model.parents.target.map(x => x.readAttribute('id')), [11])
+                        }).then(done, done)
+                    
+                        this.withRequest('POST', '/models/24/parents/11', {}, (xhr) => {
+                            xhr.respond(201, {}, null);
+                        });
+                    }, done)
+                
+                    this.withRequest('GET', '/parents', { params: {where: {id: 11}, order: {id: 'desc'}, limit: 1} }, (xhr) => {
+                        xhr.respond(200, {}, '[{"id": 11, "name": "Parent1"}]');
+                    });
+                })
+                
+                this.withRequest('GET', '/parents', { params: {where: {models_parents: {model_id: 24}}, order: {id: 'desc'}} }, (xhr) => {
+                    xhr.respond(200, {}, '[]');
+                });
+            })
+            
+            it('doesnt update target when not loaded', function (done) {
+                let model = new Model({id: 24})
+                let parent1 = new Parent({id: 11})
+                
+                model.association('parents').addBang(parent1).then(() => {
+                    assert.deepStrictEqual(model.parents.target, [])
+                    assert.ok(!model.parents.loaded)
+                }).then(done, done)
+        
+                this.withRequest('POST', '/models/24/parents/11', {}, (xhr) => {
+                    xhr.respond(201, {}, null);
+                });
+            })
+        })
+
+        describe('removeBang', () => {
+            it('sends request', function () {
+                let model = new Model({id: 24})
+                let parent = new Parent({id: 11})
+                model.parent = [parent]
+                model.association('parents').removeBang(parent)
+        
+                assert.equal(this.requests[0].url, 'http://example.com/models/24/parents/11')
+                assert.equal(this.requests[0].method, 'DELETE')
+            })
+    
+            it('updates target', function (done) {
+                let model = new Model({id: 24})
+                let parent = new Parent({id: 11})
+                model.parent = [parent]
+
+                model.association('parents').removeBang(parent).then(() => {
+                    assert.equal(model.parents.toArray().length, 0)
+                }).then(done, done)
+        
+                this.withRequest('DELETE', '/models/24/parents/11', {}, (xhr) => {
+                    xhr.respond(201, {}, null);
+                });
+            })
+        })
     });
 
     describe('hasAndBelongsToMany(Parent, {foriegnKey: KEY})', () => {
@@ -88,55 +165,5 @@ describe('Viking.Record::associations', () => {
             });
         });
     });
-    
-    describe('addBang', () => {
-        it('sends request', function () {
-            let model = new Model({id: 24})
-            let parent = new Parent({id: 11})
-            model.association('parents').addBang(parent)
-        
-            assert.equal(this.requests[0].url, 'http://example.com/models/24/parents/11')
-            assert.equal(this.requests[0].method, 'POST')
-        })
-    
-        it('updates target', function (done) {
-            let model = new Model({id: 24})
-            let parent = new Parent({id: 11})
-
-            model.association('parents').addBang(parent).then(() => {
-                assert.equal(model.parents.toArray().map(x => x.readAttribute('id'))[0], 11)
-            }).then(done, done)
-        
-            this.withRequest('POST', '/models/24/parents/11', {}, (xhr) => {
-                xhr.respond(201, {}, null);
-            });
-        })
-    })
-
-    describe('removeBang', () => {
-        it('sends request', function () {
-            let model = new Model({id: 24})
-            let parent = new Parent({id: 11})
-            model.parent = [parent]
-            model.association('parents').removeBang(parent)
-        
-            assert.equal(this.requests[0].url, 'http://example.com/models/24/parents/11')
-            assert.equal(this.requests[0].method, 'DELETE')
-        })
-    
-        it('updates target', function (done) {
-            let model = new Model({id: 24})
-            let parent = new Parent({id: 11})
-            model.parent = [parent]
-
-            model.association('parents').removeBang(parent).then(() => {
-                assert.equal(model.parents.toArray().length, 0)
-            }).then(done, done)
-        
-            this.withRequest('DELETE', '/models/24/parents/11', {}, (xhr) => {
-                xhr.respond(201, {}, null);
-            });
-        })
-    })
 
 });
