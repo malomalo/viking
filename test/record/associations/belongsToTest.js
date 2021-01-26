@@ -4,12 +4,11 @@ import VikingRecord from 'viking/record';
 import { belongsTo } from 'viking/record/associations';
 
 describe('Viking.Record::associations', () => {
-
+    class Parent extends VikingRecord { }
+    class Model extends VikingRecord {
+        static associations = [belongsTo(Parent)];
+    }
     describe('belongsTo(Parent)', () => {
-        class Parent extends VikingRecord { }
-        class Model extends VikingRecord {
-            static associations = [belongsTo(Parent)];
-        }
 
         it("load association", function(done) {
             let model = new Model({parent_id: 24});
@@ -81,6 +80,73 @@ describe('Viking.Record::associations', () => {
                 assert.equal(this.requests.length, 0);
             });
         });
+        
+        describe('include', () => {
+            it('instantiating null', function(done) {
+                Model.includes('parent').find(24).then(model => {
+                    assert.strictEqual(model.parent, null);
+                }).then(done, done);
+            
+                this.withRequest('GET', '/models', { params: {where: {id: 24}, order: {id: 'desc'}, limit: 1, include: ['parent']} }, (xhr) => {
+                    xhr.respond(200, {}, '[{"id": 24, "name": "Viking", "parent": null}]');
+                });
+            });
+        });
+        
+        describe('addBang', () => {
+            it('sends request', function () {
+                let model = new Model({id: 24})
+                let parent = new Parent({id: 11})
+                model.association('parent').addBang(parent)
+            
+                assert.equal(this.requests[0].url, 'http://example.com/models/24/parent/11')
+                assert.equal(this.requests[0].method, 'POST')
+            })
+        
+            it('updates target', function (done) {
+                let model = new Model({id: 24})
+                let parent = new Parent({id: 11})
+
+                model.association('parent').addBang(parent).then(() => {
+                    assert.equal(model.parent.readAttribute('id'), 11)
+                    assert.equal(model.readAttribute('parent_id'), 11)
+                    // TODO assert model.changes does not include parent_id
+                    done()
+                }, done)
+            
+                this.withRequest('POST', '/models/24/parent/11', {}, (xhr) => {
+                    xhr.respond(201, {}, null);
+                });
+            })
+        })
+    
+        describe('removeBang', () => {
+            it('sends request', function () {
+                let model = new Model({id: 24})
+                model.parent = new Parent({id: 11})
+                model.association('parent').removeBang(model.parent)
+            
+                assert.equal(this.requests[0].url, 'http://example.com/models/24/parent/11')
+                assert.equal(this.requests[0].method, 'DELETE')
+            })
+        
+            it('updates target', function (done) {
+                let model = new Model({id: 24})
+                model.parent = new Parent({id: 11})
+
+                model.association('parent').removeBang(model.parent).then(() => {
+                    assert.equal(model.parent, null)
+                    assert.equal(model.readAttribute('parent_id'), null)
+                    // TODO assert model.changes does not include parent_id
+                    assert.equal(model.association('parent').loaded, true)
+                    done()
+                }, done)
+            
+                this.withRequest('DELETE', '/models/24/parent/11', {}, (xhr) => {
+                    xhr.respond(201, {}, null);
+                });
+            })
+        })
     });
 
     describe('belongsTo(Parent, {foriegnKey: KEY})', () => {
@@ -88,7 +154,6 @@ describe('Viking.Record::associations', () => {
         class Model extends VikingRecord {
             static associations = [belongsTo(Parent, {foreignKey: 'parental_id'})];
         }
-
         it("load association", function(done) {
             let model = new Model({parental_id: 24});
 
@@ -117,22 +182,7 @@ describe('Viking.Record::associations', () => {
         });
     });
     
-    describe('include', () => {
-        class Parent extends VikingRecord { }
-        class Model extends VikingRecord {
-            static associations = [belongsTo(Parent, {foreignKey: 'parental_id'})];
-        }
-
-        it('instantiating null', function(done) {
-            Model.includes('parent').find(24).then(model => {
-                assert.strictEqual(model.parent, null);
-            }).then(done, done);
-            
-            this.withRequest('GET', '/models', { params: {where: {id: 24}, order: {id: 'desc'}, limit: 1, include: ['parent']} }, (xhr) => {
-                xhr.respond(200, {}, '[{"id": 24, "name": "Viking", "parent": null}]');
-            });
-        });
-    });
+    
 
     // Model.reflectOnAssociation('parent');
 
