@@ -23,6 +23,19 @@ describe('Viking.Record::ssociations', () => {
             model.parents.push(parent)
         })
         
+        it("setting target fires add event on record", function (done){
+            let model = new Model({id: 11});
+            let parent = new Parent({id: 24});
+        
+            parent.addEventListener('add', association => {
+                assert.equal(association.owner, model)
+                assert.equal(parent.readAttribute('model_id'), 11)
+                done()
+            })
+        
+            model.parents.push(parent)
+        })
+        
         it("unsetting target fires remove event", function (done) {
             let model = new Model();
             let parent = new Parent({id: 24});
@@ -30,6 +43,20 @@ describe('Viking.Record::ssociations', () => {
             
             model.association('parents').addEventListener('remove', records => {
                 assert.equal(records[0].readAttribute('id'), 24)
+                done()
+            })
+            
+            model.parents = []
+        })
+        
+        it("unsetting target fires remove event on record", function (done) {
+            let model = new Model();
+            let parent = new Parent({id: 24});
+            model.parents = [parent]
+            
+            parent.addEventListener('remove', association => {
+                assert.equal(association.owner, model)
+                assert.equal(parent.readAttribute('model_id'), null)
                 done()
             })
             
