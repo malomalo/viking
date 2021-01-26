@@ -86,8 +86,8 @@ describe('Viking.Record::associations', () => {
                 
                 model.parents.load().then(() => {
                     parent1.then((p) => {
-                        model.association('parents').addBang(p).then(() => {
-                            assert.deepStrictEqual(model.parents.target.map(x => x.readAttribute('id')), [11])
+                        model.parents.addBang(p).then(() => {
+                            assert.deepStrictEqual(model.parents.target, [p])
                         }).then(done, done)
                     
                         this.withRequest('POST', '/models/24/parents/11', {}, (xhr) => {
@@ -109,7 +109,7 @@ describe('Viking.Record::associations', () => {
                 let model = new Model({id: 24})
                 let parent1 = new Parent({id: 11})
     
-                model.association('parents').addBang(parent1).then(() => {
+                model.parents.addBang(parent1).then(() => {
                     assert.deepStrictEqual(model.parents.target, [])
                     assert.ok(!model.parents.loaded)
                 }).then(done, done)
@@ -125,7 +125,7 @@ describe('Viking.Record::associations', () => {
                 let model = new Model({id: 24})
                 let parent = new Parent({id: 11})
                 model.parent = [parent]
-                model.association('parents').removeBang(parent)
+                model.parents.removeBang(parent)
             
                 assert.equal(this.requests[0].url, 'http://example.com/models/24/parents/11')
                 assert.equal(this.requests[0].method, 'DELETE')
@@ -136,13 +136,17 @@ describe('Viking.Record::associations', () => {
                 let parent = new Parent({id: 11})
                 model.parent = [parent]
 
-                model.association('parents').removeBang(parent).then(() => {
-                    assert.equal(model.parents.toArray().length, 0)
+                model.parents.removeBang(parent).then(() => {
+                    assert.equal(model.parents.target.length, 0)
                 }).then(done, done)
             
                 this.withRequest('DELETE', '/models/24/parents/11', {}, (xhr) => {
                     xhr.respond(201, {}, null);
                 });
+            })
+            
+            it('doesnt update target when not loaded', function () {
+                // TODO
             })
         })
     });

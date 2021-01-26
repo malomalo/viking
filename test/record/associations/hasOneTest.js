@@ -84,6 +84,59 @@ describe('Viking.Record::associations', () => {
                 assert.equal(this.requests.length, 0);
             });
         });
+        
+        describe('addBang', () => {
+            it('sends request', function () {
+                let model = new Model({id: 24})
+                let parent = new Parent({id: 11})
+                model.association('parent').addBang(parent)
+            
+                assert.equal(this.requests[0].url, 'http://example.com/models/24/parent/11')
+                assert.equal(this.requests[0].method, 'POST')
+            })
+        
+            it('updates target', function (done) {
+                let model = new Model({id: 24})
+                let parent = new Parent({id: 11})
+
+                model.association('parent').addBang(parent).then(() => {
+                    assert.equal(model.parent.readAttribute('id'), 11)
+                    assert.equal(parent.readAttribute('model_id'), 24)
+                    done()
+                }, done)
+            
+                this.withRequest('POST', '/models/24/parent/11', {}, (xhr) => {
+                    xhr.respond(201, {}, null);
+                });
+            })
+        })
+    
+        describe('removeBang', () => {
+            it('sends request', function () {
+                let model = new Model({id: 24})
+                model.parent = new Parent({id: 11})
+                model.association('parent').removeBang(model.parent)
+            
+                assert.equal(this.requests[0].url, 'http://example.com/models/24/parent/11')
+                assert.equal(this.requests[0].method, 'DELETE')
+            })
+        
+            it('updates target', function (done) {
+                let model = new Model({id: 24})
+                let parent = new Parent({id: 11})
+                model.parent = parent
+
+                model.association('parent').removeBang(model.parent).then(() => {
+                    assert.equal(model.parent, null)
+                    assert.equal(parent.readAttribute('model_id'), null)
+                    done()
+                }, done)
+            
+                this.withRequest('DELETE', '/models/24/parent/11', {}, (xhr) => {
+                    xhr.respond(201, {}, null);
+                });
+            })
+        })
     });
    
     describe('hasOne(Parent, {foriegnKey: KEY})', () => {
@@ -136,54 +189,4 @@ describe('Viking.Record::associations', () => {
             assert.deepEqual(assocation.options, { foreignKey: 'child_id' });
         });
     });
-    
-    describe('addBang', () => {
-        it('sends request', function () {
-            let model = new Model({id: 24})
-            let parent = new Parent({id: 11})
-            model.association('parent').addBang(parent)
-            
-            assert.equal(this.requests[0].url, 'http://example.com/models/24/parent/11')
-            assert.equal(this.requests[0].method, 'POST')
-        })
-        
-        it('updates target', function (done) {
-            let model = new Model({id: 24})
-            let parent = new Parent({id: 11})
-
-            model.association('parent').addBang(parent).then(() => {
-                assert.equal(model.parent.readAttribute('id'), 11)
-                done()
-            }, done)
-            
-            this.withRequest('POST', '/models/24/parent/11', {}, (xhr) => {
-                xhr.respond(201, {}, null);
-            });
-        })
-    })
-    
-    describe('removeBang', () => {
-        it('sends request', function () {
-            let model = new Model({id: 24})
-            model.parent = new Parent({id: 11})
-            model.association('parent').removeBang(model.parent)
-            
-            assert.equal(this.requests[0].url, 'http://example.com/models/24/parent/11')
-            assert.equal(this.requests[0].method, 'DELETE')
-        })
-        
-        it('updates target', function (done) {
-            let model = new Model({id: 24})
-            model.parent = new Parent({id: 11})
-
-            model.association('parent').removeBang(model.parent).then(() => {
-                assert.equal(model.parent, null)
-                done()
-            }, done)
-            
-            this.withRequest('DELETE', '/models/24/parent/11', {}, (xhr) => {
-                xhr.respond(201, {}, null);
-            });
-        })
-    })
 });

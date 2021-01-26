@@ -111,8 +111,8 @@ describe('Viking.Record::associations', () => {
                 let parent = new Parent({id: 11})
                 model.parent = [parent]
 
-                model.association('parents').removeBang(parent).then(() => {
-                    assert.equal(model.parents.toArray().length, 0)
+                model.parents.removeBang(parent).then(() => {
+                    assert.equal(model.parents.target.length, 0)
                 }).then(done, done)
         
                 this.withRequest('DELETE', '/models/24/parents/11', {}, (xhr) => {
