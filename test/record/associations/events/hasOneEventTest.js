@@ -3,7 +3,7 @@ import 'mocha';
 import VikingRecord from 'viking/record';
 import { hasOne } from 'viking/record/associations';
 
-describe('Viking.Record::ssociations', () => {
+describe('Viking.Record::associations', () => {
 
     describe('HasOne Events', () => {
         class Parent extends VikingRecord { }
