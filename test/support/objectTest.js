@@ -1,6 +1,6 @@
 import 'mocha';
 import * as assert from 'assert';
-import {toParam, toQuery} from 'viking/support/object';
+import {toParam, toQuery, deepAssign} from 'viking/support/object';
 
 describe('VikingSupport.Object', () => {
 
@@ -15,6 +15,32 @@ describe('VikingSupport.Object', () => {
 
     it('#toQuery is an alias for #toParam', () => {
         assert.strictEqual(toParam, toQuery);
+    });
+    
+    it('#deepAssign', () => {
+        assert.deepEqual(deepAssign({test: 1}, {test: 2}), {test: 2});
+        assert.deepEqual(deepAssign({test: 1}, {test: 2}, {test: 3}), {test: 3});
+        assert.deepEqual(deepAssign({
+            a: 2,
+            b: {
+                test: 1,
+                test2: 2
+            }
+        }, {
+            c: 3,
+            b: {
+                test: 2,
+                test3: 3
+            }
+        }), {
+            a: 2,
+            b: {
+                test: 2,
+                test2: 2,
+                test3: 3
+            },
+            c: 3
+        });
     });
 
 });
