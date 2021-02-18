@@ -694,4 +694,35 @@ describe('Viking.View', () => {
         });
 
     });
+    
+    describe("assignableProperties", () => {
+        it("assigns", () => {
+            class Test extends View {
+                static assignableProperties = [
+                    'lorem'
+                ]
+            }
+            
+            const view = new Test({lorem: 99})
+            assert.equal(view.lorem, 99)
+        })
+        
+        it("keeps extended assignables", () => {
+            class Test extends View {
+                static assignableProperties = [
+                    'lorem'
+                ]
+            }
+            
+            class Test2 extends Test {
+                static assignableProperties = [
+                    'ipsum'
+                ]
+            }
+
+            const view = new Test2({lorem: 99, ipsum: 88})
+            assert.equal(view.lorem, 99)
+            assert.equal(view.ipsum, 88)
+        })
+    })
 });
