@@ -213,61 +213,12 @@ describe('Viking.Record#setAttributes', () => {
     });
 
 
-    it('changedAttributes()', () => {
-        let model = new VikingRecord({name: 'Time', age: 30});
-        assert.deepEqual(model.changedAttributes(), {
-            name: [null, 'Time'],
-            age: [null, 30]
-        });
-
-        model.persit();
-        assert.deepEqual(model.changedAttributes(), {});
-
-        model.setAttributes({name: 'Tom', age: 28});
-        assert.deepEqual(model.changedAttributes(), {
-            name: ['Time', 'Tom'],
-            age: [30, 28]
-        });
-
-        model.setAttributes({name: 'Tome', age: 30});
-        assert.deepEqual(model.changedAttributes(), {
-            name: ['Time', 'Tome']
-        });
-    });
-
-    it('hasChanged()', () => {
-        let model = new VikingRecord({name: 'Time', age: 30});
-        model.persit();
-
-        assert.equal(model.hasChanged(), false);
-
-        model.setAttributes({name: 'Tom'});
-        assert.equal(model.hasChanged(), true);
-
-        model.setAttributes({name: 'Time'});
-        assert.equal(model.hasChanged(), false);
-    });
-
-    it('hasChanged(attributeName)', () => {
-        let model = new VikingRecord({name: 'Time', age: 30});
-        model.persit();
-        model.setAttributes({age: 28});
-
-        assert.equal(model.hasChanged('name'), false);
-
-        model.setAttributes({name: 'Tom'});
-        assert.equal(model.hasChanged('name'), true);
-
-        model.setAttributes({name: 'Time'});
-        assert.equal(model.hasChanged('name'), false);
-    });
-
     it('change listener', (done) => {
         let model = new VikingRecord();
         model.addEventListener('change', () => {
             assert.ok(model.hasChanged('name'), 'name changed');
             assert.ok(!model.hasChanged('age'), 'age did not');
-            assert.deepEqual(model.changedAttributes(), {name: [null, 'Rob']}, 'changedAttributes returns the changed attrs');
+            assert.deepEqual(model.changes(), {name: [null, 'Rob']}, 'changedAttributes returns the changed attrs');
             // assert.equal(model.previous('name'), 'Tim');
             // assert.ok(_.isEqual(model.previousAttributes(), {name: 'Tim', age: 10}), 'previousAttributes is correct');
             done();

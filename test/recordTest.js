@@ -114,15 +114,6 @@ describe('Viking.Record', () => {
     //   assert.equal(i, 2, 'Unset does not fire an event for missing attributes.');
     // });
   
-    // it('unset and changedAttributes', () => {
-    //   assert.expect(1);
-    //   var model = new Backbone.Model({a: 1});
-    //   model.on('change', function() {
-    //     assert.ok('a' in model.changedAttributes(), 'changedAttributes should contain unset properties');
-    //   });
-    //   model.unset('a');
-    // });
-  
     it('using a non-default id attribute.', () => {
         class MyModel extends Model {
             static primaryKey = '_id';
