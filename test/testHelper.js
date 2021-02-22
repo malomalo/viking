@@ -76,7 +76,7 @@ before(function() {
             callback(match);
         } else {
             this.requests.forEach((xhr) => {
-                console.log(decodeURIComponent(xhr.url));
+                console.log("\x1b[33m", "\t! MISSED\t" + [xhr.method, decodeURIComponent(xhr.url), xhr.requestBody].filter(x => x).join("\t"));
             });
         }
     };
