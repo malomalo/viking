@@ -3,6 +3,7 @@ import * as assert from 'assert';
 import Model from 'viking/record';
 
 describe('Viking.Record', () => {
+    class Ship extends Model { }
 
     // before: () => {
     //     Viking.View.templates = window['JST'];
@@ -34,6 +35,19 @@ describe('Viking.Record', () => {
         assert.equal(doc.readAttribute('title'), 'The Tempest');
         assert.equal(doc.readAttribute('author'), 'Bill Shakespeare');
     });
+    
+    it('initialize changes', function(done) {
+        Ship.create({name: 'Voyager'}).then((ship) => {
+            assert.deepEqual(ship.changedAttributes().name, ['Voyager', null])
+            
+            ship.name = "Enterprise"
+            assert.deepEqual(ship.changedAttributes().name, ['Voyager', 'Enterprise'])
+        }).then(done, done);
+    
+        this.withRequest('POST', '/ships', { body: {ship: {name: 'Voyager'}} }, (xhr) => {
+            xhr.respond(200, {}, '{"id": 12, "name": "Voyager"}');
+        });
+    })
 
 
 
