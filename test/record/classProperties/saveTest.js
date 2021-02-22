@@ -29,6 +29,27 @@ describe('Viking.Record', () => {
                 xhr.respond(200, {}, '[{"id": 1, "name": "Rod Kimbal", "imdb_id": "999"}]');
             });
         });
+        
+        it('updating triggers saved event', function (done) {
+            Actor.create({name: "Rod Kimbal"}).then(person => {
+                person.addEventListener('saved:name', change => {
+                    assert.equal(change[0], "Rod Kimbal")
+                    assert.equal(change[1], "Andy Sanberg")
+                    done()
+                })
+                
+                person.name = "Andy Sanberg"
+                person.save()
+            
+                this.withRequest('PATCH', '/actors/1', { body: {actor: {name: 'Andy Sanberg'}} }, (xhr) => {
+                    xhr.respond(200, {}, '{{"id": 1, "name": "Andy Sanberg", "imdb_id": "999"}');
+                });
+            })
+        
+            this.withRequest('POST', '/actors', { body: {actor: {name: 'Rod Kimbal'}} }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 1, "name": "Rod Kimbal", "imdb_id": "999"}]');
+            });
+        });
     })
     
 })
