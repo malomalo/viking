@@ -35,37 +35,6 @@ describe('Viking.Record', () => {
         assert.equal(doc.readAttribute('author'), 'Bill Shakespeare');
     });
     
-    // it('#2030 - set with failed validate, followed by another set triggers change', () => {
-    //   var attr = 0, main = 0, error = 0;
-    //   var Model = Backbone.Model.extend({
-    //     validate: function(attrs) {
-    //       if (attrs.x > 1) {
-    //         error++;
-    //         return 'this is an error';
-    //       }
-    //     }
-    //   });
-    //   var model = new Model({x: 0});
-    //   model.on('change:x', function() { attr++; });
-    //   model.on('change', function() { main++; });
-    //   model.set({x: 2}, {validate: true});
-    //   model.set({x: 1}, {validate: true});
-    //   assert.deepEqual([attr, main, error], [1, 1, 1]);
-    // });
-
-    // it('set falsy values in the correct order', () => {
-    //   assert.expect(2);
-    //   var model = new Backbone.Model({result: 'result'});
-    //   model.on('change', function() {
-    //     assert.equal(model.changed.result, void 0);
-    //     assert.equal(model.previous('result'), false);
-    //   });
-    //   model.set({result: void 0}, {silent: true});
-    //   model.set({result: null}, {silent: true});
-    //   model.set({result: false}, {silent: true});
-    //   model.set({result: void 0});
-    // });
-  
     // it('nested set triggers with the correct options', () => {
     //   let model = new Model();
     //   let o1 = {};
@@ -122,19 +91,6 @@ describe('Viking.Record', () => {
 
       model = new MyModel();
       assert.equal(model.cid.charAt(0), 'a');
-
-    //   var Collection = Backbone.Collection.extend({
-    //     model: Model
-    //   });
-    //   var col = new Collection([{id: 'c5'}, {id: 'c6'}, {id: 'c7'}]);
-  
-    //   assert.equal(col.get('c6').cid.charAt(0), 'm');
-    //   col.set([{id: 'c6', value: 'test'}], {
-    //     merge: true,
-    //     add: true,
-    //     remove: false
-    //   });
-    //   assert.ok(col.get('c6').has('value'));
     });
 
     // it('change with options', () => {
@@ -1031,23 +987,6 @@ describe('Viking.Record', () => {
     // });
   
   
-    // it('#1179 - isValid returns true in the absence of validate.', () => {
-    //   assert.expect(1);
-    //   var model = new Backbone.Model();
-    //   model.validate = null;
-    //   assert.ok(model.isValid());
-    // });
-  
-    // it('#1961 - Creating a model with {validate:true} will call validate and use the error callback', () => {
-    //   var Model = Backbone.Model.extend({
-    //     validate: function(attrs) {
-    //       if (attrs.id === 1) return "This shouldn't happen";
-    //     }
-    //   });
-    //   var model = new Model({id: 1}, {validate: true});
-    //   assert.equal(model.validationError, "This shouldn't happen");
-    // });
-  
     // it('toJSON receives attrs during save(..., {wait: true})', () => {
     //   assert.expect(1);
     //   var Model = Backbone.Model.extend({
@@ -1082,25 +1021,3 @@ describe('Viking.Record', () => {
     // });
 
 });
-
-    // var ProxyModel = Backbone.Model.extend();
-    // var Klass = Backbone.Collection.extend({
-    //   url: function() { return '/collection'; }
-    // });
-    // var doc, collection;
-  
-    // QUnit.module('Backbone.Model', {
-  
-    //   beforeEach: () => {
-    //     doc = new ProxyModel({
-    //       id: '1-the-tempest',
-    //       title: 'The Tempest',
-    //       author: 'Bill Shakespeare',
-    //       length: 123
-    //     });
-    //     collection = new Klass();
-    //     collection.add(doc);
-    //   }
-  
-    // });
-

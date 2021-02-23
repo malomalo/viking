@@ -199,31 +199,6 @@ describe('Viking.Record#setAttributes', () => {
         a.setAttributes({foo: 2});
         assert.equal(a.readAttribute('foo'), 2, 'Foo should NOT have changed, still 2');
         assert.equal(changeCount, 1, 'Change count should NOT have incremented.');
-
-        // a.validate = function(attrs) {
-        //     assert.equal(attrs.foo, void 0, 'validate:true passed while unsetting');
-        // };
-        // a.unset('foo', {validate: true});
-        // assert.equal(a.get('foo'), void 0, 'Foo should have changed');
-        // delete a.validate;
-        // assert.equal(changeCount, 2, 'Change count should have incremented for unset.');
-
-        // a.unset('id');
-        // assert.equal(a.id, undefined, 'Unsetting the id should remove the id property.');
-    });
-
-
-    it('change listener', (done) => {
-        let model = new VikingRecord();
-        model.addEventListener('change', () => {
-            assert.ok(model.hasChanged('name'), 'name changed');
-            assert.ok(!model.hasChanged('age'), 'age did not');
-            assert.deepEqual(model.changes(), {name: [null, 'Rob']}, 'changedAttributes returns the changed attrs');
-            // assert.equal(model.previous('name'), 'Tim');
-            // assert.ok(_.isEqual(model.previousAttributes(), {name: 'Tim', age: 10}), 'previousAttributes is correct');
-            done();
-        });
-        model.setAttributes({name: 'Rob'});
     });
 
 });
