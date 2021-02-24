@@ -6,7 +6,9 @@ import { belongsTo } from 'viking/record/associations';
 describe('Viking.Record::associations', () => {
     class Parent extends VikingRecord { }
     class Model extends VikingRecord {
-        static associations = [belongsTo(Parent)];
+        static associations = [
+            belongsTo(Parent)
+        ];
     }
     describe('belongsTo(Parent)', () => {
 
@@ -181,6 +183,20 @@ describe('Viking.Record::associations', () => {
             });
         });
     });
+    
+    describe('belongsTo({polymorphic: true})', () => {
+        class Child extends VikingRecord {
+            static associations = [
+                belongsTo('guardian', {polymorphic: true})
+            ];
+        }
+        it("load association", function(done) {
+            let parent = new Parent({id: 24});
+            let child = new Child({guardian: parent})
+            
+            assert.equal(child.readAttribute('guardian_id'), 24)
+        });
+    })
     
     
 
