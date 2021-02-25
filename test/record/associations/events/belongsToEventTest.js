@@ -15,7 +15,7 @@ describe('Viking.Record::ssociations', () => {
             let model = new Model();
             let parent = new Parent({id: 24});
         
-            model.association('parent').addEventListener('add', record => {
+            model.association('parent').addEventListener('added', record => {
                 assert.equal(record.readAttribute('id'), 24)
                 done()
             })
@@ -27,7 +27,7 @@ describe('Viking.Record::ssociations', () => {
             let model = new Model();
             let parent = new Parent({id: 24});
         
-            parent.addEventListener('add', association => {
+            parent.addEventListener('added', association => {
                 assert.equal(association.owner, model);
                 assert.equal(model.readAttribute('parent_id'), 24)
                 done()
@@ -41,7 +41,7 @@ describe('Viking.Record::ssociations', () => {
             let parent = new Parent({id: 24});
             model.parent = parent
             
-            model.association('parent').addEventListener('remove', record => {
+            model.association('parent').addEventListener('removed', record => {
                 assert.equal(record.readAttribute('id'), 24)
                 done()
             })
@@ -54,7 +54,7 @@ describe('Viking.Record::ssociations', () => {
             let parent = new Parent({id: 24});
             model.parent = parent
             
-            parent.addEventListener('remove', association => {
+            parent.addEventListener('removed', association => {
                 assert.equal(association.owner, model);
                 assert.equal(model.readAttribute('parent_id'), null)
                 done()
@@ -66,7 +66,7 @@ describe('Viking.Record::ssociations', () => {
         it("loading fires load event", function (done) {
             let model = new Model({parent_id: 24});
             
-            model.association('parent').addEventListener('load', record => {
+            model.association('parent').addEventListener('loaded', record => {
                 assert.equal(record.readAttribute('id'), 24)
                 done()
             })

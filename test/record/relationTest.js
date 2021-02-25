@@ -11,7 +11,7 @@ describe('Viking.Relation', () => {
         it('add', function (done) {
             const relation = Model.where({parent_id: 11})
 
-            relation.addEventListener('add', record => {
+            relation.addEventListener('added', record => {
                 assert.equal(record.readAttribute('id'), 1);
                 done();
             });
@@ -26,7 +26,7 @@ describe('Viking.Relation', () => {
         it('remove', function (done) {
             const relation = Model.where({parent_id: 11})
 
-            relation.addEventListener('remove', record => {
+            relation.addEventListener('removed', record => {
                 assert.equal(record.readAttribute('id'), 1);
                 done();
             });

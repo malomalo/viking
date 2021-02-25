@@ -15,7 +15,7 @@ describe('Viking.Record#callbacks', () => {
     it('change', (done) => {
         let model = new Record();
         
-        model.addEventListener('change', (record, changes) => {
+        model.addEventListener('changed', (record, changes) => {
             assert.strictEqual(record, model);
             assert.deepEqual(changes, {name: [null, 'Rob']});
             done();
@@ -26,7 +26,7 @@ describe('Viking.Record#callbacks', () => {
     it('change:[attribute]', (done) => {
         let model = new Record();
         
-        model.addEventListener('change:name', (record, oldValue, newValue) => {
+        model.addEventListener('changed:name', (record, oldValue, newValue) => {
             assert.strictEqual(record, model);
             assert.equal(oldValue, null);
             assert.equal(newValue, 'Rob');

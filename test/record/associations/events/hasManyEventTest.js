@@ -15,7 +15,7 @@ describe('Viking.Record::ssociations', () => {
             let model = new Model();
             let parent = new Parent({id: 24});
         
-            model.association('parents').addEventListener('add', records => {
+            model.association('parents').addEventListener('added', records => {
                 assert.equal(records[0].readAttribute('id'), 24)
                 done()
             })
@@ -27,7 +27,7 @@ describe('Viking.Record::ssociations', () => {
             let model = new Model({id: 11});
             let parent = new Parent({id: 24});
         
-            parent.addEventListener('add', association => {
+            parent.addEventListener('added', association => {
                 assert.equal(association.owner, model)
                 assert.equal(parent.readAttribute('model_id'), 11)
                 done()
@@ -41,7 +41,7 @@ describe('Viking.Record::ssociations', () => {
             let parent = new Parent({id: 24});
             model.parents = [parent]
             
-            model.association('parents').addEventListener('remove', records => {
+            model.association('parents').addEventListener('removed', records => {
                 assert.equal(records[0].readAttribute('id'), 24)
                 done()
             })
@@ -54,7 +54,7 @@ describe('Viking.Record::ssociations', () => {
             let parent = new Parent({id: 24});
             model.parents = [parent]
             
-            parent.addEventListener('remove', association => {
+            parent.addEventListener('removed', association => {
                 assert.equal(association.owner, model)
                 assert.equal(parent.readAttribute('model_id'), null)
                 done()
@@ -66,7 +66,7 @@ describe('Viking.Record::ssociations', () => {
         it("loading fires load event", function (done) {
             let model = new Model({id: 24});
             
-            model.association('parents').addEventListener('load', records => {
+            model.association('parents').addEventListener('loaded', records => {
                 assert.equal(records[0].readAttribute('id'), 2)
                 done()
             })

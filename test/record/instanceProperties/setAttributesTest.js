@@ -177,7 +177,7 @@ describe('Viking.Record#setAttributes', () => {
             custom: {foo: 1}
         });
 
-        model.addEventListener('change', () => { counter++; });
+        model.addEventListener('changed', () => { counter++; });
         model.setAttributes({
             custom: {foo: 1} // no change should be fired
         });
@@ -190,7 +190,7 @@ describe('Viking.Record#setAttributes', () => {
     it('set and unset', () => {
         let a = new VikingRecord({id: 'id', foo: 1, bar: 2, baz: 3});
         let changeCount = 0;
-        a.addEventListener('change:foo', () => { changeCount += 1; });
+        a.addEventListener('changed:foo', () => { changeCount += 1; });
         a.setAttributes({foo: 2});
         assert.equal(a.readAttribute('foo'), 2, 'Foo should have changed.');
         assert.equal(changeCount, 1, 'Change count should have incremented.');
