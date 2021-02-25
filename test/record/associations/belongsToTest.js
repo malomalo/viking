@@ -150,6 +150,38 @@ describe('Viking.Record::associations', () => {
             })
         })
     });
+    
+    describe('belongsTo(name, Parent)', () => {
+        class Parent extends VikingRecord { }
+        class Model extends VikingRecord {
+            static associations = [belongsTo('guardian', Parent)];
+        }
+        it("load association", function(done) {
+            let model = new Model({guardian_id: 24});
+            model.guardian.then((model) => {
+                assert.ok(model instanceof Parent);
+                assert.equal(model.readAttribute('id'), 24);
+                assert.equal(model.readAttribute('name'), 'Viking');
+            }).then(done, done);
+            this.withRequest('GET', '/parents', { params: {where: {id: 24}, order: {id: 'desc'}, limit: 1} }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 24, "name": "Viking"}]');
+            });
+        });
+
+        describe('assigning the association', () => {
+            it('to a model with an id', function() {
+                let model = new Model();
+                let guardian = new Parent({id: 13});
+                model.guardian = guardian;
+
+                assert.equal(model.readAttribute('guardian_id'), 13);
+                assert.ok(model._associations.guardian.loaded);
+                assert.strictEqual(model._associations.guardian.target, guardian);
+                assert.strictEqual(model.guardian, guardian);
+                assert.equal(this.requests.length, 0);
+            });
+        });
+    });
 
     describe('belongsTo(Parent, {foriegnKey: KEY})', () => {
         class Parent extends VikingRecord { }
