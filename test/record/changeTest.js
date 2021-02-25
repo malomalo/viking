@@ -7,7 +7,8 @@ describe('Viking.Record', () => {
         static schema = {
             id: {type: "integer"},
             name: {type: 'string'},
-            age: {type: "integer"}
+            age: {type: "integer"},
+            union: {type: "boolean"}
         }
     }
 
@@ -15,7 +16,7 @@ describe('Viking.Record', () => {
         let model = new Actor({name: 'Rod Kimbal', age: 30});
         assert.deepEqual(model.changes(), { name: [null, 'Rod Kimbal'], age: [null, 30] });
 
-        model.persit();
+        model.persist();
         assert.deepEqual(model.changes(), {});
 
         model.setAttribute('name', 'Andy Sanberg');
@@ -33,7 +34,7 @@ describe('Viking.Record', () => {
     
     it('#changedAttributes()', () => {
         let model = new Actor({name: 'Time', age: 30});
-        model.persit();
+        model.persist();
 
         assert.equal(model.hasChanged(), false);
 
@@ -50,7 +51,7 @@ describe('Viking.Record', () => {
     
     it('#hasChanged()', () => {
         let model = new Actor({name: 'Time', age: 30});
-        model.persit();
+        model.persist();
 
         assert.equal(model.hasChanged(), false);
 
@@ -59,11 +60,14 @@ describe('Viking.Record', () => {
 
         model.setAttributes({name: 'Time'});
         assert.equal(model.hasChanged(), false);
+        
+        let actor = Actor.instantiate({id: 11, name: 'Jeff Johnson', union: false})
+        assert.equal(model.hasChanged(), false);
     });
     
     it('#hasChanged(attributeName)', () => {
         let model = new Actor({name: 'Time', age: 30});
-        model.persit();
+        model.persist();
         model.setAttributes({age: 28});
 
         assert.equal(model.hasChanged('name'), false);
