@@ -2,6 +2,7 @@ import * as assert from 'assert';
 import 'mocha';
 import VikingRecord from 'viking/record';
 import { belongsTo } from 'viking/record/associations';
+import * as Errors from 'viking/errors';
 
 describe('Viking.Record::associations', () => {
     class Parent extends VikingRecord { }
@@ -216,46 +217,53 @@ describe('Viking.Record::associations', () => {
         });
     });
     
-    describe('belongsTo({polymorphic: true})', () => {
-        class Child extends VikingRecord {
+    describe('belongsTo({polymorphic: [ModelA, ModelB, ....]})', () => {
+        class Country extends VikingRecord {}
+        class Person extends VikingRecord {}
+        class Company extends VikingRecord {}
+        class Ship extends VikingRecord {
             static associations = [
-                belongsTo('guardian', {polymorphic: true})
+                belongsTo('owner', {polymorphic: [Country, Person]})
             ];
         }
+        
         it("load association", function(done) {
-            let parent = new Parent({id: 24});
-            let child = new Child({guardian: parent})
+            let ship = new Ship({id: 3, owner_id: 31, owner_type: 'Country'});
+
+            ship.owner.then((model) => {
+                assert.ok(model instanceof Country);
+                assert.equal(model.readAttribute('id'), 31);
+                assert.equal(model.readAttribute('name'), 'საქართველო');
+            }).then(done, done);
+            this.withRequest('GET', '/countries', { params: {where: {id: 31}, order: {id: 'desc'}, limit: 1} }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 31, "name": "საქართველო"}]');
+            });
+        });
+        
+        it("load association without a reference to the model", function(done) {
+            let ship = new Ship({id: 3, owner_id: 31, owner_type: 'Company'});
             
-            assert.equal(child.readAttribute('guardian_id'), 24)
+            ship.owner.then(undefined, function (error) {
+                assert.ok(error instanceof Errors.ClassNotFound);
+                assert.equal(error.message, 'Could not find class "Company" in polymorphic relation Ship#owner');
+            }).then(done, done);
+        });
+        
+        it("assigning the association", function() {
+            let person = Person.instantiate({id: 24});
+            let ship = new Ship({id: 3, owner: person});
+            
+            assert.equal(ship.readAttribute('owner_id'), 24)
+            assert.equal(ship.readAttribute('owner_type'), 'Person')
+            assert.strictEqual(ship.owner, person);
+            
+            let company = Company.instantiate({id: 27});
+            ship.owner = company;
+            
+            assert.equal(ship.readAttribute('owner_id'), 27)
+            assert.equal(ship.readAttribute('owner_type'), 'Company')
+            assert.strictEqual(ship.owner, company);
         });
     })
     
-    
-
-    // Model.reflectOnAssociation('parent');
-
-    // test("::new('children', { modelName: 'Region' })", function () {
-    //     let Region = Viking.Model.extend();
-    //     Viking.context['Region'] = Region;
-    //     var assocation = new Viking.Model.BelongsToReflection('parent', { modelName: 'Region' });
-
-    //     assert.equal(assocation.name, 'parent');
-    //     assert.equal(assocation.macro, 'belongsTo');
-    //     assert.deepEqual(assocation.options, { modelName: 'Region' });
-    //     assert.deepEqual(assocation.modelName, new Viking.Model.Name('Region'));
-
-    //     delete Viking.context['Region'];
-    // });
-
-    // test("::new('subject', {polymorphic: true})", function () {
-    //     let Photo = Viking.Model.extend();
-    //     Viking.context['Photo'] = Photo;
-    //     var assocation = new Viking.Model.BelongsToReflection('subject', { polymorphic: true });
-    //     assert.equal(assocation.macro, 'belongsTo');
-    //     assert.equal(assocation.name, 'subject');
-    //     assert.deepEqual(assocation.options, { polymorphic: true });
-    //     assert.equal(assocation.modelName, undefined);
-
-    //     delete Viking.context['Photo'];
-    // });
 });

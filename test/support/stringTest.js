@@ -71,7 +71,7 @@ describe('VikingSupport.String', () => {
     });
 
     it('demodulize()', function () {
-        assert.equal(StringSupport.demodulize("Namespaced.Module", ), 'Module');
+        assert.equal(StringSupport.demodulize("Namespaced::Module", ), 'Module');
         assert.equal(StringSupport.demodulize('Module'), 'Module');
         assert.equal(StringSupport.demodulize(''), '');
     });
