@@ -74,6 +74,7 @@ before(function() {
 
         if (match) {
             callback(match);
+            this.requests = this.requests.filter(xhr => xhr !== match)
         } else {
             this.requests.forEach((xhr) => {
                 console.log("\x1b[33m", "\t! MISSED\t" + [xhr.method, decodeURIComponent(xhr.url), xhr.requestBody].filter(x => x).join("\t"));

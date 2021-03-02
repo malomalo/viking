@@ -11,12 +11,21 @@ describe('Viking.Relation', () => {
         it('add', function (done) {
             const relation = Model.where({parent_id: 11})
 
+            let onceFlag = false
             relation.addEventListener('added', record => {
+                if (onceFlag) assert.ok(false)
                 assert.equal(record.readAttribute('id'), 1);
-                done();
+                onceFlag = true;
             });
 
             relation.load();
+
+            this.withRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 1}]');
+            });
+            
+            relation.reload().then(() => done());
+            
 
             this.withRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
                 xhr.respond(200, {}, '[{"id": 1}]');
