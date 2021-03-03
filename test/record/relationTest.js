@@ -13,7 +13,7 @@ describe('Viking.Relation', () => {
 
             let onceFlag = false
             relation.addEventListener('added', record => {
-                if (onceFlag) assert.ok(false)
+                assert.ok(!onceFlag)
                 assert.equal(record.readAttribute('id'), 1);
                 onceFlag = true;
             });
@@ -24,7 +24,7 @@ describe('Viking.Relation', () => {
                 xhr.respond(200, {}, '[{"id": 1}]');
             });
             
-            relation.reload().then(() => done());
+            relation.reload().then(() => done(), done);
             
 
             this.withRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
