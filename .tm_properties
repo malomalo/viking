@@ -1,1 +1,5 @@
-exclude = '{$exclude,test/coverage,test/index.html,.tm_properties}'
+exclude = '{$exclude,tmp,esdoc,.tm_properties,node_modules,docs}'
+
+[ *.js ]
+tabSize = 4
+softTabs = true
