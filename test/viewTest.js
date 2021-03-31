@@ -36,7 +36,7 @@ describe('Viking.View', () => {
       myView.el.innerHTML = '<p><a><b>test</b></a></p>';
       const result = myView.$('a b');
 
-      assert.strictEqual(result[0].innerHTML, 'test');
+      assert.strictEqual(result.innerHTML, 'test');
     });
 
     // it('$el', () => {
@@ -102,16 +102,16 @@ describe('Viking.View', () => {
         const events = {'click h1': 'increment'};
 
         myView.delegateEvents(events);
-        myView.$('h1')[0].click();
+        myView.$('h1').click();
         assert.equal(counter1, 1);
         assert.equal(counter2, 1);
 
-        myView.$('h1')[0].click();
+        myView.$('h1').click();
         assert.equal(counter1, 2);
         assert.equal(counter2, 2);
 
         myView.delegateEvents(events);
-        myView.$('h1')[0].click();
+        myView.$('h1').click();
         assert.equal(counter1, 3);
         assert.equal(counter2, 3);
     });
@@ -127,7 +127,7 @@ describe('Viking.View', () => {
         myView.delegate('click', function() {
             counter++;
         });
-        myView.$('h1')[0].click();
+        myView.$('h1').click();
 
         assert.equal(counter, 2);
         // assert.equal(myView.delegate(), myView, '#delegate returns the view instance');
@@ -174,17 +174,17 @@ describe('Viking.View', () => {
 
         const events = {'click h1': 'increment'};
         myView.delegateEvents(events);
-        myView.$('h1')[0].click();
+        myView.$('h1').click();
         assert.equal(counter1, 1);
         assert.equal(counter2, 1);
 
         myView.undelegateEvents();
-        myView.$('h1')[0].click();
+        myView.$('h1').click();
         assert.equal(counter1, 1);
         assert.equal(counter2, 2);
 
         myView.delegateEvents(events);
-        myView.$('h1')[0].click();
+        myView.$('h1').click();
         assert.equal(counter1, 2);
         assert.equal(counter2, 3);
 
@@ -199,7 +199,7 @@ describe('Viking.View', () => {
 
         myView.undelegate('click');
 
-        myView.$('h1')[0].click();
+        myView.$('h1').click();
         myView.el.click();
 
         assert.equal(myView.undelegate(), myView, '#undelegate returns the view instance');
@@ -226,7 +226,7 @@ describe('Viking.View', () => {
         myView.delegate('click', function() { counter++; });
         myView.delegate('click', 'h1', function() { assert.ok(false); });
         myView.undelegate('click', 'h1');
-        myView.$('h1')[0].click();
+        myView.$('h1').click();
         myView.el.click();
         assert.equal(counter, 2);
     });
@@ -240,7 +240,7 @@ describe('Viking.View', () => {
         let handler = function() { assert.ok(false); };
         myView.delegate('click', 'h1', handler);
         myView.undelegate('click', 'h1', handler);
-        myView.$('h1')[0].click();
+        myView.$('h1').click();
         myView.el.click();
         assert.equal(counter, 2);
     });
@@ -462,8 +462,8 @@ describe('Viking.View', () => {
             events: { 'click h1': 'increment' }
         });
 
-        myView.$('h1')[0].click();
-        myView.$('h1')[0].click();
+        myView.$('h1').click();
+        myView.$('h1').click();
 
         assert.equal(counter, 2);
     });
