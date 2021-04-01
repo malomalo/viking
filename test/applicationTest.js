@@ -19,16 +19,16 @@ describe('Viking/Application', () => {
         // assert.equal(document.title, 'my new title');
     });
     
-    it('test render is promise', (done) => {
+    it('test if render is async then display is called after render is complete', (done) => {
         class MyController extends Controller {
             show()  {
-                this.display(View).then(done, done) 
+                this.display(View).then(done, done);
             }
         }
 
         class MyRouter extends Router {
             static routes = {
-                '/': { to: { controller: MyController, action: 'show' }}
+                '/': { to: { controller: MyController, action: 'show' } }
             };
         }
         
@@ -39,13 +39,12 @@ describe('Viking/Application', () => {
                 await new Promise(resolve => {
                     setTimeout(() => {
                         this.el.innerHTML = 'hello'
-                        resolve()
-                    }, 0)
-                })
+                        resolve();
+                    }, 10);
+                });
             }
             
             async display () {
-                console.log("**************", this.el.innerHTML);
                 assert.equal(this.el.innerHTML, 'hello');
             }
         }
