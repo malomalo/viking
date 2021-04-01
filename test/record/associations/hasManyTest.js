@@ -25,6 +25,38 @@ describe('Viking.Record::associations', () => {
                 xhr.respond(200, {}, '[{"id": 2, "name": "Viking"}]');
             });
         });
+        
+        it("forEach iterates over the association", function(done) {
+            let model = new Model({id: 24});
+            let loaded_parents = [];
+
+            model.parents.forEach((p) => { loaded_parents.push(p) }).then(() => {
+                assert.equal(loaded_parents.length, 2);
+                assert.ok(loaded_parents[0] instanceof Parent);
+                assert.equal(loaded_parents[0].readAttribute('id'), 2);
+                assert.equal(loaded_parents[0].readAttribute('name'), 'Viking A');
+                
+                assert.ok(loaded_parents[1] instanceof Parent);
+                assert.equal(loaded_parents[1].readAttribute('id'), 3);
+                assert.equal(loaded_parents[1].readAttribute('name'), 'Viking B');
+            }).then(done, done);
+
+            this.withRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}} }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 2, "name": "Viking A"},{"id": 3, "name": "Viking B"}]');
+            });
+        });
+
+        it("map maps over the association", function(done) {
+            let model = new Model({id: 24});
+
+            model.parents.map((p) => p.readAttribute('id')).then((ids) => {
+                assert.deepEqual(ids, [2,3]);
+            }).then(done, done);
+
+            this.withRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}} }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 2, "name": "Viking A"},{"id": 3, "name": "Viking B"}]');
+            });
+        });
 
         describe('assigning the association', () => {
             it('to a model with an id', function() {
