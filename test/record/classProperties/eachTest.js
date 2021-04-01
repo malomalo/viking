@@ -8,7 +8,7 @@ describe('Viking.Record', () => {
     it('::each', function(done) {
         let matches = [ {id: 32, name: 'Roger'}, {id: 92, name: 'Bob'} ];
 
-        Ship.each((model) => {
+        Ship.forEach((model) => {
             let m = matches.shift();
             if (m) {
                 assert.equal(model.readAttribute('id'), m.id);
