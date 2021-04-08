@@ -26,6 +26,19 @@ describe('Viking.Record::associations', () => {
             });
         });
         
+        it("order", function() {
+            class Parent extends VikingRecord { }
+            class Model extends VikingRecord {
+                static associations = [hasMany(Parent, {order: {created_at: 'asc'}})];
+            }
+            
+            let model = new Model({id: 24});
+
+            model.parents.toArray()
+            
+            assert.ok(this.requests.find(req => req.url == "http://example.com/parents?where%5Bmodel_id%5D=24&order%5Bcreated_at%5D=asc"))
+        });
+        
         it("forEach iterates over the association", function(done) {
             let model = new Model({id: 24});
             let loaded_parents = [];
