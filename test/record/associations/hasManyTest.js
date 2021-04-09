@@ -25,7 +25,19 @@ describe('Viking.Record::associations', () => {
                 xhr.respond(200, {}, '[{"id": 2, "name": "Viking"}]');
             });
         });
-
+        
+        it("reload association", function (done) {
+            let model = new Model({id: 24});
+            model.parents.toArray().then(parents => {
+                model.association('parents').reload();
+                assert.ok(this.findRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}} }));
+            }).then(done, done)
+            
+            this.withRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}} }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 2, "name": "Viking"}]');
+            });
+        })
+        
         it("forEach iterates over the association", function(done) {
             let model = new Model({id: 24});
             let loaded_parents = [];
