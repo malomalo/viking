@@ -29,8 +29,8 @@ describe('Viking.Record::associations', () => {
         it("reload association", function (done) {
             let model = new Model({id: 24});
             model.parents.toArray().then(parents => {
-                model.association('parents').reload()
-                assert.equal(this.requests[0]?.url, 'http://example.com/parents?where%5Bmodel_id%5D=24&order%5Bid%5D=desc')
+                model.association('parents').reload();
+                assert.ok(this.findRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}} }));
             }).then(done, done)
             
             this.withRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}} }, (xhr) => {
