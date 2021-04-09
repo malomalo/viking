@@ -6,12 +6,8 @@ tasks/
 .tm_properties
 .travis.yml
 docco.css
-Gemfile
-Gemfile.lock
 logo.jpg
-prepack.sh
 TODO
-viking.js
 test/
 Rakefile
 docs/
