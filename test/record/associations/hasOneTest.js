@@ -139,6 +139,22 @@ describe('Viking.Record::associations', () => {
         })
     });
    
+    describe('hasOne(Parent, scope)', () => {
+        it("ordering", function() {
+            class Parent extends VikingRecord { }
+            class Model extends VikingRecord {
+                static associations = [hasOne(Parent, (r) => r.order({created_at: 'asc'}))];
+            }
+
+            let model = new Model({id: 25});
+
+            model._associations['parent'].load();
+            assert.ok(this.findRequest('GET', '/parents', {
+                params: {where: {model_id: 25}, order: {created_at: 'asc'}, limit: 1}
+            }));
+        });
+    });
+
     describe('hasOne(Parent, {foriegnKey: KEY})', () => {
         class Parent extends VikingRecord { }
         class Model extends VikingRecord {

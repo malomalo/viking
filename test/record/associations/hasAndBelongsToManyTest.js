@@ -121,7 +121,23 @@ describe('Viking.Record::associations', () => {
             })
         })
     });
+    
+    describe('hasAndBelongsToMany(Parent, scope)', () => {
+        it("ordering", function() {
+            class Parent extends VikingRecord { }
+            class Model extends VikingRecord {
+                static associations = [hasAndBelongsToMany(Parent, (r) => r.order({created_at: 'asc'}))];
+            }
+        
+            let model = new Model({id: 24});
 
+            model.parents.load();
+            assert.ok(this.findRequest('GET', '/parents', {
+                params: {where: {models_parents: {model_id: 24}}, order: {created_at: 'asc'}}
+            }));
+        });
+    });
+    
     describe('hasAndBelongsToMany(Parent, {foriegnKey: KEY})', () => {
         class Parent extends VikingRecord { }
         class Model extends VikingRecord {
