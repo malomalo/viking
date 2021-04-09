@@ -26,6 +26,19 @@ describe('Viking.Record::associations', () => {
                 xhr.respond(200, {}, '[{"id": 2, "name": "Viking"}]');
             });
         });
+        
+        it("reload association", function (done) {
+            let model = new Model({id: 24});
+            
+            model.parents.toArray().then(parents => {
+                model.association('parents').reload()
+                assert.equal(this.requests[0]?.url, 'http://example.com/parents?where%5Bmodels_parents%5D%5Bmodel_id%5D=24&order%5Bid%5D=desc')
+            }).then(done, done)
+            
+            this.withRequest('GET', '/parents', { params: {where: {models_parents: {model_id: 24}}, order: {id: 'desc'}} }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 2, "name": "Viking"}]');
+            });
+        })
 
         describe('assigning the association', () => {
 
