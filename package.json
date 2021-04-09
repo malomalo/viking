@@ -1,7 +1,12 @@
 {
-  "name": "viking",
-  "description": "Backbone bindings for Rails",
+  "name": "@malomalo/viking",
+  "version": "2.0.0-rc8",
+  "author": "Jonathan Bracy <jonbracy@gmail.com>",
+  "description": "Viking.js is an open-source web framework for JavaScript. Inspired by Backbone.js & Ruby on Rails; it makes it easier to write client side JavaScript applications.",
   "url": "http://vikingjs.com",
+  "repository": {
+    "url": "git://github.com/malomalo/viking.git"
+  },
   "keywords": [
     "backbone",
     "rails",
@@ -14,22 +19,47 @@
     "client",
     "browser"
   ],
-  "author": "Jonathan Bracy <jonbracy@gmail.com>",
   "devDependencies": {
-    "phantomjs": "1.8.1-3",
-    "docco": "0.6.1"
+    "@babel/cli": "^7.10.5",
+    "@babel/core": "^7.11.0",
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
+    "@babel/preset-env": "^7.11.0",
+    "@babel/register": "^7.10.5",
+    "esdoc": "^1.1.0",
+    "esdoc-standard-plugin": "^1.0.0",
+    "jsdom": "^16.3.0",
+    "jsdom-global": "^3.0.2",
+    "mocha": "^8.1.0",
+    "sinon": "^9.0.2"
   },
   "scripts": {
-    "test": "phantomjs test/runner.js http://127.0.0.1:4321/test/index.html",
-    "prepack": "./prepack.sh"
+    "test": "npx mocha -r @babel/register -r test/testSetup.js test/testHelper.js 'test/**/*.js'",
+    "esdoc": "npx esdoc"
   },
-  "main": "build/viking.js",
-  "version": "0.9.1",
   "dependencies": {
-    "backbone": "^1.4.0",
-    "jquery": "^3.4.1",
-    "strftime": "^0.10.0",
-    "underscore": "^1.9.2",
-    "underscore.inflection": "^1.3.3"
+    "esdoc-ecmascript-proposal-plugin": "^1.0.0"
+  },
+  "esdoc": {
+    "source": "./lib",
+    "destination": "./esdoc",
+    "plugins": [
+      {
+        "name": "esdoc-standard-plugin",
+        "brand": {
+                "logo": "./logo.png",
+                "title": "Viking.js",
+                "description": "Viking.js is an open-source web framework for JavaScript. Inspired by Backbone.js & Ruby on Rails; it makes it easier to write client side JavaScript applications.",
+                "repository": "https://github.com/malomalo/viking",
+                "site": "http://vikingjs.com",
+                "image": "http://vikingjs.com/logo.png"
+              }
+      },
+      {
+        "name": "esdoc-ecmascript-proposal-plugin",
+        "option": {
+          "all": true
+        }
+      }
+    ]
   }
 }
