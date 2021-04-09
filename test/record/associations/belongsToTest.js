@@ -184,6 +184,22 @@ describe('Viking.Record::associations', () => {
         });
     });
 
+    describe('belongsTo(Parent, scope)', () => {
+        it("ordering", function() {
+            class Parent extends VikingRecord { }
+            class Model extends VikingRecord {
+                static associations = [belongsTo(Parent, (r) => r.order({created_at: 'asc'}))];
+            }
+
+            let model = new Model({parent_id: 25});
+
+            model._associations['parent'].load();
+            assert.ok(this.findRequest('GET', '/parents', {
+                params: {where: {id: 25}, order: {created_at: 'asc'}, limit: 1}
+            }));
+        });
+    });
+
     describe('belongsTo(Parent, {foriegnKey: KEY})', () => {
         class Parent extends VikingRecord { }
         class Model extends VikingRecord {

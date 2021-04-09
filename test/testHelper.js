@@ -55,7 +55,16 @@ before(function() {
         this.requests.push(xhr);
     };
 
-    this.withRequest = (method, url, {params = null, body =  null} = {}, callback) => {
+    this.withRequest = (method, url, options, callback) => {
+        let match = this.findRequest(method, url, options);
+
+        if (match) {
+            callback(match);
+            this.requests = this.requests.filter(xhr => xhr !== match);
+        }
+    };
+    
+    this.findRequest = (method, url, {params = null, body =  null} = {}) => {
         if (params && Object.keys(params).length > 0) { url += `?${toQuery(params)}`; }
 
         let match = this.requests.find((xhr) => {
@@ -72,15 +81,15 @@ before(function() {
             return ;
         });
 
-        if (match) {
-            callback(match);
-            this.requests = this.requests.filter(xhr => xhr !== match)
-        } else {
+        if (!match) {
             this.requests.forEach((xhr) => {
-                console.log("\x1b[33m", "\t! MISSED\t" + [xhr.method, decodeURIComponent(xhr.url), xhr.requestBody].filter(x => x).join("\t"));
+                console.error("\x1b[33m", "\t! MISSED\t" + [xhr.method, decodeURIComponent(xhr.url), xhr.requestBody].filter(x => x).join("\t"));
             });
         }
+        
+        return match;
     };
+
 });
 
 after(function () {

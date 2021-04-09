@@ -26,18 +26,6 @@ describe('Viking.Record::associations', () => {
                 xhr.respond(200, {}, '[{"id": 2, "name": "Viking"}]');
             });
         });
-        
-        it("order", function() {
-            class Parent extends VikingRecord { }
-            class Model extends VikingRecord {
-                static associations = [hasAndBelongsToMany(Parent, {order: {created_at: 'asc'}})];
-            }
-            
-            let model = new Model({id: 24});
-
-            model.parents.toArray()
-            assert.ok(this.requests.find(req => req.url == "http://example.com/parents?where%5Bmodels_parents%5D%5Bmodel_id%5D=24&order%5Bcreated_at%5D=asc"))
-        });
 
         describe('assigning the association', () => {
 
@@ -133,7 +121,23 @@ describe('Viking.Record::associations', () => {
             })
         })
     });
+    
+    describe('hasAndBelongsToMany(Parent, scope)', () => {
+        it("ordering", function() {
+            class Parent extends VikingRecord { }
+            class Model extends VikingRecord {
+                static associations = [hasAndBelongsToMany(Parent, (r) => r.order({created_at: 'asc'}))];
+            }
+        
+            let model = new Model({id: 24});
 
+            model.parents.load();
+            assert.ok(this.findRequest('GET', '/parents', {
+                params: {where: {models_parents: {model_id: 24}}, order: {created_at: 'asc'}}
+            }));
+        });
+    });
+    
     describe('hasAndBelongsToMany(Parent, {foriegnKey: KEY})', () => {
         class Parent extends VikingRecord { }
         class Model extends VikingRecord {
