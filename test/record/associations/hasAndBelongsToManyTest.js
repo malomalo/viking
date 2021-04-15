@@ -42,7 +42,7 @@ describe('Viking.Record::associations', () => {
 
         describe('assigning the association', () => {
 
-            it('to a model with an id', function() {
+            it('to a model with an id', async function() {
                 let model = new Model({id: 13});
                 let parents = [new Parent(), new Parent()];
                 model.parents = parents;
@@ -50,7 +50,7 @@ describe('Viking.Record::associations', () => {
                 parents.forEach((m) => { assert.equal(m.readAttribute('model_id'), 13); });
                 assert.ok(model._associations.parents.loaded);
                 assert.deepStrictEqual(model._associations.parents.target, parents);
-                let models = model.parents.toArray();
+                let models = await model.parents.toArray();
                 assert.deepStrictEqual(models, parents);
                 assert.equal(this.requests.length, 0);
             });
