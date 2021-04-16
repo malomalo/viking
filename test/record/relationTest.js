@@ -8,13 +8,14 @@ describe('Viking.Relation', () => {
 
     describe('events', () => {
         
-        it('add', function (done) {
+        it('added', function (done) {
             const relation = Model.where({parent_id: 11})
 
             let onceFlag = false
-            relation.addEventListener('added', record => {
+            relation.addEventListener('added', records => {
+                console.log(records);
                 assert.ok(!onceFlag)
-                assert.equal(record.readAttribute('id'), 1);
+                assert.deepEqual(records.map(x => x.readAttribute('id')), [1]);
                 onceFlag = true;
             });
 
@@ -32,12 +33,11 @@ describe('Viking.Relation', () => {
             });
         });
         
-        it('remove', function (done) {
+        it('removed', function (done) {
             const relation = Model.where({parent_id: 11})
 
-            relation.addEventListener('removed', record => {
-                assert.equal(record.readAttribute('id'), 1);
-                done();
+            relation.addEventListener('removed', records => {
+                assert.deepEqual(records.map(x => x.readAttribute('id')), [1]);
             });
             
             relation.load().then(() => {
@@ -49,6 +49,20 @@ describe('Viking.Relation', () => {
             
             this.withRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
                 xhr.respond(200, {}, '[{"id": 1}, {"id": 2}]');
+            });
+        })
+        
+        it('loaded', function (done) {
+            const relation = Model.where({parent_id: 11})
+
+            relation.addEventListener('loaded', records => {
+                assert.deepEqual(records.map(x => x.readAttribute('id')), [1]);
+            });
+            
+            relation.load().then(x => done(), done);
+
+            this.withRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 1}]');
             });
         })
     })
