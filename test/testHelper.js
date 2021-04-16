@@ -83,7 +83,10 @@ before(function() {
 
         if (!match) {
             this.requests.forEach((xhr) => {
-                console.error("\x1b[33m", "\t! MISSED\t" + [xhr.method, decodeURIComponent(xhr.url), xhr.requestBody].filter(x => x).join("\t"));
+                console.error("\x1b[33m", "!!! MISSED REQUEST !!!!!")
+                console.error("\x1b[33m", "\tREQUESTS\n\t\t" + [method, decodeURIComponent('http://example.com' + url), JSON.stringify(body)].filter(x => x).join("\t"));
+                console.error("\x1b[33m", "\tQUEUE\n\t\t" + [xhr.method, decodeURIComponent(xhr.url), xhr.requestBody].filter(x => x).join("\t"));
+                console.error("\x1b[33m", "!!!!!!!!!!!!!!!!!!!!!!!!");
             });
         }
         

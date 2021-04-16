@@ -68,11 +68,63 @@ describe('Viking.Record::ssociations', () => {
             
             model.association('parent').addEventListener('loaded', record => {
                 assert.equal(record.readAttribute('id'), 24)
-                done()
+                done();
             })
             model.parent.id;
             this.withRequest('GET', '/parents', { params: {where: {id: 24}, order: {id: 'desc'}, limit: 1} }, (xhr) => {
                 xhr.respond(200, {}, '[{"id": 24, "name": "Viking"}]');
+            });
+        })
+        
+        it("loading doesnt fire load event if loaded", function(done) {
+            let model = new Model({parent_id: 24});
+            let counter = 0
+            
+            model.association('parent').addEventListener('loaded', record => {
+                counter += 1
+                assert.equal(1, counter)
+            })
+            
+            model.association('parent').load().then(() => {
+                model.association('parent').load().then((r) => done(), done);
+                this.withRequest('GET', '/parents', { params: {where: {id: 24}, order: {id: 'desc'}, limit: 1} }, (xhr) => {
+                    xhr.respond(200, {}, '[{"id": 24, "name": "Viking"}]');
+                });
+            })
+            this.withRequest('GET', '/parents', { params: {where: {id: 24}, order: {id: 'desc'}, limit: 1} }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 24, "name": "Viking"}]');
+            });
+        })
+        
+        it("loading fires added event", function(done) {
+            let model = new Model({parent_id: 24});
+            
+            model.association('parent').addEventListener('added', record => {
+                assert.equal(record.readAttribute('id'), 24)
+            })
+            
+            model.association('parent').load().then(() => {done()}, () => {done()});
+            this.withRequest('GET', '/parents', { params: {where: {id: 24}, order: {id: 'desc'}, limit: 1} }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 24, "name": "Viking"}]');
+            });
+        })
+        
+        it("loading fires removed event", function (done){
+            let model = new Model({parent_id: 24});
+            
+            model.association('parent').addEventListener('removed', record => {
+                assert.equal(record.readAttribute('id'), 24)
+                done()
+            })
+            
+            model.association('parent').load();
+            this.withRequest('GET', '/parents', { params: {where: {id: 24}, order: {id: 'desc'}, limit: 1} }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 24, "name": "Viking"}]');
+            });
+            
+            model.association('parent').reload();
+            this.withRequest('GET', '/parents', { params: {where: {id: 24}, order: {id: 'desc'}, limit: 1} }, (xhr) => {
+                xhr.respond(200, {}, '[]');
             });
         })
     });
