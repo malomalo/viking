@@ -68,7 +68,7 @@ describe('Viking.Record::ssociations', () => {
             
             model.association('parent').addEventListener('loaded', record => {
                 assert.equal(record.readAttribute('id'), 24)
-                done()
+                done();
             })
             model.parent.id;
             this.withRequest('GET', '/parents', { params: {where: {id: 24}, order: {id: 'desc'}, limit: 1} }, (xhr) => {
@@ -86,7 +86,7 @@ describe('Viking.Record::ssociations', () => {
             })
             
             model.association('parent').load().then(() => {
-                model.association('parent').load().then(() => {done()}, () => {done()})
+                model.association('parent').load().then((r) => done(), done);
                 this.withRequest('GET', '/parents', { params: {where: {id: 24}, order: {id: 'desc'}, limit: 1} }, (xhr) => {
                     xhr.respond(200, {}, '[{"id": 24, "name": "Viking"}]');
                 });
