@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import 'mocha';
 import VikingRecord from 'viking/record';
-import { belongsTo } from 'viking/record/associations';
+import { hasMany, belongsTo } from 'viking/record/associations';
 import * as Errors from 'viking/errors';
 
 describe('Viking.Record::associations', () => {
@@ -49,13 +49,35 @@ describe('Viking.Record::associations', () => {
                 xhr.respond(200, {}, '[{"id": 24, "name": "Viking"}]');
             });
         });
+        
+        it("allows deep chaining", async function() {
+            class A extends VikingRecord { }
+            class B extends VikingRecord {
+                static associations = [hasMany(A)];
+            }
+            class C extends VikingRecord {
+                static associations = [belongsTo(B)];
+            }
 
-        it("doesn't send query if not foriegnKey present", function(done) {
+            this.onRequest('GET', '/bs', { params: {where: {id: 2}, order: {id: 'desc'}, limit: 1} }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 5, "name": "B"}]');
+            });
+            this.onRequest('GET', '/as', { params: {where: {b_id: 5, x: 2}, order: {id: 'desc'} } }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 1, "name": "A Up", "x": 2}]');
+            });
+
+            let model = new C({id: 3, b_id: 2})
+
+            assert.deepEqual(
+                [{id: 1, name: 'A Up', x: 2}],
+                await model.b.as.where({x: 2}).map((x) => x.attributes)
+            );
+        });
+
+        it("doesn't send query if not foriegnKey present", function() {
             let model = new Model();
-
-            model.parent.then((model) => {
-                assert.strictEqual(model, null);
-            }).then(done, done);
+            
+            assert.strictEqual(model.parent,  null);
             assert.equal(this.requests.length, 0);
         });
 
