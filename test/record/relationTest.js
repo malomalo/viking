@@ -13,7 +13,6 @@ describe('Viking.Relation', () => {
 
             let onceFlag = false
             relation.addEventListener('added', records => {
-                console.log(records);
                 assert.ok(!onceFlag)
                 assert.deepEqual(records.map(x => x.readAttribute('id')), [1]);
                 onceFlag = true;
