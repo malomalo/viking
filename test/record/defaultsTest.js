@@ -62,5 +62,22 @@ describe('Viking.Record', () => {
             assert.equal(9, three.square);
         });
 
+        it('include defaults in save', function () {
+            class Defaulted extends Model {
+                static schema = { one: {default: 1} };
+            }
+            
+            const record = new Defaulted()
+            record.save()
+            
+            assert.ok(this.findRequest('POST', '/defaulteds', {
+                body: {
+                    defaulted: {
+                        one: 1
+                    }
+                }
+            }));
+        });
+
     });
 });
