@@ -7,8 +7,7 @@ describe('Viking.Record', () => {
 
         it('Automatically add the CSRF token', function () {
             document.head.innerHTML = '<meta name="csrf-token" content="ETZaIMiq">';
-            console.log(document.head.innerHTML);
-                    
+            
             let connection = new Connection('http://example.com');
             connection.get('/');
             

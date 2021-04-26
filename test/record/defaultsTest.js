@@ -47,6 +47,21 @@ describe('Viking.Record', () => {
             assert.equal(emptyattrs.attributes.one, 1);
         });
         
+        it('is a function', function () {
+            class Pow extends Model {
+                static base = 3;
+                static schema = {
+                    square: {
+                        type: 'integer',
+                        default: () => this.base * this.base
+                    }
+                }
+            }
+            
+            const three = new Pow();
+            assert.equal(9, three.square);
+        });
+
         it('include defaults in save', function () {
             class Defaulted extends Model {
                 static schema = { one: {default: 1} };
