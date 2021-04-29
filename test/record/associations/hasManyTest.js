@@ -213,42 +213,79 @@ describe('Viking.Record::associations', () => {
         });
     });
     
-    // describe('belongsTo(Parent, {foriegnKey: KEY})', () => {
-    //     class Parent extends VikingRecord { }
-    //     class Model extends VikingRecord {
-    //         static associations = [belongsTo(Parent, {foreignKey: 'parental_id'})];
-    //     }
+    describe('hasMany(Parent, {foriegnKey: KEY})', () => {
+        class Parent extends VikingRecord { }
+        class Child extends VikingRecord {
+            static associations = [hasMany(Parent, {foreignKey: 'offspring_id'})];
+        }
 
-    //     it("load association", function(done) {
-        //         let model = new Model({parental_id: 24});
+        it("load association", function(done) {
+            let model = new Child({id: 24});
 
-    //         model.parent.then((model) => {
-    //             assert.ok(model instanceof Parent);
-    //             assert.equal(model.readAttribute('id'), 24);
-    //             assert.equal(model.readAttribute('name'), 'Viking');
-    //         }).then(done, done);
-    //         this.withRequest('GET', '/parents', {where: {id: 24}, order: {id: 'desc'}, limit: 1}, (xhr) => {
-    //             xhr.respond(200, {}, '[{"id": 24, "name": "Viking"}]');
-    //         });
-    //     });
+            model.parents.toArray().then((models) => {
+                assert.ok(models[0] instanceof Parent);
+                assert.equal(models[0].readAttribute('id'), 11);
+                assert.equal(models[0].readAttribute('name'), 'Viking');
+            }).then(done, done);
+            this.withRequest('GET', '/parents', {params: {where: {offspring_id: 24}, order: {id: 'desc'}}}, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 11, "name": "Viking"}]');
+            });
 
-    //     describe('assigning the association', () => {
-    //         it('to a model with an id', function(done) {
-        //             let model = new Model();
-    //             let parent = new Parent({id: 13});
-    //             model.parent = parent;
+        });
 
-    //             assert.equal(model.readAttribute('parental_id'), 13);
-    //             assert.ok(model._associations.parent.loaded);
-    //             assert.strictEqual(model._associations.parent.target, parent);
-    //             model.parent.then((model) => {
-    //                 assert.strictEqual(model, parent);
-    //                 done();
-    //             });
-    //             assert.equal(this.requests.length, 0);
-    //         });
-    //     });
-    // });
+        describe('assigning the association', (done) => {
+            it('to a model with an id', function(done) {
+                let model = new Child({id: 24});
+                let parent = new Parent({id: 13});
+                model.parents = [parent];
+
+                assert.equal(parent.readAttribute('offspring_id'), 24);
+                assert.ok(model._associations.parents.loaded);
+                assert.strictEqual(model._associations.parents.target[0], parent);
+                model.parents.toArray().then(models => {
+                    assert.strictEqual(models[0], parent);
+                }).then(done, done);
+                assert.equal(this.requests.length, 0);
+            });
+        });
+    });
+    
+    describe('hasMany(Parent, {as: NAME})', () => {
+        class Parent extends VikingRecord { }
+        class Child extends VikingRecord {
+            static associations = [hasMany(Parent, {as: 'offspring'})];
+        }
+
+        it("load association", function(done) {
+            let model = new Child({id: 24});
+
+            model.parents.toArray().then((models) => {
+                assert.ok(models[0] instanceof Parent);
+                assert.equal(models[0].readAttribute('id'), 11);
+                assert.equal(models[0].readAttribute('name'), 'Viking');
+            }).then(done, done);
+            this.withRequest('GET', '/parents', {params: {where: {offspring_id: 24}, order: {id: 'desc'}}}, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 11, "name": "Viking"}]');
+            });
+
+        });
+
+        describe('assigning the association', (done) => {
+            it('to a model with an id', function(done) {
+                let model = new Child({id: 24});
+                let parent = new Parent({id: 13});
+                model.parents = [parent];
+
+                assert.equal(parent.readAttribute('offspring_id'), 24);
+                assert.ok(model._associations.parents.loaded);
+                assert.strictEqual(model._associations.parents.target[0], parent);
+                model.parents.toArray().then(models => {
+                    assert.strictEqual(models[0], parent);
+                }).then(done, done);
+                assert.equal(this.requests.length, 0);
+            });
+        });
+    });
 
     // // Model.reflectOnAssociation('parent');
 
