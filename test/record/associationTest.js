@@ -24,7 +24,6 @@ describe('Viking.Record::associations', () => {
 
         it("load association", function(done) {
             let model = new Requirement({id: 24});
-console.error(model.phases)
             model.phases.load().then((models) => {
                 assert.equal(models.length, 1);
                 assert.ok(models[0] instanceof Phase);
@@ -35,6 +34,21 @@ console.error(model.phases)
                 xhr.respond(200, {}, '[{"id": 24, "name": "Viking"}]');
             });
         });
+        
+        it("clone association", function (done) {
+            let model = new Requirement({id: 24});
+            model.phases.load().then(models => {
+                const clone = model.phases.clone()
+                assert.ok(clone.loaded);
+                assert.notEqual(clone.listenerId, model.phases.listenerId)
+                assert.notEqual(clone.target[0].cid, model.phases.target[0].cid)
+                assert.equal(clone.target[0].readAttribute('id'), model.phases.target[0].readAttribute('id'))
+            }).then(done, done)
+            
+            this.withRequest('GET', '/phases', { params: {where: {requirement_id: 24}, order: {id: 'desc'}} }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 24, "name": "Viking"}]');
+            });
+        })
         
     });
     
