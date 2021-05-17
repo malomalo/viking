@@ -29,13 +29,31 @@ describe('Viking.Record::associations', () => {
         it("reload association", function (done) {
             let model = new Model({id: 24});
             model.parents.toArray().then(parents => {
-                model.association('parents').reload();
+                model.association('parents').reload().then(secondLoadParents => {
+                    assert.deepEqual(parents.map(x => x.cid), secondLoadParents.map(x => x.cid))
+                }).then(done, done);
+                
                 assert.ok(this.findRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}} }));
-            }).then(done, done)
+                
+                this.withRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}} }, (xhr) => {
+                    xhr.respond(200, {}, '[{"id": 2, "name": "Viking"}]');
+                });
+            })
             
             this.withRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}} }, (xhr) => {
                 xhr.respond(200, {}, '[{"id": 2, "name": "Viking"}]');
             });
+        })
+        
+        it("add to association", function () {
+            let model = new Model()
+            let parent = new Parent()
+            let parent2 = new Parent()
+            
+            model.parents.add(parent)
+            model.parents.add(parent2)
+            
+            assert.deepEqual([parent.cid, parent2.cid], model.parents.target.map(x => x.cid))
         })
         
         it("forEach iterates over the association", function(done) {
