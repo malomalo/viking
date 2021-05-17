@@ -1,14 +1,26 @@
 import * as assert from 'assert';
 import 'mocha';
 import VikingRecord from 'viking/record';
-import { hasMany } from 'viking/record/associations';
+import { hasMany, belongsTo } from 'viking/record/associations';
+import {extendClass} from 'viking/support/class';
 
 describe('Viking.Record::associations', () => {
     describe('hasMany(Parent)', () => {
-        class Parent extends VikingRecord { }
+        
+        function Parent () {
+          var NewTarget = Object.getPrototypeOf(this).constructor;
+          return Reflect.construct(VikingRecord, arguments, NewTarget);
+        }
+        
         class Model extends VikingRecord {
             static associations = [hasMany(Parent)];
         }
+        
+        extendClass('Parent', VikingRecord, Parent, {
+            associations: [
+                belongsTo(Model)
+            ]
+        })
 
         it("load association", function(done) {
             let model = new Model({id: 24});
@@ -43,6 +55,15 @@ describe('Viking.Record::associations', () => {
             this.withRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}} }, (xhr) => {
                 xhr.respond(200, {}, '[{"id": 2, "name": "Viking"}]');
             });
+        })
+        
+        it("set inverse association", function () {
+            let model = new Model()
+            let parent = new Parent()
+            
+            model.parents.add(parent)
+            
+            assert.equal(model.cid, parent.model.cid)
         })
         
         it("add to association", function () {
