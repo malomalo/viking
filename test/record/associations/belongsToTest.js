@@ -31,12 +31,12 @@ describe('Viking.Record::associations', () => {
             model.parent.then(p => {
                 model.association('parent').reload().then(secondLoadParent => {
                     assert.equal(p.cid, secondLoadParent.cid)
+                    assert.equal('Viking 2', secondLoadParent.readAttribute('name'));
+                    assert.deepEqual({}, secondLoadParent.changes());
                 }).then(done, done);
                 
-                assert.ok(this.findRequest('GET', '/parents', { params: {where: {id: 24}, order: {id: 'desc'}, limit: 1} }));
-                
                 this.withRequest('GET', '/parents', { params: {where: {id: 24}, order: {id: 'desc'}, limit: 1} }, (xhr) => {
-                    xhr.respond(200, {}, '[{"id": 24, "name": "Viking"}]');
+                    xhr.respond(200, {}, '[{"id": 24, "name": "Viking 2"}]');
                 });
             })
             
