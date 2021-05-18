@@ -31,9 +31,16 @@ describe('Viking.Record::associations', () => {
             let model = new Model({id: 24});
             
             model.parents.toArray().then(parents => {
-                model.association('parents').reload();
-                assert.ok(this.findRequest('GET', '/parents', { params: {where: {models_parents: {model_id: 24}}, order: {id: 'desc'}} }));
-            }).then(done, done)
+                model.association('parents').reload().then(secondLoadParents => {
+                    assert.deepEqual(parents.map(x => x.cid), secondLoadParents.map(x => x.cid))
+                    assert.deepEqual(['Viking 2'], secondLoadParents.map(x => x.readAttribute('name')));
+                    assert.deepEqual([{}], secondLoadParents.map(x => x.changes()));
+                }).then(done, done);
+                
+                this.withRequest('GET', '/parents', { params: {where: {models_parents: {model_id: 24}}, order: {id: 'desc'}} }, (xhr) => {
+                    xhr.respond(200, {}, '[{"id": 2, "name": "Viking 2"}]');
+                });
+            })
             
             this.withRequest('GET', '/parents', { params: {where: {models_parents: {model_id: 24}}, order: {id: 'desc'}} }, (xhr) => {
                 xhr.respond(200, {}, '[{"id": 2, "name": "Viking"}]');

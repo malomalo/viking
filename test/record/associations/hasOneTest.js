@@ -28,9 +28,16 @@ describe('Viking.Record::associations', () => {
         it("reload association", function (done) {
             let model = new Model({id: 24});
             model.parent.then(p => {
-                model.association('parent').reload();
-                assert.ok(this.findRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}, limit: 1} }));
-            }).then(done, done)
+                model.association('parent').reload().then(updatedParent => {
+                    assert.equal(p.cid, updatedParent.cid);
+                    assert.equal('Viking 2', updatedParent.readAttribute('name'));
+                    assert.deepEqual({}, updatedParent.changes());
+                }).then(done, done);
+                
+                this.withRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}, limit: 1} }, (xhr) => {
+                    xhr.respond(200, {}, '[{"id": 1, "name": "Viking 2"}]');
+                });
+            })
             
             this.withRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}, limit: 1} }, (xhr) => {
                 xhr.respond(200, {}, '[{"id": 1, "name": "Viking"}]');
