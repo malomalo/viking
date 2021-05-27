@@ -2,7 +2,7 @@ import 'mocha';
 import * as assert from 'assert';
 import Record from 'viking/record';
 
-describe('Viking.Record#callbacks', () => {
+describe('Viking.Record#events', () => {
 
     class Actor extends Record {
         static schema = {
