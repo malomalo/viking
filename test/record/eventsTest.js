@@ -35,9 +35,9 @@ describe('Viking.Record#events', () => {
         model.setAttributes({name: 'Rob'});
     });
 
-    it('saved', function (done) {
+    it('afterSave', function (done) {
         Actor.create({name: "Rod Kimbal"}).then(person => {
-            person.addEventListener('saved', (savedChanges, options) => {
+            person.addEventListener('afterSave', (savedChanges, options) => {
                 try {
                     assert.deepEqual(savedChanges, {
                         name: ["Rod Kimbal", "Andy Sanberg"]
@@ -59,10 +59,10 @@ describe('Viking.Record#events', () => {
         });
     });
     
-    it('saved:[attribute]', function (done) {
+    it('afterSave:[attribute]', function (done) {
         Actor.create({name: "Rod Kimbal"}).then(person => {
 
-            person.addEventListener('saved:name', (from, to) => {
+            person.addEventListener('afterSave:name', (from, to) => {
                 try {
                     assert.equal(from, "Rod Kimbal");
                     assert.equal(to, "Andy Sanberg");
