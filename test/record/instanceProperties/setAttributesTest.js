@@ -40,7 +40,10 @@ describe('Viking.Record#setAttributes', () => {
                 let a = new Model();
 
                 a.setAttributes({date: "2013-04-10"});
-                assert.equal(a.readAttribute('date').valueOf(), new Date(1365570000000).valueOf());
+                assert.equal(a.readAttribute('date').valueOf(), new Date(2013, 3, 10).valueOf());
+                
+                a.setAttributes({date: "2013-04-11"});
+                assert.equal(a.readAttribute('date').valueOf(), new Date(2013, 3, 11).valueOf());
             });
 
             it("int(milliseconds since epoch) to date", () => {
