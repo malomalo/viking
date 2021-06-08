@@ -232,6 +232,40 @@ describe('Viking.Record::associations', () => {
             });
         });
     });
+    
+    describe('hasOne(Parent, {as: NAME})', () => {
+        class Parent extends VikingRecord { }
+        class Child extends VikingRecord {
+            static associations = [hasOne(Parent, {as: 'offspring'})];
+        }
+
+        it("load association", function(done) {
+            let model = new Child({id: 24});
+
+            model.parent.then((model) => {
+                assert.ok(model instanceof Parent);
+                assert.equal(model.readAttribute('id'), 11);
+                assert.equal(model.readAttribute('name'), 'Viking');
+            }).then(done, done);
+            this.withRequest('GET', '/parents', { params: {where: {offspring_id: 24, offspring_type: 'Child'}, order: {id: 'desc'}, limit: 1} }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 11, "name": "Viking"}]');
+            });
+
+        });
+
+        describe('assigning the association', () => {
+            it('to a model with an id', function() {
+                let model = new Child({id: 24});
+                let parent = new Parent({id: 13});
+                model.parent = parent;
+
+                assert.equal(parent.readAttribute('offspring_id'), 24);
+                assert.ok(model._associations.parent.loaded);
+                assert.strictEqual(model._associations.parent.target, parent);
+                assert.equal(this.requests.length, 0);
+            });
+        });
+    });
 
     describe("Model.reflectOnAssociation('parent');", () => {
         it("::new('children', { modelName: 'Region' })", function () {
