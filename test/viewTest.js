@@ -724,5 +724,16 @@ describe('Viking.View', () => {
             assert.equal(view.lorem, 99)
             assert.equal(view.ipsum, 88)
         })
+        
+        it("overrides key attributes", () => {
+            class Test extends View {
+                static assignableProperties = [
+                    'attributes'
+                ]
+            }
+            
+            const view = new Test({attributes: ['test']})
+            assert.deepEqual(view.attributes, ['test'])
+        })
     })
 });
