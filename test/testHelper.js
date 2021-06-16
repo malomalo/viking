@@ -74,6 +74,9 @@ before(function() {
         this.requestCallbacks.push([method, url, options, callback]);
     };
     
+    this.click = function (element, options) {
+        element.dispatchEvent(new MouseEvent('click', Object.assign({ bubbles: true }, options)))
+    }
     
     this.xhr = sinon.useFakeXMLHttpRequest();
     this.xhr.onCreate = (xhr) => {
