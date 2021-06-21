@@ -70,4 +70,39 @@ describe('Viking.Relation', () => {
             });
         })
     })
+    
+    describe('order', () => {
+        it('single key', function () {
+            let relation = Model.where({parent_id: 11}).order('created_at')
+            relation = relation.reorder({created_at: 'desc'})
+            
+            relation.load()
+            assert.ok(this.findRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {created_at: 'desc'} } }));
+        })
+        
+        it('hash', function () {
+            let relation = Model.where({parent_id: 11}).order({created_at: 'asc'})
+            
+            relation.load()
+            assert.ok(this.findRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {created_at: 'asc'} } }));
+        })
+    })
+    
+    describe('reorder', () => {
+        it('single key', function () {
+            let relation = Model.where({parent_id: 11}).order('created_at')
+            relation = relation.reorder('book_count')
+            
+            relation.load()
+            assert.ok(this.findRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {book_count: 'desc'} } }));
+        })
+        
+        it('hash', function () {
+            let relation = Model.where({parent_id: 11}).order({created_at: 'asc'})
+            relation = relation.reorder({created_at: 'desc'})
+            
+            relation.load()
+            assert.ok(this.findRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {created_at: 'desc'} } }));
+        })
+    })
 })
