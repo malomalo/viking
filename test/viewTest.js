@@ -474,7 +474,7 @@ describe('Viking.View', () => {
 
         myView.delegate('click', function() { assert.ok(false); });
         myView.addEventListenerFor(myView, ['*', 'x'], function(eventName) {
-          if (eventName !== 'removed' && eventName !== 'onremove') {
+          if (eventName !== 'afterRemove' && eventName !== 'beforeRemove') {
             assert.ok(false);
           }
         });
@@ -574,12 +574,12 @@ describe('Viking.View', () => {
         let counter = 0;
         const view = new View();
 
-        view.addEventListener('removed', () => {
+        view.addEventListener('afterRemove', () => {
             counter += 1;
         });
 
         view.remove();
-        view.removeEventListener('removed');
+        view.removeEventListener('afterRemove');
 
         assert.equal(counter, 1);
     });

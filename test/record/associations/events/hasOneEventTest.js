@@ -15,7 +15,7 @@ describe('Viking.Record::associations', () => {
             let model = new Model();
             let parent = new Parent({id: 24});
         
-            model.association('parent').addEventListener('added', record => {
+            model.association('parent').addEventListener('afterAdd', record => {
                 assert.equal(record.readAttribute('id'), 24)
                 done()
             })
@@ -27,7 +27,7 @@ describe('Viking.Record::associations', () => {
             let model = new Model({id: 11});
             let parent = new Parent({id: 24});
         
-            parent.addEventListener('added', association => {
+            parent.addEventListener('afterAdd', association => {
                 assert.equal(association.owner, model);
                 assert.equal(parent.readAttribute('model_id'), 11)
                 done()
@@ -41,7 +41,7 @@ describe('Viking.Record::associations', () => {
             let parent = new Parent({id: 24});
             model.parent = parent
             
-            model.association('parent').addEventListener('removed', record => {
+            model.association('parent').addEventListener('afterRemove', record => {
                 assert.equal(record.readAttribute('id'), 24)
                 done()
             })
@@ -54,7 +54,7 @@ describe('Viking.Record::associations', () => {
             let parent = new Parent({id: 24});
             model.parent = parent
             
-            parent.addEventListener('removed', association => {
+            parent.addEventListener('afterRemove', association => {
                 assert.equal(association.owner, model);
                 assert.equal(parent.readAttribute('model_id'), null)
                 done()
@@ -66,7 +66,7 @@ describe('Viking.Record::associations', () => {
         it("loading fires load event", function (done) {
             let model = new Model({id: 24});
             
-            model.association('parent').addEventListener('loaded', record => {
+            model.association('parent').addEventListener('afterLoad', record => {
                 assert.equal(record.readAttribute('id'), 1)
                 done()
             })
@@ -82,7 +82,7 @@ describe('Viking.Record::associations', () => {
             let model = new Model({id: 24});
             let counter = 0
             
-            model.association('parent').addEventListener('loaded', record => {
+            model.association('parent').addEventListener('afterLoad', record => {
                 counter += 1
                 assert.equal(1, counter)
             })
@@ -98,10 +98,10 @@ describe('Viking.Record::associations', () => {
             });
         })
         
-        it("loading fires added event", function(done) {
+        it("loading fires afterAdd event", function(done) {
             let model = new Model({id: 24});
             
-            model.association('parent').addEventListener('added', record => {
+            model.association('parent').addEventListener('afterAdd', record => {
                 assert.equal(record.readAttribute('id'), 1)
                 done()
             })
@@ -112,10 +112,10 @@ describe('Viking.Record::associations', () => {
             });
         })
         
-        it("loading fires removed event", function (done){
+        it("loading fires afterRemove event", function (done){
             let model = new Model({id: 24});
             
-            model.association('parent').addEventListener('removed', record => {
+            model.association('parent').addEventListener('afterRemove', record => {
                 assert.equal(record.readAttribute('id'), 1)
                 done()
             })

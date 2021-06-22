@@ -8,11 +8,11 @@ describe('Viking.Relation', () => {
 
     describe('events', () => {
         
-        it('added', function (done) {
+        it('afterAdd', function (done) {
             const relation = Model.where({parent_id: 11})
 
             let onceFlag = false
-            relation.addEventListener('added', records => {
+            relation.addEventListener('afterAdd', records => {
                 assert.ok(!onceFlag)
                 assert.deepEqual(records.map(x => x.readAttribute('id')), [1]);
                 onceFlag = true;
@@ -36,10 +36,10 @@ describe('Viking.Relation', () => {
             });
         });
         
-        it('removed', function (done) {
+        it('afterRemove', function (done) {
             const relation = Model.where({parent_id: 11})
 
-            relation.addEventListener('removed', records => {
+            relation.addEventListener('afterRemove', records => {
                 assert.deepEqual(records.map(x => x.readAttribute('id')), [1]);
             });
             
@@ -56,10 +56,10 @@ describe('Viking.Relation', () => {
             });
         })
         
-        it('loaded', function (done) {
+        it('afterLoad', function (done) {
             const relation = Model.where({parent_id: 11})
 
-            relation.addEventListener('loaded', records => {
+            relation.addEventListener('afterLoad', records => {
                 assert.deepEqual(records.map(x => x.readAttribute('id')), [1]);
             });
             
