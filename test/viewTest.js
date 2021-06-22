@@ -724,5 +724,73 @@ describe('Viking.View', () => {
             assert.equal(view.lorem, 99)
             assert.equal(view.ipsum, 88)
         })
+        
+        it("overrides key attributes", () => {
+            class Test extends View {
+                static assignableProperties = [
+                    'attributes'
+                ]
+            }
+            
+            const view = new Test({attributes: ['test']})
+            assert.deepEqual(view.attributes, ['test'])
+        })
+    })
+    
+    describe("defaults", () => {
+        it("assigns", () => {
+            class Test extends View {
+                static defaults = {
+                    test: 1
+                }
+            }
+            
+            const view = new Test({test: 99})
+            assert.equal(view.test, 99)
+        })
+        
+        it("assigns default", () => {
+            class Test extends View {
+                static defaults = {
+                    test: 1
+                }
+            }
+            
+            const view = new Test()
+            assert.equal(view.test, 1)
+        })
+        
+        it("allows falsy values", () => {
+            class Test extends View {
+                static defaults = {
+                    test: true
+                }
+            }
+
+            const view = new Test({test: false})
+            assert.equal(view.test, false)
+        })
+        
+        it("allows keys to pass thru extending", () => {
+            class Test extends View {
+                static defaults = {
+                    test: 1,
+                    hello: 'world',
+                    lorem: 'ispum'
+                }
+            }
+            
+            class Test2 extends Test {
+                static defaults = {
+                    test: 99
+                }
+            }
+
+            const view = new Test2({lorem: 'latin'})
+            assert.equal(view.lorem, 'latin')
+            assert.equal(view.test, 99)
+            assert.equal(view.hello, 'world')
+        })
+        
     })
 });

@@ -23,6 +23,20 @@ describe('Viking.Record::ssociations', () => {
             model.parent = parent
         })
         
+        it("setting target when already set to that target does not fire add event", function (done){
+            let model = new Model();
+            let parent = new Parent({id: 24});
+            
+            model.parent = parent
+        
+            parent.addEventListener('added', association => {
+                assert.ok(false)
+            })
+            
+            model.parent = parent
+            done()
+        })
+        
         it("setting target fires add event on record", function (done){
             let model = new Model();
             let parent = new Parent({id: 24});

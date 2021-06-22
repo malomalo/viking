@@ -18,14 +18,18 @@ describe('Viking.Relation', () => {
                 onceFlag = true;
             });
 
-            relation.load();
+            relation.load().then(() => {
+                relation.reload().then(() => {
+                    assert.ok(true)
+                    done()
+                }, () => {
+                    assert.ok(false)
+                });
 
-            this.withRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
-                xhr.respond(200, {}, '[{"id": 1}]');
+                this.withRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
+                    xhr.respond(200, {}, '[{"id": 1}]');
+                });
             });
-            
-            relation.reload().then(() => done(), done);
-            
 
             this.withRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
                 xhr.respond(200, {}, '[{"id": 1}]');
@@ -41,10 +45,11 @@ describe('Viking.Relation', () => {
             
             relation.load().then(() => {
                 relation.addWhere({id: 2});
+                relation.load().then(() => done(), done)
                 this.withRequest('GET', '/models', { params: { where: {parent_id: 11, id: 2}, order: {id: 'desc'} } }, (xhr) => {
                     xhr.respond(200, {}, '[{"id": 2}]');
                 });
-            }).then(done, done);
+            });
             
             this.withRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
                 xhr.respond(200, {}, '[{"id": 1}, {"id": 2}]');
@@ -58,11 +63,46 @@ describe('Viking.Relation', () => {
                 assert.deepEqual(records.map(x => x.readAttribute('id')), [1]);
             });
             
-            relation.load().then(x => done(), done);
+            relation.load().then(() => done(), done);
 
             this.withRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
                 xhr.respond(200, {}, '[{"id": 1}]');
             });
+        })
+    })
+    
+    describe('order', () => {
+        it('single key', function () {
+            let relation = Model.where({parent_id: 11}).order('created_at')
+            relation = relation.reorder({created_at: 'desc'})
+            
+            relation.load()
+            assert.ok(this.findRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {created_at: 'desc'} } }));
+        })
+        
+        it('hash', function () {
+            let relation = Model.where({parent_id: 11}).order({created_at: 'asc'})
+            
+            relation.load()
+            assert.ok(this.findRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {created_at: 'asc'} } }));
+        })
+    })
+    
+    describe('reorder', () => {
+        it('single key', function () {
+            let relation = Model.where({parent_id: 11}).order('created_at')
+            relation = relation.reorder('book_count')
+            
+            relation.load()
+            assert.ok(this.findRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {book_count: 'desc'} } }));
+        })
+        
+        it('hash', function () {
+            let relation = Model.where({parent_id: 11}).order({created_at: 'asc'})
+            relation = relation.reorder({created_at: 'desc'})
+            
+            relation.load()
+            assert.ok(this.findRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {created_at: 'desc'} } }));
         })
     })
 })

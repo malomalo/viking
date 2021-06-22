@@ -5,7 +5,6 @@ import { toQuery }  from 'viking/support/object';
 import Model        from 'viking/record';
 import Connection   from 'viking/record/connection';
 
-
 assert.tag = function (tag, name, attrsOrContent, content) {
     var attrs;
     
@@ -74,6 +73,9 @@ before(function() {
         this.requestCallbacks.push([method, url, options, callback]);
     };
     
+    this.click = function (element, options) {
+        element.dispatchEvent(new MouseEvent('click', Object.assign({ bubbles: true }, options)))
+    }
     
     this.xhr = sinon.useFakeXMLHttpRequest();
     this.xhr.onCreate = (xhr) => {
@@ -104,14 +106,16 @@ before(function() {
 
     this.findRequest = (method, url, options) => {
         let match = this.requests.find((xhr) => requestMatches(xhr, method, url, options));
-
+        
         if (!match) {
+            console.error("\x1b[33m", "!!! MISSED REQUESTS !!!!!")
+            console.error("\x1b[33m", "\tREQUEST")
+            console.error("\x1b[33m", "\t\t" + [method, decodeURIComponent('http://example.com' + url + toQuery(options?.params)), JSON.stringify(options?.body)].filter(x => x).join("\t"));
+            console.error("\x1b[33m", "\tQUEUE");
             this.requests.forEach((xhr) => {
-                console.error("\x1b[33m", "!!! MISSED REQUEST !!!!!")
-                console.error("\x1b[33m", "\tREQUEST\n\t\t" + [method, decodeURIComponent('http://example.com' + url), JSON.stringify(options?.body)].filter(x => x).join("\t"));
-                console.error("\x1b[33m", "\tQUEUE\n\t\t" + [xhr.method, decodeURIComponent(xhr.url), xhr.requestBody].filter(x => x).join("\t"));
-                console.error("\x1b[33m", "!!!!!!!!!!!!!!!!!!!!!!!!");
+                console.error("\x1b[33m", "\t\t" + [xhr.method, decodeURIComponent(xhr.url), xhr.requestBody].filter(x => x).join("\t"));
             });
+            console.error("\x1b[33m", "!!!!!!!!!!!!!!!!!!!!!!!!");
         }
         
         return match;
