@@ -8,26 +8,32 @@ describe('Viking.Record', () => {
     //     Viking.View.templates = window['JST'];
     // }
 
-    it('clone', () => {
-      let a = new Model({foo: 1, bar: 2, baz: 3});
-      let b = a.clone();
+    describe('clone', () => {
+        it('clone', () => {
+          let a = new Model({foo: 1, bar: 2, baz: 3});
+          let b = a.clone();
 
-      assert.equal(a.readAttribute('foo'), 1);
-      assert.equal(a.readAttribute('bar'), 2);
-      assert.equal(a.readAttribute('baz'), 3);
-      assert.equal(b.readAttribute('foo'), a.readAttribute('foo'), 'Foo should be the same on the clone.');
-      assert.equal(b.readAttribute('bar'), a.readAttribute('bar'), 'Bar should be the same on the clone.');
-      assert.equal(b.readAttribute('baz'), a.readAttribute('baz'), 'Baz should be the same on the clone.');
-      a.setAttributes({foo: 100});
-      assert.equal(a.readAttribute('foo'), 100);
-      assert.equal(b.readAttribute('foo'), 1, 'Changing a parent attribute does not change the clone.');
-
-    //   let foo = new Model({p: 1});
-    //   var bar = new Model({p: 2});
-    //   bar.set(foo.clone().attributes, {unset: true});
-    //   assert.equal(foo.get('p'), 1);
-    //   assert.equal(bar.get('p'), undefined);
-    });
+          assert.equal(a.readAttribute('foo'), 1);
+          assert.equal(a.readAttribute('bar'), 2);
+          assert.equal(a.readAttribute('baz'), 3);
+          assert.equal(b.readAttribute('foo'), a.readAttribute('foo'), 'Foo should be the same on the clone.');
+          assert.equal(b.readAttribute('bar'), a.readAttribute('bar'), 'Bar should be the same on the clone.');
+          assert.equal(b.readAttribute('baz'), a.readAttribute('baz'), 'Baz should be the same on the clone.');
+          a.setAttributes({foo: 100});
+          assert.equal(a.readAttribute('foo'), 100);
+          assert.equal(b.readAttribute('foo'), 1, 'Changing a parent attribute does not change the clone.');
+        });
+        
+        it('changes', () => {
+            let a = new Model({foo: 1, bar: 2, baz: 3});
+            a.persist();
+            let b = a.clone();
+            
+            a.setAttributes({foo: 100});
+            assert.deepEqual({foo: [1, 100]}, a.changes())
+            assert.deepEqual({}, b.changes())
+        })
+    })
 
     it('readAttribute', () => {
         let doc = new Model({title: 'The Tempest', author: 'Bill Shakespeare'});
