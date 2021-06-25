@@ -29,7 +29,7 @@ describe('Viking.Record::ssociations', () => {
             
             model.parent = parent
         
-            parent.addEventListener('added', association => {
+            parent.addEventListener('afterAdd', association => {
                 assert.ok(false)
             })
             
