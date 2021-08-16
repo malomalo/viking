@@ -83,5 +83,22 @@ describe('Viking.Record#events', () => {
             xhr.respond(201, {}, '{"id": 1, "name": "Rod Kimbal", "imdb_id": "999"}');
         });
     });
+    
+    it('error', function(done) {
+
+      const actor = new Actor({name: 'Fred'});
+      
+      actor.addEventListener('error', (response) => {
+          assert.equal("something went wrong", response)
+          done()
+      })
+      
+      actor.save()
+  
+      this.withRequest('POST', '/actors', { body: {actor: {name: 'Fred'} } }, (xhr) => {
+          xhr.respond(500, {}, 'something went wrong');
+      });
+
+    });
 
 });
