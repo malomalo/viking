@@ -100,5 +100,24 @@ describe('Viking.Record#events', () => {
       });
 
     });
+    
+    it('invalid', function(done) {
+
+      const actor = new Actor({name: 'Fred'});
+      
+      actor.addEventListener('invalid', () => {
+          assert.deepEqual(actor.errors, {name: ["can only be Jimmy"]})
+          done()
+      })
+      
+      actor.save()
+  
+      this.withRequest('POST', '/actors', { body: {actor: {name: 'Fred'} } }, (xhr) => {
+          xhr.respond(400, {
+              'Content-Type': 'application/json'
+          }, '{"id": null, "name": "Fred", "errors": {"name": ["can only be Jimmy"]}}');
+      });
+
+    });
 
 });
