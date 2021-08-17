@@ -105,4 +105,33 @@ describe('Viking.Relation', () => {
             assert.ok(this.findRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {created_at: 'desc'} } }));
         })
     })
+    
+    describe('add', () => {
+        it('single record', async function () {
+            let relation = Model.where({parent_id: 11})
+            relation.load()
+            await this.withRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 1}, {"id": 2}]');
+            });
+            
+            relation.add(new Model({id: 3}))
+            
+            assert.deepEqual(relation.target.map(x => x.readAttribute('id')), [1, 2, 3])
+            
+        })
+    })
+    
+    describe('remove', () => {
+        it('single record', async function () {
+            let relation = Model.where({parent_id: 11})
+            relation.load()
+            await this.withRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 1}, {"id": 2}]');
+            });
+            
+            await relation.remove(relation.target[1])
+            assert.deepEqual(relation.target.map(x => x.readAttribute('id')), [1])
+            
+        })
+    })
 })
