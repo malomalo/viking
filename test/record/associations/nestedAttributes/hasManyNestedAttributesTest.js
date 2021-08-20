@@ -15,8 +15,16 @@ describe('Viking.Record::Associations', () => {
             var NewTarget = Object.getPrototypeOf(this).constructor;
             return Reflect.construct(VikingRecord, arguments, NewTarget);
         }
+        
+        function Step () {
+            var NewTarget = Object.getPrototypeOf(this).constructor;
+            return Reflect.construct(VikingRecord, arguments, NewTarget);
+        }
 
-        extendClass('Phase', VikingRecord, Phase);
+        extendClass('Phase', VikingRecord, Phase, {
+            associations: [ hasMany('steps', Step) ]
+        });
+        extendClass('Step', VikingRecord, Step);
             
         describe('saving', () => {
             let model = new Requirement({id: 24});
@@ -118,15 +126,66 @@ describe('Viking.Record::Associations', () => {
             });
         })
         describe('saving deep', () => {
-            it("create", function () {});
-            it("update", function () {})
-            it("destroy", function () {});
+            let model = new Requirement({id: 24});
+            model.persist()
+        
+            let phase = new Phase({
+                name: 'Tom'
+            })
+            model.phases.add(phase)
+            
+            let step = new Step({
+                name: 'Start'
+            })
+            phase.steps.add(step)
+            
+            it("create", function (done) {
+                model.save({
+                    include: { phases: {steps: true} }
+                }).then(() => {
+                    phase = model.phases.first()
+                    step = phase.steps.first()
+                    assert.equal(phase.readAttribute('id'), 11);
+                    assert.equal(step.readAttribute('id'), 99);
+                    assert.ok(phase.isPersisted());
+                    assert.ok(step.isPersisted());
+                }).then(done, done)
+                this.withRequest('PUT', '/requirements/24', { body: {
+                    requirement: {
+                        phases_attributes: [{
+                            name: 'Tom',
+                            requirement_id: 24,
+                            steps_attributes: [{
+                                name: 'Start'
+                            }]
+                        }]
+                    }
+                }}, (xhr) => {
+                    xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Tom", "requirement_id": 24, "steps": [{"id": "99", "name": "Start"}]}]}');
+                })
+            });
+            it("update")
+            it("destroy");
         })
         
         describe('saving unloaded', () => {
-            it("create", function () {});
-            it("update", function () {})
-            it("destroy", function () {});
+            it("create", function (done) {
+                let model = new Requirement({id: 24});
+                model.persist()
+                
+                model.save({
+                    include: { phases: {steps: true} }
+                }).then(() => {
+                   assert.ok(true)
+                }).then(done, done)
+                this.withRequest('PUT', '/requirements/24', { body: {
+                    requirement: {}
+                }}, (xhr) => {
+                    xhr.respond(201, {}, '{"id": 24, "phases": []}');
+                })
+            });
+            it("update")
+            it("destroy");
         })
     });
 });
