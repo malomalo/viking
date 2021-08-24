@@ -273,13 +273,13 @@ describe('Viking.Record::associations', () => {
                 static associations = [hasOne('parent', Region, { foreignKey: 'child_id' })];
             }
         
-            var assocation = Region.reflectOnAssociation('parent');
+            var association = Region.reflectOnAssociation('parent');
 
-            assert.strictEqual(assocation.model, Region);
-            assert.equal(assocation.name, 'parent');
-            assert.equal(assocation.macro, 'hasOne');
-            assert.equal(assocation.foreignKey(), 'child_id');
-            assert.deepEqual(assocation.options, { foreignKey: 'child_id' });
+            assert.strictEqual(association.model, Region);
+            assert.equal(association.name, 'parent');
+            assert.equal(association.macro, 'hasOne');
+            assert.equal(association.foreignKey(), 'child_id');
+            assert.deepEqual(association.options, { foreignKey: 'child_id' });
         });
     });
 });
