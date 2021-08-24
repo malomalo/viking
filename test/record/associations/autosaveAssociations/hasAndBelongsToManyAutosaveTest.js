@@ -4,129 +4,138 @@ import VikingRecord from 'viking/record';
 import { hasAndBelongsToMany } from 'viking/record/associations';
 import {extendClass} from 'viking/support/class';
 
-describe('Viking.Record::Associations', () => {
-
-    describe('hasAndBelongsToMany NestedAttributes', () => {
-        class Requirement extends VikingRecord {
-            static associations = [ hasAndBelongsToMany('phases', Phase) ]
-        }
-
-        function Phase () {
-            var NewTarget = Object.getPrototypeOf(this).constructor;
-            return Reflect.construct(VikingRecord, arguments, NewTarget);
-        }
-
-        extendClass('Phase', VikingRecord, Phase);
-            
-        describe('saving', () => {
-            let model = new Requirement({id: 24});
-            model.persist()
+describe('Viking.Record HasAndBelongsToManyAssociation autosave', () => {
+    
+    class Phase extends VikingRecord {
         
-            let phase = new Phase({
-                name: 'Tom'
+    }
+
+    class Requirement extends VikingRecord {
+        static associations = [ hasAndBelongsToMany('phases', Phase) ]
+    }
+
+    describe('on a persisted record', () => {
+        it('creates the subresource', function (done) {
+            let model = Requirement.instantiate({id: 24});
+            let phase = new Phase({ name: 'Tom' });
+            model.phases.push(phase);
+            
+            assert.ok(phase.isNewRecord())
+            model.save().then(() => {
+                assert.ok(phase.isPersisted());
+                assert.equal(phase.readAttribute('id'), 11);
+            }).then(done, done);
+            
+            this.withRequest('PUT', '/requirements/24', { body: {
+                requirement: {
+                    phases_attributes: [{
+                        name: 'Tom'
+                    }]
+                }
+            }}, (xhr) => {
+                xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Tom"}]}');
             })
-            model.phases.add(phase)
+        });
         
-            it("create", function (done) {
-                assert.ok(phase.isNewRecord())
-                model.save({
-                    include: { phases: true }
-                }).then(() => {
-                    phase = model.phases.first()
-                    assert.equal(phase.readAttribute('id'), 11);
-                    assert.ok(phase.isPersisted());
-                }).then(done, done)
-                this.withRequest('PUT', '/requirements/24', { body: {
-                    requirement: {
-                        phases_attributes: [{
-                            name: 'Tom',
-                            requirement_id: 24
-                        }]
-                    }
-                }}, (xhr) => {
-                    xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Tom"}]}');
-                })
-            });
-        
-            it("update", function (done) {
-                model.phases.loaded = true;
-                phase.setAttribute('id', 11);
-                phase.persist();
+        it('updates the subresource', function (done) {
+            let model = Requirement.instantiate({id: 24, phases: [{ id: 11, name: 'Tom' }]});
+            let phase = model.phases.first();
             
-                phase.setAttribute('name', 'Jerry')
-                assert.deepEqual(phase.changes(), {name: ['Tom', 'Jerry']})
-                model.save({
-                    include: { phases: {} }
-                }).then(() => {
-                    assert.deepEqual(phase.changes(), {})
-                }).then(done, done)
-            
-                this.withRequest('PUT', '/requirements/24', { body: {
-                    requirement: {
-                        phases_attributes: [{
-                            name: 'Jerry',
-                            id: 11
-                        }]
-                    }
-                }}, (xhr) => {
-                    xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Jerry"}]}');
-                })
-            })
+            phase.setAttribute('name', 'Jerry');
+            assert.deepEqual(phase.changes(), {name: ['Tom', 'Jerry']})
+            model.save().then(() => {
+                assert.equal(phase.readAttribute('name'), 'Jerry');
+                assert.deepEqual(phase.changes(), {});
+            }).then(done, done);
 
-            it("unchanged", function (done) {
-                model.phases.loaded = true;
-                phase.setAttribute('id', 11);
-                phase.persist();
-                
-                model.save({
-                    include: { phases: true }
-                }).then(() => {
-                    assert.ok(true);
-                }).then(done, done)
-                this.withRequest('PUT', '/requirements/24', { body: {
-                    requirement: {}
-                }}, (xhr) => {
-                    xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Tom", "requirement_id": 24}]}');
-                })
+            this.withRequest('PUT', '/requirements/24', { body: {
+                requirement: {
+                    phases_attributes: [{
+                        name: 'Jerry',
+                        id: 11
+                    }]
+                }
+            }}, (xhr) => {
+                xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Jerry"}]}');
             });
-        
-            it("destroy", function (done) {
-                model.phases.loaded = true;
-                phase.setAttribute('id', 11);
-                phase.persist();
-            
-            
-                model.phases.remove(phase).then(() => {
-                    model.save({
-                        include: { phases: {} }
-                    }).then(() => {
-                        assert.ok(true)
-                    }).then(done, done)
-            
-                    this.withRequest('PUT', '/requirements/24', { body: {
-                        requirement: {
-                            phases_attributes: [{
-                                _destroyed: true,
-                                id: 11
-                            }]
-                        }
-                    }}, (xhr) => {
-                        xhr.respond(201, {}, '{"id": 24, "phases": []}');
-                    })
-                })
-            
+        });
+
+        it('does nothing with unchanged subresources', function (done) {
+            let model = Requirement.instantiate({id: 24, phases: [{ id: 11, name: 'Tom' }]});
+            let phase = model.phases.first();
+
+            model.setAttribute('planet', 'Venus');
+            model.save().then(() => assert.ok(true)).then(done, done);
+
+            this.withRequest('PUT', '/requirements/24', { body: {
+                requirement: { planet: 'Venus' }
+            }}, (xhr) => {
+                xhr.respond(201, {}, '{"id": 24, "planet": "Venus"}');
             });
-        })
-        describe('saving deep', () => {
-            it("create", function () {});
-            it("update", function () {})
-            it("destroy", function () {});
-        })
+        });
+
+        it('removes the relation', function (done) {
+            let model = Requirement.instantiate({id: 24, phases: [{ id: 11, name: 'Tom' }]});
+            let phase = model.phases.first();
+
+            phase.setAttribute('name', 'Jerry');
+            model.phases = [];
+
+            model.save().then(() => assert.ok(true)).then(done, done);
+
+            this.withRequest('PUT', '/requirements/24', { body: {
+                requirement: { phases_attributes: [] }
+            }}, (xhr) => {
+                xhr.respond(201, {}, '{"id": 24, "phases": []}');
+            });
+        });
+    });
+
+    describe('on a new record', () => {
+        it('creates the subresource', function (done) {
+            let model = new Requirement();
+            let phase = new Phase({name: 'Tom'});
+            model.phases.push(phase);
+            
+            assert.ok(phase.isNewRecord())
+            model.save().then(() => {
+                assert.ok(phase.isPersisted());
+                assert.equal(phase.readAttribute('id'), 11);
+            }).then(done, done);
+            
+            this.withRequest('POST', '/requirements', { body: {
+                requirement: {
+                    phases_attributes: [{
+                        name: 'Tom'
+                    }]
+                }
+            }}, (xhr) => {
+                xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Tom"}]}');
+            })
+        });
         
-        describe('saving unloaded', () => {
-            it("create", function () {});
-            it("update", function () {})
-            it("destroy", function () {});
-        })
+        it('updates the subresource', function (done) {
+            let model = new Requirement();
+            let phase = Phase.instantiate({ id: 11, name: 'Tom' });
+            model.phases.push(phase);
+
+            phase.setAttribute('name', 'Jerry');
+            assert.deepEqual(phase.changes(), {name: ['Tom', 'Jerry']})
+            model.save().then(() => {
+                assert.equal(phase.readAttribute('name'), 'Jerry');
+                assert.deepEqual(phase.changes(), {});
+            }).then(done, done);
+
+            this.withRequest('POST', '/requirements', { body: {
+                requirement: {
+                    phases_attributes: [{
+                        name: 'Jerry',
+                        id: 11
+                    }]
+                }
+            }}, (xhr) => {
+                xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Jerry"}]}');
+            });
+        });
     });
 });

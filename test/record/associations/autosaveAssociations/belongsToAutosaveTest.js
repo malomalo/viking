@@ -23,7 +23,6 @@ describe('Viking.Record belongsToAssociations autosave', () => {
             
             assert.ok(phase.isNewRecord())
             model.save().then(() => {
-                // phase = model.phase;
                 assert.equal(phase.readAttribute('id'), 11);
                 assert.ok(phase.isPersisted());
             }).then(done, done);
