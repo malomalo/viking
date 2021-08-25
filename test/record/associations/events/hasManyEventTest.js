@@ -102,7 +102,7 @@ describe('Viking.Record::Associations', () => {
             model.parents = []
         })
         
-        it("loading fires load event", function (done) {
+        it("loading fires afterLoad event", function (done) {
             let model = new Model({id: 24});
             
             model.association('parents').addEventListener('afterLoad', records => {
@@ -115,21 +115,20 @@ describe('Viking.Record::Associations', () => {
             });
         })
         
-        it("loading doesnt fire load event if loaded", function(done) {
+        it("loading doesnt fire afterLoad event if loaded", function(done) {
             let model = new Model({id: 24});
             let counter = 0
             
             model.association('parents').addEventListener('afterLoad', records => {
                 counter += 1
-                assert.equal(1, counter)
-            })
+            });
             
             model.association('parents').load().then(() => {
-                model.association('parents').load().then(x => done(), x => done())
-                this.withRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}} }, (xhr) => {
-                    xhr.respond(200, {}, '[{"id": 2, "name": "Viking"}]');
-                });
-            })
+                model.association('parents').load().then(r => {
+                    assert.equal(1, counter);
+                }).then(done, done);
+            });
+            
             this.withRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}} }, (xhr) => {
                 xhr.respond(200, {}, '[{"id": 2, "name": "Viking"}]');
             });
