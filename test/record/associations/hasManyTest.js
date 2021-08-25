@@ -312,12 +312,12 @@ describe('Viking.Record::associations', () => {
     // // test("::new('children', { modelName: 'Region' })", function () {
     // //     let Region = Viking.Model.extend();
     // //     Viking.context['Region'] = Region;
-    // //     var assocation = new Viking.Model.BelongsToReflection('parent', { modelName: 'Region' });
+    // //     var association = new Viking.Model.BelongsToReflection('parent', { modelName: 'Region' });
 
-    // //     assert.equal(assocation.name, 'parent');
-    // //     assert.equal(assocation.macro, 'belongsTo');
-    // //     assert.deepEqual(assocation.options, { modelName: 'Region' });
-    // //     assert.deepEqual(assocation.modelName, new Viking.Model.Name('Region'));
+    // //     assert.equal(association.name, 'parent');
+    // //     assert.equal(association.macro, 'belongsTo');
+    // //     assert.deepEqual(association.options, { modelName: 'Region' });
+    // //     assert.deepEqual(association.modelName, new Viking.Model.Name('Region'));
 
     // //     delete Viking.context['Region'];
     // // });
@@ -325,11 +325,11 @@ describe('Viking.Record::associations', () => {
     // // test("::new('subject', {polymorphic: true})", function () {
     // //     let Photo = Viking.Model.extend();
     // //     Viking.context['Photo'] = Photo;
-    // //     var assocation = new Viking.Model.BelongsToReflection('subject', { polymorphic: true });
-    // //     assert.equal(assocation.macro, 'belongsTo');
-    // //     assert.equal(assocation.name, 'subject');
-    // //     assert.deepEqual(assocation.options, { polymorphic: true });
-    // //     assert.equal(assocation.modelName, undefined);
+    // //     var association = new Viking.Model.BelongsToReflection('subject', { polymorphic: true });
+    // //     assert.equal(association.macro, 'belongsTo');
+    // //     assert.equal(association.name, 'subject');
+    // //     assert.deepEqual(association.options, { polymorphic: true });
+    // //     assert.equal(association.modelName, undefined);
 
     // //     delete Viking.context['Photo'];
     // // });

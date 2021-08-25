@@ -54,7 +54,6 @@ describe('Viking.Record::associations', () => {
                 let parents = [new Parent(), new Parent()];
                 model.parents = parents;
 
-                parents.forEach((m) => { assert.equal(m.readAttribute('model_id'), 13); });
                 assert.ok(model._associations.parents.loaded);
                 assert.deepStrictEqual(model._associations.parents.target, parents);
                 let models = await model.parents.toArray();

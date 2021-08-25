@@ -3,7 +3,7 @@ import 'mocha';
 import VikingRecord from 'viking/record';
 import { hasAndBelongsToMany } from 'viking/record/associations';
 
-describe('Viking.Record::ssociations', () => {
+describe('Viking.Record::Associations', () => {
 
     describe('HasAndBelongsTo Events', () => {
         class Parent extends VikingRecord { }
@@ -69,26 +69,23 @@ describe('Viking.Record::ssociations', () => {
             });
         })
         
-        it("loading doesnt fire load event if afterLoad", function(done) {
+        it("loading doesnt fire afterLoad event if loaded", function(done) {
             let model = new Model({id: 24});
-            let counter = 0
+            let counter = 0;
             
             model.association('parents').addEventListener('afterLoad', record => {
                 counter += 1
-                assert.equal(1, counter)
-            })
+            });
             
             model.association('parents').load().then(() => {
-                model.association('parents').load().then(() => done(), x => done())
-                this.withRequest('GET', '/parents', { params: {where: {models_parents:{model_id: 24}}, order: {id: 'desc'} }}, (xhr) => {
-                    xhr.respond(200, {}, '[{"id": 2, "name": "Viking"}]');
-                });
-            })
+                model.association('parents').load().then(r => {
+                    assert.equal(1, counter);
+                }).then(done, done);
+            });
+
             this.withRequest('GET', '/parents', { params: {where: {models_parents:{model_id: 24}}, order: {id: 'desc'} }}, (xhr) => {
                 xhr.respond(200, {}, '[{"id": 2, "name": "Viking"}]');
             });
-            
-            
         })
         
         it("loading fires afterAdd event", function(done) {
