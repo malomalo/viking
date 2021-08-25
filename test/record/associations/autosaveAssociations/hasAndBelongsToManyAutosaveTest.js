@@ -137,5 +137,26 @@ describe('Viking.Record HasAndBelongsToManyAssociation autosave', () => {
                 xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Jerry"}]}');
             });
         });
+        
+        it('adds unchanged subresource', function (done) {
+            let model = new Requirement({
+                phases: [Phase.instantiate({ id: 11, name: 'Tom' })]
+            });
+
+            model.save().then(() => {
+                const phase = model.phases.first()
+                assert.equal(phase.readAttribute('name'), 'Tom');
+            }).then(done, done);
+
+            this.withRequest('POST', '/requirements', { body: {
+                requirement: {
+                    phases_attributes: [{
+                        id: 11
+                    }]
+                }
+            }}, (xhr) => {
+                xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Tom"}]}');
+            });
+        });
     });
 });
