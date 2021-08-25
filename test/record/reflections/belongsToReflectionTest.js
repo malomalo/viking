@@ -2,12 +2,12 @@
 //     let Parent = Viking.Model.extend();
 //     Viking.context['Parent'] = Parent;
 
-//     var assocation = new Viking.Model.BelongsToReflection('parent');
+//     var association = new Viking.Model.BelongsToReflection('parent');
 
-//     assert.equal(assocation.name, 'parent');
-//     assert.equal(assocation.macro, 'belongsTo');
-//     assert.deepEqual(assocation.options, {});
-//     assert.propEqual(_.omit(assocation.modelName, 'model'), {
+//     assert.equal(association.name, 'parent');
+//     assert.equal(association.macro, 'belongsTo');
+//     assert.deepEqual(association.options, {});
+//     assert.propEqual(_.omit(association.modelName, 'model'), {
 //         name: 'Parent',
 //         element: 'parent',
 //         human: 'Parent',
@@ -26,12 +26,12 @@
 // test("::new('children', { modelName: 'Region' })", function () {
 //     let Region = Viking.Model.extend();
 //     Viking.context['Region'] = Region;
-//     var assocation = new Viking.Model.BelongsToReflection('parent', { modelName: 'Region' });
+//     var association = new Viking.Model.BelongsToReflection('parent', { modelName: 'Region' });
 
-//     assert.equal(assocation.name, 'parent');
-//     assert.equal(assocation.macro, 'belongsTo');
-//     assert.deepEqual(assocation.options, { modelName: 'Region' });
-//     assert.deepEqual(assocation.modelName, new Viking.Model.Name('Region'));
+//     assert.equal(association.name, 'parent');
+//     assert.equal(association.macro, 'belongsTo');
+//     assert.deepEqual(association.options, { modelName: 'Region' });
+//     assert.deepEqual(association.modelName, new Viking.Model.Name('Region'));
 
 //     delete Viking.context['Region'];
 // });
@@ -39,11 +39,11 @@
 // test("::new('subject', {polymorphic: true})", function () {
 //     let Photo = Viking.Model.extend();
 //     Viking.context['Photo'] = Photo;
-//     var assocation = new Viking.Model.BelongsToReflection('subject', { polymorphic: true });
-//     assert.equal(assocation.macro, 'belongsTo');
-//     assert.equal(assocation.name, 'subject');
-//     assert.deepEqual(assocation.options, { polymorphic: true });
-//     assert.equal(assocation.modelName, undefined);
+//     var association = new Viking.Model.BelongsToReflection('subject', { polymorphic: true });
+//     assert.equal(association.macro, 'belongsTo');
+//     assert.equal(association.name, 'subject');
+//     assert.deepEqual(association.options, { polymorphic: true });
+//     assert.equal(association.modelName, undefined);
 
 //     delete Viking.context['Photo'];
 // });
@@ -55,11 +55,11 @@
 //     Viking.context['Child'] = Child;
 //     Viking.context['MultiWord'] = MultiWord;
 
-//     var assocation = new Viking.Model.BelongsToReflection('child');
-//     assert.equal(assocation.klass(), Child);
+//     var association = new Viking.Model.BelongsToReflection('child');
+//     assert.equal(association.klass(), Child);
 
-//     var assocation = new Viking.Model.BelongsToReflection('multi_word');
-//     assert.equal(assocation.klass(), MultiWord);
+//     var association = new Viking.Model.BelongsToReflection('multi_word');
+//     assert.equal(association.klass(), MultiWord);
 
 //     delete Viking.context['Child'];
 //     delete Viking.context['MultiWord'];
@@ -70,8 +70,8 @@
 
 //     Viking.context['Child'] = Child;
 
-//     var assocation = new Viking.Model.BelongsToReflection('child');
-//     assert.equal(assocation.model(), Child);
+//     var association = new Viking.Model.BelongsToReflection('child');
+//     assert.equal(association.model(), Child);
 
 //     delete Viking.context['Child'];
 // });
