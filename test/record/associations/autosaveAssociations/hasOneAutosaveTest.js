@@ -26,9 +26,7 @@ describe('Viking.Record hasOneAssociations autosave', () => {
             
             this.withRequest('PUT', '/requirements/24', { body: {
                 requirement: {
-                    phase_attributes: {
-                        name: 'Tom'
-                    }
+                    phase: { name: 'Tom' }
                 }
             }}, (xhr) => {
                 xhr.respond(201, {}, '{"id": 24, "phase": {"id": "11", "name": "Tom"}}');
@@ -49,10 +47,7 @@ describe('Viking.Record hasOneAssociations autosave', () => {
 
             this.withRequest('PUT', '/requirements/24', { body: {
                 requirement: {
-                    phase_attributes: {
-                        name: 'Jerry',
-                        id: 11
-                    }
+                    phase: { name: 'Jerry', id: 11 }
                 }
             }}, (xhr) => {
                 xhr.respond(201, {}, '{"id": 24, "phase": {"id": "11", "name": "Jerry"}}');
@@ -83,7 +78,7 @@ describe('Viking.Record hasOneAssociations autosave', () => {
             model.save().then(() => assert.ok(true)).then(done, done);
 
             this.withRequest('PUT', '/requirements/24', { body: {
-                requirement: { phase_attributes: null }
+                requirement: { phase: null }
             }}, (xhr) => {
                 xhr.respond(201, {}, '{"id": 24, "phase": null}');
             });
@@ -104,9 +99,7 @@ describe('Viking.Record hasOneAssociations autosave', () => {
 
             this.withRequest('POST', '/requirements', { body: {
                 requirement: {
-                    phase_attributes: {
-                        name: 'Tom'
-                    }
+                    phase: { name: 'Tom' }
                 }
             }}, (xhr) => {
                 xhr.respond(201, {}, '{"id": 24, "phase": {"id": "11", "name": "Tom"}}');
@@ -127,10 +120,7 @@ describe('Viking.Record hasOneAssociations autosave', () => {
 
             this.withRequest('POST', '/requirements', { body: {
                 requirement: {
-                    phase_attributes: {
-                        name: 'Jerry',
-                        id: 11
-                    }
+                    phase: { name: 'Jerry', id: 11 }
                 }
             }}, (xhr) => {
                 xhr.respond(201, {}, '{"id": 24, "phase": {"id": "11", "name": "Jerry"}}');
@@ -149,7 +139,7 @@ describe('Viking.Record hasOneAssociations autosave', () => {
             }).then(done, done);
 
             this.withRequest('POST', '/requirements', { body: {
-                requirement: { planet: 'Venus', phase_attributes: { id: 11} }
+                requirement: { planet: 'Venus', phase: { id: 11 } }
             }}, (xhr) => {
                 xhr.respond(201, {}, '{"id": 24, "planet": "Venus", "phase": { "id": 11, "requirement_id": 24 }}');
             });

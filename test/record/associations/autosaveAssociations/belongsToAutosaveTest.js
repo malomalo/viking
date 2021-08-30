@@ -28,11 +28,7 @@ describe('Viking.Record belongsToAssociations autosave', () => {
             }).then(done, done);
             
             this.withRequest('PUT', '/requirements/24', { body: {
-                requirement: {
-                    phase_attributes: {
-                        name: 'Tom'
-                    }
-                }
+                requirement: { phase: { name: 'Tom' } }
             }}, (xhr) => {
                 xhr.respond(201, {}, '{"id": 24, "phase": {"id": "11", "name": "Tom"}}');
             })
@@ -51,12 +47,7 @@ describe('Viking.Record belongsToAssociations autosave', () => {
             }).then(done, done);
 
             this.withRequest('PUT', '/requirements/24', { body: {
-                requirement: {
-                    phase_attributes: {
-                        name: 'Jerry',
-                        id: 11
-                    }
-                }
+                requirement: { phase: { name: 'Jerry', id: 11 } }
             }}, (xhr) => {
                 xhr.respond(201, {}, '{"id": 24, "phase": {"id": "11", "name": "Jerry"}}');
             });
@@ -108,11 +99,7 @@ describe('Viking.Record belongsToAssociations autosave', () => {
             }).then(done, done);
             
             this.withRequest('POST', '/requirements', { body: {
-                requirement: {
-                    phase_attributes: {
-                        name: 'Tom'
-                    }
-                }
+                requirement: { phase: { name: 'Tom' } }
             }}, (xhr) => {
                 xhr.respond(201, {}, '{"id": 24, "phase": {"id": "11", "name": "Tom"}}');
             })
@@ -131,13 +118,7 @@ describe('Viking.Record belongsToAssociations autosave', () => {
             }).then(done, done);
 
             this.withRequest('POST', '/requirements', { body: {
-                requirement: {
-                    phase_id: 11,
-                    phase_attributes: {
-                        name: 'Jerry',
-                        id: 11
-                    }
-                }
+                requirement: { phase_id: 11, phase: { name: 'Jerry', id: 11 } }
             }}, (xhr) => {
                 xhr.respond(201, {}, '{"id": 24, "phase": {"id": "11", "name": "Jerry"}}');
             });

@@ -25,10 +25,7 @@ describe('Viking.Record HasManyAssociation autosave', () => {
             
             this.withRequest('PUT', '/requirements/24', { body: {
                 requirement: {
-                    phases_attributes: [{
-                        name: 'Tom',
-                        requirement_id: 24
-                    }]
+                    phases: [{ name: 'Tom', requirement_id: 24 }]
                 }
             }}, (xhr) => {
                 xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Tom", "requirement_id": 24}]}');
@@ -48,10 +45,7 @@ describe('Viking.Record HasManyAssociation autosave', () => {
 
             this.withRequest('PUT', '/requirements/24', { body: {
                 requirement: {
-                    phases_attributes: [{
-                        name: 'Jerry',
-                        id: 11
-                    }]
+                    phases: [{ name: 'Jerry', id: 11 }]
                 }
             }}, (xhr) => {
                 xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Jerry", "requirement_id": 24}]}');
@@ -82,7 +76,7 @@ describe('Viking.Record HasManyAssociation autosave', () => {
             model.save().then(() => assert.ok(true)).then(done, done);
 
             this.withRequest('PUT', '/requirements/24', { body: {
-                requirement: { phases_attributes: [] }
+                requirement: { phases: [] }
             }}, (xhr) => {
                 xhr.respond(201, {}, '{"id": 24, "phases": []}');
             });
@@ -103,9 +97,7 @@ describe('Viking.Record HasManyAssociation autosave', () => {
 
             this.withRequest('POST', '/requirements', { body: {
                 requirement: {
-                    phases_attributes: [{
-                        name: 'Tom'
-                    }]
+                    phases: [{ name: 'Tom' }]
                 }
             }}, (xhr) => {
                 xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Tom", "requirement_id": 24}]}');
@@ -126,10 +118,7 @@ describe('Viking.Record HasManyAssociation autosave', () => {
 
             this.withRequest('POST', '/requirements', { body: {
                 requirement: {
-                    phases_attributes: [{
-                        name: 'Jerry',
-                        id: 11
-                    }]
+                    phases: [{ name: 'Jerry', id: 11 }]
                 }
             }}, (xhr) => {
                 xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Jerry", "requirement_id": 24}]}');
