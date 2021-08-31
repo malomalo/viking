@@ -84,6 +84,23 @@ describe('Viking.Record HasAndBelongsToManyAssociation autosave', () => {
                 xhr.respond(201, {}, '{"id": 24, "phases": []}');
             });
         });
+        
+        it('adds unchanged subresource', function (done) {
+            let phase = Phase.instantiate({ id: 11, name: 'Tom' });
+            let model = Requirement.instantiate({ id: 24 });
+            model.phases = [phase];
+
+            model.save().then(() => {
+                assert.deepEqual({}, phase.changes());
+                assert.equal(phase.readAttribute('name'), 'Tim');
+            }).then(done, done);
+
+            this.withRequest('PUT', '/requirements/24', { body: {
+                requirement: { phases: [{ id: 11 }] }
+            }}, (xhr) => {
+                xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Tim"}]}');
+            });
+        });
     });
 
     describe('on a new record', () => {
@@ -123,6 +140,21 @@ describe('Viking.Record HasAndBelongsToManyAssociation autosave', () => {
                 }
             }}, (xhr) => {
                 xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Jerry"}]}');
+            });
+        });
+        
+        it('adds unchanged subresource', function (done) {
+            let phase = Phase.instantiate({ id: 11, name: 'Tom' });
+            let model = new Requirement({ phases: [phase] });
+
+            model.save().then(() => {
+                assert.deepEqual({}, phase.changes());
+            }).then(done, done);
+
+            this.withRequest('POST', '/requirements', { body: {
+                requirement: { phases: [{ id: 11 }] }
+            }}, (xhr) => {
+                xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Tom"}]}');
             });
         });
     });
