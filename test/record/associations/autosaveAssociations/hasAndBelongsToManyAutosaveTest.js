@@ -144,15 +144,21 @@ describe('Viking.Record HasAndBelongsToManyAssociation autosave', () => {
         });
         
         it('adds unchanged subresource', function (done) {
+            let model = new Requirement({
             let phase = Phase.instantiate({ id: 11, name: 'Tom' });
             let model = new Requirement({ phases: [phase] });
 
             model.save().then(() => {
                 assert.deepEqual({}, phase.changes());
+                assert.equal(phase.readAttribute('name'), 'Tom');
             }).then(done, done);
 
             this.withRequest('POST', '/requirements', { body: {
                 requirement: { phases: [{ id: 11 }] }
+                    phases_attributes: [{
+                        id: 11
+                    }]
+                }
             }}, (xhr) => {
                 xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Tom"}]}');
             });
