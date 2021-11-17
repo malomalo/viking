@@ -17,6 +17,14 @@ describe('Viking.Record.Types', () => {
             assert.equal(FloatType.load(' '),   null);
             assert.equal(FloatType.load(''),    null);
         });
+        
+        it("::load coerces null to null", () => {
+            assert.equal(FloatType.load(null), 	null);
+        });
+        
+        it("::load coerces undefined to undefined", () => {
+            assert.equal(FloatType.load(undefined), 	undefined);
+        });
 
         it("::dump coerces number to number", () => {
             assert.equal(FloatType.dump(10.5),  10.5);

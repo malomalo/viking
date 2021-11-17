@@ -149,6 +149,7 @@ describe('Viking.Record HasAndBelongsToManyAssociation autosave', () => {
 
             model.save().then(() => {
                 assert.deepEqual({}, phase.changes());
+                assert.equal(phase.readAttribute('name'), 'Tom');
             }).then(done, done);
 
             this.withRequest('POST', '/requirements', { body: {
