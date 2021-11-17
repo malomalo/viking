@@ -19,6 +19,14 @@ describe('Viking.Record.Types', () => {
             assert.equal(IntegerType.load(' '),   	null);
             assert.equal(IntegerType.load(''), 	null);
         });
+        
+        it("::load coerces null to null", () => {
+            assert.equal(IntegerType.load(null), 	null);
+        });
+        
+        it("::load coerces undefined to undefined", () => {
+            assert.equal(IntegerType.load(undefined), 	undefined);
+        });
 
         it("::dump coerces number to number", () => {
             assert.equal(IntegerType.dump(10),     10);
@@ -27,7 +35,6 @@ describe('Viking.Record.Types', () => {
 
         it("::dump coerces null to null", () => {
             assert.equal(IntegerType.dump(null),   null);
-            assert.equal(IntegerType.dump(null), null);
         });
 
     });
