@@ -112,11 +112,13 @@ describe('Viking.Record::Associations', () => {
         it("loading fires afterAdd event", function(done) {
             let model = new Model({parent_id: 24});
             
-            model.association('parent').addEventListener('afterAdd', record => {
+            model.association('parent').addEventListener('afterAdd', async record => {
                 assert.equal(record.readAttribute('id'), 24)
+                assert.equal(model.parent.readAttribute('id'), 24)
+                done()
             })
             
-            model.association('parent').load().then(() => {done()}, () => {done()});
+            model.association('parent').load();
             this.withRequest('GET', '/parents', { params: {where: {id: 24}, order: {id: 'desc'}, limit: 1} }, (xhr) => {
                 xhr.respond(200, {}, '[{"id": 24, "name": "Viking"}]');
             });
