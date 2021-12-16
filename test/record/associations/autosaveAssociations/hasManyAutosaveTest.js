@@ -40,6 +40,7 @@ describe('Viking.Record HasManyAssociation autosave', () => {
             assert.deepEqual(phase.changes(), {name: ['Tom', 'Jerry']})
             model.save().then(() => {
                 assert.equal(phase.readAttribute('name'), 'Jerry');
+                assert.ok(!phase.needsSaved())
                 assert.deepEqual(phase.changes(), {});
             }).then(done, done);
 

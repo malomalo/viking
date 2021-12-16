@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import 'mocha';
 import VikingRecord from 'viking/record';
-import { hasAndBelongsToMany } from 'viking/record/associations';
+import { hasAndBelongsToMany, belongsTo } from 'viking/record/associations';
 import {extendClass} from 'viking/support/class';
 
 describe('Viking.Record HasAndBelongsToManyAssociation autosave', () => {
@@ -12,6 +12,10 @@ describe('Viking.Record HasAndBelongsToManyAssociation autosave', () => {
 
     class Requirement extends VikingRecord {
         static associations = [ hasAndBelongsToMany('phases', Phase) ]
+    }
+    
+    class Constraint extends VikingRecord {
+        static associations = [belongsTo('requirement', Requirement)]
     }
 
     describe('on a persisted record', () => {
@@ -156,6 +160,27 @@ describe('Viking.Record HasAndBelongsToManyAssociation autosave', () => {
                 requirement: { phases: [{ id: 11 }] }
             }}, (xhr) => {
                 xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Tom"}]}');
+            });
+        });
+    });
+    
+    describe('on a parent record', () => {
+        it('adds unchanged subresource', function (done) {
+            let phase = Phase.instantiate({ id: 11, name: 'Tom' });
+            let requirement = new Requirement({ phases: [phase] });
+            let constraint = new Constraint({requirement: requirement})
+
+            constraint.save().then(() => {
+                assert.deepEqual({}, phase.changes());
+                assert.equal(phase.readAttribute('name'), 'Tom');
+            }).then(done, done);
+
+            this.withRequest('POST', '/constraints', { body: {
+                constraint: {
+                    requirement: { phases: [{ id: 11 }] }
+                }
+            }}, (xhr) => {
+                xhr.respond(201, {}, '{"id": 24, "requirement": {"id": 7, "phases": [{"id": "11", "name": "Tom"}]}}');
             });
         });
     });
