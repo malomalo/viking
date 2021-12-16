@@ -66,7 +66,7 @@ describe('Viking.Record::associations', () => {
         describe('addBang', () => {
             it('sends request', function () {
                 let model = new Model({id: 24})
-                let parent = new Parent({id: 11})
+                let parent = Parent.instantiate({id: 11})
                 model.association('parents').addBang(parent)
         
                 assert.equal(this.requests[0].url, 'http://example.com/models/24/parents/11')
@@ -101,7 +101,7 @@ describe('Viking.Record::associations', () => {
             
             it('doesnt update target when not loaded', function (done) {
                 let model = new Model({id: 24})
-                let parent1 = new Parent({id: 11})
+                let parent1 = Parent.instantiate({id: 11})
                 
                 model.association('parents').addBang(parent1).then(() => {
                     assert.deepStrictEqual(model.parents.target, [])
@@ -110,6 +110,23 @@ describe('Viking.Record::associations', () => {
         
                 this.withRequest('POST', '/models/24/parents/11', {}, (xhr) => {
                     xhr.respond(201, {}, null);
+                });
+            })
+            
+            it('creates target', function (done) {
+                let model = new Model({id: 24})
+                let parent = new Parent({name: 'Tim Smith'})
+
+                model.parents.addBang(parent).then(() => {
+                    assert.equal(parent.readAttribute('model_id'), 24)
+                    assert.equal(parent.readAttribute('name'), 'Tim Smith Modified')
+                    done()
+                }, done)
+            
+                this.withRequest('POST', '/models/24/parents', {
+                    name: 'Tim Smith'
+                }, (xhr) => {
+                    xhr.respond(201, {}, '{"id": 1, "name": "Tim Smith Modified", "model_id": 24}');
                 });
             })
         })
