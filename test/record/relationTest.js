@@ -69,6 +69,76 @@ describe('Viking.Relation', () => {
                 xhr.respond(200, {}, '[{"id": 1}]');
             });
         })
+
+        
+        describe('changed', function () {
+            it('*', function (done) {
+                const relation = Model.where({parent_id: 11})
+
+                relation.addEventListener('changed', (attribute, newValue) => {
+                    assert.equal('limit', attribute);
+                    assert.equal(11, newValue);
+                    done()
+                });
+            
+                relation.setLimit(11);
+            })
+        
+            it('changed:limit', function (done) {
+                const relation = Model.where({parent_id: 11})
+
+                relation.addEventListener('changed:limit', (newValue) => {
+                    assert.equal(11, newValue);
+                    done()
+                });
+            
+                relation.setLimit(11);
+            })
+            
+            it('changed:offset', function (done) {
+                const relation = Model.where({parent_id: 11})
+
+                relation.addEventListener('changed:offset', (newValue) => {
+                    assert.equal(2, newValue);
+                    done()
+                });
+            
+                relation.setOffset(2);
+            })
+            
+            it('changed:order', function (done) {
+                const relation = Model.where({parent_id: 11})
+
+                relation.addEventListener('changed:order', (newValue) => {
+                    assert.deepEqual(newValue, {timestamp: 'desc'});
+                    done()
+                });
+            
+                relation.setOrder({timestamp: 'desc'});
+            })
+            
+            it('changed:where', function (done) {
+                const relation = Model.where({parent_id: 11})
+
+                relation.addEventListener('changed:where', (newValue) => {
+                    assert.deepEqual(newValue, {created_on: {gt: '2020-01-01'}});
+                    done()
+                });
+            
+                relation.setWhere({created_on: {gt: '2020-01-01'}});
+            })
+            
+            it('changed:distinct', function (done) {
+                const relation = Model.where({parent_id: 11})
+
+                relation.addEventListener('changed:distinct', (newValue) => {
+                    assert.equal(newValue, true);
+                    done()
+                });
+            
+                relation.setDistinct();
+            })
+        })
     })
     
     describe('order', () => {
