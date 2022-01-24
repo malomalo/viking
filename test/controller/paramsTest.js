@@ -25,12 +25,34 @@ describe('Viking.Controller', () => {
                     }
                 };
             }
-          
+
             this.router = new Router();
             this.router.start()
             this.router.navigateTo('/projects', {
                 counter: 2,
                 other: 'parameter'
+            })
+        });
+        
+        it('params from route are present in params', function () {
+            class Controller extends VController {
+                show () {
+                    assert.equal(this.params.project_id, '999-9999-9999');
+                    assert.equal(this.params.foo, 'hello');
+                }
+            }
+            class Router extends VikingRouter {
+                static routes = {
+                    '/projects/:project_id': {
+                        to: [Controller, 'show']
+                    }
+                };
+            }
+          
+            this.router = new Router();
+            this.router.start()
+            this.router.navigateTo('/projects/999-9999-9999', {
+                foo: 'hello'
             })
         });
 
