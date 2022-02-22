@@ -230,6 +230,26 @@ describe('Viking.Record::associations', () => {
                 // TODO
             })
         })
+        
+        describe('remove', () => {
+            it('same record', async () => {
+                let parent = new Parent({id: 11})
+                let model = new Model({id: 24, parents: [parent]})
+                
+                await model.parents.remove(parent);
+                assert.deepEqual(model.parents.target, []);
+            })
+        
+            it('clone of record', async () => {
+                let parent = new Parent({id: 11})
+                let model = new Model({id: 24, parents: [parent]})
+                
+                let parentClone = parent.clone()
+                await model.parents.remove(parentClone);
+                assert.deepEqual(model.parents.target, []);
+            })
+        })
+        
     });
     
     describe('hasMany(Parent, scope)', () => {
