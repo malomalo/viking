@@ -62,9 +62,10 @@ describe('Viking.Record::Associations', () => {
             done()
         })
 
-        it("setting target fires add event on record", function (done){
+        it("setting target fires add event on record", function (done) {
             let model = new Model({id: 11});
             let parent = new Parent({id: 24});
+            model.parents.instantiate([]);
         
             parent.addEventListener('afterAdd', association => {
                 assert.equal(association.owner, model)

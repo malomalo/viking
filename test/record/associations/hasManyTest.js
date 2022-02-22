@@ -47,14 +47,14 @@ describe('Viking.Record::associations', () => {
             });
         })
         
-        it("add to association", function () {
+        it("add to association", async function () {
             let model = new Model()
             let parent = new Parent()
             let parent2 = new Parent()
+            model.parents.instantiate([])
             
-            model.parents.add(parent)
-            model.parents.add(parent2)
-            
+            await model.parents.add(parent)
+            await model.parents.add(parent2)
             assert.deepEqual([parent.cid, parent2.cid], model.parents.target.map(x => x.cid))
         })
         
