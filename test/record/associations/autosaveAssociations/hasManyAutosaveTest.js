@@ -82,6 +82,7 @@ describe('Viking.Record HasManyAssociation autosave', () => {
             model.save().then(() => {
                 assert.equal(part.readAttribute('name'), 'Bar');
                 assert.deepEqual(part.changes(), {});
+                assert.ok(!phase.association('parts').needsSaved())
             }).then(done, done);
 
             this.withRequest('PUT', '/requirements/24', { body: {
