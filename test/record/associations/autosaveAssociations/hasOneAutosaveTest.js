@@ -83,6 +83,24 @@ describe('Viking.Record hasOneAssociations autosave', () => {
                 xhr.respond(201, {}, '{"id": 24, "phase": null}');
             });
         })
+        
+        it('shows needsSaved for during event callbacks', function (done) {
+            let model = new Requirement({id: 11});
+            
+            model.association('phase').addEventListener('afterAdd', () => {
+                assert.ok(!model.association('phase').needsSaved());
+                done()
+            })
+            model.phase.load()
+            
+            this.withRequest('GET', '/phases', {params: {
+                where: {requirement_id: 11},
+                order: {id: 'desc'},
+                limit: 1
+            }}, xhr => {
+                xhr.respond(201, {}, '[{"id": "99", "name": "Jerry", "requirement_id": 11}]')
+            })
+        })
     });
 
     describe('on a new record', () => {
