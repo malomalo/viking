@@ -5,9 +5,12 @@ import { belongsTo } from 'viking/record/associations';
 import {extendClass} from 'viking/support/class';
 
 describe('Viking.Record belongsToAssociations autosave', () => {
+    class User extends VikingRecord {
+        
+    }
 
     class Phase extends VikingRecord {
-        
+        static associations = [ belongsTo('user', User)]
     }
 
     class Requirement extends VikingRecord {
@@ -52,7 +55,33 @@ describe('Viking.Record belongsToAssociations autosave', () => {
                 xhr.respond(201, {}, '{"id": 24, "phase": {"id": "11", "name": "Jerry"}}');
             });
         });
+        
+        it('updates deep subresource', function (done) {
+            let model = Requirement.instantiate({
+                id: 24, phase: {
+                    id: 11, name: 'Preparation', user: {
+                        id: 3, name: 'Tom'
+                    }
+                }
+            });
+            let phase = model.phase;
+            let user = phase.user
+            
+            user.setAttribute('name', 'Jerry');
+            
+            assert.deepEqual(user.changes(), {name: ['Tom', 'Jerry']})
+            model.save().then(() => {
+                assert.equal(user.readAttribute('name'), 'Jerry');
+                assert.deepEqual(user.changes(), {});
+            }).then(done, done);
 
+            this.withRequest('PUT', '/requirements/24', { body: {
+                requirement: { phase: { user: {name: 'Jerry', id: 3}, id: 11 } }
+            }}, (xhr) => {
+                xhr.respond(201, {}, '{"id": 24, "phase": {"id": "11", "name": "Preparation", "user": {"name": "Jerry", "id": 3}}}');
+            });
+        });
+ 
         it('does nothing with unchanged subresources', function (done) {
             let model = Requirement.instantiate({id: 24, phase: { id: 11, name: 'Tom' }});
             let phase = model.phase;
