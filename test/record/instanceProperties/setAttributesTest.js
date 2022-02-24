@@ -3,20 +3,19 @@ import * as assert from 'assert';
 import VikingRecord from 'viking/record';
 
 describe('Viking.Record#setAttributes', () => {
-
+    class Model extends VikingRecord {
+        static schema = {
+            key:        {type: 'integer', array: true},
+            date:       {type: 'date'},
+            datetime:       {type: 'datetime'},
+            float:      {type: 'float'},
+            integer:    {type: 'integer'},
+            string:     {type: 'string'},
+            boolean:    {type: 'boolean'},
+            unkown:     {type: 'anUnkownType'}
+        };
+    }
     describe('coercion', () => {
-        class Model extends VikingRecord {
-            static schema = {
-                key:        {type: 'integer', array: true},
-                date:       {type: 'date'},
-                datetime:       {type: 'datetime'},
-                float:      {type: 'float'},
-                integer:    {type: 'integer'},
-                string:     {type: 'string'},
-                unkown:     {type: 'anUnkownType'}
-            };
-        }
-
         it('supports arrays', () => {
 
         });
@@ -167,6 +166,30 @@ describe('Viking.Record#setAttributes', () => {
             }
         });
     });
+    
+    it('set falsy value', () => {
+        let model = new Model();
+        model.setAttributes({integer: 0, boolean: false, string: ''})
+        assert.deepEqual(model.changes(), {
+            integer: [null, 0],
+            boolean: [null, false],
+            string: [null, '']
+        })
+    })
+    
+    it('set non-falsy to falsy value', () => {
+        let model = new Model({
+            integer: 1,
+            boolean: true,
+            string: 'test'
+        });
+        model.setAttributes({integer: 0, boolean: false, string: ''})
+        assert.deepEqual(model.changes(), {
+            integer: [null, 0],
+            boolean: [null, false],
+            string: [null, '']
+        })
+    })
 
     it('set an empty string', () => {
         let model = new VikingRecord({name: 'Model'});
