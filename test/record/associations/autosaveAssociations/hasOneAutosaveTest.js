@@ -22,6 +22,7 @@ describe('Viking.Record hasOneAssociations autosave', () => {
             model.save().then(() => {
                 assert.equal(phase.readAttribute('id'), 11);
                 assert.ok(phase.isPersisted());
+                assert.ok(!model.association('phase').needsSaved());
             }).then(done, done);
             
             this.withRequest('PUT', '/requirements/24', { body: {
@@ -43,6 +44,7 @@ describe('Viking.Record hasOneAssociations autosave', () => {
             model.save().then(() => {
                 assert.equal(phase.readAttribute('name'), 'Jerry');
                 assert.deepEqual(phase.changes(), {});
+                assert.ok(!model.association('phase').needsSaved());
             }).then(done, done);
 
             this.withRequest('PUT', '/requirements/24', { body: {
@@ -95,6 +97,7 @@ describe('Viking.Record hasOneAssociations autosave', () => {
             model.save().then(() => {
                 assert.equal(phase.readAttribute('id'), 11);
                 assert.ok(phase.isPersisted());
+                assert.ok(!model.association('phase').needsSaved());
             }).then(done, done);
 
             this.withRequest('POST', '/requirements', { body: {
@@ -116,6 +119,7 @@ describe('Viking.Record hasOneAssociations autosave', () => {
             model.save().then(() => {
                 assert.equal(phase.readAttribute('name'), 'Jerry');
                 assert.deepEqual(phase.changes(), {});
+                assert.ok(!model.association('phase').needsSaved());
             }).then(done, done);
 
             this.withRequest('POST', '/requirements', { body: {
@@ -145,4 +149,24 @@ describe('Viking.Record hasOneAssociations autosave', () => {
             });
         });
     });
+    
+    describe('dirty', () => {
+        it('shows not dirty after load', function (done) {
+            let model = new Requirement({id: 11});
+            
+            model.association('phase').addEventListener('afterAdd', () => {
+                assert.ok(!model.association('phase').needsSaved());
+                done()
+            })
+            model.phase.load()
+            
+            this.withRequest('GET', '/phases', {params: {
+                where: {requirement_id: 11},
+                order: {id: 'desc'},
+                limit: 1
+            }}, xhr => {
+                xhr.respond(201, {}, '[{"id": "99", "name": "Jerry", "requirement_id": 11}]')
+            })
+        })
+    })
 });
