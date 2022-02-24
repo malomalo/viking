@@ -20,6 +20,7 @@ describe('Viking.Record HasManyAssociation autosave', () => {
                 model.save().then(() => {
                     assert.ok(phase.isPersisted());
                     assert.equal(phase.readAttribute('id'), 11);
+                    assert.ok(!model.association('phases').needsSaved());
                 }).then(done, done);
 
                 this.withRequest('PUT', '/requirements/24', { body: {
@@ -49,6 +50,7 @@ describe('Viking.Record HasManyAssociation autosave', () => {
                 assert.equal(phase.readAttribute('name'), 'Jerry');
                 assert.ok(!phase.needsSaved())
                 assert.deepEqual(phase.changes(), {});
+                assert.ok(!model.association('phases').needsSaved());
             }).then(done, done);
 
             this.withRequest('PUT', '/requirements/24', { body: {
@@ -89,23 +91,6 @@ describe('Viking.Record HasManyAssociation autosave', () => {
                 xhr.respond(201, {}, '{"id": 24, "phases": []}');
             });
         });
-        
-        it('shows needsSaved for during event callbacks', function (done) {
-            let model = new Requirement({id: 11});
-            
-            model.phases.addEventListener('afterAdd', () => {
-                assert.ok(!model.phases.needsSaved());
-                done()
-            })
-            model.phases.load()
-            
-            this.withRequest('GET', '/phases', {params: {
-                where: {requirement_id: 11},
-                order: {id: 'desc'}
-            }}, xhr => {
-                xhr.respond(201, {}, '[{"id": "99", "name": "Jerry", "requirement_id": 11}]')
-            })
-        })
     });
 
     describe('on a new record', () => {
@@ -117,6 +102,7 @@ describe('Viking.Record HasManyAssociation autosave', () => {
                 model.save().then(() => {
                     assert.ok(phase.isPersisted());
                     assert.equal(phase.readAttribute('id'), 11);
+                    assert.ok(!model.association('phases').needsSaved());
                 }).then(done, done);
 
                 this.withRequest('POST', '/requirements', { body: {
@@ -138,6 +124,7 @@ describe('Viking.Record HasManyAssociation autosave', () => {
                 model.save().then(() => {
                     assert.equal(phase.readAttribute('name'), 'Jerry');
                     assert.deepEqual(phase.changes(), {});
+                    assert.ok(!model.association('phases').needsSaved());
                 }).then(done, done);
 
                 this.withRequest('POST', '/requirements', { body: {
@@ -150,4 +137,23 @@ describe('Viking.Record HasManyAssociation autosave', () => {
             });
         });
     });
+    
+    describe('dirty', () => {
+        it('shows not dirty for during event callbacks', function (done) {
+            let model = new Requirement({id: 11});
+            
+            model.phases.addEventListener('afterAdd', () => {
+                assert.ok(!model.phases.needsSaved());
+                done()
+            })
+            model.phases.load()
+            
+            this.withRequest('GET', '/phases', {params: {
+                where: {requirement_id: 11},
+                order: {id: 'desc'}
+            }}, xhr => {
+                xhr.respond(201, {}, '[{"id": "99", "name": "Jerry", "requirement_id": 11}]')
+            })
+        })
+    })
 });
