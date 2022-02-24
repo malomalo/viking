@@ -6,7 +6,10 @@ import { extendClass } from 'viking/support/class';
 
 describe('Viking.Record HasManyAssociation autosave', () => {
     
-    class Phase extends VikingRecord { }
+    class Part extends VikingRecord { }
+    class Phase extends VikingRecord {
+        static associations = [ hasMany('parts', Part) ]
+    }
     class Requirement extends VikingRecord {
         static associations = [ hasMany('phases', Phase) ]
     }
@@ -59,6 +62,32 @@ describe('Viking.Record HasManyAssociation autosave', () => {
                 }
             }}, (xhr) => {
                 xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Jerry", "requirement_id": 24}]}');
+            });
+        });
+        
+        it('updates deep subresource', function (done) {
+            let model = Requirement.instantiate({
+                id: 24, phases: [{
+                    id: 11, name: 'Preparation', parts: [{
+                        id: 3, name: 'Cog'
+                    }]
+                }]
+            });
+            let phase = model.association('phases').target[0];
+            let part = phase.association('parts').target[0];
+            
+            part.setAttribute('name', 'Bar');
+            
+            assert.deepEqual(part.changes(), {name: ['Cog', 'Bar']})
+            model.save().then(() => {
+                assert.equal(part.readAttribute('name'), 'Bar');
+                assert.deepEqual(part.changes(), {});
+            }).then(done, done);
+
+            this.withRequest('PUT', '/requirements/24', { body: {
+                requirement: { phases: [{ parts: [{name: 'Bar', id: 3}], id: 11 }] }
+            }}, (xhr) => {
+                xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Preparation", "parts": [{"name": "Bar", "id": 3}]}]}');
             });
         });
 
