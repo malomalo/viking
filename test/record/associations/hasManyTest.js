@@ -47,14 +47,14 @@ describe('Viking.Record::associations', () => {
             });
         })
         
-        it("add to association", function () {
+        it("add to association", async function () {
             let model = new Model()
             let parent = new Parent()
             let parent2 = new Parent()
+            model.parents.instantiate([])
             
-            model.parents.add(parent)
-            model.parents.add(parent2)
-            
+            await model.parents.add(parent)
+            await model.parents.add(parent2)
             assert.deepEqual([parent.cid, parent2.cid], model.parents.target.map(x => x.cid))
         })
         
@@ -136,7 +136,7 @@ describe('Viking.Record::associations', () => {
         describe('addBang', () => {
             it('sends request', function () {
                 let model = new Model({id: 24})
-                let parent = new Parent({id: 11})
+                let parent = Parent.instantiate({id: 11})
                 model.association('parents').addBang(parent)
         
                 assert.equal(this.requests[0].url, 'http://example.com/models/24/parents/11')
@@ -171,7 +171,7 @@ describe('Viking.Record::associations', () => {
             
             it('doesnt update target when not loaded', function (done) {
                 let model = new Model({id: 24})
-                let parent1 = new Parent({id: 11})
+                let parent1 = Parent.instantiate({id: 11})
     
                 model.parents.addBang(parent1).then(() => {
                     assert.deepStrictEqual(model.parents.target, [])
@@ -180,6 +180,23 @@ describe('Viking.Record::associations', () => {
 
                 this.withRequest('POST', '/models/24/parents/11', {}, (xhr) => {
                     xhr.respond(201, {}, null);
+                });
+            })
+            
+            it('creates target', function (done) {
+                let model = new Model({id: 24})
+                let parent = new Parent({name: 'Tim Smith'})
+
+                model.parents.addBang(parent).then(() => {
+                    assert.equal(parent.readAttribute('model_id'), 24)
+                    assert.equal(parent.readAttribute('name'), 'Tim Smith Modified')
+                    done()
+                }, done)
+            
+                this.withRequest('POST', '/models/24/parents', {
+                    name: 'Tim Smith'
+                }, (xhr) => {
+                    xhr.respond(201, {}, '{"id": 1, "name": "Tim Smith Modified", "model_id": 24}');
                 });
             })
         })
@@ -213,6 +230,26 @@ describe('Viking.Record::associations', () => {
                 // TODO
             })
         })
+        
+        describe('remove', () => {
+            it('same record', async () => {
+                let parent = new Parent({id: 11})
+                let model = new Model({id: 24, parents: [parent]})
+                
+                await model.parents.remove(parent);
+                assert.deepEqual(model.parents.target, []);
+            })
+        
+            it('clone of record', async () => {
+                let parent = new Parent({id: 11})
+                let model = new Model({id: 24, parents: [parent]})
+                
+                let parentClone = parent.clone()
+                await model.parents.remove(parentClone);
+                assert.deepEqual(model.parents.target, []);
+            })
+        })
+        
     });
     
     describe('hasMany(Parent, scope)', () => {
@@ -312,12 +349,12 @@ describe('Viking.Record::associations', () => {
     // // test("::new('children', { modelName: 'Region' })", function () {
     // //     let Region = Viking.Model.extend();
     // //     Viking.context['Region'] = Region;
-    // //     var assocation = new Viking.Model.BelongsToReflection('parent', { modelName: 'Region' });
+    // //     var association = new Viking.Model.BelongsToReflection('parent', { modelName: 'Region' });
 
-    // //     assert.equal(assocation.name, 'parent');
-    // //     assert.equal(assocation.macro, 'belongsTo');
-    // //     assert.deepEqual(assocation.options, { modelName: 'Region' });
-    // //     assert.deepEqual(assocation.modelName, new Viking.Model.Name('Region'));
+    // //     assert.equal(association.name, 'parent');
+    // //     assert.equal(association.macro, 'belongsTo');
+    // //     assert.deepEqual(association.options, { modelName: 'Region' });
+    // //     assert.deepEqual(association.modelName, new Viking.Model.Name('Region'));
 
     // //     delete Viking.context['Region'];
     // // });
@@ -325,11 +362,11 @@ describe('Viking.Record::associations', () => {
     // // test("::new('subject', {polymorphic: true})", function () {
     // //     let Photo = Viking.Model.extend();
     // //     Viking.context['Photo'] = Photo;
-    // //     var assocation = new Viking.Model.BelongsToReflection('subject', { polymorphic: true });
-    // //     assert.equal(assocation.macro, 'belongsTo');
-    // //     assert.equal(assocation.name, 'subject');
-    // //     assert.deepEqual(assocation.options, { polymorphic: true });
-    // //     assert.equal(assocation.modelName, undefined);
+    // //     var association = new Viking.Model.BelongsToReflection('subject', { polymorphic: true });
+    // //     assert.equal(association.macro, 'belongsTo');
+    // //     assert.equal(association.name, 'subject');
+    // //     assert.deepEqual(association.options, { polymorphic: true });
+    // //     assert.equal(association.modelName, undefined);
 
     // //     delete Viking.context['Photo'];
     // // });

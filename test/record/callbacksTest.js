@@ -27,12 +27,13 @@ describe('Viking.Record#callbacks', () => {
             }
         }
         it('before', function () {
-            const model = new Actor();
+            const model = new Actor({name: 'Jake'});
             assert.equal(model.score, null)
             model.save()
             assert.ok(this.findRequest('POST', '/actors', {
                 body: {
                     actor: {
+                        name: 'Jake',
                         score: 1
                     }
                 }
@@ -56,13 +57,13 @@ describe('Viking.Record#callbacks', () => {
         })
 
         it('after', function (done) {
-            const model = new Actor();
+            const model = new Actor({name: 'Jake'});
             assert.equal(model.score, null)
             model.save().then(() => {
                 assert.equal(model.score, 99)
             }).then(done, done)
 
-            this.withRequest('POST', '/actors', { body: {actor: {score: 1} } }, (xhr) => {
+            this.withRequest('POST', '/actors', { body: {actor: {name: 'Jake', score: 1} } }, (xhr) => {
                 xhr.respond(201, {}, '{"id": 1, "score": 1}');
             });
         })
