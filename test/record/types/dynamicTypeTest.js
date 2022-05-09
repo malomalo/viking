@@ -10,14 +10,15 @@ describe('Viking.Record.Types', () => {
             static schema = {
                 value_type: {type: "string"},
                 value: {
-                    type: (value, attrs) => {
-                        return Types.registry[attrs.value_type].load(value)
+                    type: {
+                        load: (value, attrs) => Types.registry[attrs.value_type].load(value),
+                        dump: (value, attrs) => Types.registry[attrs.value_type].dump(value)
                     }
                 }
             }
         }
 
-        it("type: function()", function() {
+        it("::load", function() {
             let trait = new Trait({ value_type: 'boolean', value: 'true' })
             assert.equal(trait.value, true);
             
@@ -29,6 +30,20 @@ describe('Viking.Record.Types', () => {
             
             trait = new Trait({ value_type: 'date', value: "2013-04-10" })
             assert.equal(trait.value.valueOf(), new Date(1365570000000).valueOf());
+        });
+        
+        it("::dump", function() {
+            let trait = new Trait({ value_type: 'boolean', value: 'true' })
+            assert.equal(trait.asJSON().value, true);
+            
+            trait = new Trait({ value_type: 'string', value: 'true' })
+            assert.equal(trait.asJSON().value, 'true');
+            
+            trait = new Trait({ value_type: 'integer', value: '123' })
+            assert.equal(trait.asJSON().value, 123);
+            
+            trait = new Trait({ value_type: 'date', value: "2013-04-10" })
+            assert.equal(trait.asJSON().value, '2013-04-10');
         });
     });
 });
