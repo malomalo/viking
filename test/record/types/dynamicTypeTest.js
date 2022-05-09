@@ -11,14 +11,14 @@ describe('Viking.Record.Types', () => {
                 value_type: {type: "string"},
                 value: {
                     type: {
-                        load: (value, attrs) => Types.registry[attrs.value_type].load(value),
-                        dump: (value, attrs) => Types.registry[attrs.value_type].dump(value)
+                        load: (value, attrs, recordAttrs) => Types.registry[attrs.value_type || recordAttrs.value_type].load(value),
+                        dump: (value, attrs, recordAttrs) => Types.registry[attrs.value_type || recordAttrs.value_type].dump(value)
                     }
                 }
             }
         }
 
-        it("::load", function() {
+        it("::load via contructor", function() {
             let trait = new Trait({ value_type: 'boolean', value: 'true' })
             assert.equal(trait.value, true);
             
@@ -30,6 +30,12 @@ describe('Viking.Record.Types', () => {
             
             trait = new Trait({ value_type: 'date', value: "2013-04-10" })
             assert.equal(trait.value.valueOf(), new Date(1365570000000).valueOf());
+        });
+        
+        it("::load via setAttributes", function() {
+            const trait = new Trait({ value_type: 'integer' })
+            trait.value = '123'
+            assert.equal(trait.value, 123);
         });
         
         it("::dump", function() {
