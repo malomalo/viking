@@ -2,6 +2,7 @@ import * as assert from 'assert';
 import 'mocha';
 import VikingRecord from 'viking/record';
 import { hasOne, hasMany } from 'viking/record/associations';
+import * as Errors from 'viking/errors';
 
 describe('Viking.Record::associations', () => {
 
@@ -130,7 +131,7 @@ describe('Viking.Record::associations', () => {
         
         describe('addBang', () => {
             it('sends request', function () {
-                let model = new Model({id: 24})
+                let model = Model.instantiate({id: 24})
                 let parent = Parent.instantiate({id: 11})
                 model.association('parent').addBang(parent)
             
@@ -139,7 +140,7 @@ describe('Viking.Record::associations', () => {
             })
         
             it('updates target', function (done) {
-                let model = new Model({id: 24})
+                let model = Model.instantiate({id: 24})
                 let parent = Parent.instantiate({id: 11})
 
                 model.association('parent').addBang(parent).then(() => {
@@ -154,7 +155,7 @@ describe('Viking.Record::associations', () => {
             })
             
             it('creates target', function (done) {
-                let model = new Model({id: 24})
+                let model = Model.instantiate({id: 24})
                 let parent = new Parent({name: 'Tim Smith'})
 
                 model.association('parent').addBang(parent).then(() => {
@@ -169,7 +170,14 @@ describe('Viking.Record::associations', () => {
                 }, (xhr) => {
                     xhr.respond(201, {}, '{"id": 1, "name": "Tim Smith Modified", "model_id": 24}');
                 });
-            })
+            });
+            
+            it('raises error when parent model is not persisted', function () {
+                let model = new Model({id: 24})
+                let parent = new Parent({name: 'Tim Smith'})
+
+                assert.throws( () => model.association('parent').addBang(parent), Errors.RecordNotSaved );
+            });
         })
     
         describe('removeBang', () => {

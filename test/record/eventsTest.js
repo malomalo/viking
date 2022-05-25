@@ -35,52 +35,241 @@ describe('Viking.Record#events', () => {
         model.setAttributes({name: 'Rob'});
     });
 
-    it('afterSave', function (done) {
-        Actor.create({name: "Rod Kimbal"}).then(person => {
-            person.addEventListener('afterSave', (savedChanges, options) => {
-                try {
-                    assert.deepEqual(savedChanges, {
-                        name: ["Rod Kimbal", "Andy Sanberg"]
-                    });
-                } catch (e) { done(e); }
-                done();
-            });
-
-            person.name = "Andy Sanberg";
-            person.save();
-
-            this.withRequest('PUT', '/actors/1', { body: {actor: {name: 'Andy Sanberg'}} }, (xhr) => {
-                xhr.respond(200, {}, '{"id": 1, "name": "Andy Sanberg", "imdb_id": "999"}');
-            });
-        });
+    it('beforeCreate on new record', function (done) {
+        let actor = new Actor({name: "Rod Kimbal"});
         
-        this.withRequest('POST', '/actors', { body: {actor: {name: 'Rod Kimbal'} } }, (xhr) => {
-            xhr.respond(201, {}, '{"id": 1, "name": "Rod Kimbal", "imdb_id": "999"}');
+        actor.addEventListener('beforeCreate', (changes, options) => {
+            try {
+                assert.deepEqual(changes, {
+                    name: [null, "Rod Kimbal"]
+                });
+            } catch (e) { done(e); }
+            done();
+        });
+
+        actor.save();
+    });
+
+    it('beforeSave on new record', function (done) {
+        let actor = new Actor({name: "Rod Kimbal"});
+        
+        actor.addEventListener('beforeSave', (changes, options) => {
+            try {
+                assert.deepEqual(changes, {
+                    name: [null, "Rod Kimbal"]
+                });
+            } catch (e) { done(e); }
+            done();
+        });
+
+        actor.save();
+    });
+
+    it('beforeSave on persisted record', function (done) {
+        let actor = Actor.instantiate({name: "Rod Kimbal"});
+        
+        actor.addEventListener('beforeSave', (changes, options) => {
+            try {
+                assert.deepEqual(changes, {
+                    name: ["Rod Kimbal", "Andy Sanberg"]
+                });
+            } catch (e) { done(e); }
+            done();
+        });
+
+        actor.name = 'Andy Sanberg';
+        actor.save();
+    });
+
+    it('beforeSync on new record via #save', function (done) {
+        let actor = new Actor({name: "Rod Kimbal"});
+        
+        actor.addEventListener('beforeSync', (options) => {
+            assert.ok(true);
+            done();
+        });
+
+        actor.save();
+    });
+    
+    it('beforeSync on persisted record via #save', function (done) {
+        let actor = Actor.instantiate({id: 1, name: "Rod Kimbal"});
+        
+        actor.addEventListener('beforeSync', (options) => {
+            assert.ok(true);
+            done();
+        });
+
+        actor.name = 'Andy Sanberg';
+        actor.save();
+    });
+    
+    it('beforeSync on persisted record via #reload', function (done) {
+        let actor = Actor.instantiate({id: 1, name: "Rod Kimbal"});
+        
+        actor.addEventListener('beforeSync', (options) => {
+            assert.ok(true);
+            done();
+        });
+
+        actor.reload();
+    });
+
+    it('afterSave on new record', function (done) {
+        let person = new Actor({name: "Rod Kimbal"});
+        
+        person.addEventListener('afterCreate', (savedChanges, options) => {
+            try {
+                assert.deepEqual(savedChanges, {
+                    id: [null, 1],
+                    name: [null, "Andy Sanberg"],
+                    imdb_id: [null, "999"]
+                });
+            } catch (e) { done(e); }
+            done();
+        });
+
+        person.name = "Andy Sanberg";
+        person.save();
+
+        this.withRequest('POST', '/actors', { body: {actor: {name: 'Andy Sanberg'}} }, (xhr) => {
+            xhr.respond(200, {}, '{"id": 1, "name": "Andy Sanberg", "imdb_id": "999"}');
         });
     });
     
-    it('afterSave:[attribute]', function (done) {
-        Actor.create({name: "Rod Kimbal"}).then(person => {
-
-            person.addEventListener('afterSave:name', (from, to) => {
-                try {
-                    assert.equal(from, "Rod Kimbal");
-                    assert.equal(to, "Andy Sanberg");
-                } catch (e) { done(e); }
-                done();
-            })
-
-            person.name = "Andy Sanberg";
-            person.save();
-
-            this.withRequest('PUT', '/actors/1', { body: {actor: {name: 'Andy Sanberg'}} }, (xhr) => {
-                xhr.respond(200, {}, '{"id": 1, "name": "Andy Sanberg", "imdb_id": "999"}');
-            });
-
-        });
+    it('afterSave on new record', function (done) {
+        let person = new Actor({name: "Rod Kimbal"});
         
-        this.withRequest('POST', '/actors', { body: {actor: {name: 'Rod Kimbal'} } }, (xhr) => {
-            xhr.respond(201, {}, '{"id": 1, "name": "Rod Kimbal", "imdb_id": "999"}');
+        person.addEventListener('afterSave', (savedChanges, options) => {
+            try {
+                assert.deepEqual(savedChanges, {
+                    id: [null, 1],
+                    name: [null, "Andy Sanberg"],
+                    imdb_id: [null, "999"]
+                });
+            } catch (e) { done(e); }
+            done();
+        });
+
+        person.name = "Andy Sanberg";
+        person.save();
+
+        this.withRequest('POST', '/actors', { body: {actor: {name: 'Andy Sanberg'}} }, (xhr) => {
+            xhr.respond(200, {}, '{"id": 1, "name": "Andy Sanberg", "imdb_id": "999"}');
+        });
+    });
+        
+    it('afterSave on persisted record', function (done) {
+        let person = Actor.instantiate({id: 1, name: "Rod Kimbal", imdb_id: "999"});
+        
+        person.addEventListener('afterSave', (savedChanges, options) => {
+            try {
+                assert.deepEqual(savedChanges, {
+                    name: ["Rod Kimbal", "Andy Sanberg"]
+                });
+            } catch (e) { done(e); }
+            done();
+        });
+
+        person.name = "Andy Sanberg";
+        person.save();
+
+        this.withRequest('PUT', '/actors/1', { body: {actor: {name: 'Andy Sanberg'}} }, (xhr) => {
+            xhr.respond(200, {}, '{"id": 1, "name": "Andy Sanberg", "imdb_id": "999"}');
+        });
+    });
+     
+    it('afterSync on persisted record via save', function (done) {
+        let person = Actor.instantiate({id: 1, name: "Rod Kimbal", imdb_id: "999"});
+        
+        person.addEventListener('afterSync', (savedChanges, options) => {
+            try {
+                assert.deepEqual(savedChanges, {
+                    name: ["Rod Kimbal", "Andy Sanberg"]
+                });
+            } catch (e) { done(e); }
+            done();
+        });
+
+        person.name = "Andy Sanberg";
+        person.save();
+
+        this.withRequest('PUT', '/actors/1', { body: {actor: {name: 'Andy Sanberg'}} }, (xhr) => {
+            xhr.respond(200, {}, '{"id": 1, "name": "Andy Sanberg", "imdb_id": "999"}');
+        });
+    });
+
+    it('afterSync on persisted record via reload', function (done) {
+        let person = Actor.instantiate({id: 1, name: "Rod Kimbal", imdb_id: "999"});
+        
+        person.addEventListener('afterSync', (savedChanges, options) => {
+            try {
+                assert.deepEqual(savedChanges, {
+                    name: ["Rod Kimbal", "Andy Sanberg"]
+                });
+            } catch (e) { done(e); }
+            done();
+        });
+
+        person.reload();
+
+        this.withRequest('GET', '/actors/1', {}, (xhr) => {
+            xhr.respond(200, {}, '{"id": 1, "name": "Andy Sanberg", "imdb_id": "999"}');
+        });
+    });
+
+    it('afterSync:[attribute] on new record via save', function (done) {
+        let person = new Actor({name: "Rod Kimbal"});
+        
+        person.addEventListener('afterSync:name', (from, to) => {
+            try {
+                assert.equal(from, null);
+                assert.equal(to, "Rod Kimbal");
+            } catch (e) { done(e); }
+            done();
+        });
+
+        person.save();
+
+        this.withRequest('POST', '/actors', { body: {actor: {name: 'Rod Kimbal'}} }, (xhr) => {
+            xhr.respond(200, {}, '{"id": 1, "name": "Rod Kimbal", "imdb_id": "999"}');
+        });
+    });
+
+    it('afterSync:[attribute] on persisted record via save', function (done) {
+        let person = Actor.instantiate({id: 1, name: "Rod Kimbal", imdb_id: "999"});
+        
+        person.addEventListener('afterSync:name', (from, to) => {
+            try {
+                assert.equal(from, "Rod Kimbal");
+                assert.equal(to, "Andy Sanberg");
+            } catch (e) { done(e); }
+            done();
+        });
+
+        person.name = "Andy Sanberg";
+        person.save();
+
+        this.withRequest('PUT', '/actors/1', { body: {actor: {name: 'Andy Sanberg'}} }, (xhr) => {
+            xhr.respond(200, {}, '{"id": 1, "name": "Andy Sanberg", "imdb_id": "999"}');
+        });
+    });
+
+    it('afterSync:[attribute] on persisted record via reload', function (done) {
+        let person = Actor.instantiate({id: 1, name: "Rod Kimbal", imdb_id: "999"});
+        
+        person.addEventListener('afterSync:name', (from, to) => {
+            try {
+                assert.equal(from, "Rod Kimbal");
+                assert.equal(to, "Andy Sanberg");
+            } catch (e) { done(e); }
+            done();
+        });
+
+        person.reload();
+
+        this.withRequest('GET', '/actors/1', {}, (xhr) => {
+            xhr.respond(200, {}, '{"id": 1, "name": "Andy Sanberg", "imdb_id": "999"}');
         });
     });
     
