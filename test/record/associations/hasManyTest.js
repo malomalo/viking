@@ -2,6 +2,7 @@ import * as assert from 'assert';
 import 'mocha';
 import VikingRecord from 'viking/record';
 import { hasMany } from 'viking/record/associations';
+import * as Errors from 'viking/errors';
 
 describe('Viking.Record::associations', () => {
     describe('hasMany(Parent)', () => {
@@ -135,18 +136,17 @@ describe('Viking.Record::associations', () => {
         
         describe('addBang', () => {
             it('sends request', function () {
-                let model = new Model({id: 24})
+                let model = Model.instantiate({id: 24})
                 let parent = Parent.instantiate({id: 11})
                 model.association('parents').addBang(parent)
-        
+                
                 assert.equal(this.requests[0].url, 'http://example.com/models/24/parents/11')
                 assert.equal(this.requests[0].method, 'POST')
-            })
+            });
     
             it('updates target when loaded and record persisted', function (done) {
-                let model = new Model({id: 24})
+                let model = Model.instantiate({id: 24})
                 let parent1 = Parent.find(11)
-                
                 
                 model.parents.load().then(() => {
                     parent1.then((p) => {
@@ -167,10 +167,10 @@ describe('Viking.Record::associations', () => {
                 this.withRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}} }, (xhr) => {
                     xhr.respond(200, {}, '[]');
                 });
-            })
+            });
             
             it('doesnt update target when not loaded', function (done) {
-                let model = new Model({id: 24})
+                let model = Model.instantiate({id: 24})
                 let parent1 = Parent.instantiate({id: 11})
     
                 model.parents.addBang(parent1).then(() => {
@@ -181,10 +181,10 @@ describe('Viking.Record::associations', () => {
                 this.withRequest('POST', '/models/24/parents/11', {}, (xhr) => {
                     xhr.respond(201, {}, null);
                 });
-            })
+            });
             
             it('creates target', function (done) {
-                let model = new Model({id: 24})
+                let model = Model.instantiate({id: 24})
                 let parent = new Parent({name: 'Tim Smith'})
 
                 model.parents.addBang(parent).then(() => {
@@ -198,7 +198,14 @@ describe('Viking.Record::associations', () => {
                 }, (xhr) => {
                     xhr.respond(201, {}, '{"id": 1, "name": "Tim Smith Modified", "model_id": 24}');
                 });
-            })
+            });
+            
+            it('raises error when parent model is not persisted', function () {
+                let model = new Model({id: 24})
+                let parent = new Parent({name: 'Tim Smith'})
+
+                assert.throws( () => model.parents.addBang(parent), Errors.RecordNotSaved );
+            });
         })
     
         describe('removeBang', () => {
