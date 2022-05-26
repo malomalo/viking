@@ -115,7 +115,7 @@ describe('Viking.Record#events', () => {
         actor.reload();
     });
 
-    it('afterSave on new record', function (done) {
+    it('afterCreate on new record', function (done) {
         let person = new Actor({name: "Rod Kimbal"});
         
         person.addEventListener('afterCreate', (savedChanges, options) => {
