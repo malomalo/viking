@@ -38,7 +38,12 @@ describe('Viking.Record::associations', () => {
                 });
                 
                 Promise.all([a, b]).then((values) => {
-                  assert.strictEqual(values[0], values[1]);
+                    assert.deepStrictEqual(values[0], values[1]);
+
+                    // Ensure that these are the same exact array
+                    values[0].pop()
+                    assert.deepStrictEqual(values[0], []);
+                    assert.deepStrictEqual(values[0], []);
                 }).then(done, done);
             });
         });
