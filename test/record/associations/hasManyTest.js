@@ -10,19 +10,36 @@ describe('Viking.Record::associations', () => {
             static associations = [hasMany(Parent)];
         }
 
-        it("load association", function(done) {
-            let model = new Model({id: 24});
+        describe('.load()', () => {
+            it("load association", function(done) {
+                let model = new Model({id: 24});
 
-            model.parents.toArray().then((models) => {
-                assert.equal(models.length, 1);
-                let model = models[0];
-                assert.ok(model instanceof Parent);
-                assert.equal(model.readAttribute('id'), 2);
-                assert.equal(model.readAttribute('name'), 'Viking');
-            }).then(done, done);
+                model.parents.toArray().then((models) => {
+                    assert.equal(models.length, 1);
+                    let model = models[0];
+                    assert.ok(model instanceof Parent);
+                    assert.equal(model.readAttribute('id'), 2);
+                    assert.equal(model.readAttribute('name'), 'Viking');
+                }).then(done, done);
 
-            this.withRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}} }, (xhr) => {
-                xhr.respond(200, {}, '[{"id": 2, "name": "Viking"}]');
+                this.withRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}} }, (xhr) => {
+                    xhr.respond(200, {}, '[{"id": 2, "name": "Viking"}]');
+                });
+            });
+
+            it("sends one network request and return the same result to all callers of load while request is in flight", function(done) {
+                let model = new Model({id: 24});
+
+                let a = model.parents.load();
+                let b = model.parents.load();
+                
+                this.withRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}} }, (xhr) => {
+                    xhr.respond(200, {}, '[{"id": 2, "name": "Viking"}]');
+                });
+                
+                Promise.all([a, b]).then((values) => {
+                  assert.strictEqual(values[0], values[1]);
+                }).then(done, done);
             });
         });
         
