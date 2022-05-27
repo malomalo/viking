@@ -176,6 +176,29 @@ describe('Viking.Relation', () => {
         })
     })
     
+    describe('distinct', () => {
+        it('no key', function () {
+            let relation = Model.where({parent_id: 11}).distinct()
+            
+            relation.load()
+            assert.ok(this.findRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'}, distinct: true } }));
+        })
+        
+        it('single key', function () {
+            let relation = Model.where({parent_id: 11}).distinct('session_id')
+            
+            relation.load()
+            assert.ok(this.findRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'}, distinct_on: ['session_id'] } }));
+        })
+        
+        it('dinstinct then spawn', function () {
+            let relation = Model.where({parent_id: 11}).distinct().order('created_at')
+            
+            relation.load()
+            assert.ok(this.findRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {created_at: 'desc'}, distinct: true } }));
+        })
+    })
+    
     describe('add', () => {
         it('single record', async function () {
             let relation = Model.where({parent_id: 11})
