@@ -10,19 +10,32 @@ describe('Viking.Record', () => {
     class Ship extends VikingRecord { }
 
     it('::count', function(done) {
-        Ship.count((count) => {
+        Ship.count().then((count) => {
             assert.equal(count, 100);
-        }).then(() => done(), done);
+            done()
+        }, done);
 
         this.withRequest('GET', '/ships/calculate', { params: {order: {id: 'desc'}, select: {count: '*'} } }, (xhr) => {
             xhr.respond(200, {}, '[100]');
         });
     });
+    
+    it('::count attribute', function(done) {
+        Ship.count('model_id').then((count) => {
+            assert.equal(count, 5);
+            done()
+        }, done);
+
+        this.withRequest('GET', '/ships/calculate', { params: {order: {id: 'desc'}, select: {count: 'model_id'} } }, (xhr) => {
+            xhr.respond(200, {}, '[5]');
+        });
+    });
 
     it('::sum', function(done) {
-        Ship.sum('size', (count) => {
+        Ship.sum('size').then((count) => {
             assert.equal(count, 100);
-        }).then(() => done(), done);
+            done()
+        }, done);
 
         this.withRequest('GET', '/ships/calculate', { params: {order: {id: 'desc'}, select: {sum: 'size'} } }, (xhr) => {
             xhr.respond(200, {}, '[100]');
