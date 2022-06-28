@@ -19,6 +19,13 @@ describe('Viking.Record::urlRoot', () => {
         }
         assert.equal(Model.urlRoot(), '/buoys');
     });
+    
+    it("returns an URL based on #namespace set on the model", () => {
+        class Boat extends VikingRecord {
+            static namespace = 'Navy';
+        }
+        assert.equal(Boat.urlRoot(), '/navy/boats');
+    });
 
     // STI test
     it("returns an URL based on modelName of the baseClass", () => {
