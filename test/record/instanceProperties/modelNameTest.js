@@ -37,7 +37,7 @@ describe('Viking.Record#modelName', () => {
             title: 'Other Model',
             collection: 'my/other_models',
             paramKey: 'my_other_model',
-            routeKey: 'my_other_models',
+            routeKey: 'my/other_models',
             element: 'other_model'
         });
 

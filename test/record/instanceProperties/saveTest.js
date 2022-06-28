@@ -18,6 +18,14 @@ describe('Viking.Record#save', () => {
         };
     }
     
+    class Submodel extends VikingRecord {
+        static namespace = 'Model';
+        static schema = {
+            id:         {type: 'integer'},
+            key:        {type: 'integer'},
+        }
+    }
+    
     describe("saving a new record", () => {
         it("sends post request", function (done) {
             let a = new Model({ integer: 1, string: 'hello', boolean: true });
@@ -49,6 +57,21 @@ describe('Viking.Record#save', () => {
                 model: { integer: 1, string: 'hello', boolean: true }
             }}, (xhr) => {
                 xhr.respond(201, {}, '{"integer": 2, "string": "bye", "boolean": false}');
+            });
+        });
+        
+        it("sends post request with namespace", function (done) {
+            let a = new Submodel({ key: 99 });
+            
+            assert.ok(a.isNewRecord())
+            a.save().then(() => {
+                assert.ok(!a.isNewRecord())
+            }).then(done, done);
+        
+            this.withRequest('POST', '/model/submodels', { body: {
+                model_submodel: { key: 99 }
+            }}, (xhr) => {
+                xhr.respond(201, {}, '{"key": 99}');
             });
         });
 
