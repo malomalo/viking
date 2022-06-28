@@ -16,6 +16,15 @@ describe('Viking.Record#paramRoot', () => {
         // model = new Model();
         // assert.equal(model.paramRoot(), 'namespaced_model');
     });
+    
+    it("returns lowest modelName for namespace", () => {
+        class Boat extends VikingRecord {
+            static namespace = 'Navy';
+        }
+        let boat = new Boat();
+
+        assert.equal(boat.paramRoot(), 'boat');
+    });
 
     it("instance.paramRoot returns underscored baseClass.modelName when used as STI", () => {
         class Boat extends VikingRecord { }
