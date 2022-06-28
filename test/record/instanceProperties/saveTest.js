@@ -69,7 +69,7 @@ describe('Viking.Record#save', () => {
             }).then(done, done);
         
             this.withRequest('POST', '/model/submodels', { body: {
-                submodel: { key: 99 }
+                model_submodel: { key: 99 }
             }}, (xhr) => {
                 xhr.respond(201, {}, '{"key": 99}');
             });

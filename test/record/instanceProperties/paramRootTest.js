@@ -23,7 +23,7 @@ describe('Viking.Record#paramRoot', () => {
         }
         let boat = new Boat();
 
-        assert.equal(boat.paramRoot(), 'boat');
+        assert.equal(boat.paramRoot(), 'navy_boat');
     });
 
     it("instance.paramRoot returns underscored baseClass.modelName when used as STI", () => {
