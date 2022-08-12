@@ -49,6 +49,22 @@ describe('Viking.Record::associations', () => {
             });
         });
         
+        it('coalesces loads when a inflight load is happening', function (done) {
+            let callback_order = [];
+            let model = new Model({id: 24});
+
+            let p1 = model.parents.load().then(() => { callback_order.push(1); });
+            let p2 = model.parents.load().then(() => { callback_order.push(2); });
+            
+            this.withRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}} }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 2, "name": "Viking"}]');
+            });
+            
+            Promise.all([p1,p2]).then(() => {
+                assert.deepEqual(callback_order, [1,2]);
+            }).then(done, done);
+        });
+        
         it("reload association", function (done) {
             let model = new Model({id: 24});
             model.parents.toArray().then(parents => {
@@ -321,14 +337,14 @@ describe('Viking.Record::associations', () => {
 
         describe('assigning the association', (done) => {
             it('to a model with an id', function(done) {
-                let model = new Child({id: 24});
+                let child = new Child({id: 24});
                 let parent = new Parent({id: 13});
-                model.parents = [parent];
-
+                child.parents = [parent];
+                
                 assert.equal(parent.readAttribute('offspring_id'), 24);
-                assert.ok(model._associations.parents.loaded);
-                assert.strictEqual(model._associations.parents.target[0], parent);
-                model.parents.toArray().then(models => {
+                assert.ok(child._associations.parents.loaded);
+                assert.strictEqual(child._associations.parents.target[0], parent);
+                child.parents.toArray().then(models => {
                     assert.strictEqual(models[0], parent);
                 }).then(done, done);
                 assert.equal(this.requests.length, 0);
