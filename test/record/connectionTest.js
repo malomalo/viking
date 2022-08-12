@@ -131,6 +131,43 @@ describe('Viking.Record', () => {
                 this.withRequest('GET', '/', {}, (xhr) => xhr.respond(500, {}, '{"foo": "bar"}'));
             });
             
+            describe('preflight', () => {
+                it('with a function as a callback', function () {
+                    let connection = new Connection('http://example.com');
+                    let counter = 0;
+                
+                    connection.get('/', { preflight: response => counter++ });
+                    assert.equal(counter, 1);
+                    this.withRequest('GET', '/', {}, (xhr) => xhr.respond(201, {}, '{"foo": "bar"}'));
+                    assert.equal(counter, 1);
+                });
+                
+                it('with a function that returns a promise as a callback', function (done) {
+                    let connection = new Connection('http://example.com');
+                    let counter = 0;
+                    let resolve_preflight = null;
+                    const preflight_promise = new Promise((res, rej) => { resolve_preflight = res; }).then(() => {
+                        assert.equal(counter, 0);
+                        counter++;
+                    });
+                    
+                    connection.get('/', { preflight: response => preflight_promise }).then(() => {
+                        assert.equal(counter, 1);
+                    }).then(done, done);
+
+                    preflight_promise.then(() => {
+                        this.withRequest('GET', '/', {}, (xhr) => xhr.respond(201, {}, '{"foo": "bar"}'));
+                    })
+                    
+                    
+                    assert.equal(counter, 0);
+                    resolve_preflight()
+
+
+
+                });
+
+            });
             
         })
 
