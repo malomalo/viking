@@ -3,29 +3,30 @@ import * as assert from 'assert';
 import JSONType from 'viking/record/types/json';
 import Record from 'viking/record';
 import Types from 'viking/record/types';
-
+import Value from 'viking/record/types/value';
 
 describe('Viking.Record.Types', () => {
     
     describe('custom', () => {
         
-        Types.registry.length = {
-            load: (value, key, changes, record, typeSettings) => {
-                const units = changes[typeSettings.units_key] || record.attributes[typeSettings.units_key]
+        Types.registry.length = class Length extends Value {
+            static set(key, value, inObject, record, typeSettings) {
+                const units = inObject[typeSettings.units_key] || record.attributes[typeSettings.units_key]
                 if (!units) {
                     return false
                 }
-                if (typeof value != "object") value = {
-                    value,
-                    units
-                }
+                
+                if (typeof value != "object") {
+                    value = { value, units };
+                } 
 
-                changes[key] = value
-                changes[typeSettings.units_key] = value.units
+                inObject[key] = value
+                inObject[typeSettings.units_key] = value.units
                 
                 return true
-            },
-            dump: (v, key) => {
+            }
+            
+            static dump(v) {
                 return v.value
             }
         }

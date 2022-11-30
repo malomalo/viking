@@ -6,39 +6,26 @@ describe('Viking.Record.Types', () => {
     describe('Integer', () => {
 
         it("::load coerces number to number", () => {
-            const changes = {};
-            IntegerType.load(10, 'foo', changes)
-            assert.equal(changes.foo,     10);
-            IntegerType.load(10.5, 'foo', changes)
-            assert.equal(changes.foo,   10.5);
+            assert.equal(IntegerType.load(10),     10);
+            assert.equal(IntegerType.load(10.5),   10.5);
         });
 
         it("::load coerces string to number", () => {
-            const changes = {};
-            IntegerType.load('10', 'foo', changes)
-            assert.equal(changes.foo,   10);
-            IntegerType.load('10.5', 'foo', changes)
-            assert.equal(changes.foo, 10.5);
+            assert.equal(IntegerType.load('10'),   10);
+            assert.equal(IntegerType.load('10.5'), 10.5);
         });
 
         it("::load coerces empty string to null", () => {
-            const changes = {};
-            IntegerType.load(' ', 'foo', changes)
-            assert.equal(changes.foo,   	null);
-            IntegerType.load('', 'foo', changes)
-            assert.equal(changes.foo, 	null);
+            assert.equal(IntegerType.load(' '), null);
+            assert.equal(IntegerType.load(''),  null);
         });
         
         it("::load coerces null to null", () => {
-            const changes = {};
-            IntegerType.load(null, 'foo', changes)
-            assert.equal(changes.foo, 	null);
+            assert.equal(IntegerType.load(null),    null);
         });
         
         it("::load coerces undefined to undefined", () => {
-            const changes = {};
-            IntegerType.load(undefined, 'foo', changes)
-            assert.equal(changes.foo, undefined);
+            assert.equal(IntegerType.load(undefined), undefined);
         });
 
         it("::dump coerces number to number", () => {
