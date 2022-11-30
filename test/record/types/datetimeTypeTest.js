@@ -9,39 +9,48 @@ describe('Viking.Record.Types', () => {
             assert.throws(function() { DateTimeType.load(true) }, TypeError);
 
             try {
-                DateTimeType.load(true);
+                DateTimeType.load(true, 'foo', {});
             } catch (e) {
                 assert.equal(e.message, "boolean can't be coerced into Date");
             }
         });
 
         it("::load coerces iso8601 string to date", function() {
+            const changes = {}
+            
+            DateTimeType.load("2013-04-10T21:24:28+00:00", 'foo', changes)
             assert.deepEqual(
-                DateTimeType.load("2013-04-10T21:24:28+00:00"),
+                changes.foo,
                 new Date(1365629068000)
             );
 
+            DateTimeType.load("2013-04-10T21:24:28+00:00", 'foo', changes)
             assert.equal(
-                DateTimeType.load("2013-04-10T21:24:28+00:00").valueOf(),
+                changes.foo.valueOf(),
                 (new Date(1365629068000)).valueOf()
             );
         });
 
         it("::load coerces int(milliseconds since epoch) to date", function() {
+            const changes = {}
+            DateTimeType.load(1365629126097, 'foo', changes)
             assert.deepEqual(
-                DateTimeType.load(1365629126097),
+                changes.foo,
                 new Date(1365629126097)
             );
 
+            DateTimeType.load(1365629126097, 'foo', changes)
             assert.equal(
-                DateTimeType.load(1365629126097).valueOf(),
+                changes.foo.valueOf(),
                 (new Date(1365629126097)).valueOf()
             );
         });
 
         it("::load coerces date to date", function() {
+            const changes = {}
+            DateTimeType.load(new Date(1365629126097), 'foo', changes)
             assert.equal(
-                DateTimeType.load(new Date(1365629126097)).valueOf(),
+                changes.foo.valueOf(),
                 (new Date(1365629126097)).valueOf()
             );
         });

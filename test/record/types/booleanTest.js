@@ -6,31 +6,27 @@ describe('Viking.Record.Types', () => {
     describe('Boolean', () => {
 
         it("::load coerces the string 'true' to true", function() {
-            assert.strictEqual(
-                BooleanType.load("true"),
-                true
-            );
+            const changes = {}
+            BooleanType.load("true", 'foo', changes)
+            assert.equal(true, changes.foo)
         });
 
         it("::load coerces the string 'false' to false", function() {
-            assert.strictEqual(
-                BooleanType.load("false"),
-                false
-            );
+            const changes = {}
+            BooleanType.load("false", 'foo', changes)
+            assert.equal(false, changes.foo)
         });
 
         it("::load coerces true to true", function() {
-            assert.strictEqual(
-                BooleanType.load(true),
-                true
-            );
+            const changes = {}
+            BooleanType.load(true, 'foo', changes)
+            assert.equal(true, changes.foo)
         });
 
         it("::load coerces false to false", function() {
-            assert.strictEqual(
-                BooleanType.load(false),
-                false
-            );
+            const changes = {}
+            BooleanType.load(false, 'foo', changes)
+            assert.equal(false, changes.foo)
         });
 
         it("::dump true", function() {

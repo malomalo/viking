@@ -6,21 +6,31 @@ describe('Viking.Record.Types', () => {
     describe('String', () => {
 
         it("::load coerces boolean to string", function() {
-            assert.equal(StringType.load(true), 'true');
-            assert.equal(StringType.load(false), 'false');
+            const changes = {}
+            StringType.load(true, 'foo', changes)
+            assert.equal(changes.foo, 'true');
+            StringType.load(false, 'foo', changes)
+            assert.equal(changes.foo, 'false');
         });
 
         it("::load coerces number to string", function() {
-            assert.equal(StringType.load(10), '10');
-            assert.equal(StringType.load(10.5), '10.5');
+            const changes = {}
+            StringType.load(10, 'foo', changes)
+            assert.equal(changes.foo, '10');
+            StringType.load(10.5, 'foo', changes)
+            assert.equal(changes.foo, '10.5');
         });
 
         it("::load coerces null to string", function() {
-            assert.equal(StringType.load(null), null);
+            const changes = {}
+            StringType.load(null, 'foo', changes)
+            assert.equal(changes.foo, null);
         });
 
         it("::load coerces undefined to string", function() {
-            assert.equal(StringType.load(undefined), undefined);
+            const changes = {}
+            StringType.load(undefined, 'foo', changes)
+            assert.equal(changes.foo, undefined);
         });
 
         // it("::dump coerces boolean to string", function() {

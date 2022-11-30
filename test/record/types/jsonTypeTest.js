@@ -6,8 +6,11 @@ describe('Viking.Record.Types', () => {
     describe('JSON', () => {
 
         it("::load coerces {} to Viking.Record", () => {
-            assert.deepEqual(JSONType.load({}), {});
-            assert.deepEqual(JSONType.load({key: 'value'}), {key: 'value'});
+            const changes = {}
+            JSONType.load({}, 'foo', changes)
+            assert.deepEqual(changes.foo, {});
+            JSONType.load({key: 'value'}, 'foo', changes)
+            assert.deepEqual(changes.foo, {key: 'value'});
         });
 
         // it("::load coerces {} to Viking.Model with modelName set to key", function() {
