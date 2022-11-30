@@ -16,16 +16,16 @@ describe('Viking.Record.Types', () => {
         });
 
         it("::load coerces empty string to null", () => {
-            assert.equal(IntegerType.load(' '),   	null);
-            assert.equal(IntegerType.load(''), 	null);
+            assert.equal(IntegerType.load(' '), null);
+            assert.equal(IntegerType.load(''),  null);
         });
         
         it("::load coerces null to null", () => {
-            assert.equal(IntegerType.load(null), 	null);
+            assert.equal(IntegerType.load(null),    null);
         });
         
         it("::load coerces undefined to undefined", () => {
-            assert.equal(IntegerType.load(undefined), 	undefined);
+            assert.equal(IntegerType.load(undefined), undefined);
         });
 
         it("::dump coerces number to number", () => {

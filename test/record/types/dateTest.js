@@ -7,7 +7,6 @@ describe('Viking.Record.Types', () => {
 
         it("::load thows error when can't coerce value", function() {
             assert.throws(function() { DateType.load(true) }, TypeError);
-
             try {
                 DateType.load(true);
             } catch (e) {
@@ -32,7 +31,7 @@ describe('Viking.Record.Types', () => {
                 DateType.load(1365629126097),
                 new Date(1365629126097)
             );
-
+            
             assert.equal(
                 DateType.load(1365629126097).valueOf(),
                 (new Date(1365629126097)).valueOf()
