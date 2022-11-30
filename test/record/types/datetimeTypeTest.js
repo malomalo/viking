@@ -9,7 +9,7 @@ describe('Viking.Record.Types', () => {
             assert.throws(function() { DateTimeType.load(true) }, TypeError);
 
             try {
-                DateTimeType.load(true, 'foo', {});
+                DateTimeType.load(true);
             } catch (e) {
                 assert.equal(e.message, "boolean can't be coerced into Date");
             }
