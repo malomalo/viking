@@ -3,13 +3,13 @@ import * as assert from 'assert';
 import JSONType from 'viking/record/types/json';
 import Record from 'viking/record';
 import Types from 'viking/record/types';
-import Value from 'viking/record/types/value';
+import Type from 'viking/record/type';
 
 describe('Viking.Record.Types', () => {
     
     describe('custom', () => {
         
-        Types.registry.length = class Length extends Value {
+        Types.registry.length = class Length extends Type {
             static set(key, value, inObject, record, typeSettings) {
                 const units = inObject[typeSettings.units_key] || record.attributes[typeSettings.units_key]
                 if (!units) {
