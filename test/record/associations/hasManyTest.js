@@ -225,16 +225,22 @@ describe('Viking.Record::associations', () => {
                 let model = Model.instantiate({id: 24})
                 let parent = new Parent({name: 'Tim Smith'})
 
-                model.parents.addBang(parent).then(() => {
-                    assert.equal(parent.readAttribute('model_id'), 24)
-                    assert.equal(parent.readAttribute('name'), 'Tim Smith Modified')
-                    done()
-                }, done)
+                model.parents.load().then(() => {
+                    model.parents.addBang(parent).then(() => {
+                        assert.equal(parent.readAttribute('model_id'), 24)
+                        assert.equal(parent.readAttribute('name'), 'Tim Smith Modified')
+                        assert.equal(model.parents.target.length, 1)
+                    }).then(done, done)
             
-                this.withRequest('POST', '/models/24/parents', {
-                    name: 'Tim Smith'
-                }, (xhr) => {
-                    xhr.respond(201, {}, '{"id": 1, "name": "Tim Smith Modified", "model_id": 24}');
+                    this.withRequest('POST', '/models/24/parents', {
+                        name: 'Tim Smith'
+                    }, (xhr) => {
+                        xhr.respond(201, {}, '{"id": 1, "name": "Tim Smith Modified", "model_id": 24}');
+                    });
+                })
+                
+                this.withRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}} }, (xhr) => {
+                    xhr.respond(200, {}, '[]');
                 });
             });
             
