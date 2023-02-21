@@ -44,7 +44,7 @@ describe('Viking.Relation', () => {
             });
             
             relation.load().then(() => {
-                relation.addWhere({id: 2});
+                relation.applyWhere({id: 2});
                 relation.load().then(() => done(), done)
                 this.withRequest('GET', '/models', { params: { where: {parent_id: 11, id: 2}, order: {id: 'desc'} } }, (xhr) => {
                     xhr.respond(200, {}, '[{"id": 2}]');
