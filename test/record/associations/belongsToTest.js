@@ -346,6 +346,12 @@ describe('Viking.Record::associations', () => {
             assert.equal(ship.readAttribute('owner_type'), 'Company')
             assert.strictEqual(ship.owner, company);
         });
+        
+        it("instantiating the association", function () {
+            let ship = new Ship({id: 3, owner_type: 'Person', owner_id: 24, owner: {id: 24, name: 'Rod Kimbel'}})
+            let person = ship.owner
+            assert.equal(person.readAttribute('name'), 'Rod Kimbel')
+        })
     })
     
 });
