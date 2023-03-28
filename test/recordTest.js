@@ -7,6 +7,16 @@ describe('Viking.Record', () => {
     // before: () => {
     //     Viking.View.templates = window['JST'];
     // }
+    
+    class Actor extends Model {
+        static schema = {
+            id: {type: "integer"},
+            name: {type: 'string'},
+            age: {type: "integer"},
+            union: {type: "boolean"},
+            preferences: {type: "json"}
+        }
+    }
 
     describe('clone', () => {
         it('clone', () => {
@@ -32,6 +42,13 @@ describe('Viking.Record', () => {
             a.setAttributes({foo: 100});
             assert.deepEqual({foo: [1, 100]}, a.changes())
             assert.deepEqual({}, b.changes())
+        })
+        
+        it('json type', () => {
+            let a = new Actor({preferences: {fruit: 'apple'}});
+            let b = a.clone();
+            a.preferences.fruit = 'banana'
+            assert.equal(b.preferences.fruit, 'apple')
         })
     })
 
