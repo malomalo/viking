@@ -1,9 +1,8 @@
-import 'mocha';
 import * as assert from 'assert';
-import JSONType from 'viking/record/types/json';
-import Record from 'viking/record';
-import Types from 'viking/record/types';
-import Type from 'viking/record/type';
+import JSONType from '@malomalo/viking/record/types/json';
+import Record from '@malomalo/viking/record';
+import Types from '@malomalo/viking/record/types';
+import Type from '@malomalo/viking/record/type';
 
 describe('Viking.Record.Types', () => {
     

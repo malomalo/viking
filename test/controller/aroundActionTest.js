@@ -1,6 +1,5 @@
-import 'mocha';
 import * as assert from 'assert';
-import VController from 'viking/controller';
+import VController from '@malomalo/viking/controller';
 
 describe('Viking.Controller', () => {
   describe('aroundActions', () => {

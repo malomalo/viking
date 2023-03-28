@@ -1,6 +1,5 @@
-import 'mocha';
 import * as assert from 'assert';
-import {toParam, toQuery} from 'viking/support/date';
+import {toParam, toQuery} from '@malomalo/viking/support/date';
 
 describe('VikingSupport.Date', () => {
 

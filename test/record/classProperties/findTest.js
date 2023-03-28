@@ -1,9 +1,8 @@
 import * as assert from 'assert';
 // import * as sinon from 'sinon';
-import 'mocha';
-import VikingRecord from 'viking/record';
-import { toQuery } from 'viking/support/object';
-import { ServerError } from 'viking/errors';
+import VikingRecord from '@malomalo/viking/record';
+import { toQuery } from '@malomalo/viking/support/object';
+import { ServerError } from '@malomalo/viking/errors';
 
 
 describe('Viking.Record::find', () => {

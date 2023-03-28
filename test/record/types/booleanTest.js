@@ -1,6 +1,5 @@
-import 'mocha';
 import * as assert from 'assert';
-import BooleanType from 'viking/record/types/boolean';
+import BooleanType from '@malomalo/viking/record/types/boolean';
 
 describe('Viking.Record.Types', () => {
     describe('Boolean', () => {

@@ -1,6 +1,5 @@
-import 'mocha';
 import * as assert from 'assert';
-import {toParam, toQuery, deepAssign} from 'viking/support/object';
+import {toParam, toQuery, deepAssign} from '@malomalo/viking/support/object';
 
 describe('VikingSupport.Object', () => {
 

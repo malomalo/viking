@@ -1,6 +1,5 @@
-import 'mocha';
 import * as assert from 'assert';
-import Connection from 'viking/record/connection';
+import Connection from '@malomalo/viking/record/connection';
 
 describe('Viking.Record', () => {
     describe('Connection', () => {

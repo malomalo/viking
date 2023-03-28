@@ -1,8 +1,7 @@
-import 'mocha';
 import * as assert from 'assert';
-import * as Errors from 'viking/errors';
-import VView from 'viking/view';
-import VController from 'viking/controller';
+import * as Errors from '@malomalo/viking/errors';
+import VView from '@malomalo/viking/view';
+import VController from '@malomalo/viking/controller';
 
 describe('Viking.Controller', () => {
   describe('DoubleRenderError', () => {

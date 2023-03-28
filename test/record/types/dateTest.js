@@ -1,6 +1,5 @@
-import 'mocha';
 import * as assert from 'assert';
-import DateType from 'viking/record/types/date';
+import DateType from '@malomalo/viking/record/types/date';
 
 describe('Viking.Record.Types', () => {
     describe('Date', () => {

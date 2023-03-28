@@ -1,8 +1,7 @@
 import * as assert from 'assert';
-import 'mocha';
-import VikingRecord from 'viking/record';
-import { hasOne, hasMany } from 'viking/record/associations';
-import * as Errors from 'viking/errors';
+import VikingRecord from '@malomalo/viking/record';
+import { hasOne, hasMany } from '@malomalo/viking/record/associations';
+import * as Errors from '@malomalo/viking/errors';
 
 describe('Viking.Record::associations', () => {
 

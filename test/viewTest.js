@@ -1,6 +1,5 @@
-import 'mocha';
 import * as assert from 'assert';
-import View from 'viking/view';
+import View from '@malomalo/viking/view';
 
 describe('Viking.View', () => {
 

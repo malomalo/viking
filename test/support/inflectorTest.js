@@ -1,6 +1,5 @@
-import 'mocha';
 import * as assert from 'assert';
-import * as Inflector from 'viking/support/inflector';
+import * as Inflector from '@malomalo/viking/support/inflector';
 
 let regularExamples = [
     ['rose', 'roses'],

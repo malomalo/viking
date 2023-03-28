@@ -39,3 +39,8 @@ To use IE8 you'll need these dependencies:
 * [JSON2](https://github.com/douglascrockford/JSON-js) (required by backbone.js for IE8 support)
 
 * [Viking.IE8](test/dependencies/viking.ie8.js) (needs to be included after viking.js)
+
+### Development
+Link viking to run tests
+    npm link
+    npm link viking

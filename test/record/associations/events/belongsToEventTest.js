@@ -1,7 +1,6 @@
 import * as assert from 'assert';
-import 'mocha';
-import VikingRecord from 'viking/record';
-import { belongsTo } from 'viking/record/associations';
+import VikingRecord from '@malomalo/viking/record';
+import { belongsTo } from '@malomalo/viking/record/associations';
 
 describe('Viking.Record::Associations', () => {
 
