@@ -1,9 +1,8 @@
-import 'mocha';
 import * as assert from 'assert';
-import VikingRecord from 'viking/record';
-import Relation from 'viking/record/relation';
-import { toQuery } from 'viking/support/object';
-import { ServerError } from 'viking/errors';
+import VikingRecord from '@malomalo/viking/record';
+import Relation from '@malomalo/viking/record/relation';
+import { toQuery } from '@malomalo/viking/support/object';
+import { ServerError } from '@malomalo/viking/errors';
 
 describe('Viking.Record::where', () => {
 

@@ -1,7 +1,6 @@
-import 'mocha';
 import * as assert from 'assert';
-import VController from 'viking/controller';
-import VikingRouter from 'viking/router';
+import VController from '@malomalo/viking/controller';
+import VikingRouter from '@malomalo/viking/router';
 
 describe('Viking.Controller', () => {
     

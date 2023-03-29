@@ -1,6 +1,5 @@
-import 'mocha';
 import * as assert from 'assert';
-import VikingRecord from 'viking/record';
+import VikingRecord from '@malomalo/viking/record';
 
 describe('Viking.Record::urlRoot', () => {
 

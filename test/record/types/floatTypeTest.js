@@ -1,6 +1,5 @@
-import 'mocha';
 import * as assert from 'assert';
-import FloatType from 'viking/record/types/float';
+import FloatType from '@malomalo/viking/record/types/float';
 
 describe('Viking.Record.Types', () => {
     describe('Float', () => {

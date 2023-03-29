@@ -1,10 +1,9 @@
 import * as assert from 'assert';
 // import * as sinon from 'sinon';
-import 'mocha';
-import VikingRecord from 'viking/record';
-import { toQuery } from 'viking/support/object';
-import { ServerError } from 'viking/errors';
-import { hasMany, belongsTo } from 'viking/record/associations';
+import VikingRecord from '@malomalo/viking/record';
+import { toQuery } from '@malomalo/viking/support/object';
+import { ServerError } from '@malomalo/viking/errors';
+import { hasMany, belongsTo } from '@malomalo/viking/record/associations';
 
 describe('Viking.Record::instantiate', () => {
 

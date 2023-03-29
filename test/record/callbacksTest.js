@@ -1,6 +1,5 @@
-import 'mocha';
 import * as assert from 'assert';
-import Record from 'viking/record';
+import Record from '@malomalo/viking/record';
 
 describe('Viking.Record#callbacks', () => {
     

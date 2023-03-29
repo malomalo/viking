@@ -1,11 +1,10 @@
-import 'mocha';
 import * as sinon from 'sinon';
-import assert from 'assert';
-import { toQuery }  from 'viking/support/object';
-import Model        from 'viking/record';
-import Connection   from 'viking/record/connection';
+import * as assert from 'assert';
+import { toQuery }  from '../lib/viking/support/object.js';
+import Model        from '../lib/viking/record.js';
+import Connection   from '../lib/viking/record/connection.js';
 
-assert.tag = function (tag, name, attrsOrContent, content) {
+export function assert_tag (tag, name, attrsOrContent, content) {
     var attrs;
     
     if (typeof attrsOrContent === 'string') {
@@ -15,12 +14,12 @@ assert.tag = function (tag, name, attrsOrContent, content) {
         attrs = attrsOrContent;
     }
     
-    assert.tagName(tag, name);
+    assert_tagName(tag, name);
 
     if ( attrs === undefined || Object.entries(attrs).length === 0 ) {
-        assert.noTagAttributes(tag);
+        assert_noTagAttributes(tag);
     } else {
-        assert.tagAttributes(tag, attrs);
+        assert_tagAttributes(tag, attrs);
     }
     
     if (content) {
@@ -28,11 +27,11 @@ assert.tag = function (tag, name, attrsOrContent, content) {
     }
 }
 
-assert.tagName = function (tag, name) {
+export function assert_tagName (tag, name) {
     assert.equal(tag.tagName, name.toUpperCase());
 }
 
-assert.tagAttributes = function (tag, attrs) {
+export function assert_tagAttributes (tag, attrs) {
     Object.entries(attrs).forEach((k) => {
         if (k[1] === true) {
             assert.equal(tag.getAttribute(k[0]), '');
@@ -42,7 +41,7 @@ assert.tagAttributes = function (tag, attrs) {
     });
 }
 
-assert.noTagAttributes = function (tag) {
+export function assert_noTagAttributes (tag) {
     assert.equal(Object.entries(tag.attributes).length, 0);
 }
 

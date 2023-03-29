@@ -1,6 +1,5 @@
-import 'mocha';
 import * as assert from 'assert';
-import Model from 'viking/record';
+import Model from '@malomalo/viking/record';
 
 describe('Viking.Record#save', () => {
     class Actor extends Model {

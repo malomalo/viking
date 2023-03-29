@@ -1,7 +1,6 @@
-import 'mocha';
 import * as assert from 'assert';
-import * as StringSupport from 'viking/support/string';
-import { NameError } from 'viking/errors';
+import * as StringSupport from '@malomalo/viking/support/string';
+import { NameError } from '@malomalo/viking/errors';
 
 describe('VikingSupport.String', () => {
 

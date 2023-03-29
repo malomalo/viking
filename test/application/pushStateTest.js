@@ -1,9 +1,5 @@
-import 'mocha';
 import * as assert from 'assert';
-import Application from 'viking/application';
-import View from 'viking/view';
-import Router from 'viking/router';
-import Controller from 'viking/controller';
+import {Application, View, Router, Controller} from '@malomalo/viking';
 
 describe('Viking/Application', () => {
     

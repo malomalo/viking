@@ -1,6 +1,5 @@
-import 'mocha';
 import * as assert from 'assert';
-import {toParam, toQuery} from 'viking/support/array';
+import {toParam, toQuery} from '@malomalo/viking/support/array';
 
 describe('VikingSupport.Array', () => {
 

@@ -1,6 +1,5 @@
-import 'mocha';
 import * as assert from 'assert';
-import {toParam, toQuery} from 'viking/support/boolean';
+import {toParam, toQuery} from '@malomalo/viking/support/boolean';
 
 describe('VikingSupport.Boolean', () => {
 

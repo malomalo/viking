@@ -1,8 +1,7 @@
 import * as assert from 'assert';
-import 'mocha';
-import VikingRecord from 'viking/record';
-import { belongsTo } from 'viking/record/associations';
-import {extendClass} from 'viking/support/class';
+import VikingRecord from '@malomalo/viking/record';
+import { belongsTo } from '@malomalo/viking/record/associations';
+import {extendClass} from '@malomalo/viking/support/class';
 
 describe('Viking.Record belongsToAssociations autosave', () => {
     class User extends VikingRecord {
