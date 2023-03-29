@@ -49,6 +49,17 @@ describe('Viking.Record', () => {
             let b = a.clone();
             a.preferences.fruit = 'banana'
             assert.equal(b.preferences.fruit, 'apple')
+            
+            a = new Actor({preferences: {}});
+            b = a.clone();
+            a.preferences.fruit = 'banana'
+            assert.equal(b.preferences.fruit, undefined)
+            
+            
+            a = new Actor({preferences: null});
+            b = a.clone();
+            a.preferences = {fruit: 'banana'}
+            assert.equal(b.preferences, undefined)
         })
     })
 
