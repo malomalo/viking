@@ -41,6 +41,57 @@ describe('VikingSupport.Object', () => {
             },
             c: 3
         });
+        
+        assert.deepEqual(
+            deepAssign({test: [1,2], bar: 2}, {test: [3,4]}),
+            {test: [3,4], bar: 2}
+        );
+        
+        assert.deepEqual(
+            deepAssign({test: {bar: [1,2]}}, {test: {bar: [3,4]}}),
+            {test: {bar: [3,4]}}
+        );
+        
+        assert.deepEqual(
+            deepAssign({test: {bar: [[1],[2]]}}, {test: {bar: [[3],[4]]}}),
+            {test: {bar: [[3],[4]]}}
+        );
+        
+        const foo = {agents: [{
+            name: "Jerry",
+            status: 'active'
+        }, {
+            name: "Rob",
+            status: 'active'
+        }]}
+        const was = deepAssign({}, foo)
+        foo.agents.find(x => x.name == "Jerry").status = "inactive"
+        
+        assert.deepEqual(
+            was,
+            {
+                agents: [{
+                        name: "Jerry",
+                        status: 'active'
+                    }, {
+                        name: "Rob",
+                        status: 'active'
+                }]
+            }
+        );
+        
+        assert.deepEqual(
+            foo,
+            {
+                agents: [{
+                        name: "Jerry",
+                        status: 'inactive'
+                    }, {
+                        name: "Rob",
+                        status: 'active'
+                }]
+            }
+        );
     });
 
 });
