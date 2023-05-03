@@ -28,6 +28,15 @@ describe('Viking.Record.Types', () => {
             }
         });
         
+        // it("::load coerces {} to Viking.Model with modelName set to key", function() {
+        //     assert.equal(JSONType.load({}, 'key').modelName.name, 'Key');
+        // });
+        
+        // it("::load coerces {} to Viking.Model with baseModel set to the JSON object", function() {
+        //     var attribute = JSONType.load({}, 'key');
+        //     assert.strictEqual(attribute.baseModel, attribute);
+        // });
+        
         describe("changes", () => {
 
             it("first level key", () => {
