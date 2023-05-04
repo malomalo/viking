@@ -14,8 +14,17 @@ describe('Viking.Record.Types', () => {
         it("coerces {} to Viking.Record", () => {
             let model = new Actor({preferences: {}})
             assert.deepEqual(model.preferences, {});
+            
             model = new Actor({preferences: {key: 'value'}})
             assert.deepEqual(model.preferences, {key: 'value'});
+        });
+        
+        it("null", () => {
+            let model = new Actor({preferences: null})
+            assert.equal(model.preferences, null);
+            
+            model = new Actor({preferences: {green_room: null}})
+            assert.deepEqual(model.preferences, {green_room: null});
         });
     
         it("thows error when can't coerce value", function() {
