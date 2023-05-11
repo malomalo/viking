@@ -136,6 +136,21 @@ describe('Viking.Record.Types', () => {
   //           it("array.remove")
         })
         
+        describe('clone', () => {
+            it('initiates new references', () => {
+                let model = new Actor({preferences: {fruit: 'apple', water: 'still'}}).persist()
+                let clone = model.clone()
+                
+                clone.preferences.fruit = 'orange'
+                assert.equal(model.preferences.fruit, 'apple')
+                
+                model = new Actor({preferences: {fruit: {green_room: 'apple'}, water: 'still'}}).persist()
+                clone = model.clone()
+                clone.preferences.fruit.green_room = 'orange'
+                assert.equal(model.preferences.fruit.green_room, 'apple')
+            })
+        })
+        
         // it("::load doesn't use the type key for STI", function () {
         //     assert.deepEqual(JSONType.load({type: 'my_value'}).attributes, {type: 'my_value'});
         // });
