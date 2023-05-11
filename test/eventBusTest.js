@@ -93,6 +93,15 @@ describe('Viking.Events', () => {
     //   obj.trigger('a b c');
     //   assert.equal(counter, 5);
     // });
+    
+    it('binding and trigger with arguments', () => {
+        const obj = new Event();
+        obj.addEventListener('a', (...args) => {
+            assert.equal(args[0], 'foo')
+            assert.equal(args[1], 'bar')
+        })
+        obj.dispatchEvent('a', 'foo', 'bar')
+    })
 
     it('binding and trigger with event maps context', () => {
       let counter = 0;
