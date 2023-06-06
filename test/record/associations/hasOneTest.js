@@ -94,14 +94,18 @@ describe('Viking.Record::associations', () => {
                 console.log('done1');
                 xhr.respond(200, {}, '[{"id": 3, "name": "C"}]');
             })
+
             this.onRequest('GET', '/as', { params: {where: {b_id: 3}, order: {id: 'desc'}, limit: 1 } }, (xhr) => {
                 console.log('done2');
-                xhr.respond(200, {}, '[{"id": 09}]');
+                xhr.respond(200, {}, '[]');
             });
-
+            
             let model = new C({id: 1, b_id: 3})
-            console.error('%%%%%%%', model.b.a)
-            model.b.a.thenw(n => { console.log('IIIII'); assert.equal(null, n)}, () => console.error('^^^^^^^^^^^^^^')).then(done, done)
+            model.b.a.then(n => {
+                assert.equal(null, n)
+            }).then(done, done)
+            
+
         });
 
         it("return null if no parent", function(done) {

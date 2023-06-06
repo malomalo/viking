@@ -81,10 +81,10 @@ describe('Viking.Record::associations', () => {
             );
         });
 
-        it("doesn't send query if not foriegnKey present", function() {
+        it("doesn't send query if not foriegnKey present", async function() {
             let model = new Model();
             
-            assert.strictEqual(model.parent,  null);
+            assert.strictEqual(await model.parent,  null);
             assert.equal(this.requests.length, 0);
         });
 
