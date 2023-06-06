@@ -96,7 +96,6 @@ describe('Viking.Record::associations', () => {
             })
 
             this.onRequest('GET', '/as', { params: {where: {b_id: 3}, order: {id: 'desc'}, limit: 1 } }, (xhr) => {
-                console.log('done2');
                 xhr.respond(200, {}, '[]');
             });
             
