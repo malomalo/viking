@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import 'mocha';
 import VikingRecord from 'viking/record';
-import { hasOne, hasMany } from 'viking/record/associations';
+import { hasOne, hasMany, belongsTo } from 'viking/record/associations';
 import * as Errors from 'viking/errors';
 
 describe('Viking.Record::associations', () => {
@@ -79,6 +79,31 @@ describe('Viking.Record::associations', () => {
                 [{id: 1, name: 'A Up', x: 2}],
                 await model.b.as.where({x: 2}).map((x) => x.attributes)
             );
+        });
+        
+        it("allows deep chaining with a null at end", function (done) {
+            class A extends VikingRecord { }
+            class B extends VikingRecord {
+                static associations = [hasOne(A)];
+            }
+            class C extends VikingRecord {
+                static associations = [belongsTo(B)];
+            }
+
+            this.onRequest('GET', '/bs', { params: {where: {id: 3}, order: {id: 'desc'}, limit: 1} }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 3, "name": "C"}]');
+            })
+
+            this.onRequest('GET', '/as', { params: {where: {b_id: 3}, order: {id: 'desc'}, limit: 1 } }, (xhr) => {
+                xhr.respond(200, {}, '[]');
+            });
+            
+            let model = new C({id: 1, b_id: 3})
+            model.b.a.then(n => {
+                assert.equal(null, n)
+            }).then(done, done)
+            
+
         });
 
         it("return null if no parent", function(done) {
