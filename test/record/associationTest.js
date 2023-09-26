@@ -50,6 +50,29 @@ describe('Viking.Record::associations', () => {
             });
         })
         
+        
     });
     
+    describe('association function', () => {
+        class Tool extends VikingRecord {}
+        class Phase extends VikingRecord {}
+        class Requirement extends VikingRecord {
+            static associations = () => [ hasMany(Phase) ]
+        }
+        class DesignRequirement extends Requirement {
+            static associations = [
+                hasMany(Tool)
+            ]
+        }
+        
+        it("load association", () => {
+            let record = new Requirement()
+            assert.deepEqual(['phases'], Object.keys(record._associations))
+        })
+        
+        it("nested extensions", () => {
+            let record = new DesignRequirement()
+            assert.deepEqual(['phases', 'tools'], Object.keys(record._associations))
+        })
+    })
 });
