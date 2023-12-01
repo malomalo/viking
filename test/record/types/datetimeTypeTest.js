@@ -17,6 +17,11 @@ describe('Viking.Record.Types', () => {
 
         it("::load coerces iso8601 string to date", function() {
             assert.deepEqual(
+                DateTimeType.load("2013-04-10T21:24+00:00"),
+                new Date(1365629040000)
+            );
+            
+            assert.deepEqual(
                 DateTimeType.load("2013-04-10T21:24:28+00:00"),
                 new Date(1365629068000)
             );
