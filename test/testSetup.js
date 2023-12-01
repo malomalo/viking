@@ -11,4 +11,5 @@ jsdom('', {
 });
 
 process.env.NODE_PATH = path.resolve(__dirname + '/../lib:') + process.env.NODE_PATH;
+process.env.TZ = 'America/Chicago';
 module._initPaths();
