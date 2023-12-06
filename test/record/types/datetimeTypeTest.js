@@ -54,7 +54,11 @@ describe('Viking.Record.Types', () => {
         it("::dump coerces Date to ISOString", function() {
             assert.deepEqual(
                 DateTimeType.dump(new Date(1365629068000)),
-                "2013-04-10T21:24:28.000Z"
+                "2013-04-10T16:24:28.000-0500"
+            );
+            assert.deepEqual(
+                DateTimeType.dump(new Date("2013-04-10T21:24:28")),
+                "2013-04-10T21:24:28.000-0500"
             );
         });
 
