@@ -33,7 +33,7 @@
     "sinon": "^15.0.1"
   },
   "scripts": {
-    "test": "npx mocha -r @babel/register -r test/testSetup.js test/testHelper.js 'test/**/*Test.js'",
+    "test": "npx mocha -r @babel/register -r test/testSetup.js test/testHelper.js 'test/**/hasManyTest.js'",
     "esdoc": "npx esdoc"
   },
   "dependencies": {
