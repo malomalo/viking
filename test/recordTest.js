@@ -74,12 +74,16 @@ describe('Viking.Record', () => {
         assert.equal(false, doc.isSaving());
         
         const promise = doc.save();
+        assert.equal(doc.isSaving(), true);
         this.withRequest('POST', '/actors', { body: {
             actor: { title: 'The Tempest', author: 'Bill Shakespeare'  }
         }}, (xhr) => {
-            assert.equal(doc.isSaving(), true);
             xhr.respond(201, {}, '{"id": 1, "name": { title: "The Tempest", author: "Bill Shakespeare"  }}');
         });
+        
+        promise.then(() =>
+            assert.equal(doc.isSaving(), false)
+        );
         
         assert.doesNotReject(promise);
     });
