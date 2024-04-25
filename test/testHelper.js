@@ -110,7 +110,7 @@ before(function() {
         if (!match) {
             console.error("\x1b[33m", "!!! MISSED REQUESTS !!!!!")
             console.error("\x1b[33m", "\tREQUEST")
-            console.error("\x1b[33m", "\t\t" + [method, decodeURIComponent('http://example.com' + url + `?${toQuery(options?.params)}`), JSON.stringify(options?.body)].filter(x => x).join("\t"));
+            console.error("\x1b[33m", "\t\t" + [method, decodeURIComponent('http://example.com' + url + `${ options?.params ? "?" + toQuery(options.params) : ""}`), JSON.stringify(options?.body)].filter(x => x).join("\t"));
             console.error("\x1b[33m", "\tQUEUE");
             this.requests.forEach((xhr) => {
                 console.error("\x1b[33m", "\t\t" + [xhr.method, decodeURIComponent(xhr.url), xhr.requestBody].filter(x => x).join("\t"));

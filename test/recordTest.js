@@ -69,6 +69,25 @@ describe('Viking.Record', () => {
         assert.equal(doc.readAttribute('author'), 'Bill Shakespeare');
     });
     
+    it('isSaving', function () {
+        let doc = new Actor({title: 'The Tempest', author: 'Bill Shakespeare'});
+        assert.equal(false, doc.isSaving());
+        
+        const promise = doc.save();
+        assert.equal(doc.isSaving(), true);
+        this.withRequest('POST', '/actors', { body: {
+            actor: { title: 'The Tempest', author: 'Bill Shakespeare'  }
+        }}, (xhr) => {
+            xhr.respond(201, {}, '{"id": 1, "name": { title: "The Tempest", author: "Bill Shakespeare"  }}');
+        });
+        
+        promise.then(() =>
+            assert.equal(doc.isSaving(), false)
+        );
+        
+        assert.doesNotReject(promise);
+    });
+    
     // it('nested set triggers with the correct options', () => {
     //   let model = new Model();
     //   let o1 = {};
