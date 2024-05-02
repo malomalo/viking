@@ -56,6 +56,23 @@ describe('Viking.Relation', () => {
             });
         })
         
+        it('afterResponse', function (done) {
+            const relation = Model.where({parent_id: 11})
+
+            relation.addEventListener('afterResponse', response => {
+                response[0].name = "foo"
+            });
+            relation.addEventListener('afterAdd', records => {
+                assert.deepEqual(records.map(x => x.readAttribute('name')), ['foo']);
+            });
+            
+            relation.load().then(() => done(), done)
+            
+            this.withRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 1}]');
+            });
+        })
+        
         it('afterLoad', function (done) {
             const relation = Model.where({parent_id: 11})
 
