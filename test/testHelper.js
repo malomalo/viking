@@ -105,7 +105,7 @@ before(function() {
     };
 
     this.findRequest = (method, url, options) => {
-        let match = this.requests.find((xhr) => xhr.sendFlag && requestMatches(xhr, method, url, options));
+        let match = this.requests.find((xhr) => xhr.sendFlag && !xhr.aborted && requestMatches(xhr, method, url, options));
 
         if (!match) {
             console.error("\x1b[33m", "!!! MISSED REQUESTS !!!!!")

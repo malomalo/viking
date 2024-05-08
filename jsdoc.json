@@ -1,0 +1,17 @@
+{
+    "plugins": ["plugins/markdown"],
+    "markdown": {
+        "tags": ["fires"]
+    },
+    "recurseDepth": 10,
+    "source": {
+        "includePattern": ".+\\.js(doc|x)?$",
+        "excludePattern": "(^|\\/|\\\\)_"
+    },
+    "sourceType": "module",
+    "opts": {
+        "destination": "./out/",
+        "recurse": true,
+        "readme": "./README.md"
+    }
+}
