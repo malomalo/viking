@@ -34,10 +34,12 @@
   },
   "scripts": {
     "test": "npx mocha -r @babel/register -r test/testSetup.js test/testHelper.js 'test/**/*Test.js'",
-    "esdoc": "npx esdoc"
+    "esdoc": "npx esdoc",
+    "jsdoc": "npx jsdoc -c jsdoc.json lib/"
   },
   "dependencies": {
-    "esdoc-ecmascript-proposal-plugin": "^1.0.0"
+    "esdoc-ecmascript-proposal-plugin": "^1.0.0",
+    "jsdoc": "^4.0.3"
   },
   "esdoc": {
     "source": "./lib",
@@ -46,13 +48,13 @@
       {
         "name": "esdoc-standard-plugin",
         "brand": {
-                "logo": "./logo.png",
-                "title": "Viking.js",
-                "description": "Viking.js is an open-source web framework for JavaScript. Inspired by Backbone.js & Ruby on Rails; it makes it easier to write client side JavaScript applications.",
-                "repository": "https://github.com/malomalo/viking",
-                "site": "http://vikingjs.com",
-                "image": "http://vikingjs.com/logo.png"
-              }
+          "logo": "./logo.png",
+          "title": "Viking.js",
+          "description": "Viking.js is an open-source web framework for JavaScript. Inspired by Backbone.js & Ruby on Rails; it makes it easier to write client side JavaScript applications.",
+          "repository": "https://github.com/malomalo/viking",
+          "site": "http://vikingjs.com",
+          "image": "http://vikingjs.com/logo.png"
+        }
       },
       {
         "name": "esdoc-ecmascript-proposal-plugin",
