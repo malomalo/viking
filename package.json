@@ -30,7 +30,9 @@
     "jsdom": "^21.1.0",
     "jsdom-global": "^3.0.2",
     "mocha": "^10.2.0",
-    "sinon": "^15.0.1"
+    "sinon": "^15.0.1",
+    "esdoc-ecmascript-proposal-plugin": "^1.0.0",
+    "jsdoc": "^4.0.3"
   },
   "scripts": {
     "test": "npx mocha -r @babel/register -r test/testSetup.js test/testHelper.js 'test/**/*Test.js'",
@@ -38,8 +40,6 @@
     "jsdoc": "npx jsdoc -c jsdoc.json lib/"
   },
   "dependencies": {
-    "esdoc-ecmascript-proposal-plugin": "^1.0.0",
-    "jsdoc": "^4.0.3"
   },
   "esdoc": {
     "source": "./lib",
