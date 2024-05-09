@@ -51,4 +51,45 @@ describe('Viking/Application', () => {
         
         const app = new MyApplication();
     });
+    
+    describe('#display', () => {
+        it('global property as object', done => {
+            class MyApplication extends Application {
+                static globals = {
+                    foo: 'bar'
+                }
+            }
+            class MyView extends View {
+                constructor (locals) {
+                    super(locals)
+                    assert.equal('bar', locals.foo)
+                    done()
+                }
+            }
+            let app = new MyApplication();
+        
+            app.display(MyView);
+        })
+        
+        it('global property as function', done => {
+            class MyApplication extends Application {
+                static globals = function (app) {
+                    return { app }
+                }
+            }
+            let app = new MyApplication();
+            
+            class MyView extends View {
+                constructor (locals) {
+                    super(locals)
+                    assert.ok(locals.app == app)
+                    done()
+                }
+            }
+        
+            app.display(MyView);
+        })
+    })
+    
+    
 });
