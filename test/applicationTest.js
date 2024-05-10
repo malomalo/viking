@@ -6,61 +6,49 @@ import Router from 'viking/router';
 import Controller from 'viking/controller';
 
 describe('Viking/Application', function () {
-    it('tests the title of the Browser if the view has a title', function () {
-        class MyView extends View {
-            title = 'my new title';
-        }
-
-        let app = new Application();
-
-        app.display(MyView);
-        // TODO not sure why this is failing
-        // assert.equal(document.title, 'my new title');
-    });
-
-    it('test if render is async then display is called after render is complete', (done) => {
-        class MyController extends Controller {
-            show()  {
-                this.display(View).then(done, done);
-            }
-        }
-
-        class MyRouter extends Router {
-            static routes = {
-                '/': { to: { controller: MyController, action: 'show' } }
-            };
-        }
-
-        class MyApplication extends Application {
-            static router = MyRouter;
-
-            async render () {
-                await new Promise(resolve => {
-                    setTimeout(function () {
-                        this.el.innerHTML = 'hello'
-                        resolve();
-                    }, 10);
-                });
-            }
-
-            async display () {
-                assert.equal(this.el.innerHTML, 'hello');
-            }
-        }
-
-        const app = new MyApplication();
-    });
     
-    describe('::layout', function () {
+    
+    describe('::title', function () {
+        it('application title', async function () {
+            class MyApplication extends Application {
+                static title = 'my new title';
+            }
+
+            let app = new MyApplication();
+
+            await app.display(() => createElement('div'));
+            
+            assert.equal(document.title, 'my new title')
+        });
+        
+        it('display title', async function () {
+            class MyApplication extends Application {
+                static title = 'my new title';
+            }
+
+            let app = new MyApplication();
+
+            await app.display(() => createElement('div'), {}, {
+                title: 'better title'
+            });
+            
+            assert.equal(document.title, 'better title')
+        });
+    })
+    
+    describe('#layout', function () {
         it('Element', async function () {
             class MyApplication extends Application {
                 layout = (locals) => {
-                    return createElement('layout', locals.content())
+                    return createElement('layout', [
+                        locals.message,
+                        locals.content()
+                    ])
                 }
             }
             let app = new MyApplication();
-            await app.display(() => createElement('div', 'Hello'));
-            assert.equal(app.el.outerHTML, '<div><layout><div>Hello</div></layout></div>')
+            await app.display((locals) => createElement('div', 'Hello'), {message: 'Hello'});
+            assert.equal(app.el.outerHTML, '<div><layout>Hello<div>Hello</div></layout></div>')
         })
         it('[Element]', async function () {
             class MyApplication extends Application {
@@ -123,7 +111,7 @@ describe('Viking/Application', function () {
             let app = new MyApplication();
             await app.display(() => createElement('div', 'Hello'));
 
-            await app.display(() => createElement('div', 'World'), {
+            await app.display(() => createElement('div', 'World'), {}, {
                 layout: (locals) => {
                     return createElement('new-layout', locals.content())
                 }
@@ -133,11 +121,11 @@ describe('Viking/Application', function () {
         })
     })
     
-    describe('display', function () {
+    describe('#display', function () {
         it('Element', async function () {
             class MyApplication extends Application {}
             let app = new MyApplication();
-            await app.display(() => createElement('div', 'Hello'));
+            await app.display((locals) => createElement('div', locals.message), {message: 'Hello'});
             assert.equal(app.el.outerHTML, '<div><div>Hello</div></div>')
         })
         it('[Element]', async function () {
@@ -156,6 +144,32 @@ describe('Viking/Application', function () {
                 ])
             }));
             assert.equal(app.el.outerHTML, '<div><div>Hello</div><div>World</div></div>')
+        })
+    })
+    
+    describe('#helpers', function () {
+        it('object', async function () {
+            class MyApplication extends Application {
+                helpers = {
+                    someGlobalProp: 'Hello'
+                }
+            }
+            let app = new MyApplication();
+            await app.display((locals) => createElement('div', locals.someGlobalProp));
+            assert.equal(app.el.outerHTML, '<div><div>Hello</div></div>')
+        })
+        it('function', async function () {
+            class MyApplication extends Application {
+                appProp = 'Hello'
+                helpers = () => {
+                    return {
+                        app: this
+                    }
+                }
+            }
+            let app = new MyApplication();
+            await app.display((locals) => createElement('div', locals.app.appProp));
+            assert.equal(app.el.outerHTML, '<div><div>Hello</div></div>')
         })
     })
 });

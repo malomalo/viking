@@ -137,4 +137,3 @@ global.createElement = (tag, content) => {
     el.append(...content)
     return el
 }
-console.log(global);
