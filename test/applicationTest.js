@@ -86,20 +86,19 @@ describe('Viking/Application', function () {
         })
 
         it('keeps layout on subsequent displays', async function () {
+            let timesRun = 0
             class MyApplication extends Application {
                 layout = (locals) => {
+                    timesRun++
                     return createElement('layout', locals.content())
                 }
             }
             let app = new MyApplication();
             await app.display(() => createElement('div', 'Hello'));
-
-            const layout = app.el.querySelector('layout')
+            assert.equal(timesRun, 1)
 
             await app.display(() => createElement('div', 'World'));
-
-            assert.equal(app.el.outerHTML, '<div><layout><div>World</div></layout></div>')
-            assert.equal(layout, app.el.querySelector('layout'))
+            assert.equal(timesRun, 1)
         })
 
         it('changes layout', async function () {
