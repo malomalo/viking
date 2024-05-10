@@ -5,20 +5,19 @@ import View from 'viking/view';
 import Router from 'viking/router';
 import Controller from 'viking/controller';
 
-describe('Viking/Application', () => {
-    
-    it('tests the title of the Browser if the view has a title', () => {
+describe('Viking/Application', function () {
+    it('tests the title of the Browser if the view has a title', function () {
         class MyView extends View {
             title = 'my new title';
         }
-        
+
         let app = new Application();
-        
+
         app.display(MyView);
         // TODO not sure why this is failing
         // assert.equal(document.title, 'my new title');
     });
-    
+
     it('test if render is async then display is called after render is complete', (done) => {
         class MyController extends Controller {
             show()  {
@@ -31,180 +30,132 @@ describe('Viking/Application', () => {
                 '/': { to: { controller: MyController, action: 'show' } }
             };
         }
-        
+
         class MyApplication extends Application {
             static router = MyRouter;
-            
+
             async render () {
                 await new Promise(resolve => {
-                    setTimeout(() => {
+                    setTimeout(function () {
                         this.el.innerHTML = 'hello'
                         resolve();
                     }, 10);
                 });
             }
-            
+
             async display () {
                 assert.equal(this.el.innerHTML, 'hello');
             }
         }
-        
+
         const app = new MyApplication();
     });
     
-    describe('::layout', () => {
-        it('Element', async () => {
+    describe('::layout', function () {
+        it('Element', async function () {
             class MyApplication extends Application {
-                static layout = (content) => {
-                    const el = document.createElement('layout')
-                    el.append(content)
-                    return el
+                layout = (locals) => {
+                    return createElement('layout', locals.content())
                 }
             }
             let app = new MyApplication();
-            const el = document.createElement('div')
-            el.innerHTML = 'Hello'
-            await app.display(el);
+            await app.display(() => createElement('div', 'Hello'));
             assert.equal(app.el.outerHTML, '<div><layout><div>Hello</div></layout></div>')
         })
-        it('[Element]', async () => {
+        it('[Element]', async function () {
             class MyApplication extends Application {
-                static layout = (content) => {
-                    const el = document.createElement('layout')
-                    el.append(content)
+                layout = (locals) => {
                     return [
-                        el
+                        createElement('layout', locals.content())
                     ]
                 }
             }
             let app = new MyApplication();
-            const el = document.createElement('div')
-            el.innerHTML = 'World'
-            await app.display(el);
+            await app.display(() => createElement('div', 'World'));
             assert.equal(app.el.outerHTML, '<div><layout><div>World</div></layout></div>')
         })
-        
-        it('Promise', async () => {
+
+        it('Promise', async function () {
             class MyApplication extends Application {
-                static layout = async (content) => {
+                layout = async (locals) => {
                     return new Promise(resolve => {
-                        const el = document.createElement('layout')
-                        el.append(content)
-                        resolve(el)
+                        resolve(createElement('layout', locals.content()))
                     })
                 }
             }
             let app = new MyApplication();
-            const el = document.createElement('div')
-            el.innerHTML = 'Hello'
-            await app.display(el);
+            await app.display(() => createElement('div', 'Hello'));
             assert.equal(app.el.outerHTML, '<div><layout><div>Hello</div></layout></div>')
         })
-        
-        it('false', async () => {
+
+        it('false', async function () {
             class MyApplication extends Application {
-                static layout = () => false
+                layout = (locals) => false
             }
             let app = new MyApplication();
-            const el = document.createElement('div')
-            el.innerHTML = 'Hello'
-            await app.display(el);
+            await app.display(() => createElement('div', 'Hello'));
             assert.equal(app.el.outerHTML, '<div><div>Hello</div></div>')
         })
-        
-        it('keeps layout on subsequent displays', async () => {
+
+        it('keeps layout on subsequent displays', async function () {
             class MyApplication extends Application {
-                static layout = (content) => {
-                    const el = document.createElement('layout')
-                    el.append(content)
-                    return el
+                layout = (locals) => {
+                    return createElement('layout', locals.content())
                 }
             }
             let app = new MyApplication();
-            const el = document.createElement('div')
-            el.innerHTML = 'Hello'
-            await app.display(el);
-            
+            await app.display(() => createElement('div', 'Hello'));
+
             const layout = app.el.querySelector('layout')
-            
-            const el2 = document.createElement('div')
-            el2.innerHTML = 'World'
-            await app.display(el2)
-            
+
+            await app.display(() => createElement('div', 'World'));
+
             assert.equal(app.el.outerHTML, '<div><layout><div>World</div></layout></div>')
             assert.equal(layout, app.el.querySelector('layout'))
         })
-        
-        it('changes layout', async () => {
+
+        it('changes layout', async function () {
             class MyApplication extends Application {
-                static layout = (content) => {
-                    const el = document.createElement('layout')
-                    el.append(content)
-                    return el
+                layout = (locals) => {
+                    return createElement('layout', locals.content())
                 }
             }
             let app = new MyApplication();
-            const el = document.createElement('div')
-            el.innerHTML = 'Hello'
-            await app.display(el);
-            
-            const el2 = document.createElement('div')
-            el2.innerHTML = 'World'
-            await app.display(el2, {
-                layout: content => {
-                    const el = document.createElement('new-layout')
-                    el.append(content)
-                    return el
+            await app.display(() => createElement('div', 'Hello'));
+
+            await app.display(() => createElement('div', 'World'), {
+                layout: (locals) => {
+                    return createElement('new-layout', locals.content())
                 }
-            })
-            
+            });
+
             assert.equal(app.el.outerHTML, '<div><new-layout><div>World</div></new-layout></div>')
         })
     })
     
-    describe('display', () => {
-        it('Element', async () => {
+    describe('display', function () {
+        it('Element', async function () {
             class MyApplication extends Application {}
             let app = new MyApplication();
-            const el = document.createElement('div')
-            el.innerHTML = 'Hello'
-            await app.display(el);
+            await app.display(() => createElement('div', 'Hello'));
             assert.equal(app.el.outerHTML, '<div><div>Hello</div></div>')
         })
-        it('[Element]', async () => {
+        it('[Element]', async function () {
             class MyApplication extends Application {}
             let app = new MyApplication();
-            const el = document.createElement('div')
-            el.innerHTML = 'Hello'
-            await app.display([el]);
+            await app.display(() => [createElement('div', 'Hello')]);
             assert.equal(app.el.outerHTML, '<div><div>Hello</div></div>')
         })
-        it('Promise', () => {
+        it('Promise', async function () {
             class MyApplication extends Application {}
             let app = new MyApplication();
-            const render =  new Promise(resolve => {
-                const el = document.createElement('div')
-                el.innerHTML = 'Hello'
-                
-                const el2 = document.createElement('div')
-                el2.innerHTML = 'World'
-                resolve([el, el2])
-            })
-            app.display(render);
-            return render.then(() => {
-                assert.equal(app.el.outerHTML, '<div><div>Hello</div><div>World</div></div>')
-            })
-        })
-        it('View', async () => {
-            class MyApplication extends Application {}
-            class MyView extends View {
-                render () {
-                    this.el.innerHTML = 'Hello World'
-                }
-            }
-            let app = new MyApplication();
-            await app.display(new MyView())
-            assert.equal(app.el.outerHTML, '<div><div>Hello World</div></div>')
+            await app.display(() => new Promise(resolve => {
+                resolve([
+                    createElement('div', 'Hello'),
+                    createElement('div', 'World')
+                ])
+            }));
+            assert.equal(app.el.outerHTML, '<div><div>Hello</div><div>World</div></div>')
         })
     })
 });

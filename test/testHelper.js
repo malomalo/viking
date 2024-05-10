@@ -130,3 +130,11 @@ after(function () {
 beforeEach(function () {
     this.requests = [];
 });
+
+global.createElement = (tag, content) => {
+    const el = document.createElement(tag)
+    if (!Array.isArray(content)) { content = [content] }
+    el.append(...content)
+    return el
+}
+console.log(global);
