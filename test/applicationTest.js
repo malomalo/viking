@@ -143,6 +143,14 @@ describe('Viking/Application', function () {
                 ])
             }));
             assert.equal(app.el.outerHTML, '<div><div>Hello</div><div>World</div></div>')
+            
+            await app.display(() => new Promise(resolve => {
+                resolve([
+                    createElement('div', 'Game'),
+                    createElement('div', '7')
+                ])
+            }));
+            assert.equal(app.el.outerHTML, '<div><div>Game</div><div>7</div></div>')
         })
     })
     
