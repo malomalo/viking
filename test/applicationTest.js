@@ -17,10 +17,10 @@ describe('Viking/Application', function () {
             let app = new MyApplication();
 
             await app.display(() => createElement('div'));
-            
+
             assert.equal(document.title, 'my new title')
         });
-        
+
         it('display title', async function () {
             class MyApplication extends Application {
                 static title = 'my new title';
@@ -31,7 +31,7 @@ describe('Viking/Application', function () {
             await app.display(() => createElement('div'), {}, {
                 title: 'better title'
             });
-            
+
             assert.equal(document.title, 'better title')
         });
     })
@@ -42,7 +42,7 @@ describe('Viking/Application', function () {
                 layout = (locals) => {
                     return createElement('layout', [
                         locals.message,
-                        locals.content()
+                        ...locals.content()
                     ])
                 }
             }
@@ -117,10 +117,34 @@ describe('Viking/Application', function () {
             });
 
             assert.equal(app.el.outerHTML, '<div><new-layout><div>World</div></new-layout></div>')
+
+            await app.display(() => createElement('div', 'Game 7'), {}, {
+                layout: (locals) => false
+            });
+
+            assert.equal(app.el.outerHTML, '<div><div>Game 7</div></div>')
         })
     })
-    
+
     describe('#display', function () {
+        it('String', async function () {
+            class MyApplication extends Application {}
+            let app = new MyApplication();
+            await app.display((locals) => "Hello");
+            assert.equal(app.el.outerHTML, '<div>Hello</div>')
+
+            await app.display((locals) => "World");
+            assert.equal(app.el.outerHTML, '<div>World</div>')
+        })
+        it('HTML', async function () {
+            class MyApplication extends Application {}
+            let app = new MyApplication();
+            await app.display((locals) => "<div>Hello</div><div>World</div>");
+            assert.equal(app.el.outerHTML, '<div><div>Hello</div><div>World</div></div>')
+
+            await app.display((locals) => "<div>Game</div><div>7</div>");
+            assert.equal(app.el.outerHTML, '<div><div>Game</div><div>7</div></div>')
+        })
         it('Element', async function () {
             class MyApplication extends Application {}
             let app = new MyApplication();
@@ -143,7 +167,7 @@ describe('Viking/Application', function () {
                 ])
             }));
             assert.equal(app.el.outerHTML, '<div><div>Hello</div><div>World</div></div>')
-            
+
             await app.display(() => new Promise(resolve => {
                 resolve([
                     createElement('div', 'Game'),
@@ -153,7 +177,7 @@ describe('Viking/Application', function () {
             assert.equal(app.el.outerHTML, '<div><div>Game</div><div>7</div></div>')
         })
     })
-    
+
     describe('#helpers', function () {
         it('object', async function () {
             class MyApplication extends Application {
