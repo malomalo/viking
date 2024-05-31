@@ -244,4 +244,16 @@ describe('Viking.Relation', () => {
             
         })
     })
+    
+    describe('setTarget', () => {
+        it('sets collection', function (done) {
+            let relation = Model.where({parent_id: 11})
+            relation.load().then(records => {
+                assert.deepEqual([relation, relation], records.map(r => r.collection))
+            }).finally(done)
+            this.withRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 1}, {"id": 2}]');
+            });
+        })
+    })
 })
