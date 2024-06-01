@@ -172,6 +172,27 @@ describe('Viking.Record::associations', () => {
             // });
         });
         
+        describe('setTarget', () => {
+            it('adds to collections', function () {
+                let parent = new Parent()
+                let model = new Model({parents: [parent]})
+                assert.deepStrictEqual([model.association('parents')], parent.collections)
+                
+                let model2 = new Model({parents: [parent]})
+                assert.deepStrictEqual([model.association('parents'), model2.association('parents')], parent.collections)
+            })
+
+            it('removes from collections', function () {
+                let parent = new Parent()
+                let model = new Model({parents: [parent]})
+                let model2 = new Model({parents: [parent]})
+
+                model.parents = []
+
+                assert.deepStrictEqual([model2.association('parents')], parent.collections)
+            })
+        })
+        
         describe('addBang', () => {
             it('sends request', function () {
                 let model = Model.instantiate({id: 24})
