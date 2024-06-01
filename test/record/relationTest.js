@@ -1,6 +1,7 @@
 import 'mocha';
 import * as assert from 'assert';
 import VikingRecord from 'viking/record';
+import Relation from 'viking/record/relation';
 
 describe('Viking.Relation', () => {
 
@@ -246,13 +247,24 @@ describe('Viking.Relation', () => {
     })
     
     describe('setTarget', () => {
-        it('sets collection', function (done) {
+        it('adds to collections on add', function (done) {
             let relation = Model.where({parent_id: 11})
             relation.load().then(records => {
-                assert.deepEqual([relation, relation], records.map(r => r.collection))
+                assert.deepEqual([[relation], [relation]], records.map(r => r.collection))
             }).finally(done)
             this.withRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
                 xhr.respond(200, {}, '[{"id": 1}, {"id": 2}]');
+            });
+        })
+        
+        it('adds to collections on add', function (done) {
+            let relation = new Relation(Model)
+            relation.setTarget([{id: 1}, {id: 2}].map(r => Model.instantiate(r)))
+            relation.load().then(records => {
+                assert.deepEqual([[], []], records.map(r => r.collection))
+            }).finally(done)
+            this.withRequest('GET', '/models', { params: { order: {id: 'desc'} } }, (xhr) => {
+                xhr.respond(200, {}, '[]');
             });
         })
     })
