@@ -1,6 +1,7 @@
 import 'mocha';
 import * as assert from 'assert';
 import VikingRecord from 'viking/record';
+import Relation from 'viking/record/relation';
 
 describe('Viking.Relation', () => {
 
@@ -242,6 +243,33 @@ describe('Viking.Relation', () => {
             await relation.remove(relation.target[1])
             assert.deepEqual(relation.target.map(x => x.readAttribute('id')), [1])
             
+        })
+    })
+    
+    describe('setTarget', () => {
+        it('adds to collections on add', function (done) {
+            let relation = Model.where({parent_id: 11})
+            relation.load().then(records => {
+                assert.strictDeepEqual([[relation], [relation]], records.map(r => r.collections))
+            }).finally(done)
+            this.withRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 1}, {"id": 2}]');
+            });
+        })
+        
+        it('adds to collections on add', function (done) {
+            let model = new Model({id: 1})
+            let relation = new Relation(Model)
+            relation.setTarget([model, new Model({id: 2})])
+            
+            const relation2 = new Relation(Model)
+            relation2.setTarget([model, new Model({id: 3})])
+            relation.load().then(records => {
+                assert.strictDeepEqual([[relation2], []], records.map(r => r.collections))
+            }).finally(done)
+            this.withRequest('GET', '/models', { params: { order: {id: 'desc'} } }, (xhr) => {
+                xhr.respond(200, {}, '[]');
+            });
         })
     })
 })
