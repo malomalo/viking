@@ -216,7 +216,34 @@ describe('Viking.Relation', () => {
             assert.ok(this.findRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {created_at: 'desc'}, distinct: true } }));
         })
     })
-    
+
+    describe('groupBy', () => {
+        it('groupBy a column', function () {
+            let relation = Model.groupBy('parent_id')
+            
+            relation.load()
+            assert.ok(this.findRequest('GET', '/models', { params: { order: {id: 'desc'}, group_by: 'parent_id' } }));
+        })
+        
+        it('groupBy multiple columns', function () {
+            let relation = Model.groupBy('parent_id', 'region_id')
+
+            relation.load()
+            assert.ok(this.findRequest('GET', '/models', { params: { order: {id: 'desc'}, group_by: ['parent_id', 'region_id'] } }));
+        })
+
+        it('dinstinct then spawn', function () {
+            let relationA = Model.groupBy('parent_id');
+            let relationB = relationA.groupBy('region_id').order('created_at');
+
+            relationA.load()
+            assert.ok(this.findRequest('GET', '/models', { params: { order: {id: 'desc'}, group_by: 'parent_id' } }));
+
+            relationB.load()
+            assert.ok(this.findRequest('GET', '/models', { params: { order: {created_at: 'desc'}, group_by: ['parent_id', 'region_id'] } }));
+        })
+    })
+
     describe('add', () => {
         it('single record', async function () {
             let relation = Model.where({parent_id: 11})
