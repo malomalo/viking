@@ -31,6 +31,16 @@ describe('Viking.Record', () => {
         });
     });
 
+    it('::count with groupBy', function(done) {
+        Ship.groupBy('name').count().then((count) => {
+            assert.deepEqual(count, {jon: 100});
+        }).then(done, done);
+
+        this.withRequest('GET', '/ships/calculate', { params: {order: {id: 'desc'}, group_by: 'name', select: {count: '*'} } }, (xhr) => {
+            xhr.respond(200, {}, '{"jon": 100}');
+        });
+    });
+
     it('::sum', function(done) {
         Ship.sum('size').then((count) => {
             assert.equal(count, 100);
