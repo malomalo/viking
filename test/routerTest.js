@@ -350,6 +350,9 @@ describe('Viking.Router', () => {
             static routes = {
                 '/projects': (params) => {
                     assert.equal(params.counter, 2);
+                },
+                '/projects_with_nested_params': (params) => {
+                    assert.equal(params.nest.counter, 2);
                 }
             };
         }
@@ -358,6 +361,7 @@ describe('Viking.Router', () => {
         this.router.start();
 
         this.router.navigateTo('/projects', {counter: 2})
+        this.router.navigateTo('/projects_with_nested_params', {nest: {counter: 2}})
     })
 
     // test('routes with a string', async () => {
