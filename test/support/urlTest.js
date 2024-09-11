@@ -31,5 +31,11 @@ describe('VikingSupport.URL', () => {
         }, parseSearchParams("pets[][]=dogs&pets[][]=Purplish"));
     });
     
+    it('#parseSearchParams(basicArrays)', () => {
+        assert.deepEqual({
+            pets: ['dogs', 'cats']
+        }, parseSearchParams("pets[]=dogs&pets[]=cats"));
+    });
+    
 });
 
