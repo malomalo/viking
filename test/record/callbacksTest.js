@@ -126,6 +126,55 @@ describe('Viking.Record#callbacks', () => {
                 xhr.respond(201, {}, '[{"id": 1, "score": 1}]');
             });
         })
+        
+        it('afterSave with multiple async saves', function (done) {
+            const actor = Actor.instantiate({name: 'Ben', id: 1, score: 2})
+            let count = 0
+            actor.addEventListener('afterSave', (...args) => {
+                count++
+            })
+            actor.setAttribute('name', 'Jon')
+            actor.save().then((...args) => {
+                assert.equal(count, 1)
+            }).then(() => {
+                this.withRequest('PUT', '/actors/1', { body: {actor: {name: "Charlie"} } }, (xhr) => {
+                    xhr.respond(201, {}, '{"id": 1, "name": "Charlie"}');
+                });
+            })
+
+            actor.setAttribute('name', 'Charlie')
+            actor.save().then((...args) => {
+                assert.equal(count, 2)
+            }).then(done, done)
+
+            this.withRequest('PUT', '/actors/1', { body: {actor: {name: "Jon"} } }, (xhr) => {
+                xhr.respond(201, {}, '{"id": 1, "name": "Jon"}');
+            });
+            
+        })
+        
+        it('afterSave with sync saves', function (done) {
+            const actor = Actor.instantiate({name: 'Ben', id: 1, score: 2})
+            let count = 0
+            actor.addEventListener('afterSave', (...args) => {
+                count++
+            })
+            actor.setAttribute('name', 'Jon')
+            actor.save().then((...args) => {
+                assert.equal(count, 1)
+            }).then(() => {
+                actor.setAttribute('name', 'Charlie')
+                actor.save().then((...args) => {
+                    assert.equal(count, 2)
+                }).then(done, done)
+                this.withRequest('PUT', '/actors/1', { body: {actor: {name: "Charlie"} } }, (xhr) => {
+                    xhr.respond(201, {}, '{"id": 1, "name": "Charlie"}');
+                });
+            })
+            this.withRequest('PUT', '/actors/1', { body: {actor: {name: "Jon"} } }, (xhr) => {
+                xhr.respond(201, {}, '{"id": 1, "name": "Jon"}');
+            });
+        })
     })
     
     describe('destroy', async () => {
