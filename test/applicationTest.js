@@ -64,7 +64,7 @@ describe('Viking/Application', function () {
     describe('#layout', function () {
         it('Element', async function () {
             class MyApplication extends Application {
-                layout = (locals) => {
+                static layout = (locals) => {
                     return createElement('layout', [
                         locals.message,
                         ...locals.content()
@@ -77,7 +77,7 @@ describe('Viking/Application', function () {
         })
         it('[Element]', async function () {
             class MyApplication extends Application {
-                layout = (locals) => {
+                static layout = (locals) => {
                     return [
                         createElement('layout', locals.content())
                     ]
@@ -90,7 +90,7 @@ describe('Viking/Application', function () {
 
         it('Promise', async function () {
             class MyApplication extends Application {
-                layout = async (locals) => {
+                static layout = async (locals) => {
                     return new Promise(resolve => {
                         resolve(createElement('layout', locals.content()))
                     })
@@ -103,7 +103,7 @@ describe('Viking/Application', function () {
 
         it('false', async function () {
             class MyApplication extends Application {
-                layout = (locals) => false
+                static layout = (locals) => false
             }
             let app = new MyApplication();
             await app.display(() => createElement('div', 'Hello'));
@@ -113,7 +113,7 @@ describe('Viking/Application', function () {
         it('keeps layout on subsequent displays', async function () {
             let timesRun = 0
             class MyApplication extends Application {
-                layout = (locals) => {
+                static layout = (locals) => {
                     timesRun++
                     return createElement('layout', locals.content())
                 }
@@ -128,7 +128,7 @@ describe('Viking/Application', function () {
 
         it('changes layout', async function () {
             class MyApplication extends Application {
-                layout = (locals) => {
+                static layout = (locals) => {
                     return createElement('layout', locals.content())
                 }
             }
