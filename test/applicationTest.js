@@ -23,7 +23,7 @@ describe('Viking/Application', function () {
                         '/': {to: [MyController, 'index']}
                     };
                 }
-                layout = locals => {
+                static layout = locals => {
                     const el = document.createElement('foo')
                     el.append(...locals.content())
                     return el
@@ -60,7 +60,7 @@ describe('Viking/Application', function () {
             assert.equal(document.title, 'better title')
         });
     })
-    
+
     describe('#layout', function () {
         it('Element', async function () {
             class MyApplication extends Application {
