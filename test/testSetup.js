@@ -7,6 +7,7 @@ jsdom('', {
     beforeParse(window) {
         // setup dummy class for support.js
         window.DataTransferItemList = function () {}
+        window.scrollTo = function () {}
     }
 });
 

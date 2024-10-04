@@ -7,6 +7,31 @@ import Controller from 'viking/controller';
 
 describe('Viking/Application', function () {
     
+    describe('constructor', function () {
+        it('router.start', function (done) {
+            class MyController extends Controller {
+                async index () {
+                    await this.display(() => 'Hello World')
+                    assert.equal(app.el.outerHTML, '<main><foo>Hello World</foo></main>')
+                    done()
+                }
+            }
+            class MyApplication extends Application {
+                static tagName = 'main'
+                static router = class MyRouter extends Router {
+                    static routes = {
+                        '/': {to: [MyController, 'index']}
+                    };
+                }
+                layout = locals => {
+                    const el = document.createElement('foo')
+                    el.append(...locals.content())
+                    return el
+                }
+            }
+            const app = new MyApplication()
+        })
+    })
     
     describe('::title', function () {
         it('application title', async function () {
