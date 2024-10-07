@@ -367,6 +367,61 @@ describe('Viking.Router', () => {
         this.router.navigateTo('/projects_with_nested_params', {nest: {counter: 2}})
         this.router.navigateTo('/projects_with_array_params', {ids: [1 ,2]})
     })
+    
+    describe('events', function () {
+        it('beforeNavigation', function (done) {
+            let counter = 0;
+            let fooCounter = 0;
+
+            class Router extends VikingRouter {
+                static routes = {
+                    '/': () => { counter++; },
+                    '/foo': () => { fooCounter++; }
+                };
+            }
+
+            this.router = new Router();
+            this.router.addEventListener('beforeNavigation', (url) => {
+                if (url == "/") {
+                    assert.equal(counter, 0)
+                    assert.equal(fooCounter, 0)
+                }
+                if (url == "/foo") {
+                    assert.equal(counter, 1)
+                    assert.equal(fooCounter, 0)
+                    done()
+                }
+            })
+            this.router.navigateTo('/')
+            this.router.navigateTo('/foo')
+        })
+        it('afterNavigation', function (done) {
+            let counter = 0;
+            let fooCounter = 0;
+
+            class Router extends VikingRouter {
+                static routes = {
+                    '/': () => { counter++; },
+                    '/foo': () => { fooCounter++; }
+                };
+            }
+
+            this.router = new Router();
+            this.router.addEventListener('afterNavigation', (url) => {
+                if (url == "/") {
+                    assert.equal(counter, 1)
+                    assert.equal(fooCounter, 0)
+                }
+                if (url == "/foo") {
+                    assert.equal(counter, 1)
+                    assert.equal(fooCounter, 1)
+                    done()
+                }
+            })
+            this.router.navigateTo('/')
+            this.router.navigateTo('/foo')
+        })
+    })
 
     // test('routes with a string', async () => {
     //     await new Promise((resolve) => {
