@@ -50,6 +50,11 @@ Model.connection = new Connection('http://example.com');
 
 before(function() {
     this.requestCallbacks = [];
+    
+    assert.request = (method, url, options) => {
+        let match = this.findRequest(method, url, options);
+        assert.ok(!!match)
+    }
 
     function requestMatches(xhr, method, url, {params = null, body =  null} = {}) {
         let matchingURL = url;
