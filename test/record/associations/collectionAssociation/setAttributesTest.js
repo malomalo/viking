@@ -13,13 +13,16 @@ describe('Viking.Record::associations', () => {
 
         describe('.setAttributes()', () => {
             it("doesn't change the order or persisted records", function(done) {
-                let model = Model.instantiate({id: 24, parents: [{id: 1, name: 'Alpha'}]});
+                let parent = Parent.instantiate({id: 1, name: 'Alpha'})
+                let model = Model.instantiate({id: 24, parents: [parent]});
+
                 model.parents.toArray().then((models) => {
                     assert.equal(models.length, 1);
                     let model = models[0];
                     assert.ok(model instanceof Parent);
                     assert.equal(model.readAttribute('id'), 1);
                     assert.equal(model.readAttribute('name'), 'Alpha');
+                    assert.strictEqual(a, parent);
                 })
                 
                 model.parents.setAttributes([
@@ -38,6 +41,7 @@ describe('Viking.Record::associations', () => {
                     assert.ok(b instanceof Parent);
                     assert.equal(b.readAttribute('id'), 1);
                     assert.equal(b.readAttribute('name'), 'Alpha');
+                    assert.strictEqual(b, parent);
                 }).then(done, done);
 
                 // this.withRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}} }, (xhr) => {
