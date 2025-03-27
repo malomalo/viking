@@ -201,6 +201,41 @@ describe('Viking.Record::associations', () => {
                 
                 assert.deepStrictEqual([parent1, parent2], parents)
             })
+            
+            it('resolves existing records', function (done) {
+                let model = new Model({id: 13})
+                model.parents.load().then(() => {
+                    const p1 = model.parents.first()
+                    model.parents.reload().then(() => {
+                        assert.equal(2, p1.readAttribute('id'))
+                        assert.equal('Bravo', p1.readAttribute('name'))
+                    }).then(done, done)
+                    
+                    this.withRequest('GET', '/parents', { params: {where: {model_id: 13}, order: {id: 'desc'}} }, (xhr) => {
+                        xhr.respond(200, {}, '[{"id": 1, "name": "Alpha"}, {"id": 2, "name": "Bravo"}]');
+                    });
+                })
+                
+                this.withRequest('GET', '/parents', { params: {where: {model_id: 13}, order: {id: 'desc'}} }, (xhr) => {
+                    xhr.respond(200, {}, '[{"id": 2, "name": "Name that will change"}]');
+                });
+            })
+        })
+        
+        describe('setAttributes', () => {
+            it('matches existing records', async function () {
+                const model = new Model({parents: [{id: 2, name: 'Name that will change'}]})
+                const p1 = await model.parents.first()
+                assert.equal(2, p1.readAttribute('id'))
+                
+                model.parents.setAttributes([
+                    {id: 1, name: 'Alpha'},
+                    {id: 2, mame: 'Bravo'}
+                ])
+                
+                assert.equal(2, p1.readAttribute('id'))
+                assert.equal('Bravo', p1.readAttribute('name'))
+            })
         })
 
         describe('addBang', () => {
