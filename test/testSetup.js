@@ -2,6 +2,11 @@ import path from 'path';
 import module from 'module';
 import jsdom from 'jsdom-global';
 
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 jsdom('', {
     url: "http://example.com/",
     beforeParse(window) {
