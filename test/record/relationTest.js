@@ -278,8 +278,20 @@ describe('Viking.Relation', () => {
                 xhr.respond(200, {}, '[{"id": 1}, {"id": 2}]');
             });
             
-            await relation.remove(relation.target[1])
+            relation.remove(relation.target[1])
             assert.deepEqual(relation.target.map(x => x.readAttribute('id')), [1])
+            
+        })
+        
+        it('multiple record', async function () {
+            let relation = Model.where({parent_id: 11})
+            relation.load()
+            await this.withRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 1}, {"id": 2}, {"id": 3}]');
+            });
+            
+            relation.remove(...relation.target.slice(0, 2))
+            assert.deepEqual(relation.target.map(x => x.readAttribute('id')), [3])
             
         })
     })
