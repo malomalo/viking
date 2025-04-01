@@ -255,7 +255,18 @@ describe('Viking.Relation', () => {
             relation.add(new Model({id: 3}))
             
             assert.deepEqual(relation.target.map(x => x.readAttribute('id')), [1, 2, 3])
-            
+        })
+        
+        it('multiple record', async function () {
+            let relation = Model.where({parent_id: 11})
+            relation.load()
+            await this.withRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 1}, {"id": 2}]');
+            });
+
+            relation.add(new Model({id: 3}), new Model({id: 4}))
+
+            assert.deepEqual(relation.target.map(x => x.readAttribute('id')), [1, 2, 3, 4])
         })
     })
     
