@@ -46,6 +46,11 @@ assert.noTagAttributes = function (tag) {
     assert.equal(Object.entries(tag.attributes).length, 0);
 }
 
+assert.notRequested = function (method, url, options={}) {
+    options.silent = true
+    return assert.ok(!this.findRequest(method, url, options))
+}
+
 Model.connection = new Connection('http://example.com');
 
 before(function() {
@@ -107,7 +112,7 @@ before(function() {
     this.findRequest = (method, url, options) => {
         let match = this.requests.find((xhr) => xhr.sendFlag && !xhr.aborted && requestMatches(xhr, method, url, options));
 
-        if (!match) {
+        if (!match && !options.silent) {
             console.error("\x1b[33m", "!!! MISSED REQUESTS !!!!!")
             console.error("\x1b[33m", "\tREQUEST")
             console.error("\x1b[33m", "\t\t" + [method, decodeURIComponent('http://example.com' + url + `${ options?.params ? "?" + toQuery(options.params) : ""}`), JSON.stringify(options?.body)].filter(x => x).join("\t"));
