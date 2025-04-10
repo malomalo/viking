@@ -12,6 +12,16 @@
     "opts": {
         "destination": "./out/",
         "recurse": true,
-        "readme": "./README.md"
+        "readme": "./README.md",
+        "template": "node_modules/jsdoc-stock"
+    },
+    "templates": {
+        "logo": "logo.png",
+        "css": "styles/jsdoc.css",
+        "default": {
+          "staticFiles": {
+            "include": ["static/", "logo.png"]
+          }
+        }
     }
 }

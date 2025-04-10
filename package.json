@@ -26,20 +26,19 @@
     "@babel/preset-env": "^7.20.2",
     "@babel/register": "^7.21.0",
     "esdoc": "^1.1.0",
+    "esdoc-ecmascript-proposal-plugin": "^1.0.0",
     "esdoc-standard-plugin": "^1.0.0",
+    "jsdoc": "^4.0.3",
+    "jsdoc-stock": "github:bemky/jsdoc-stock",
     "jsdom": "^21.1.0",
     "jsdom-global": "^3.0.2",
     "mocha": "^10.2.0",
-    "sinon": "^15.0.1",
-    "esdoc-ecmascript-proposal-plugin": "^1.0.0",
-    "jsdoc": "^4.0.3"
+    "sinon": "^15.0.1"
   },
   "scripts": {
     "test": "npx mocha -r @babel/register -r test/testSetup.js test/testHelper.js 'test/**/*Test.js'",
     "esdoc": "npx esdoc",
     "jsdoc": "npx jsdoc -c jsdoc.json lib/"
-  },
-  "dependencies": {
   },
   "esdoc": {
     "source": "./lib",

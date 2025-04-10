@@ -1,0 +1,72 @@
+body {
+    color: hsl(220, 2%, 35%);
+}
+
+.nav-heading a {
+    color: #199ba1;
+    font-size: 18px;
+}
+
+.nav-item a {
+    color: #95b51b;
+}
+
+.type-function {
+    background: #d9f4ac;
+    color: #95b51b;
+}
+
+.type-class {
+    background: #c1f1f3;
+    color: #199ba1;
+}
+
+.section-method {
+    border-bottom-color: #cbcdcc;
+    margin-bottom: 4em;
+    padding-bottom: 4em;
+}
+
+h3 {
+    font-weight: bold;
+    color: black;
+}
+
+tt, code, kbd, samp {
+    background-color: hsl(183, 35%, 93%);
+}
+.params .name, .props .name,
+tt, code, kbd, samp {
+    color: hsl(183, 50%, 40%);
+}
+
+.params thead tr, .props thead tr {
+    background-color: #ecf0f0;
+}
+
+.augments {
+    color: hsl(74, 10%, 60%);
+}
+
+.ancestors,
+.ancestors a {
+    color: hsl(74, 10%, 60%);
+}
+
+nav {
+    padding: 2em;
+}
+
+nav,
+footer {
+    background: hsl(70, 95%, 95%);
+}
+main {
+    border: none;
+}
+
+.page-title {
+    font-weight: 800;
+    color: hsl(220, 2%, 35%);
+    line-height: 1;
+}
