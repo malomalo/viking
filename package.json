@@ -38,7 +38,7 @@
   "scripts": {
     "test": "npx mocha -r @babel/register -r test/testSetup.js test/testHelper.js 'test/**/*Test.js'",
     "esdoc": "npx esdoc",
-    "jsdoc": "npx jsdoc -c jsdoc.json lib/"
+    "jsdoc": "npx jsdoc -c jsdoc.json -u tutorials lib/"
   },
   "esdoc": {
     "source": "./lib",

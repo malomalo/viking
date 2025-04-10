@@ -8,7 +8,7 @@ body {
 }
 
 .nav-item a {
-    color: #95b51b;
+    color: hsl(74, 50%,40%);
 }
 
 .type-function {
