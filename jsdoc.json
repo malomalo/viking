@@ -24,7 +24,7 @@
         "css": "styles/jsdoc.css",
         "default": {
           "staticFiles": {
-            "include": ["static/", "logo.png"]
+            "include": ["static/", "logo.png", "logo.jpg"]
           }
         }
     }
