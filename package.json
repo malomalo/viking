@@ -26,14 +26,18 @@
     "@babel/preset-env": "^7.20.2",
     "@babel/register": "^7.21.0",
     "jsdoc": "^4.0.3",
+    "jsdoc-export-default-interop": "^0.3.1",
     "jsdoc-stock": "github:bemky/jsdoc-stock",
     "jsdom": "^21.1.0",
     "jsdom-global": "^3.0.2",
     "mocha": "^10.2.0",
-    "sinon": "^15.0.1"
+    "nodemon": "^3.1.9",
+    "sinon": "^15.0.1",
+    "taffydb": "^2.7.3"
   },
   "scripts": {
     "test": "npx mocha -r @babel/register -r test/testSetup.js test/testHelper.js 'test/**/*Test.js'",
-    "jsdoc": "npx jsdoc -c jsdoc.json -u tutorials lib/"
+    "docs": "npx jsdoc -c jsdoc.json -u tutorials lib/",
+    "docs:watch": "nodemon --watch lib --ext js --exec \"npm run docs\""
   }
 }

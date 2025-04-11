@@ -12,13 +12,15 @@ body {
 }
 
 .type-function {
-    background: #d9f4ac;
-    color: #95b51b;
+    --hue: 124;
 }
 
 .type-class {
-    background: #c1f1f3;
-    color: #199ba1;
+    --hue: 183;
+}
+
+.type-member {
+    --hue: 240;
 }
 
 .section-method {
@@ -41,7 +43,7 @@ tt, code, kbd, samp {
 }
 
 .params thead tr, .props thead tr {
-    background-color: #ecf0f0;
+    background-color: hsl(74, 20%, 94%);;
 }
 
 .augments {
@@ -59,7 +61,7 @@ nav {
 
 nav,
 footer {
-    background: hsl(70, 95%, 95%);
+    background: hsl(74, 20%, 94%);
 }
 main {
     border: none;
@@ -69,4 +71,7 @@ main {
     font-weight: 800;
     color: hsl(220, 2%, 35%);
     line-height: 1;
+}
+.container {
+    grid-template-columns: minmax(min-content, 280px) 1fr;
 }
