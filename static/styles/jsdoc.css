@@ -42,10 +42,6 @@ tt, code, kbd, samp {
     color: hsl(183, 50%, 40%);
 }
 
-.params thead tr, .props thead tr {
-    background-color: hsl(74, 20%, 94%);;
-}
-
 .augments {
     color: hsl(74, 10%, 60%);
 }
@@ -74,4 +70,52 @@ main {
 }
 .container {
     grid-template-columns: minmax(min-content, 280px) 1fr;
+}
+
+.class-description {
+    font-size: 1em;
+}
+
+.class-description p:first-of-type {
+    font-size: 1.2em;
+}
+
+.class-description td, .class-description th {
+    margin: 0px;
+    text-align: left;
+    vertical-align: top;
+    padding: 0.5em;
+    display: table-cell;
+}
+
+.class-description table {
+    border-spacing: 0;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    width: 100%;
+    font-size: 0.9em;
+}
+
+.class-description td {
+    border-top: 1px solid #eee
+}
+
+.class-description thead tr {
+    background-color: #ecf0f0;
+    font-weight: bold;
+}
+
+.class-description td.description > p:first-child {
+    margin-top: 0;
+    padding-top: 0;
+}
+
+.class-description td.description > p:last-child{
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+
+.params thead tr, .props thead tr, .class-description thead tr {
+    background-color: hsl(74, 20%, 94%);
 }
