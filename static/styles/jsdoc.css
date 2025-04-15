@@ -42,6 +42,15 @@ tt, code, kbd, samp {
     color: hsl(183, 50%, 40%);
 }
 
+.prettyprint {
+    box-shadow: none;
+    border: none;
+}
+
+.prettyprint code {
+    background-color: hsl(183, 35%, 93%);
+}
+
 .augments {
     color: hsl(74, 10%, 60%);
 }
@@ -118,4 +127,45 @@ main {
 
 .params thead tr, .props thead tr, .class-description thead tr {
     background-color: hsl(74, 20%, 94%);
+}
+
+article table {
+    border-spacing: 0;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    width: 100%;
+    font-size: 0.9em;
+}
+
+article table td, article table th{
+    margin: 0px;
+    text-align: left;
+    vertical-align: top;
+    padding: 0.5em;
+    display: table-cell;
+}
+
+article table td {
+    border-top: 1px solid #eee
+}
+
+article table thead tr {
+    background-color: #ecf0f0;
+    font-weight: bold;
+}
+
+article table article table thead tr {
+    background-color: #fff;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+article table td.description > p:first-child {
+    margin-top: 0;
+    padding-top: 0;
+}
+
+article table td.description > p:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
 }

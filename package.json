@@ -38,6 +38,6 @@
   "scripts": {
     "test": "npx mocha -r @babel/register -r test/testSetup.js test/testHelper.js 'test/**/*Test.js'",
     "docs": "npx jsdoc -c jsdoc.json -u tutorials lib/",
-    "docs:watch": "nodemon --watch lib --ext js --exec \"npm run docs\""
+    "docs:watch": "nodemon --watch lib --watch static --watch tutorials --ext js,md,json,css --exec \"npm run docs\""
   }
 }
