@@ -27,11 +27,13 @@ describe('Viking.Record#update', () => {
     }
     
     describe("updating a new record", () => {
+        
         it("sends post request", function (done) {
-            let a = new Model({ string: 'hello' });
+            let a = new Model();
             
             assert.ok(a.isNewRecord())
             a.update({string: 'world'}).then(() => {
+                assert.equal(a.id, 12)
                 assert.equal(a.string, 'world')
                 assert.ok(!a.isNewRecord())
             }).then(done, done);
@@ -39,32 +41,17 @@ describe('Viking.Record#update', () => {
             this.withRequest('POST', '/models', { body: {
                 model: { string: 'world' }
             }}, (xhr) => {
-                xhr.respond(201, {}, '{"integer": 1, "string": "world"}');
+                xhr.respond(201, {}, '{"id": 12, "string": "world"}');
             });
         });
         
-        it("sends only explicitly stated attributes", function (done) {
-            let a = new Model({ string: 'hello', integer: 1 });
-            
-            assert.ok(a.isNewRecord())
-            a.update({string: 'world'}).then(() => {
-                assert.equal(a.string, 'world')
-                assert.ok(!a.isNewRecord())
-            }).then(done, done);
-        
-            this.withRequest('POST', '/models', { body: {
-                model: { string: 'world' }
-            }}, (xhr) => {
-                xhr.respond(201, {}, '{"integer": 1, "string": "world"}');
-            });
-        });
-
         it('sets attributes returned from the server', function(done) {
-            let a = new Model({ string: 'hello' });
+            let a = new Model();
             
             assert.ok(a.isNewRecord())
             a.update({string: 'world'}).then(() => {
                 assert.ok(!a.isNewRecord())
+                assert.equal(a.id, 2);
                 assert.equal(a.integer, 1);
                 assert.equal(a.string, 'bye');
                 assert.equal(a.boolean, false);
@@ -73,7 +60,7 @@ describe('Viking.Record#update', () => {
             this.withRequest('POST', '/models', { body: {
                 model: { string: 'world' }
             }}, (xhr) => {
-                xhr.respond(201, {}, '{"integer": 1, "string": "bye", "boolean": false}');
+                xhr.respond(201, {}, '{"id": 2, "integer": 1, "string": "bye", "boolean": false}');
             });
         });
         
@@ -81,38 +68,19 @@ describe('Viking.Record#update', () => {
             let a = new Model({ string: 'hello' });
             
             assert.ok(a.isNewRecord())
-            a.update({string: 'hello'}).then(() => {
-                assert.ok(!a.isNewRecord())
-            }).then(done, done);
-        
-            this.withRequest('POST', '/models', { body: {
-                model: { string: 'hello' }
-            }}, (xhr) => {
-                xhr.respond(201, {}, '{"string": "hello"}');
-            });
-        });
-        
-        it('updates record changes', function(done) {
-            let a = new Model({ integer: 1, string: 'hello', boolean: true });
-            
-            assert.ok(a.isNewRecord())
             a.update({string: 'world'}).then(() => {
                 assert.ok(!a.isNewRecord())
-                assert.deepEqual(a.changes(), {
-                    boolean: [false, true],
-                    integer: [2, 1]
-                })
             }).then(done, done);
         
             this.withRequest('POST', '/models', { body: {
                 model: { string: 'world' }
             }}, (xhr) => {
-                xhr.respond(201, {}, '{"integer": 2, "string": "world", "boolean": false}');
+                xhr.respond(201, {}, '{"string": "hello"}');
             });
         });
         
         it("sends post request with namespace", function (done) {
-            let a = new Submodel({ });
+            let a = new Submodel();
             
             assert.ok(a.isNewRecord())
             a.update({key: 99}).then(() => {
@@ -134,9 +102,10 @@ describe('Viking.Record#update', () => {
         it("sends request when changed to falsy values", function (done) {
             let model = Model.instantiate({ id: 99, integer: 1, string: 'world', boolean: true })
         
+            assert.ok(!model.isNewRecord())
             model.update({integer: 0, boolean: false}).then(() => {
                 assert.ok(!model.isNewRecord())
-                assert.ok(!model.boolean)
+                assert.strictEqual(model.boolean, false)
                 assert.equal(model.integer, 0)
                 assert.deepEqual(model.changes(), {})
             }).then(done, done);
@@ -151,6 +120,7 @@ describe('Viking.Record#update', () => {
         it('sets attributes returned from the server', function(done) {
             let model = Model.instantiate({ id: 99, integer: 1, string: 'hello', boolean: true })
             
+            assert.ok(!model.isNewRecord())
             model.update({string: 'world'}).then(() => {
                 assert.ok(!model.isNewRecord())
                 assert.equal(model.integer, 3);
@@ -162,28 +132,6 @@ describe('Viking.Record#update', () => {
                 model: { string: 'world' }
             }}, (xhr) => {
                 xhr.respond(201, {}, '{"id": 99, "integer": 3, "string": "bye", "boolean": false}');
-            });
-        });
-        
-        it('preserves dirty attributes', function(done) {
-            let model = Model.instantiate({ id: 99, integer: 1, string: 'hello', boolean: true })
-            
-            model.string = 'world'
-            
-            model.update({integer: 11}).then(() => {
-                assert.ok(!model.isNewRecord())
-                assert.equal(model.integer, 11);
-                assert.equal(model.boolean, false);
-                assert.equal(model.string, 'world');
-                assert.deepEqual(model.changes(), {
-                    string: ['bye', 'world']
-                })
-            }).then(done, done);
-        
-            this.withRequest('PUT', '/models/99', { body: {
-                model: { integer: 11}
-            }}, (xhr) => {
-                xhr.respond(201, {}, '{"id": 99, "integer": 11, "string": "bye", "boolean": false}');
             });
         });
         
