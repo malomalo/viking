@@ -19,14 +19,6 @@ describe('Viking.Record#update', () => {
         };
     }
     
-    class Submodel extends VikingRecord {
-        static namespace = 'Model';
-        static schema = {
-            id:         {type: 'integer'},
-            key:        {type: 'integer'},
-        }
-    }
-    
     describe("#updateAttributes()", () => {
         describe("on a new record", () => {
             it("throws an error", function () {

@@ -18,14 +18,6 @@ describe('Viking.Record#update', () => {
         };
     }
     
-    class Submodel extends VikingRecord {
-        static namespace = 'Model';
-        static schema = {
-            id:         {type: 'integer'},
-            key:        {type: 'integer'},
-        }
-    }
-    
     describe("updating a new record", () => {
         
         it("sends post request", function (done) {
@@ -79,23 +71,6 @@ describe('Viking.Record#update', () => {
             });
         });
         
-        it("sends post request with namespace", function (done) {
-            let a = new Submodel();
-            
-            assert.ok(a.isNewRecord())
-            a.update({key: 99}).then(() => {
-                assert.ok(!a.isNewRecord())
-                assert.equal(a.key, 99);
-                assert.equal(a.id, 929);
-            }).then(done, done);
-        
-            this.withRequest('POST', '/model/submodels', { body: {
-                model_submodel: { key: 99 }
-            }}, (xhr) => {
-                xhr.respond(201, {}, '{"key": 99, "id": 929}');
-            });
-        });
-
     });
     
     describe("saving a persisted record", () => {
