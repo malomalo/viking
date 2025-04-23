@@ -66,13 +66,13 @@ describe('Viking.Record#update', () => {
                 });
             });
 
-            it('sends only the explicitly stated attributes from the server response', function(done) {
+            it('sents attributes from the server response', function(done) {
                 let record = Model.instantiate({ id: 99 })
             
                 record.updateAttributes({string: 'world'}).then(() => {
-                    assert.equal(record.integer, null);
+                    assert.equal(record.integer, 3);
                     assert.equal(record.string, 'bye');
-                    assert.equal(record.boolean, null);
+                    assert.equal(record.boolean, false);
                 }).then(done, done);
         
                 this.withRequest('PUT', '/models/99', { body: {
@@ -88,10 +88,10 @@ describe('Viking.Record#update', () => {
                 model.string = 'world'
                 model.updateAttributes({integer: 11}).then(() => {
                     assert.equal(model.integer, 11);
-                    assert.equal(model.boolean, true);
+                    assert.equal(model.boolean, false);
                     assert.equal(model.string, 'world');
                     assert.deepEqual(model.changes(), {
-                        string: ['hello', 'world']
+                        string: ['bye', 'world']
                     })
                 }).then(done, done);
 
@@ -114,7 +114,7 @@ describe('Viking.Record#update', () => {
                 });
                 
                 record.updateAttributes({integer: 11}).then(() => {
-                    assert.deepEqual(callbacks, ['beforeSync', 'changed:integer', 'changed', 'afterSync', 'afterSync:integer'])
+                    assert.deepEqual(callbacks, ['beforeSync', 'changed:integer', "changed:string", "changed:boolean", 'changed', 'afterSync', 'afterSync:integer', "afterSync:string", "afterSync:boolean"])
                 }).then(() => done(), done);
                 
                 this.withRequest('PUT', '/models/99', { body: {
