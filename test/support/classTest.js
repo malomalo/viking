@@ -2,7 +2,7 @@ import 'mocha';
 import * as assert from 'assert';
 import { extendClass } from 'viking/support/class';
 
-describe.only('VikingSupport.Class', () => {
+describe('VikingSupport.Class', () => {
 
     it('#extendClass()', () => {
         function Boat () {}
