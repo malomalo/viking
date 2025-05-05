@@ -26,6 +26,24 @@ describe('Viking.Record::associations', () => {
             });
         });
         
+        it("load with polymorphic and sti", function(done) {
+            class Attachment extends VikingRecord {}
+            class SubModel extends Model {
+                static associations = [hasOne(Attachment, {as: 'record'})]
+            }
+            
+            let model = new SubModel({id: 24});
+
+            model.attachment.then((attachment) => {
+                assert.ok(attachment instanceof Attachment);
+                assert.equal(attachment.readAttribute('id'), 1);
+            }).then(done, done);
+            
+            this.withRequest('GET', '/attachments', { params: {where: {record_id: 24, record_type: 'Model'}, order: {id: 'desc'}, limit: 1} }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 1}]');
+            });
+        });
+        
         it("reload association", function (done) {
             let model = new Model({id: 24});
             model.parent.then(p => {
