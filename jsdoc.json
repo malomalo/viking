@@ -1,31 +1,34 @@
 {
-    "plugins": ["plugins/markdown"],
-    "markdown": {
-        "tags": ["fires"]
-    },
+    "sourceType": "module",
     "recurseDepth": 10,
     "source": {
+        "include": ["./lib/"],
+        "exclude": ["./node_modules/"],
         "includePattern": ".+\\.js(doc|x)?$",
         "excludePattern": "(^|\\/|\\\\)_"
     },
     "sourceType": "module",
     "opts": {
-        "destination": "./out/",
+        "destination": "./docs/",
         "recurse": true,
-        "readme": "./README.md",
-        "template": "node_modules/jsdoc-stock"
+        "template": "node_modules/jsdoc-press"
     },
     "plugins": [
       "node_modules/jsdoc-export-default-interop/dist/index",
+      "@bemky/jsdoc-export-function-name-fix",
       "plugins/markdown"
     ],
     "templates": {
-        "logo": "logo.png",
-        "css": "styles/jsdoc.css",
-        "default": {
-          "staticFiles": {
-            "include": ["static/", "logo.png", "logo.jpg"]
-          }
-        }
+        "logo": "images/logo.png",
+        "footer": false,
+        "staticFiles": "docs-src/",
+        "nav": {
+            "order": ["class", "module"],
+            "exclude": ["typedef"]
+        },
+        "stylesheets": [
+          "./docs-src/stylesheets/jsdoc.css"
+        ],
+        "index": "./docs-src/index.md"
     }
 }

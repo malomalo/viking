@@ -1,4 +1,4 @@
-<a href="http://vikingjs.org/">![Viking.js](/logo.jpg)</a>
+<a href="http://vikingjs.org/">![Viking.js](/docs-src/images/logo.jpg)</a>
 
 Viking is an opinionated javascript framework for building front-end applications. Using an MVC, Model View Controller, structure, Viking is built to query a backend like Ruby on Rails.
 

@@ -1,0 +1,17 @@
+@import "highlight.css";
+
+:root {
+    --primary-hue: 120;
+    --code-hue: 210;
+}
+
+main,
+nav {
+    padding: 3em;
+}
+
+nav {
+    width: 25%;
+    max-width: 25% !important;
+}
+

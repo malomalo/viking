@@ -1,3 +1,6 @@
+
+<img src="/images/logo.png" width="400px">
+
 # Installation
 Viking can be installed and/or imported like any other javascript package.
 
