@@ -1,0 +1,7 @@
+.signature {
+    .signature-param,
+    .signature-return,
+    .signature-type {
+        font-weight: normal;
+    }
+}

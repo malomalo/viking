@@ -1,0 +1,62 @@
+body {
+    margin: 0 auto;
+    padding: 0;
+    display: flex;
+    height: 100vh;
+    align-items: stretch;
+    
+    nav {
+        flex: 1 0 25%;
+        max-width: min-content;
+    }
+    main {
+        flex: 4 1 auto;
+    }
+    
+    &:has(.sm-nav-trigger:checked) {
+        overflow: hidden;
+    }
+}
+
+main {
+    padding: 3em;
+    border-left: 1px solid var(--nav-border);
+    overflow: auto;
+}
+
+nav {
+    flex: 0 0 auto;
+    overflow: auto;
+    display: block;
+    max-height: 100vh;
+    position: sticky;
+    top: 0;
+    
+    padding: 3em;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: start;
+}
+
+@media only screen and (max-width: 680px) {
+    body {
+        overflow-x: hidden;
+        display: block;
+    }
+
+    nav {
+        display: none;
+    }
+
+    main {
+        width: 100%;
+        min-width: 360px;
+    }
+}
+
+@media only print {
+    nav {
+        display: none;
+    }
+}

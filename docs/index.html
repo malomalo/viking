@@ -1,0 +1,79 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="color-scheme" content="dark light"><title>Installation</title><link rel="stylesheet" href="/stylesheets/jsdoc-press.css" /><link rel="stylesheet" href="stylesheets/jsdoc.css" /></head><body><input type="checkbox" id="sm-nav-trigger" class="sm-nav-trigger" /><nav><a class="brand" href="./index.html"><img src="images/logo.png"/></a><div class="nav-group"><div class="nav-kinds">Classes</div><ul class="nav-tree"><li><a class="nav-item " href="application.html"><span class="icon-kind kind-class">C</span>
+        
+        Application
+    </a></li><li><a class="nav-item " href="association.html"><span class="icon-kind kind-class">C</span>
+        
+        Association
+    </a></li><li><a class="nav-item " href="controller.html"><span class="icon-kind kind-class">C</span>
+        
+        Controller
+    </a></li><li><a class="nav-item " href="eventbus.html"><span class="icon-kind kind-class">C</span>
+        
+        EventBus
+    </a></li><li><a class="nav-item " href="record.html"><span class="icon-kind kind-class">C</span>
+        
+        Record
+    </a></li><li><a class="nav-item " href="relation.html"><span class="icon-kind kind-class">C</span>
+        
+        Relation
+    </a></li><li><a class="nav-item " href="router.html"><span class="icon-kind kind-class">C</span>
+        
+        Router
+    </a></li><li><a class="nav-item " href="view.html"><span class="icon-kind kind-class">C</span>
+        
+        View
+    </a></li></ul></div><div class="nav-group"><div class="nav-kinds">Modules</div><ul class="nav-tree"><li><a class="nav-item " href="module-support.html"><span class="icon-kind kind-module">M</span>
+        
+        Support
+    </a></li></ul></div></nav><main class="content"><img src="/images/logo.png" width="400px"><h1>Installation</h1><p>Viking can be installed and/or imported like any other javascript package.</p><pre class="overflow-container code-block"><code class="hljs language-bash">npm install github:malomalo/viking
+</code></pre><h1>Basic Structure</h1><table><thead><tr><th>File/Folder</th><th>Purpose</th></tr></thead><tbody><tr><td>application.js</td><td>Viking.Application class that provides global object</td></tr><tr><td>router.js</td><td>Viking.Router class that configures endpoints and callbacks</td></tr><tr><td>/controllers</td><td>Folder of Viking.Controllers classes to which the router directs</td></tr><tr><td>/models</td><td>Folder of Viking.Record classes that setup the schema and configuration for accessing data models</td></tr><tr><td>/views</td><td>Templates used by Viking.Controllers for rendering</td></tr></tbody></table><h1>Setup</h1><p>Define a <a href="/Viking.Record.html">Record</a></p><pre class="overflow-container code-block"><code class="hljs language-scala"><span class="hljs-keyword">import</span> <span class="hljs-type">Record</span> from &#x27;viking&#x27;;
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Cog</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Record</span> </span>{
+    static schema = {
+        name: {<span class="hljs-class"><span class="hljs-keyword">type</span></span>: &#x27;string&#x27;},
+        price: {<span class="hljs-class"><span class="hljs-keyword">type</span></span>: &#x27;float&#x27;},
+        status: {<span class="hljs-class"><span class="hljs-keyword">type</span></span>: &#x27;string&#x27;}
+    }
+}
+</code></pre><p>Build a <a href="/Viking.View.html">View</a></p><pre class="overflow-container code-block"><code class="hljs language-axapta">import View <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;viking&#x27;</span>;
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">CogsIndexView</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_ inherited__">View</span> {
+    render () {
+        <span class="hljs-keyword">const</span> <span class="hljs-built_in">container</span> = document.createElement(<span class="hljs-string">&#x27;div&#x27;</span>)
+        <span class="hljs-keyword">this</span>.records.forEach(cog =&gt; {
+            <span class="hljs-keyword">const</span> el = document.createElement(<span class="hljs-string">&#x27;div&#x27;</span>)
+            <span class="hljs-built_in">container</span>.append(<span class="hljs-built_in">container</span>)
+            el.innerHTML = <span class="hljs-string">&#x27;&lt;span&gt;Title:&lt;/span&gt;&#x27;</span> + cog.name;
+        })
+        
+        <span class="hljs-keyword">return</span> <span class="hljs-built_in">container</span>
+    }
+}
+</code></pre><p>Define a <a href="/Viking.Controller.html">Controller</a> to declare resources and set application options</p><pre class="overflow-container code-block"><code class="hljs language-javascript"><span class="hljs-keyword">import</span> <span class="hljs-title class_">Controller</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;viking&#x27;</span>;
+<span class="hljs-keyword">import</span> cogsLayout <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;layouts/cogs-layout&#x27;</span>;
+clas <span class="hljs-title class_">CogsController</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Controller</span> {
+    <span class="hljs-title function_">index</span> () {
+        <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">display</span>(<span class="hljs-title class_">CogsIndexView</span>, {
+            <span class="hljs-attr">records</span>: <span class="hljs-title class_">Cogs</span>.<span class="hljs-title function_">where</span>({<span class="hljs-attr">status</span>: <span class="hljs-string">&#x27;active&#x27;</span>})
+        }, {
+            <span class="hljs-attr">layout</span>: cogsLayout
+        })
+    }
+    
+    <span class="hljs-title function_">show</span>(<span class="hljs-params">id</span>) {
+        <span class="hljs-comment">//...</span>
+    }
+}
+</code></pre><p>Configure routes by extending <a href="/Viking.Router.html">Router</a></p><pre class="overflow-container code-block"><code class="hljs language-javascript"><span class="hljs-keyword">import</span> <span class="hljs-title class_">Router</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;viking&#x27;</span>;
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">MyRouter</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_ inherited__">Router</span> {
+    <span class="hljs-keyword">static</span> routes = {
+        <span class="hljs-string">&#x27;/cogs&#x27;</span>: {<span class="hljs-attr">to</span>: [<span class="hljs-title class_">CogsController</span>, <span class="hljs-string">&#x27;index&#x27;</span>]}
+        <span class="hljs-string">&#x27;/cogs/:id&#x27;</span>: {<span class="hljs-attr">to</span>: [<span class="hljs-title class_">CogsController</span>, <span class="hljs-string">&#x27;show&#x27;</span>]}
+    }
+}
+</code></pre><p>Extend <a href="/Viking.Application.html">Application</a></p><pre class="overflow-container code-block"><code class="hljs language-javascript"><span class="hljs-keyword">import</span> <span class="hljs-title class_">Application</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;viking&#x27;</span>;
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">MyApplication</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_ inherited__">Application</span> {
+    <span class="hljs-keyword">static</span> router = <span class="hljs-title class_">MyRouter</span>;
+}
+</code></pre><p>Start the application on boot</p><pre class="overflow-container code-block"><code class="hljs language-javascript"><span class="hljs-title function_">domReady</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params"></span>){
+    <span class="hljs-keyword">new</span> <span class="hljs-title class_">MyApplication</span>().<span class="hljs-title function_">start</span>()
+})
+</code></pre></main><div class="sm-nav"><a href="index.html"><img src="images/logo.png" height="24px"/></a><label for="sm-nav-trigger" class="sm-nav-toggle"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></label></div><script src="/javascripts/jsdoc-press.js"></script></body></html>

@@ -1,0 +1,53 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="color-scheme" content="dark light"><title>parseSearchParams</title><link rel="stylesheet" href="/stylesheets/jsdoc-press.css" /><link rel="stylesheet" href="stylesheets/jsdoc.css" /></head><body><input type="checkbox" id="sm-nav-trigger" class="sm-nav-trigger" /><nav><a class="brand" href="./index.html"><img src="images/logo.png"/></a><div class="nav-group"><div class="nav-kinds">Classes</div><ul class="nav-tree"><li><a class="nav-item " href="application.html"><span class="icon-kind kind-class">C</span>
+        
+        Application
+    </a></li><li><a class="nav-item " href="association.html"><span class="icon-kind kind-class">C</span>
+        
+        Association
+    </a></li><li><a class="nav-item " href="controller.html"><span class="icon-kind kind-class">C</span>
+        
+        Controller
+    </a></li><li><a class="nav-item " href="eventbus.html"><span class="icon-kind kind-class">C</span>
+        
+        EventBus
+    </a></li><li><a class="nav-item " href="record.html"><span class="icon-kind kind-class">C</span>
+        
+        Record
+    </a></li><li><a class="nav-item " href="relation.html"><span class="icon-kind kind-class">C</span>
+        
+        Relation
+    </a></li><li><a class="nav-item " href="router.html"><span class="icon-kind kind-class">C</span>
+        
+        Router
+    </a></li><li><a class="nav-item " href="view.html"><span class="icon-kind kind-class">C</span>
+        
+        View
+    </a></li></ul></div><div class="nav-group"><div class="nav-kinds">Modules</div><ul class="nav-tree"><li><a class="nav-item " href="module-support.html"><span class="icon-kind kind-module">M</span>
+        
+        Support
+    </a></li></ul></div></nav><main class="content"><article class="doc"><header><div class="kind kind-color kind-function"><span class="icon-kind icon-kind-function">F</span>
+            
+            function
+        </div><h1>
+            parseSearchParams
+        </h1></header><section class="description"><p>Helper for parsing search parameters that supports Arrays.</p><p>Values will always be string; there is no type conversion. Also each array
+entry will be considered it's own object as in the first example below even
+though it may have been generated from a single object:</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>paramString</code>
+    :
+        <code class="clear">
+            
+                string
+                
+            
+        </code></div></section><section><h2>Returns</h2><div>
+                
+                    <code class="clear">
+                        
+                            <a href="support.module-object.html">Object</a>
+                            
+                        
+                    </code></div></section><section><h2>Examples</h2><pre class="overflow-container code-block"><code class="hljs language-nix"><span class="hljs-operator">//</span> returns { <span class="hljs-params">pets:</span> [ {<span class="hljs-params">category:</span> <span class="hljs-string">&quot;dogs&quot;</span>}, {<span class="hljs-params">name:</span> <span class="hljs-string">&quot;Purplish&quot;</span>} ] }
+<span class="hljs-operator">//</span> NOT { <span class="hljs-params">pets:</span> [ {<span class="hljs-params">category:</span> <span class="hljs-string">&quot;dogs&quot;</span>, <span class="hljs-params">name:</span> <span class="hljs-string">&quot;Purplish&quot;</span>} ] }
+parseSearchParams(<span class="hljs-string">&quot;pets[][category]=dogs&amp;pets[][name]=Purplish&quot;</span>) </code></pre><pre class="overflow-container code-block"><code class="hljs language-stylus"><span class="hljs-function"><span class="hljs-title">parseSearchParams</span><span class="hljs-params">(<span class="hljs-string">&quot;x=2&quot;</span>)</span></span> <span class="hljs-comment">// returns {x: &quot;2&quot;}</span></code></pre><pre class="overflow-container code-block"><code class="hljs language-inform7">// returns { pets: <span class="hljs-comment">[ <span class="hljs-comment">[&#x27;dogs&#x27;]</span>, <span class="hljs-comment">[&#x27;Purplish&#x27;]</span> ]</span> }
+parseSearchParams(<span class="hljs-string">&quot;pets<span class="hljs-subst">[]</span><span class="hljs-subst">[]</span>=dogs&amp;pets<span class="hljs-subst">[]</span><span class="hljs-subst">[]</span>=Purplish&quot;</span>) </code></pre></section></article></main><div class="sm-nav"><a href="index.html"><img src="images/logo.png" height="24px"/></a><label for="sm-nav-trigger" class="sm-nav-toggle"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></label></div><script src="/javascripts/jsdoc-press.js"></script></body></html>

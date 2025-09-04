@@ -1,0 +1,752 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="color-scheme" content="dark light"><title>Controller</title><link rel="stylesheet" href="/stylesheets/jsdoc-press.css" /><link rel="stylesheet" href="stylesheets/jsdoc.css" /></head><body><input type="checkbox" id="sm-nav-trigger" class="sm-nav-trigger" /><nav><a class="brand" href="./index.html"><img src="images/logo.png"/></a><div class="nav-group"><div class="nav-kinds">Classes</div><ul class="nav-tree"><li><a class="nav-item " href="application.html"><span class="icon-kind kind-class">C</span>
+        
+        Application
+    </a></li><li><a class="nav-item " href="association.html"><span class="icon-kind kind-class">C</span>
+        
+        Association
+    </a></li><li><a class="nav-item active" href="controller.html"><span class="icon-kind kind-class">C</span>
+        
+        Controller
+    </a><div class="nav-children-wrap"><details class="nav-detail" open><summary class="nav-subkind">Instance Properties</summary><ul class="nav-children"><li><a class="nav-item " href="controller.html#symbol-controller-_aroundactions"><span class="icon-kind kind-member">P</span>
+        
+        _aroundActions
+    </a></li><li><a class="nav-item " href="controller.html#symbol-controller-_responded"><span class="icon-kind kind-member">P</span>
+        
+        _responded
+    </a></li><li><a class="nav-item " href="controller.html#symbol-controller-_skiparoundactions"><span class="icon-kind kind-member">P</span>
+        
+        _skipAroundActions
+    </a></li><li><a class="nav-item " href="controller.html#symbol-controller-action_name"><span class="icon-kind kind-member">P</span>
+        
+        action_name
+    </a></li><li><a class="nav-item " href="controller.html#symbol-controller-application"><span class="icon-kind kind-member">P</span>
+        
+        application
+    </a></li><li><a class="nav-item " href="controller.html#symbol-controller-aroundactions"><span class="icon-kind kind-member">P</span>
+        
+        aroundActions
+    </a></li><li><a class="nav-item " href="controller.html#symbol-controller-bindedobjects"><span class="icon-kind kind-member">P</span>
+        
+        bindedObjects
+    </a></li><li><a class="nav-item " href="controller.html#symbol-controller-eventlisteners"><span class="icon-kind kind-member">P</span>
+        
+        eventListeners
+    </a></li><li><a class="nav-item " href="controller.html#symbol-controller-listenerid"><span class="icon-kind kind-member">P</span>
+        
+        listenerId
+    </a></li><li><a class="nav-item " href="controller.html#symbol-controller-params"><span class="icon-kind kind-member">P</span>
+        
+        params
+    </a></li><li><a class="nav-item " href="controller.html#symbol-controller-skiparoundactions"><span class="icon-kind kind-member">P</span>
+        
+        skipAroundActions
+    </a></li></ul></details><details class="nav-detail" open><summary class="nav-subkind">Static Methods</summary><ul class="nav-children"><li><a class="nav-item " href="controller.html#symbol-controller.getaroundactions"><span class="icon-kind kind-function">F</span>
+        
+        getAroundActions
+    </a></li><li><a class="nav-item " href="controller.html#symbol-controller.getskiparoundactions"><span class="icon-kind kind-function">F</span>
+        
+        getSkipAroundActions
+    </a></li></ul></details><details class="nav-detail" open><summary class="nav-subkind">Instance Methods</summary><ul class="nav-children"><li><a class="nav-item " href="controller.html#symbol-controller-addeventlistener"><span class="icon-kind kind-function">F</span>
+        
+        addEventListener
+    </a></li><li><a class="nav-item " href="controller.html#symbol-controller-addeventlistenerfor"><span class="icon-kind kind-function">F</span>
+        
+        addEventListenerFor
+    </a></li><li><a class="nav-item " href="controller.html#symbol-controller-dispatch"><span class="icon-kind kind-function">F</span>
+        
+        dispatch
+    </a></li><li><a class="nav-item " href="controller.html#symbol-controller-dispatchevent"><span class="icon-kind kind-function">F</span>
+        
+        dispatchEvent
+    </a></li><li><a class="nav-item " href="controller.html#symbol-controller-display"><span class="icon-kind kind-function">F</span>
+        
+        display
+    </a></li><li><a class="nav-item " href="controller.html#symbol-controller-process"><span class="icon-kind kind-function">F</span>
+        
+        process
+    </a></li><li><a class="nav-item " href="controller.html#symbol-controller-redirectto"><span class="icon-kind kind-function">F</span>
+        
+        redirectTo
+    </a></li><li><a class="nav-item " href="controller.html#symbol-controller-removeeventlistener"><span class="icon-kind kind-function">F</span>
+        
+        removeEventListener
+    </a></li><li><a class="nav-item " href="controller.html#symbol-controller-removeeventlistenerfor"><span class="icon-kind kind-function">F</span>
+        
+        removeEventListenerFor
+    </a></li></ul></details></div></li><li><a class="nav-item " href="eventbus.html"><span class="icon-kind kind-class">C</span>
+        
+        EventBus
+    </a></li><li><a class="nav-item " href="record.html"><span class="icon-kind kind-class">C</span>
+        
+        Record
+    </a></li><li><a class="nav-item " href="relation.html"><span class="icon-kind kind-class">C</span>
+        
+        Relation
+    </a></li><li><a class="nav-item " href="router.html"><span class="icon-kind kind-class">C</span>
+        
+        Router
+    </a></li><li><a class="nav-item " href="view.html"><span class="icon-kind kind-class">C</span>
+        
+        View
+    </a></li></ul></div><div class="nav-group"><div class="nav-kinds">Modules</div><ul class="nav-tree"><li><a class="nav-item " href="module-support.html"><span class="icon-kind kind-module">M</span>
+        
+        Support
+    </a></li></ul></div></nav><main class="content"><article class="doc"><header><div class="kind kind-color kind-class"><span class="icon-kind icon-kind-class">C</span>
+            
+            class
+        </div><h1>
+            Controller
+        </h1></header><section class="description"><p>Viking Controllers are core to determining what JavaScript is run for a URL.
+They are made up of one or more actions that are executed on a page load.</p><p>By default only the <code>ApplicationController</code> extends <code>Controller</code>. All
+other controllers extend <code>ApplicationController</code>. This gives you one class to
+configure things like ensuring a user has logged in.</p><p>When a URL is being dispatched the action being run is available at
+<code>this.action_name</code>.</p><pre class="overflow-container code-block"><code class="hljs language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">PropertiesController</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_ inherited__">ApplicationController</span> {
+  <span class="hljs-title function_">index</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`You have reached the <span class="hljs-subst">${<span class="hljs-variable language_">this</span>.action_name}</span> page`</span>);
+  }
+}
+</code></pre><h3>Parameters</h3><p>All request parameters, whether they come from the query string in the URL or
+extracted from URL path via the {@link Router} are available through the params
+object. For example an action that was performed at the URL path
+<code>/posts?category=All&amp;limit=5</code> will include <code>{category: 'All', limit: 5}</code> in
+<code>params</code>.</p><p>It's also possible to construct multi-dimensional parameter hashes by
+specifying keys using brackets, such as:</p><ul><li><code>post[name]=david</code></li><li><code>post[address]=spain</code></li></ul><p>The params in this case would include: <code>{post: {name: 'david', address: 'spain'}}</code></p><h3>Rendering / Displaying a View</h3><p>To display and render a view as the primary View in the application you can
+display it with <code>this.display</code>.</p><pre class="overflow-container code-block"><code class="hljs language-javascript"><span class="hljs-variable language_">this</span>.<span class="hljs-title function_">display</span>(<span class="hljs-title class_">PropertyView</span>, {<span class="hljs-attr">record</span>: property});
+</code></pre><h3>Redirecting</h3><p>Redirects are used to move from one action to another. For example redirecting
+to the login page if the user is not logged in.</p><pre class="overflow-container code-block"><code class="hljs language-javascript"><span class="hljs-variable language_">this</span>.<span class="hljs-title function_">redirectTo</span>(<span class="hljs-string">&#x27;/login&#x27;</span>);
+</code></pre><h3>Calling <code>display</code> or <code>redirectTo</code> multiple times</h3><p>An action may only contain a single render or redirect. Attempting to try to
+do either again in the same action will result in a <code>DoubleRenderError</code>:</p><pre class="overflow-container code-block"><code class="hljs language-javascript"><span class="hljs-title function_">login</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">redirectTo</span>(<span class="hljs-string">&#x27;/elsewhere&#x27;</span>);
+  <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">display</span>(<span class="hljs-title class_">LoginView</span>); <span class="hljs-comment">// throws DoubleRenderError</span>
+}
+</code></pre><p>If you need to redirect based on a condition either return after redirecting
+so that <code>display</code> doesn't get called or use an if/else statement.</p></section><section><h2>Constructor</h2><div class="symbol-title">
+            <code>
+<span class="signature"><span class="signature-prefix">new </span><span class="signature-name">Controller</span><span class="signature-punctuation">(</span><span class="signature-param">application</span><span class="signature-punctuation">)</span></span>
+</code></div><div class="symbol-parameter">
+    <code>application</code>
+    :
+        <code class="clear">
+            
+                <a href="application.html">Application</a>
+                
+            
+        </code><div class="symbol-description"><p>An instance of an Application.</p></div></div></section><section id="section-instance_members"><h2 class="section-title kind-instance_member">Instance Properties</h2><div class="symbol-summary instance_members" id="symbol-controller-_aroundactions"><div class="symbol-summary-title"><span class="icon-kind kind-member">P</span>
+        &nbsp;
+    
+    <a href="controller.html#symbol-controller-_aroundactions"><code>
+<span class="signature"><span class="signature-name">_aroundActions</span></span>
+</code></a></div></div><div class="symbol-summary instance_members" id="symbol-controller-_responded"><div class="symbol-summary-title"><span class="icon-kind kind-member">P</span>
+        &nbsp;
+    
+    <a href="controller.html#symbol-controller-_responded"><code>
+<span class="signature"><span class="signature-name">_responded</span></span>
+</code></a></div></div><div class="symbol-summary instance_members" id="symbol-controller-_skiparoundactions"><div class="symbol-summary-title"><span class="icon-kind kind-member">P</span>
+        &nbsp;
+    
+    <a href="controller.html#symbol-controller-_skiparoundactions"><code>
+<span class="signature"><span class="signature-name">_skipAroundActions</span></span>
+</code></a></div></div><div class="symbol-summary instance_members" id="symbol-controller-action_name"><div class="symbol-summary-title"><span class="icon-kind kind-member">P</span>
+        &nbsp;
+    
+    <a href="controller.html#symbol-controller-action_name"><code>
+<span class="signature"><span class="signature-name">action_name</span><span class="signature-punctuation">: </span><span class="signature-type">
+            
+                string
+                |
+            
+                null
+                
+            
+        </span></span>
+</code></a></div><section class="description"><p>The name of the action currently being processed, otherwise null;</p></section></div><div class="symbol-summary instance_members" id="symbol-controller-application"><div class="symbol-summary-title"><span class="icon-kind kind-member">P</span>
+        &nbsp;
+    
+    <a href="controller.html#symbol-controller-application"><code>
+<span class="signature"><span class="signature-name">application</span><span class="signature-punctuation">: </span><span class="signature-type">
+            
+                Application
+                
+            
+        </span></span>
+</code></a></div></div><div class="symbol-summary instance_members" id="symbol-controller-aroundactions"><div class="symbol-summary-title"><span class="icon-kind kind-member">P</span>
+        &nbsp;
+    
+    <a href="controller.html#symbol-controller-aroundactions"><code>
+<span class="signature"><span class="signature-name">aroundActions</span><span class="signature-punctuation">: </span><span class="signature-type">
+            
+                Array.<a href="aroundactioncallback.html">&lt;AroundActionCallback&gt;</a></span></span>
+</code></a></div><section class="description"><p><code>aroundActions</code> are functions or methods that are run around a controller
+action.</p><p><code>aroundActions</code> are inherited. If you set a around action on
+ApplicationController it will be run on every controller that inherits
+from ApplicationController.</p><p>If a string is given the function on the controller will be called. If
+a function is given that function will be called. Both methods and
+functions will revieve a callback to execute to continue processing the
+action.</p><caption>An around filter requiring a user to be logged in</caption>
+```javascript
+class ApplicationController extends VikingController {
+  static aroundActions = ['requireAccount'];
+<p>requireAccount(callback) {
+let session = await Session.current();</p><pre class="overflow-container code-block"><code class="hljs language-kotlin"><span class="hljs-keyword">if</span> (session) {
+  callback();
+} <span class="hljs-keyword">else</span> {
+  <span class="hljs-keyword">this</span>.redirectTo(<span class="hljs-string">&#x27;/login&#x27;</span>);
+}
+</code></pre><p>}
+}</p><pre class="overflow-container code-block"><code class="hljs language-scala">
+<span class="hljs-type">If</span> you want an aroundAction to only be called on certain actions you can
+pass the `only` options:
+
+```javascript
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ApplicationController</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">VikingController</span> </span>{
+  static aroundActions = [
+    [&#x27;requireAccount&#x27;, {only: [&#x27;protectedAction&#x27;]}]
+  ];
+}
+</code></pre><p>You may also pass the except option for every action except a certain
+action:</p><pre class="overflow-container code-block"><code class="hljs language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">ApplicationController</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_ inherited__">VikingController</span> {
+  <span class="hljs-keyword">static</span> aroundActions = [
+    [<span class="hljs-string">&#x27;requireAccount&#x27;</span>, {<span class="hljs-attr">except</span>: [<span class="hljs-string">&#x27;publicPage&#x27;</span>]}]
+  ];
+}
+</code></pre></section></div><div class="symbol-summary instance_members" id="symbol-controller-bindedobjects"><div class="symbol-summary-title"><span class="icon-kind kind-member">P</span>
+        &nbsp;
+    
+    <a href="controller.html#symbol-controller-bindedobjects"><code>
+<span class="signature"><span class="signature-name">bindedObjects</span><span class="signature-punctuation">: </span><span class="signature-type">
+            
+                Object.&lt;string, Object></span></span>
+</code></a></div><section class="description"><p>Object containing references to objects this instance is listening to</p></section></div><div class="symbol-summary instance_members" id="symbol-controller-eventlisteners"><div class="symbol-summary-title"><span class="icon-kind kind-member">P</span>
+        &nbsp;
+    
+    <a href="controller.html#symbol-controller-eventlisteners"><code>
+<span class="signature"><span class="signature-name">eventListeners</span><span class="signature-punctuation">: </span><span class="signature-type">
+            
+                Object.&lt;string, Array></span></span>
+</code></a></div><section class="description"><p>Object containing all event listeners</p></section></div><div class="symbol-summary instance_members" id="symbol-controller-listenerid"><div class="symbol-summary-title"><span class="icon-kind kind-member">P</span>
+        &nbsp;
+    
+    <a href="controller.html#symbol-controller-listenerid"><code>
+<span class="signature"><span class="signature-name">listenerId</span><span class="signature-punctuation">: </span><span class="signature-type">
+            
+                string
+                
+            
+        </span></span>
+</code></a></div><section class="description"><p>Unique identifier for this event bus instance</p></section></div><div class="symbol-summary instance_members" id="symbol-controller-params"><div class="symbol-summary-title"><span class="icon-kind kind-member">P</span>
+        &nbsp;
+    
+    <a href="controller.html#symbol-controller-params"><code>
+<span class="signature"><span class="signature-name">params</span><span class="signature-punctuation">: </span><span class="signature-type">
+            
+                Object
+                
+            
+        </span></span>
+</code></a></div><section class="description"><p>All request parameters, weather they come from the query string in the URL
+or extracted from URL path via the {@link Router}.</p></section></div><div class="symbol-summary instance_members" id="symbol-controller-skiparoundactions"><div class="symbol-summary-title"><span class="icon-kind kind-member">P</span>
+        &nbsp;
+    
+    <a href="controller.html#symbol-controller-skiparoundactions"><code>
+<span class="signature"><span class="signature-name">skipAroundActions</span><span class="signature-punctuation">: </span><span class="signature-type">
+            
+                Array.<a href="aroundactioncallback.html">&lt;AroundActionCallback&gt;</a></span></span>
+</code></a></div><section class="description"><p><code>skipAroundActions</code> allows extended controllers to skip defined
+<code>aroundActions</code> that were defined in the ApplicationController:</p><pre class="overflow-container code-block"><code class="hljs language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">LoginController</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_ inherited__">ApplicationController</span> {
+  <span class="hljs-keyword">static</span> skipAroundActions = [[<span class="hljs-string">&#x27;requireAccount&#x27;</span>, {<span class="hljs-attr">only</span>: [<span class="hljs-string">&#x27;new&#x27;</span>]}]];
+  <span class="hljs-comment">// ...</span>
+}
+</code></pre><pre class="overflow-container code-block"><code class="hljs language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">LoginController</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_ inherited__">ApplicationController</span> {
+  <span class="hljs-keyword">static</span> skipAroundActions = [[<span class="hljs-string">&#x27;requireAccount&#x27;</span>, {<span class="hljs-attr">except</span>: [<span class="hljs-string">&#x27;show&#x27;</span>]}]];
+  <span class="hljs-comment">// ...</span>
+}
+</code></pre><pre class="overflow-container code-block"><code class="hljs language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">PublicController</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_ inherited__">ApplicationController</span> {
+  <span class="hljs-keyword">static</span> skipAroundActions = [<span class="hljs-string">&#x27;requireAccount&#x27;</span>];
+  <span class="hljs-comment">// ...</span>
+}
+</code></pre></section></div></section><section id="section-instance_methods"><h2 class="section-title kind-instance_method">Instance Methods</h2><div class="symbol-summary instance_methods" id="symbol-controller-addeventlistener"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="controller.html#symbol-controller-addeventlistener"><code>
+<span class="signature"><span class="signature-name">addEventListener</span><span class="signature-punctuation">(</span><span class="signature-param">name, </span><span class="signature-param">callback, </span><span class="signature-param">options</span><span class="signature-punctuation">)</span>
+    
+    
+    
+        &rarr;
+        
+            <span class="signature-returns">
+                
+                    EventBus
+                    
+                
+            </span></span>
+</code></a></div><section class="description"><p>Bind an event to a <code>callback</code> function. Passing <code>&quot;*&quot;</code> will bind
+the callback to all events fired.</p><p>If the options.once is true, the event will only be triggered a single time.
+After the first time the callback is invoked, its listener will be removed.
+If multiple events are passed in as an array, the handler will fire
+once for each event, not once for a combination of all events.</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>name</code>
+    :
+        <code class="clear">
+            
+                string
+                |
+            
+                Array.&lt;string>
+                |
+            
+                object
+                
+            
+        </code><div class="symbol-description"><p>Event name(s) or object of event/callback pairs</p></div></div><div class="symbol-parameter">
+    <code>callback</code>
+    :
+        <code class="clear">
+            
+                function
+                |
+            
+                object
+                
+            
+        </code><div class="symbol-description"><p>Callback function or options object if name is an object</p></div></div><div class="symbol-parameter">
+    <code>options</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Event options</p></div><div class="symbol-parameter-properties"><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>once</code>
+    :
+        <code class="clear">
+            
+                boolean
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Whether the event should only trigger once</p></div></div></div><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>context</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>The context to bind the event to</p></div></div></div><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>listener</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>The listener object</p></div></div></div></div></div></section><section><h2>Returns</h2><div>
+                
+                    <code class="clear">
+                        
+                            <a href="eventbus.html">EventBus</a>
+                            
+                        
+                    </code><div class="symbol-description"><p>Returns this for chaining</p></div></div></section></div><div class="symbol-summary instance_methods" id="symbol-controller-addeventlistenerfor"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="controller.html#symbol-controller-addeventlistenerfor"><code>
+<span class="signature"><span class="signature-name">addEventListenerFor</span><span class="signature-punctuation">(</span><span class="signature-param">obj, </span><span class="signature-param">name, </span><span class="signature-param">callback, </span><span class="signature-param">options</span><span class="signature-punctuation">)</span>
+    
+    
+    
+        &rarr;
+        
+            <span class="signature-returns">
+                
+                    EventBus
+                    
+                
+            </span></span>
+</code></a></div><section class="description"><p>Tell <em>this</em> object to listen to an event in another object, while keeping
+track of what it's listening to for easier unbinding later.</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>obj</code>
+    :
+        <code class="clear">
+            
+                object
+                |
+            
+                NodeList
+                
+            
+        </code><div class="symbol-description"><p>The object to listen to events on</p></div></div><div class="symbol-parameter">
+    <code>name</code>
+    :
+        <code class="clear">
+            
+                string
+                |
+            
+                Array.&lt;string>
+                |
+            
+                object
+                
+            
+        </code><div class="symbol-description"><p>Event name(s) or object of event/callback pairs</p></div></div><div class="symbol-parameter">
+    <code>callback</code>
+    :
+        <code class="clear">
+            
+                function
+                |
+            
+                object
+                
+            
+        </code><div class="symbol-description"><p>Callback function or options object if name is an object</p></div></div><div class="symbol-parameter">
+    <code>options</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Event options</p></div><div class="symbol-parameter-properties"><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>once</code>
+    :
+        <code class="clear">
+            
+                boolean
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Whether the event should only trigger once</p></div></div></div><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>context</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>The context to bind the event to</p></div></div></div></div></div></section><section><h2>Returns</h2><div>
+                
+                    <code class="clear">
+                        
+                            <a href="eventbus.html">EventBus</a>
+                            
+                        
+                    </code><div class="symbol-description"><p>Returns this for chaining</p></div></div></section></div><div class="symbol-summary instance_methods" id="symbol-controller-dispatch"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="controller.html#symbol-controller-dispatch"><code>
+<span class="signature"><span class="signature-name">dispatch</span><span class="signature-punctuation">(</span><span class="signature-param">name</span><span class="signature-punctuation">)</span></span>
+</code></a></div><section class="description"><p>Dispatches an action on the controller, running all appropriate aroundActions.
+This method is called by the router when a route matches.</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>name</code>
+    :
+        <code class="clear">
+            
+                string
+                
+            
+        </code><div class="symbol-description"><p>The name of the action to dispatch</p></div></div></section></div><div class="symbol-summary instance_methods" id="symbol-controller-dispatchevent"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="controller.html#symbol-controller-dispatchevent"><code>
+<span class="signature"><span class="signature-name">dispatchEvent</span><span class="signature-punctuation">(</span><span class="signature-param">name, </span><span class="signature-param">args</span><span class="signature-punctuation">)</span>
+    
+    
+    
+        &rarr;
+        
+            <span class="signature-returns">
+                
+                    EventBus
+                    
+                
+            </span></span>
+</code></a></div><section class="description"><p>Trigger one or many events, firing all bound callbacks. Callbacks are
+passed the same arguments as <code>dispatchEvent</code> is, apart from the event name
+(unless you're listening on <code>&quot;*&quot;</code>, which will cause your callback to
+receive the true name of the event as the first argument).</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>name</code>
+    :
+        <code class="clear">
+            
+                string
+                |
+            
+                Array.&lt;string>
+                
+            
+        </code><div class="symbol-description"><p>Event name or array of event names</p></div></div><div class="symbol-parameter">
+    <code>args</code>
+    :
+        <code class="clear">
+            
+                *
+                
+            
+        </code><div class="symbol-description"><p>Arguments to pass to the event handlers</p></div></div></section><section><h2>Returns</h2><div>
+                
+                    <code class="clear">
+                        
+                            <a href="eventbus.html">EventBus</a>
+                            
+                        
+                    </code><div class="symbol-description"><p>Returns this for chaining</p></div></div></section></div><div class="symbol-summary instance_methods" id="symbol-controller-display"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="controller.html#symbol-controller-display"><code>
+<span class="signature"><span class="signature-name">display</span><span class="signature-punctuation">(</span><span class="signature-param">template, </span><span class="signature-param">locals, </span><span class="signature-param">options</span><span class="signature-punctuation">)</span>
+    
+    
+    
+        &rarr;
+        
+            <span class="signature-returns">
+                
+                    Promise.&lt;(Element|Array.&lt;Element>)></span></span>
+</code></a></div><section class="description"><p>A helper function to tell the Application to display the given template.
+This renders the template as the main content of the application.</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>template</code>
+    :
+        <code class="clear">
+            
+                function
+                
+            
+        </code><div class="symbol-description"><p>The template function to render</p></div></div><div class="symbol-parameter">
+    <code>locals</code>
+    :
+        <code class="clear">
+            
+                <a href="support.module-object.html">Object</a>
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Local variables to pass to the template</p></div></div><div class="symbol-parameter">
+    <code>options</code>
+    :
+        <code class="clear">
+            
+                <a href="support.module-object.html">Object</a>
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Display options to pass to the application</p></div></div></section><section><h2>Returns</h2><div>
+                
+                    <code class="clear">
+                        
+                            Promise.&lt;(Element|Array.&lt;Element>)>
+                            
+                        
+                    </code><div class="symbol-description"><ul><li>Result of Application.display</li></ul></div></div></section><section><h2>Examples</h2><pre class="overflow-container code-block"><code class="hljs language-pf">this.display(<span class="hljs-keyword">user</span>Show, {<span class="hljs-keyword">user</span>: <span class="hljs-keyword">user</span>})</code></pre><pre class="overflow-container code-block"><code class="hljs language-axapta"><span class="hljs-keyword">this</span>.<span class="hljs-keyword">display</span>(loginForm, {}, {layout: <span class="hljs-literal">false</span>})</code></pre></section></div><div class="symbol-summary instance_methods" id="symbol-controller-process"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="controller.html#symbol-controller-process"><code>
+<span class="signature"><span class="signature-name">process</span><span class="signature-punctuation">(</span><span class="signature-param">action, </span><span class="signature-param">args</span><span class="signature-punctuation">)</span></span>
+</code></a></div><section class="description"><p>Processes an action, setting up the response state and executing the action method.</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>action</code>
+    :
+        <code class="clear">
+            
+                string
+                
+            
+        </code><div class="symbol-description"><p>The name of the action to process</p></div></div><div class="symbol-parameter">
+    <code>args</code>
+    :
+        <code class="clear">
+            
+                *
+                
+            
+        </code><div class="symbol-description"><p>Arguments to pass to the action</p></div></div></section></div><div class="symbol-summary instance_methods" id="symbol-controller-redirectto"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="controller.html#symbol-controller-redirectto"><code>
+<span class="signature"><span class="signature-name">redirectTo</span><span class="signature-punctuation">(</span><span class="signature-param">path</span><span class="signature-punctuation">)</span></span>
+</code></a></div><section class="description"><p>A helper function to tell the Application to navigate to the given URL
+or Path.</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>path</code>
+    :
+        <code class="clear">
+            
+                string
+                
+            
+        </code><div class="symbol-description"><p>The URL or path to navigate to.</p></div></div></section></div><div class="symbol-summary instance_methods" id="symbol-controller-removeeventlistener"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="controller.html#symbol-controller-removeeventlistener"><code>
+<span class="signature"><span class="signature-name">removeEventListener</span><span class="signature-punctuation">(</span><span class="signature-param">name, </span><span class="signature-param">callback, </span><span class="signature-param">options</span><span class="signature-punctuation">)</span>
+    
+    
+    
+        &rarr;
+        
+            <span class="signature-returns">
+                
+                    EventBus
+                    
+                
+            </span></span>
+</code></a></div><section class="description"><p>Remove one or many callbacks that match the arguments. If called with no arguments,
+removes all callbacks for all events.</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>name</code>
+    :
+        <code class="clear">
+            
+                string
+                |
+            
+                Array.&lt;string>
+                |
+            
+                object
+                |
+            
+                null
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Event name(s) or object of event/callback pairs</p></div></div><div class="symbol-parameter">
+    <code>callback</code>
+    :
+        <code class="clear">
+            
+                function
+                |
+            
+                object
+                |
+            
+                null
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Callback function or options object if name is an object</p></div></div><div class="symbol-parameter">
+    <code>options</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Event options</p></div><div class="symbol-parameter-properties"><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>once</code>
+    :
+        <code class="clear">
+            
+                boolean
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Match only events set to trigger once</p></div></div></div><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>context</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Match only events bound to this context</p></div></div></div><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>listener</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Match only events bound by this listener</p></div></div></div></div></div></section><section><h2>Returns</h2><div>
+                
+                    <code class="clear">
+                        
+                            <a href="eventbus.html">EventBus</a>
+                            
+                        
+                    </code><div class="symbol-description"><p>Returns this for chaining</p></div></div></section></div><div class="symbol-summary instance_methods" id="symbol-controller-removeeventlistenerfor"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="controller.html#symbol-controller-removeeventlistenerfor"><code>
+<span class="signature"><span class="signature-name">removeEventListenerFor</span><span class="signature-punctuation">(</span><span class="signature-param">obj, </span><span class="signature-param">name, </span><span class="signature-param">callback, </span><span class="signature-param">options</span><span class="signature-punctuation">)</span>
+    
+    
+    
+        &rarr;
+        
+            <span class="signature-returns">
+                
+                    EventBus
+                    
+                
+            </span></span>
+</code></a></div><section class="description"><p>Tell this object to stop listening to either specific events or
+to every object it's currently listening to.</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>obj</code>
+    :
+        <code class="clear">
+            
+                object
+                |
+            
+                NodeList
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>The object to stop listening to; if omitted, stops listening to all objects</p></div></div><div class="symbol-parameter">
+    <code>name</code>
+    :
+        <code class="clear">
+            
+                string
+                |
+            
+                Array.&lt;string>
+                |
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Event name(s) or object of event/callback pairs</p></div></div><div class="symbol-parameter">
+    <code>callback</code>
+    :
+        <code class="clear">
+            
+                function
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Callback function to remove</p></div></div><div class="symbol-parameter">
+    <code>options</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Event options</p></div><div class="symbol-parameter-properties"><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>once</code>
+    :
+        <code class="clear">
+            
+                boolean
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Match only events set to trigger once</p></div></div></div><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>context</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Match only events bound to this context</p></div></div></div></div></div></section><section><h2>Returns</h2><div>
+                
+                    <code class="clear">
+                        
+                            <a href="eventbus.html">EventBus</a>
+                            
+                        
+                    </code><div class="symbol-description"><p>Returns this for chaining</p></div></div></section></div></section><section id="section-static_methods"><h2 class="section-title kind-static_method">Static Methods</h2><div class="symbol-summary static_methods" id="symbol-controller.getaroundactions"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="controller.html#symbol-controller.getaroundactions"><code>
+<span class="signature"><span class="signature-name">getAroundActions</span><span class="signature-punctuation">(</span><span class="signature-punctuation">)</span></span>
+</code></a></div></div><div class="symbol-summary static_methods" id="symbol-controller.getskiparoundactions"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="controller.html#symbol-controller.getskiparoundactions"><code>
+<span class="signature"><span class="signature-name">getSkipAroundActions</span><span class="signature-punctuation">(</span><span class="signature-punctuation">)</span></span>
+</code></a></div></div></section></article></main><div class="sm-nav"><a href="index.html"><img src="images/logo.png" height="24px"/></a><label for="sm-nav-trigger" class="sm-nav-toggle"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></label></div><script src="/javascripts/jsdoc-press.js"></script></body></html>

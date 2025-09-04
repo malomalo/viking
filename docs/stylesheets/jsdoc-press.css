@@ -1,0 +1,76 @@
+@import "jsdoc-press/base.css";
+@import "jsdoc-press/layout.css";
+@import "jsdoc-press/kinds.css";
+@import "jsdoc-press/nav.css";
+@import "jsdoc-press/tables.css";
+@import "jsdoc-press/code.css";
+@import "jsdoc-press/sections.css";
+@import "jsdoc-press/highlight.css";
+@import "jsdoc-press/overflow-container.css";
+@import "jsdoc-press/signature.css";
+@import "jsdoc-press/description.css";
+@import "jsdoc-press/doc.css";
+@import "jsdoc-press/summary.css";
+
+:root {
+    --body-family: system-ui,sans-serif;
+    --monospace-family: monospace;
+    
+    --primary-hue: 230;
+    
+    --color-80: oklch(20% 10% var(--primary-hue));
+    --color-70: oklch(30% 20% var(--primary-hue));
+    --color-60: oklch(40% 30% var(--primary-hue));
+    --color-50: oklch(50% 40% var(--primary-hue));
+    --color-40: oklch(60% 50% var(--primary-hue));
+    --color-30: oklch(70% 40% var(--primary-hue));
+    --color-20: oklch(80% 20% var(--primary-hue));
+    --color-15: oklch(85% 15% var(--primary-hue));
+    --color-10: oklch(90% 10% var(--primary-hue));
+    --color-05: oklch(95% 5% var(--primary-hue));
+    
+    --muted-color: oklch(60% 10% var(--primary-hue));
+    --muted-bg: oklch(93% 10% var(--primary-hue));
+    
+    --body-bg: white;
+    --body-color: var(--color-80);
+    --body-border: oklch(90% 5% var(--primary-hue));
+    
+    --link-hue: 214;
+    --link-color: oklch(44% 100% var(--link-hue));
+    
+    --code-hue: var(--primary-hue);
+    --code-bg: oklch(95% 3% var(--code-hue));
+    --code-color: oklch(40% 50% var(--code-hue));
+    
+    --blockquote-hue: 200;
+    --blockquote-border: var(--body-border);
+    --blockquote-color: oklch(40% 50% var(--blockquote-hue));
+    
+    --nav-bg: oklch(98% 5% var(--primary-hue));
+    --nav-color: var(--body-color);
+    --nav-heading-color: var(--nav-color);
+    --nav-border: var(--body-border);
+    --nav-link-color: var(--link-color);
+    --nav-link-active-color: var(--color-80);
+
+    --footer-bg: var(--nav-bg);
+    --footer-color: var(--muted-color);
+
+    --table-border: var(--body-border);
+    --table-header-bg: oklch(95% 10% var(--primary-hue));
+    --table-row-odd-bg: var(--table-header-bg);
+    
+    --details-color: var(--color-60);
+    --important-color: oklch(32% 100% 355);
+    
+    --title-border: var(--body-border);
+    --title-color: var(--body-color);
+    
+    --augments-color: var(--muted-color);
+    --source-color: var(--muted-color);
+    --ancestors-color: var(--color-50);
+
+    --tag-color: var(--muted-color);
+    --tag-bg: var(--muted-bg);
+}

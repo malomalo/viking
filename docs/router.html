@@ -1,0 +1,792 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="color-scheme" content="dark light"><title>Router</title><link rel="stylesheet" href="/stylesheets/jsdoc-press.css" /><link rel="stylesheet" href="stylesheets/jsdoc.css" /></head><body><input type="checkbox" id="sm-nav-trigger" class="sm-nav-trigger" /><nav><a class="brand" href="./index.html"><img src="images/logo.png"/></a><div class="nav-group"><div class="nav-kinds">Classes</div><ul class="nav-tree"><li><a class="nav-item " href="application.html"><span class="icon-kind kind-class">C</span>
+        
+        Application
+    </a></li><li><a class="nav-item " href="association.html"><span class="icon-kind kind-class">C</span>
+        
+        Association
+    </a></li><li><a class="nav-item " href="controller.html"><span class="icon-kind kind-class">C</span>
+        
+        Controller
+    </a></li><li><a class="nav-item " href="eventbus.html"><span class="icon-kind kind-class">C</span>
+        
+        EventBus
+    </a></li><li><a class="nav-item " href="record.html"><span class="icon-kind kind-class">C</span>
+        
+        Record
+    </a></li><li><a class="nav-item " href="relation.html"><span class="icon-kind kind-class">C</span>
+        
+        Relation
+    </a></li><li><a class="nav-item active" href="router.html"><span class="icon-kind kind-class">C</span>
+        
+        Router
+    </a><div class="nav-children-wrap"><details class="nav-detail" open><summary class="nav-subkind">Instance Properties</summary><ul class="nav-children"><li><a class="nav-item " href="router.html#symbol-router-bindedobjects"><span class="icon-kind kind-member">P</span>
+        
+        bindedObjects
+    </a></li><li><a class="nav-item " href="router.html#symbol-router-escaperegexp"><span class="icon-kind kind-member">P</span>
+        
+        escapeRegExp
+    </a></li><li><a class="nav-item " href="router.html#symbol-router-eventlisteners"><span class="icon-kind kind-member">P</span>
+        
+        eventListeners
+    </a></li><li><a class="nav-item " href="router.html#symbol-router-handlers"><span class="icon-kind kind-member">P</span>
+        
+        handlers
+    </a></li><li><a class="nav-item " href="router.html#symbol-router-listenerid"><span class="icon-kind kind-member">P</span>
+        
+        listenerId
+    </a></li><li><a class="nav-item " href="router.html#symbol-router-namedparam"><span class="icon-kind kind-member">P</span>
+        
+        namedParam
+    </a></li><li><a class="nav-item " href="router.html#symbol-router-optionalparam"><span class="icon-kind kind-member">P</span>
+        
+        optionalParam
+    </a></li><li><a class="nav-item " href="router.html#symbol-router-routes"><span class="icon-kind kind-member">P</span>
+        
+        routes
+    </a></li><li><a class="nav-item " href="router.html#symbol-router-splatparam"><span class="icon-kind kind-member">P</span>
+        
+        splatParam
+    </a></li></ul></details><details class="nav-detail" open><summary class="nav-subkind">Instance Methods</summary><ul class="nav-children"><li><a class="nav-item " href="router.html#symbol-router-addeventlistener"><span class="icon-kind kind-function">F</span>
+        
+        addEventListener
+    </a></li><li><a class="nav-item " href="router.html#symbol-router-addeventlistenerfor"><span class="icon-kind kind-function">F</span>
+        
+        addEventListenerFor
+    </a></li><li><a class="nav-item " href="router.html#symbol-router-dispatchevent"><span class="icon-kind kind-function">F</span>
+        
+        dispatchEvent
+    </a></li><li><a class="nav-item " href="router.html#symbol-router-getpath"><span class="icon-kind kind-function">F</span>
+        
+        getPath
+    </a></li><li><a class="nav-item " href="router.html#symbol-router-getsearch"><span class="icon-kind kind-function">F</span>
+        
+        getSearch
+    </a></li><li><a class="nav-item " href="router.html#symbol-router-handlerforpath"><span class="icon-kind kind-function">F</span>
+        
+        handlerForPath
+    </a></li><li><a class="nav-item " href="router.html#symbol-router-initialize"><span class="icon-kind kind-function">F</span>
+        
+        initialize
+    </a></li><li><a class="nav-item " href="router.html#symbol-router-loadurl"><span class="icon-kind kind-function">F</span>
+        
+        loadUrl
+    </a></li><li><a class="nav-item " href="router.html#symbol-router-navigateto"><span class="icon-kind kind-function">F</span>
+        
+        navigateTo
+    </a></li><li><a class="nav-item " href="router.html#symbol-router-removeeventlistener"><span class="icon-kind kind-function">F</span>
+        
+        removeEventListener
+    </a></li><li><a class="nav-item " href="router.html#symbol-router-removeeventlistenerfor"><span class="icon-kind kind-function">F</span>
+        
+        removeEventListenerFor
+    </a></li><li><a class="nav-item " href="router.html#symbol-router-route"><span class="icon-kind kind-function">F</span>
+        
+        route
+    </a></li><li><a class="nav-item " href="router.html#symbol-router-routetoregexp"><span class="icon-kind kind-function">F</span>
+        
+        routeToRegExp
+    </a></li><li><a class="nav-item " href="router.html#symbol-router-start"><span class="icon-kind kind-function">F</span>
+        
+        start
+    </a></li><li><a class="nav-item " href="router.html#symbol-router-stop"><span class="icon-kind kind-function">F</span>
+        
+        stop
+    </a></li></ul></details></div></li><li><a class="nav-item " href="view.html"><span class="icon-kind kind-class">C</span>
+        
+        View
+    </a></li></ul></div><div class="nav-group"><div class="nav-kinds">Modules</div><ul class="nav-tree"><li><a class="nav-item " href="module-support.html"><span class="icon-kind kind-module">M</span>
+        
+        Support
+    </a></li></ul></div></nav><main class="content"><article class="doc"><header><div class="kind kind-color kind-class"><span class="icon-kind icon-kind-class">C</span>
+            
+            class
+        </div><h1>
+            Router
+        </h1></header><section class="description"><p>Router handles URL routing in Viking applications.</p><p>The Router maps URLs to controllers and actions, allowing for clean,
+RESTful URLs. It manages browser history and provides navigation
+methods to move between application states without full page reloads.</p><h3>Router Events</h3><table><thead><tr><th>Event</th><th>Arguments</th><th>Description</th></tr></thead><tbody><tr><td>beforeNavigation</td><td>url</td><td>Triggered when navigation in the app is about to happen</td></tr><tr><td>afterNavigation</td><td>url</td><td>Triggered when navigation in the app has completed</td></tr></tbody></table></section><section><h2>Constructor</h2><div class="symbol-title">
+            <code>
+<span class="signature"><span class="signature-prefix">new </span><span class="signature-name">Router</span><span class="signature-punctuation">(</span><span class="signature-param">application</span><span class="signature-punctuation">)</span></span>
+</code></div><div class="symbol-parameter">
+    <code>application</code>
+    :
+        <code class="clear">
+            
+                <a href="application.html">Application</a>
+                
+            
+        </code><div class="symbol-description"><p>The application this router belongs to</p></div></div></section><section id="section-instance_members"><h2 class="section-title kind-instance_member">Instance Properties</h2><div class="symbol-summary instance_members" id="symbol-router-bindedobjects"><div class="symbol-summary-title"><span class="icon-kind kind-member">P</span>
+        &nbsp;
+    
+    <a href="router.html#symbol-router-bindedobjects"><code>
+<span class="signature"><span class="signature-name">bindedObjects</span><span class="signature-punctuation">: </span><span class="signature-type">
+            
+                Object.&lt;string, Object></span></span>
+</code></a></div><section class="description"><p>Object containing references to objects this instance is listening to</p></section></div><div class="symbol-summary instance_members" id="symbol-router-escaperegexp"><div class="symbol-summary-title"><span class="icon-kind kind-member">P</span>
+        &nbsp;
+    
+    <a href="router.html#symbol-router-escaperegexp"><code>
+<span class="signature"><span class="signature-name">escapeRegExp</span><span class="signature-punctuation">: </span><span class="signature-type">
+            
+                RegExp
+                
+            
+        </span></span>
+</code></a></div><section class="description"><p>Regular expression for escaping special characters in routes</p></section></div><div class="symbol-summary instance_members" id="symbol-router-eventlisteners"><div class="symbol-summary-title"><span class="icon-kind kind-member">P</span>
+        &nbsp;
+    
+    <a href="router.html#symbol-router-eventlisteners"><code>
+<span class="signature"><span class="signature-name">eventListeners</span><span class="signature-punctuation">: </span><span class="signature-type">
+            
+                Object.&lt;string, Array></span></span>
+</code></a></div><section class="description"><p>Object containing all event listeners</p></section></div><div class="symbol-summary instance_members" id="symbol-router-handlers"><div class="symbol-summary-title"><span class="icon-kind kind-member">P</span>
+        &nbsp;
+    
+    <a href="router.html#symbol-router-handlers"><code>
+<span class="signature"><span class="signature-name">handlers</span><span class="signature-punctuation">: </span><span class="signature-type">
+            
+                Array.<a href="routerhandler.html">&lt;RouterHandler&gt;</a></span></span>
+</code></a></div><section class="description"><p>Array of route handlers</p></section></div><div class="symbol-summary instance_members" id="symbol-router-listenerid"><div class="symbol-summary-title"><span class="icon-kind kind-member">P</span>
+        &nbsp;
+    
+    <a href="router.html#symbol-router-listenerid"><code>
+<span class="signature"><span class="signature-name">listenerId</span><span class="signature-punctuation">: </span><span class="signature-type">
+            
+                string
+                
+            
+        </span></span>
+</code></a></div><section class="description"><p>Unique identifier for this event bus instance</p></section></div><div class="symbol-summary instance_members" id="symbol-router-namedparam"><div class="symbol-summary-title"><span class="icon-kind kind-member">P</span>
+        &nbsp;
+    
+    <a href="router.html#symbol-router-namedparam"><code>
+<span class="signature"><span class="signature-name">namedParam</span><span class="signature-punctuation">: </span><span class="signature-type">
+            
+                RegExp
+                
+            
+        </span></span>
+</code></a></div><section class="description"><p>Regular expression for matching named parameters</p></section></div><div class="symbol-summary instance_members" id="symbol-router-optionalparam"><div class="symbol-summary-title"><span class="icon-kind kind-member">P</span>
+        &nbsp;
+    
+    <a href="router.html#symbol-router-optionalparam"><code>
+<span class="signature"><span class="signature-name">optionalParam</span><span class="signature-punctuation">: </span><span class="signature-type">
+            
+                RegExp
+                
+            
+        </span></span>
+</code></a></div><section class="description"><p>Regular expression for matching optional parameters</p></section></div><div class="symbol-summary instance_members" id="symbol-router-routes"><div class="symbol-summary-title"><span class="icon-kind kind-member">P</span>
+        &nbsp;
+    
+    <a href="router.html#symbol-router-routes"><code>
+<span class="signature"><span class="signature-name">routes</span><span class="signature-punctuation">: </span><span class="signature-type">
+            
+                RouteSet
+                
+            
+        </span></span>
+</code></a></div><section class="description"><p>Static routes configuration</p></section></div><div class="symbol-summary instance_members" id="symbol-router-splatparam"><div class="symbol-summary-title"><span class="icon-kind kind-member">P</span>
+        &nbsp;
+    
+    <a href="router.html#symbol-router-splatparam"><code>
+<span class="signature"><span class="signature-name">splatParam</span><span class="signature-punctuation">: </span><span class="signature-type">
+            
+                RegExp
+                
+            
+        </span></span>
+</code></a></div><section class="description"><p>Regular expression for matching splat parameters</p></section></div></section><section id="section-instance_methods"><h2 class="section-title kind-instance_method">Instance Methods</h2><div class="symbol-summary instance_methods" id="symbol-router-addeventlistener"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="router.html#symbol-router-addeventlistener"><code>
+<span class="signature"><span class="signature-name">addEventListener</span><span class="signature-punctuation">(</span><span class="signature-param">name, </span><span class="signature-param">callback, </span><span class="signature-param">options</span><span class="signature-punctuation">)</span>
+    
+    
+    
+        &rarr;
+        
+            <span class="signature-returns">
+                
+                    EventBus
+                    
+                
+            </span></span>
+</code></a></div><section class="description"><p>Bind an event to a <code>callback</code> function. Passing <code>&quot;*&quot;</code> will bind
+the callback to all events fired.</p><p>If the options.once is true, the event will only be triggered a single time.
+After the first time the callback is invoked, its listener will be removed.
+If multiple events are passed in as an array, the handler will fire
+once for each event, not once for a combination of all events.</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>name</code>
+    :
+        <code class="clear">
+            
+                string
+                |
+            
+                Array.&lt;string>
+                |
+            
+                object
+                
+            
+        </code><div class="symbol-description"><p>Event name(s) or object of event/callback pairs</p></div></div><div class="symbol-parameter">
+    <code>callback</code>
+    :
+        <code class="clear">
+            
+                function
+                |
+            
+                object
+                
+            
+        </code><div class="symbol-description"><p>Callback function or options object if name is an object</p></div></div><div class="symbol-parameter">
+    <code>options</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Event options</p></div><div class="symbol-parameter-properties"><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>once</code>
+    :
+        <code class="clear">
+            
+                boolean
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Whether the event should only trigger once</p></div></div></div><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>context</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>The context to bind the event to</p></div></div></div><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>listener</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>The listener object</p></div></div></div></div></div></section><section><h2>Returns</h2><div>
+                
+                    <code class="clear">
+                        
+                            <a href="eventbus.html">EventBus</a>
+                            
+                        
+                    </code><div class="symbol-description"><p>Returns this for chaining</p></div></div></section></div><div class="symbol-summary instance_methods" id="symbol-router-addeventlistenerfor"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="router.html#symbol-router-addeventlistenerfor"><code>
+<span class="signature"><span class="signature-name">addEventListenerFor</span><span class="signature-punctuation">(</span><span class="signature-param">obj, </span><span class="signature-param">name, </span><span class="signature-param">callback, </span><span class="signature-param">options</span><span class="signature-punctuation">)</span>
+    
+    
+    
+        &rarr;
+        
+            <span class="signature-returns">
+                
+                    EventBus
+                    
+                
+            </span></span>
+</code></a></div><section class="description"><p>Tell <em>this</em> object to listen to an event in another object, while keeping
+track of what it's listening to for easier unbinding later.</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>obj</code>
+    :
+        <code class="clear">
+            
+                object
+                |
+            
+                NodeList
+                
+            
+        </code><div class="symbol-description"><p>The object to listen to events on</p></div></div><div class="symbol-parameter">
+    <code>name</code>
+    :
+        <code class="clear">
+            
+                string
+                |
+            
+                Array.&lt;string>
+                |
+            
+                object
+                
+            
+        </code><div class="symbol-description"><p>Event name(s) or object of event/callback pairs</p></div></div><div class="symbol-parameter">
+    <code>callback</code>
+    :
+        <code class="clear">
+            
+                function
+                |
+            
+                object
+                
+            
+        </code><div class="symbol-description"><p>Callback function or options object if name is an object</p></div></div><div class="symbol-parameter">
+    <code>options</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Event options</p></div><div class="symbol-parameter-properties"><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>once</code>
+    :
+        <code class="clear">
+            
+                boolean
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Whether the event should only trigger once</p></div></div></div><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>context</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>The context to bind the event to</p></div></div></div></div></div></section><section><h2>Returns</h2><div>
+                
+                    <code class="clear">
+                        
+                            <a href="eventbus.html">EventBus</a>
+                            
+                        
+                    </code><div class="symbol-description"><p>Returns this for chaining</p></div></div></section></div><div class="symbol-summary instance_methods" id="symbol-router-dispatchevent"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="router.html#symbol-router-dispatchevent"><code>
+<span class="signature"><span class="signature-name">dispatchEvent</span><span class="signature-punctuation">(</span><span class="signature-param">name, </span><span class="signature-param">args</span><span class="signature-punctuation">)</span>
+    
+    
+    
+        &rarr;
+        
+            <span class="signature-returns">
+                
+                    EventBus
+                    
+                
+            </span></span>
+</code></a></div><section class="description"><p>Trigger one or many events, firing all bound callbacks. Callbacks are
+passed the same arguments as <code>dispatchEvent</code> is, apart from the event name
+(unless you're listening on <code>&quot;*&quot;</code>, which will cause your callback to
+receive the true name of the event as the first argument).</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>name</code>
+    :
+        <code class="clear">
+            
+                string
+                |
+            
+                Array.&lt;string>
+                
+            
+        </code><div class="symbol-description"><p>Event name or array of event names</p></div></div><div class="symbol-parameter">
+    <code>args</code>
+    :
+        <code class="clear">
+            
+                *
+                
+            
+        </code><div class="symbol-description"><p>Arguments to pass to the event handlers</p></div></div></section><section><h2>Returns</h2><div>
+                
+                    <code class="clear">
+                        
+                            <a href="eventbus.html">EventBus</a>
+                            
+                        
+                    </code><div class="symbol-description"><p>Returns this for chaining</p></div></div></section></div><div class="symbol-summary instance_methods" id="symbol-router-getpath"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="router.html#symbol-router-getpath"><code>
+<span class="signature"><span class="signature-name">getPath</span><span class="signature-punctuation">(</span><span class="signature-punctuation">)</span>
+    
+    
+    
+        &rarr;
+        
+            <span class="signature-returns">
+                
+                    string
+                    
+                
+            </span></span>
+</code></a></div><section class="description"><p>Get the current URL path</p></section><section><h2>Returns</h2><div>
+                
+                    <code class="clear">
+                        
+                            string
+                            
+                        
+                    </code><div class="symbol-description"><p>The current URL path, decoded</p></div></div></section></div><div class="symbol-summary instance_methods" id="symbol-router-getsearch"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="router.html#symbol-router-getsearch"><code>
+<span class="signature"><span class="signature-name">getSearch</span><span class="signature-punctuation">(</span><span class="signature-punctuation">)</span>
+    
+    
+    
+        &rarr;
+        
+            <span class="signature-returns">
+                
+                    string
+                    
+                
+            </span></span>
+</code></a></div><section class="description"><p>Get the current URL query string</p></section><section><h2>Returns</h2><div>
+                
+                    <code class="clear">
+                        
+                            string
+                            
+                        
+                    </code><div class="symbol-description"><p>The query string portion of the URL</p></div></div></section></div><div class="symbol-summary instance_methods" id="symbol-router-handlerforpath"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="router.html#symbol-router-handlerforpath"><code>
+<span class="signature"><span class="signature-name">handlerForPath</span><span class="signature-punctuation">(</span><span class="signature-param">path</span><span class="signature-punctuation">)</span>
+    
+    
+    
+        &rarr;
+        
+            <span class="signature-returns">
+                
+                    RouterHandler
+                    |
+                
+                    undefined
+                    
+                
+            </span></span>
+</code></a></div><section class="description"><p>Find the handler for a given path</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>path</code>
+    :
+        <code class="clear">
+            
+                string
+                
+            
+        </code><div class="symbol-description"><p>The path to find a handler for</p></div></div></section><section><h2>Returns</h2><div>
+                
+                    <code class="clear">
+                        
+                            <a href="routerhandler.html">RouterHandler</a>
+                            |
+                        
+                            undefined
+                            
+                        
+                    </code><div class="symbol-description"><p>The handler for the path, or undefined if not found</p></div></div></section></div><div class="symbol-summary instance_methods" id="symbol-router-initialize"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="router.html#symbol-router-initialize"><code>
+<span class="signature"><span class="signature-name">initialize</span><span class="signature-punctuation">(</span><span class="signature-punctuation">)</span></span>
+</code></a></div><section class="description"><p>Initialize is an empty function by default. Override it with your own
+initialization logic if needed.</p></section></div><div class="symbol-summary instance_methods" id="symbol-router-loadurl"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="router.html#symbol-router-loadurl"><code>
+<span class="signature"><span class="signature-name">loadUrl</span><span class="signature-punctuation">(</span><span class="signature-punctuation">)</span></span>
+</code></a></div><section class="description"><p>Load the current URL and execute the matching handler</p><p>This method is called on popstate events and when navigating programmatically</p></section></div><div class="symbol-summary instance_methods" id="symbol-router-navigateto"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="router.html#symbol-router-navigateto"><code>
+<span class="signature"><span class="signature-name">navigateTo</span><span class="signature-punctuation">(</span><span class="signature-param">url, </span><span class="signature-param">params</span><span class="signature-punctuation">)</span></span>
+</code></a></div><section class="description"><p>Navigate to a specific URL, updating browser history and firing navigation events</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>url</code>
+    :
+        <code class="clear">
+            
+                string
+                
+            
+        </code><div class="symbol-description"><p>The URL to navigate to</p></div></div><div class="symbol-parameter">
+    <code>params</code>
+    :
+        <code class="clear">
+            
+                <a href="support.module-object.html">Object</a>
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Query parameters to append to the URL</p></div></div></section></div><div class="symbol-summary instance_methods" id="symbol-router-removeeventlistener"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="router.html#symbol-router-removeeventlistener"><code>
+<span class="signature"><span class="signature-name">removeEventListener</span><span class="signature-punctuation">(</span><span class="signature-param">name, </span><span class="signature-param">callback, </span><span class="signature-param">options</span><span class="signature-punctuation">)</span>
+    
+    
+    
+        &rarr;
+        
+            <span class="signature-returns">
+                
+                    EventBus
+                    
+                
+            </span></span>
+</code></a></div><section class="description"><p>Remove one or many callbacks that match the arguments. If called with no arguments,
+removes all callbacks for all events.</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>name</code>
+    :
+        <code class="clear">
+            
+                string
+                |
+            
+                Array.&lt;string>
+                |
+            
+                object
+                |
+            
+                null
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Event name(s) or object of event/callback pairs</p></div></div><div class="symbol-parameter">
+    <code>callback</code>
+    :
+        <code class="clear">
+            
+                function
+                |
+            
+                object
+                |
+            
+                null
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Callback function or options object if name is an object</p></div></div><div class="symbol-parameter">
+    <code>options</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Event options</p></div><div class="symbol-parameter-properties"><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>once</code>
+    :
+        <code class="clear">
+            
+                boolean
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Match only events set to trigger once</p></div></div></div><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>context</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Match only events bound to this context</p></div></div></div><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>listener</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Match only events bound by this listener</p></div></div></div></div></div></section><section><h2>Returns</h2><div>
+                
+                    <code class="clear">
+                        
+                            <a href="eventbus.html">EventBus</a>
+                            
+                        
+                    </code><div class="symbol-description"><p>Returns this for chaining</p></div></div></section></div><div class="symbol-summary instance_methods" id="symbol-router-removeeventlistenerfor"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="router.html#symbol-router-removeeventlistenerfor"><code>
+<span class="signature"><span class="signature-name">removeEventListenerFor</span><span class="signature-punctuation">(</span><span class="signature-param">obj, </span><span class="signature-param">name, </span><span class="signature-param">callback, </span><span class="signature-param">options</span><span class="signature-punctuation">)</span>
+    
+    
+    
+        &rarr;
+        
+            <span class="signature-returns">
+                
+                    EventBus
+                    
+                
+            </span></span>
+</code></a></div><section class="description"><p>Tell this object to stop listening to either specific events or
+to every object it's currently listening to.</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>obj</code>
+    :
+        <code class="clear">
+            
+                object
+                |
+            
+                NodeList
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>The object to stop listening to; if omitted, stops listening to all objects</p></div></div><div class="symbol-parameter">
+    <code>name</code>
+    :
+        <code class="clear">
+            
+                string
+                |
+            
+                Array.&lt;string>
+                |
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Event name(s) or object of event/callback pairs</p></div></div><div class="symbol-parameter">
+    <code>callback</code>
+    :
+        <code class="clear">
+            
+                function
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Callback function to remove</p></div></div><div class="symbol-parameter">
+    <code>options</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Event options</p></div><div class="symbol-parameter-properties"><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>once</code>
+    :
+        <code class="clear">
+            
+                boolean
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Match only events set to trigger once</p></div></div></div><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>context</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Match only events bound to this context</p></div></div></div></div></div></section><section><h2>Returns</h2><div>
+                
+                    <code class="clear">
+                        
+                            <a href="eventbus.html">EventBus</a>
+                            
+                        
+                    </code><div class="symbol-description"><p>Returns this for chaining</p></div></div></section></div><div class="symbol-summary instance_methods" id="symbol-router-route"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="router.html#symbol-router-route"><code>
+<span class="signature"><span class="signature-name">route</span><span class="signature-punctuation">(</span><span class="signature-param">route, </span><span class="signature-param">name, </span><span class="signature-param">callback</span><span class="signature-punctuation">)</span>
+    
+    
+    
+        &rarr;
+        
+            <span class="signature-returns">
+                
+                    Viking.Router
+                    
+                
+            </span></span>
+</code></a></div><section class="description"><p>Define a route that maps a URL pattern to a controller action or callback function</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>route</code>
+    :
+        <code class="clear">
+            
+                string
+                |
+            
+                RegExp
+                
+            
+        </code><div class="symbol-description"><p>The route pattern to match</p></div></div><div class="symbol-parameter">
+    <code>name</code>
+    :
+        <code class="clear">
+            
+                string
+                |
+            
+                <a href="support.module-object.html">Object</a>
+                |
+            
+                function
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>The name of the route, controller#action string, or handler function</p></div></div><div class="symbol-parameter">
+    <code>callback</code>
+    :
+        <code class="clear">
+            
+                function
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>The callback function to execute when the route matches</p></div></div></section><section><h2>Returns</h2><div>
+                
+                    <code class="clear">
+                        
+                            Viking.Router
+                            
+                        
+                    </code><div class="symbol-description"><p>Returns this for chaining</p></div></div></section></div><div class="symbol-summary instance_methods" id="symbol-router-routetoregexp"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="router.html#symbol-router-routetoregexp"><code>
+<span class="signature"><span class="signature-name">routeToRegExp</span><span class="signature-punctuation">(</span><span class="signature-param">route</span><span class="signature-punctuation">)</span>
+    
+    
+    
+        &rarr;
+        
+            <span class="signature-returns">
+                
+                    RegExp
+                    
+                
+            </span></span>
+</code></a></div><section class="description"><p>Convert a route string pattern to a regular expression</p><p>The router uses the following syntax for defining routes:</p><ul><li><code>:name</code> - Named parameter</li><li><code>*splat</code> - Splat parameter</li><li><code>(...)</code> - Optional part</li></ul></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>route</code>
+    :
+        <code class="clear">
+            
+                string
+                
+            
+        </code><div class="symbol-description"><p>The route pattern to convert</p></div></div></section><section><h2>Returns</h2><div>
+                
+                    <code class="clear">
+                        
+                            RegExp
+                            
+                        
+                    </code><div class="symbol-description"><p>A regular expression that matches the route pattern</p></div></div></section></div><div class="symbol-summary instance_methods" id="symbol-router-start"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="router.html#symbol-router-start"><code>
+<span class="signature"><span class="signature-name">start</span><span class="signature-punctuation">(</span><span class="signature-punctuation">)</span></span>
+</code></a></div><section class="description"><p>Start the router, loading the current URL</p></section></div><div class="symbol-summary instance_methods" id="symbol-router-stop"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="router.html#symbol-router-stop"><code>
+<span class="signature"><span class="signature-name">stop</span><span class="signature-punctuation">(</span><span class="signature-punctuation">)</span></span>
+</code></a></div><section class="description"><p>Stop the router, removing event listeners</p></section></div></section></article></main><div class="sm-nav"><a href="index.html"><img src="images/logo.png" height="24px"/></a><label for="sm-nav-trigger" class="sm-nav-toggle"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></label></div><script src="/javascripts/jsdoc-press.js"></script></body></html>
