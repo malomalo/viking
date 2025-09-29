@@ -65,19 +65,23 @@ describe('Viking.Record::associations', () => {
             }).then(done, done);
         });
 
-        it("reload association", function (done) {
-            let model = new Model({id: 24});
-            model.parents.toArray().then(parents => {
+        it.only("reload association", function (done) {
+            const parent = new Parent({id: 2})
+            let model = new Model({id: 24, parents: [parent]});
+            model.parents.reload().then(firstLoadParents => {
+                assert.deepEqual(firstLoadParents.map(x => x.cid), [parent.cid])
+                
                 model.association('parents').reload().then(secondLoadParents => {
-                    assert.deepEqual(parents.map(x => x.cid), secondLoadParents.map(x => x.cid))
-                    assert.deepEqual(['Viking 2'], secondLoadParents.map(x => x.readAttribute('name')));
+                    assert.deepEqual([parent.cid], secondLoadParents.map(x => x.cid))
+                    assert.deepEqual(firstLoadParents.map(x => x.cid), secondLoadParents.map(x => x.cid))
+                    assert.deepEqual(['Viking 3'], secondLoadParents.map(x => x.readAttribute('name')));
                     assert.deepEqual([{}], secondLoadParents.map(x => x.changes()));
                 }).then(done, done);
 
                 assert.ok(this.findRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}} }));
 
                 this.withRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}} }, (xhr) => {
-                    xhr.respond(200, {}, '[{"id": 2, "name": "Viking 2"}]');
+                    xhr.respond(200, {}, '[{"id": 2, "name": "Viking 3"}]');
                 });
             })
 
