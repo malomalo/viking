@@ -1,0 +1,828 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="color-scheme" content="dark light"><title>Relation</title><link rel="stylesheet" href="/stylesheets/jsdoc-press.css" /><link rel="stylesheet" href="stylesheets/jsdoc.css" /></head><body><input type="checkbox" id="sm-nav-trigger" class="sm-nav-trigger" /><nav><a class="brand" href="./index.html"><img src="images/logo.png"/></a><div class="nav-group"><div class="nav-kinds">Classes</div><ul class="nav-tree"><li><a class="nav-item " href="application.html"><span class="icon-kind kind-class">C</span>
+        
+        Application
+    </a></li><li><a class="nav-item " href="association.html"><span class="icon-kind kind-class">C</span>
+        
+        Association
+    </a></li><li><a class="nav-item " href="controller.html"><span class="icon-kind kind-class">C</span>
+        
+        Controller
+    </a></li><li><a class="nav-item " href="eventbus.html"><span class="icon-kind kind-class">C</span>
+        
+        EventBus
+    </a></li><li><a class="nav-item " href="record.html"><span class="icon-kind kind-class">C</span>
+        
+        Record
+    </a></li><li><a class="nav-item active" href="relation.html"><span class="icon-kind kind-class">C</span>
+        
+        Relation
+    </a><div class="nav-children-wrap"><details class="nav-detail" open><summary class="nav-subkind">Events</summary><ul class="nav-children"><li><a class="nav-item " href="relation.html#symbol-relation-event-afteradd"><span class="icon-kind kind-event">E</span>
+        
+        afterAdd
+    </a></li><li><a class="nav-item " href="relation.html#symbol-relation-event-afterload"><span class="icon-kind kind-event">E</span>
+        
+        afterLoad
+    </a></li><li><a class="nav-item " href="relation.html#symbol-relation-event-afterremove"><span class="icon-kind kind-event">E</span>
+        
+        afterRemove
+    </a></li><li><a class="nav-item " href="relation.html#symbol-relation-event-beforeload"><span class="icon-kind kind-event">E</span>
+        
+        beforeLoad
+    </a></li><li><a class="nav-item " href="relation.html#symbol-relation-event-beforesettarget"><span class="icon-kind kind-event">E</span>
+        
+        beforeSetTarget
+    </a></li><li><a class="nav-item " href="relation.html#symbol-relation-event-changed"><span class="icon-kind kind-event">E</span>
+        
+        changed
+    </a></li><li><a class="nav-item " href="relation.html#symbol-relation-changed-attribute"><span class="icon-kind kind-event">E</span>
+        
+        changed:[attribute]
+    </a></li></ul></details><details class="nav-detail" open><summary class="nav-subkind">Instance Methods</summary><ul class="nav-children"><li><a class="nav-item " href="relation.html#symbol-relation-addeventlistener"><span class="icon-kind kind-function">F</span>
+        
+        addEventListener
+    </a></li><li><a class="nav-item " href="relation.html#symbol-relation-addeventlistenerfor"><span class="icon-kind kind-function">F</span>
+        
+        addEventListenerFor
+    </a></li><li><a class="nav-item " href="relation.html#symbol-relation-dispatchevent"><span class="icon-kind kind-function">F</span>
+        
+        dispatchEvent
+    </a></li><li><a class="nav-item " href="relation.html#symbol-relation-groupby"><span class="icon-kind kind-function">F</span>
+        
+        groupBy
+    </a></li><li><a class="nav-item " href="relation.html#symbol-relation-initialize"><span class="icon-kind kind-function">F</span>
+        
+        initialize
+    </a></li><li><a class="nav-item " href="relation.html#symbol-relation-load"><span class="icon-kind kind-function">F</span>
+        
+        load
+    </a></li><li><a class="nav-item " href="relation.html#symbol-relation-reload"><span class="icon-kind kind-function">F</span>
+        
+        reload
+    </a></li><li><a class="nav-item " href="relation.html#symbol-relation-removeeventlistener"><span class="icon-kind kind-function">F</span>
+        
+        removeEventListener
+    </a></li><li><a class="nav-item " href="relation.html#symbol-relation-removeeventlistenerfor"><span class="icon-kind kind-function">F</span>
+        
+        removeEventListenerFor
+    </a></li><li><a class="nav-item " href="relation.html#symbol-relation-settarget"><span class="icon-kind kind-function">F</span>
+        
+        setTarget
+    </a></li><li><a class="nav-item " href="relation.html#symbol-relation-spawn"><span class="icon-kind kind-function">F</span>
+        
+        spawn
+    </a></li></ul></details><details class="nav-detail" open><summary class="nav-subkind">Instance Properties</summary><ul class="nav-children"><li><a class="nav-item " href="relation.html#symbol-relation-bindedobjects"><span class="icon-kind kind-member">P</span>
+        
+        bindedObjects
+    </a></li><li><a class="nav-item " href="relation.html#symbol-relation-eventlisteners"><span class="icon-kind kind-member">P</span>
+        
+        eventListeners
+    </a></li><li><a class="nav-item " href="relation.html#symbol-relation-listenerid"><span class="icon-kind kind-member">P</span>
+        
+        listenerId
+    </a></li></ul></details></div></li><li><a class="nav-item " href="router.html"><span class="icon-kind kind-class">C</span>
+        
+        Router
+    </a></li><li><a class="nav-item " href="view.html"><span class="icon-kind kind-class">C</span>
+        
+        View
+    </a></li></ul></div><div class="nav-group"><div class="nav-kinds">Modules</div><ul class="nav-tree"><li><a class="nav-item " href="module-support.html"><span class="icon-kind kind-module">M</span>
+        
+        Support
+    </a></li></ul></div></nav><main class="content"><article class="doc"><header><div class="kind kind-color kind-class"><span class="icon-kind icon-kind-class">C</span>
+            
+            class
+        </div><h1>
+            Relation
+        </h1></header><section><h2>Constructor</h2><div class="symbol-title">
+            <code>
+<span class="signature"><span class="signature-prefix">new </span><span class="signature-name">Relation</span><span class="signature-punctuation">(</span><span class="signature-param">klass</span><span class="signature-punctuation">)</span></span>
+</code></div><div class="symbol-parameter">
+    <code>klass</code>
+    :
+        <code class="clear">
+            
+                <a href="record.html">Record</a>
+                
+            
+        </code><div class="symbol-description"><p>A Model <code>class</code>, not an instance of the <code>klass</code></p></div></div></section><section id="section-instance_members"><h2 class="section-title kind-instance_member">Instance Properties</h2><div class="symbol-summary instance_members" id="symbol-relation-bindedobjects"><div class="symbol-summary-title"><span class="icon-kind kind-member">P</span>
+        &nbsp;
+    
+    <a href="relation.html#symbol-relation-bindedobjects"><code>
+<span class="signature"><span class="signature-name">bindedObjects</span><span class="signature-punctuation">: </span><span class="signature-type">
+            
+                Object.&lt;string, Object></span></span>
+</code></a></div><section class="description"><p>Object containing references to objects this instance is listening to</p></section></div><div class="symbol-summary instance_members" id="symbol-relation-eventlisteners"><div class="symbol-summary-title"><span class="icon-kind kind-member">P</span>
+        &nbsp;
+    
+    <a href="relation.html#symbol-relation-eventlisteners"><code>
+<span class="signature"><span class="signature-name">eventListeners</span><span class="signature-punctuation">: </span><span class="signature-type">
+            
+                Object.&lt;string, Array></span></span>
+</code></a></div><section class="description"><p>Object containing all event listeners</p></section></div><div class="symbol-summary instance_members" id="symbol-relation-listenerid"><div class="symbol-summary-title"><span class="icon-kind kind-member">P</span>
+        &nbsp;
+    
+    <a href="relation.html#symbol-relation-listenerid"><code>
+<span class="signature"><span class="signature-name">listenerId</span><span class="signature-punctuation">: </span><span class="signature-type">
+            
+                string
+                
+            
+        </span></span>
+</code></a></div><section class="description"><p>Unique identifier for this event bus instance</p></section></div></section><section id="section-instance_methods"><h2 class="section-title kind-instance_method">Instance Methods</h2><div class="symbol-summary instance_methods" id="symbol-relation-addeventlistener"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="relation.html#symbol-relation-addeventlistener"><code>
+<span class="signature"><span class="signature-name">addEventListener</span><span class="signature-punctuation">(</span><span class="signature-param">name, </span><span class="signature-param">callback, </span><span class="signature-param">options</span><span class="signature-punctuation">)</span>
+    
+    
+    
+        &rarr;
+        
+            <span class="signature-returns">
+                
+                    EventBus
+                    
+                
+            </span></span>
+</code></a></div><section class="description"><p>Bind an event to a <code>callback</code> function. Passing <code>&quot;*&quot;</code> will bind
+the callback to all events fired.</p><p>If the options.once is true, the event will only be triggered a single time.
+After the first time the callback is invoked, its listener will be removed.
+If multiple events are passed in as an array, the handler will fire
+once for each event, not once for a combination of all events.</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>name</code>
+    :
+        <code class="clear">
+            
+                string
+                |
+            
+                Array.&lt;string>
+                |
+            
+                object
+                
+            
+        </code><div class="symbol-description"><p>Event name(s) or object of event/callback pairs</p></div></div><div class="symbol-parameter">
+    <code>callback</code>
+    :
+        <code class="clear">
+            
+                function
+                |
+            
+                object
+                
+            
+        </code><div class="symbol-description"><p>Callback function or options object if name is an object</p></div></div><div class="symbol-parameter">
+    <code>options</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Event options</p></div><div class="symbol-parameter-properties"><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>once</code>
+    :
+        <code class="clear">
+            
+                boolean
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Whether the event should only trigger once</p></div></div></div><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>context</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>The context to bind the event to</p></div></div></div><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>listener</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>The listener object</p></div></div></div></div></div></section><section><h2>Returns</h2><div>
+                
+                    <code class="clear">
+                        
+                            <a href="eventbus.html">EventBus</a>
+                            
+                        
+                    </code><div class="symbol-description"><p>Returns this for chaining</p></div></div></section></div><div class="symbol-summary instance_methods" id="symbol-relation-addeventlistenerfor"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="relation.html#symbol-relation-addeventlistenerfor"><code>
+<span class="signature"><span class="signature-name">addEventListenerFor</span><span class="signature-punctuation">(</span><span class="signature-param">obj, </span><span class="signature-param">name, </span><span class="signature-param">callback, </span><span class="signature-param">options</span><span class="signature-punctuation">)</span>
+    
+    
+    
+        &rarr;
+        
+            <span class="signature-returns">
+                
+                    EventBus
+                    
+                
+            </span></span>
+</code></a></div><section class="description"><p>Tell <em>this</em> object to listen to an event in another object, while keeping
+track of what it's listening to for easier unbinding later.</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>obj</code>
+    :
+        <code class="clear">
+            
+                object
+                |
+            
+                NodeList
+                
+            
+        </code><div class="symbol-description"><p>The object to listen to events on</p></div></div><div class="symbol-parameter">
+    <code>name</code>
+    :
+        <code class="clear">
+            
+                string
+                |
+            
+                Array.&lt;string>
+                |
+            
+                object
+                
+            
+        </code><div class="symbol-description"><p>Event name(s) or object of event/callback pairs</p></div></div><div class="symbol-parameter">
+    <code>callback</code>
+    :
+        <code class="clear">
+            
+                function
+                |
+            
+                object
+                
+            
+        </code><div class="symbol-description"><p>Callback function or options object if name is an object</p></div></div><div class="symbol-parameter">
+    <code>options</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Event options</p></div><div class="symbol-parameter-properties"><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>once</code>
+    :
+        <code class="clear">
+            
+                boolean
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Whether the event should only trigger once</p></div></div></div><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>context</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>The context to bind the event to</p></div></div></div></div></div></section><section><h2>Returns</h2><div>
+                
+                    <code class="clear">
+                        
+                            <a href="eventbus.html">EventBus</a>
+                            
+                        
+                    </code><div class="symbol-description"><p>Returns this for chaining</p></div></div></section></div><div class="symbol-summary instance_methods" id="symbol-relation-dispatchevent"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="relation.html#symbol-relation-dispatchevent"><code>
+<span class="signature"><span class="signature-name">dispatchEvent</span><span class="signature-punctuation">(</span><span class="signature-param">name, </span><span class="signature-param">args</span><span class="signature-punctuation">)</span>
+    
+    
+    
+        &rarr;
+        
+            <span class="signature-returns">
+                
+                    EventBus
+                    
+                
+            </span></span>
+</code></a></div><section class="description"><p>Trigger one or many events, firing all bound callbacks. Callbacks are
+passed the same arguments as <code>dispatchEvent</code> is, apart from the event name
+(unless you're listening on <code>&quot;*&quot;</code>, which will cause your callback to
+receive the true name of the event as the first argument).</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>name</code>
+    :
+        <code class="clear">
+            
+                string
+                |
+            
+                Array.&lt;string>
+                
+            
+        </code><div class="symbol-description"><p>Event name or array of event names</p></div></div><div class="symbol-parameter">
+    <code>args</code>
+    :
+        <code class="clear">
+            
+                *
+                
+            
+        </code><div class="symbol-description"><p>Arguments to pass to the event handlers</p></div></div></section><section><h2>Returns</h2><div>
+                
+                    <code class="clear">
+                        
+                            <a href="eventbus.html">EventBus</a>
+                            
+                        
+                    </code><div class="symbol-description"><p>Returns this for chaining</p></div></div></section></div><div class="symbol-summary instance_methods" id="symbol-relation-groupby"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="relation.html#symbol-relation-groupby"><code>
+<span class="signature"><span class="signature-name">groupBy</span><span class="signature-punctuation">(</span><span class="signature-param">on</span><span class="signature-punctuation">)</span>
+    
+    
+    
+        &rarr;
+        
+            <span class="signature-returns">
+                
+                    Object
+                    
+                
+            </span></span>
+</code></a></div><section class="description"><p>Group the results by a attribute</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>on</code>
+    :
+        <code class="clear">
+            
+                *
+                
+            
+        </code><div class="symbol-description"><p>Attributes to group the results by</p></div></div></section><section><h2>Returns</h2><div>
+                
+                    <code class="clear">
+                        
+                            <a href="support.module-object.html">Object</a>
+                            
+                        
+                    </code></div></section></div><div class="symbol-summary instance_methods" id="symbol-relation-initialize"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="relation.html#symbol-relation-initialize"><code>
+<span class="signature"><span class="signature-name">initialize</span><span class="signature-punctuation">(</span><span class="signature-punctuation">)</span></span>
+</code></a></div><section class="description"><p>placeholder function for extending</p></section></div><div class="symbol-summary instance_methods" id="symbol-relation-load"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="relation.html#symbol-relation-load"><code>
+<span class="signature"><span class="signature-name">load</span><span class="signature-punctuation">(</span><span class="signature-param">eventParameters</span><span class="signature-punctuation">)</span>
+    
+    
+    
+        &rarr;
+        
+            <span class="signature-returns">
+                
+                    Array.<a href="record.html">&lt;Record&gt;</a></span></span>
+</code></a></div><section class="description"><p>Load and return the relation.</p><p>If the relation is loaded the loaded relation will be returned and no
+events will be fired.</p><p>Use [reload]{@linkcode Relation#reload} if you wish to fetch the
+relation from the server again.</p><p>If there is currently a request in flight to fetch the relation from the
+server the result of that request will be returned after the original
+load finishes. A new request will not be sent.</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>eventParameters</code>
+    :
+        <code class="clear">
+            
+                *
+                
+            
+        </code><div class="symbol-description"><p>Parameters to pass to events fired in this function</p></div></div></section><section><h2>Returns</h2><div>
+                
+                    <code class="clear">
+                        
+                            Array.<<a href="record.html">Record</a>>
+                            
+                        
+                    </code></div></section></div><div class="symbol-summary instance_methods" id="symbol-relation-reload"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="relation.html#symbol-relation-reload"><code>
+<span class="signature"><span class="signature-name">reload</span><span class="signature-punctuation">(</span><span class="signature-param">eventParameters</span><span class="signature-punctuation">)</span>
+    
+    
+    
+        &rarr;
+        
+            <span class="signature-returns">
+                
+                    Array.<a href="record.html">&lt;Record&gt;</a></span></span>
+</code></a></div><section class="description"><p>Load the relation from the server even if it's in memory.</p><p>If there is currently a request in flight to fetch the relation it will
+be cancelled and a new request will be sent. The result of the new request
+will be used to fullfill the promise of the original request before
+fulling the promise of the new request.</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>eventParameters</code>
+    :
+        <code class="clear">
+            
+                *
+                
+            
+        </code><div class="symbol-description"><p>Parameters to pass to events fired in this function</p></div></div></section><section><h2>Returns</h2><div>
+                
+                    <code class="clear">
+                        
+                            Array.<<a href="record.html">Record</a>>
+                            
+                        
+                    </code></div></section></div><div class="symbol-summary instance_methods" id="symbol-relation-removeeventlistener"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="relation.html#symbol-relation-removeeventlistener"><code>
+<span class="signature"><span class="signature-name">removeEventListener</span><span class="signature-punctuation">(</span><span class="signature-param">name, </span><span class="signature-param">callback, </span><span class="signature-param">options</span><span class="signature-punctuation">)</span>
+    
+    
+    
+        &rarr;
+        
+            <span class="signature-returns">
+                
+                    EventBus
+                    
+                
+            </span></span>
+</code></a></div><section class="description"><p>Remove one or many callbacks that match the arguments. If called with no arguments,
+removes all callbacks for all events.</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>name</code>
+    :
+        <code class="clear">
+            
+                string
+                |
+            
+                Array.&lt;string>
+                |
+            
+                object
+                |
+            
+                null
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Event name(s) or object of event/callback pairs</p></div></div><div class="symbol-parameter">
+    <code>callback</code>
+    :
+        <code class="clear">
+            
+                function
+                |
+            
+                object
+                |
+            
+                null
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Callback function or options object if name is an object</p></div></div><div class="symbol-parameter">
+    <code>options</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Event options</p></div><div class="symbol-parameter-properties"><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>once</code>
+    :
+        <code class="clear">
+            
+                boolean
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Match only events set to trigger once</p></div></div></div><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>context</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Match only events bound to this context</p></div></div></div><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>listener</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Match only events bound by this listener</p></div></div></div></div></div></section><section><h2>Returns</h2><div>
+                
+                    <code class="clear">
+                        
+                            <a href="eventbus.html">EventBus</a>
+                            
+                        
+                    </code><div class="symbol-description"><p>Returns this for chaining</p></div></div></section></div><div class="symbol-summary instance_methods" id="symbol-relation-removeeventlistenerfor"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="relation.html#symbol-relation-removeeventlistenerfor"><code>
+<span class="signature"><span class="signature-name">removeEventListenerFor</span><span class="signature-punctuation">(</span><span class="signature-param">obj, </span><span class="signature-param">name, </span><span class="signature-param">callback, </span><span class="signature-param">options</span><span class="signature-punctuation">)</span>
+    
+    
+    
+        &rarr;
+        
+            <span class="signature-returns">
+                
+                    EventBus
+                    
+                
+            </span></span>
+</code></a></div><section class="description"><p>Tell this object to stop listening to either specific events or
+to every object it's currently listening to.</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>obj</code>
+    :
+        <code class="clear">
+            
+                object
+                |
+            
+                NodeList
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>The object to stop listening to; if omitted, stops listening to all objects</p></div></div><div class="symbol-parameter">
+    <code>name</code>
+    :
+        <code class="clear">
+            
+                string
+                |
+            
+                Array.&lt;string>
+                |
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Event name(s) or object of event/callback pairs</p></div></div><div class="symbol-parameter">
+    <code>callback</code>
+    :
+        <code class="clear">
+            
+                function
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Callback function to remove</p></div></div><div class="symbol-parameter">
+    <code>options</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Event options</p></div><div class="symbol-parameter-properties"><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>once</code>
+    :
+        <code class="clear">
+            
+                boolean
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Match only events set to trigger once</p></div></div></div><div class="symbol-parameter-property"><div class="symbol-parameter">
+    <code>context</code>
+    :
+        <code class="clear">
+            
+                object
+                
+            
+        </code><span class="tag-attr tag-optional">optional</span><div class="symbol-description"><p>Match only events bound to this context</p></div></div></div></div></div></section><section><h2>Returns</h2><div>
+                
+                    <code class="clear">
+                        
+                            <a href="eventbus.html">EventBus</a>
+                            
+                        
+                    </code><div class="symbol-description"><p>Returns this for chaining</p></div></div></section></div><div class="symbol-summary instance_methods" id="symbol-relation-settarget"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="relation.html#symbol-relation-settarget"><code>
+<span class="signature"><span class="signature-name">setTarget</span><span class="signature-punctuation">(</span><span class="signature-param">records, </span><span class="signature-param">eventParameters</span><span class="signature-punctuation">)</span></span>
+</code></a></div><section class="description"><p>Sets the records of this relation, removing and adding records as necessary.</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>records</code>
+    :
+        <code class="clear">
+            
+                Array.<<a href="record.html">Record</a>>
+                
+            
+        </code></div><div class="symbol-parameter">
+    <code>eventParameters</code>
+    :
+        <code class="clear">
+            
+                *
+                
+            
+        </code><div class="symbol-description"><p>Parameters to pass to events fired in this function</p></div></div></section></div><div class="symbol-summary instance_methods" id="symbol-relation-spawn"><div class="symbol-summary-title"><span class="icon-kind kind-function">F</span>
+        &nbsp;
+    
+    <a href="relation.html#symbol-relation-spawn"><code>
+<span class="signature"><span class="signature-name">spawn</span><span class="signature-punctuation">(</span><span class="signature-punctuation">)</span>
+    
+    
+    
+        &rarr;
+        
+            <span class="signature-returns">
+                
+                    Relation
+                    
+                
+            </span></span>
+</code></a></div><section><h2>Returns</h2><div>
+                
+                    <code class="clear">
+                        
+                            <a href="relation.html">Relation</a>
+                            
+                        
+                    </code></div></section></div></section><section id="section-events"><h2 class="section-title kind-event">Events</h2><div class="symbol-summary events" id="symbol-relation-event-afteradd"><div class="symbol-summary-title"><span class="icon-kind kind-event">E</span>
+        &nbsp;
+    
+    <a href="relation.html#symbol-relation-event-afteradd"><code>
+<span class="signature"><span class="signature-name">afterAdd</span></span>
+</code></a></div><section class="description"><p>Fired when records are added to the relation. Will <em>not</em> be called
+for any records already in memory.</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>addedRecords</code>
+    :
+        <code class="clear">
+            
+                Array.<<a href="record.html">Record</a>>
+                
+            
+        </code><div class="symbol-description"><p>The records that were added
+to the relation</p></div></div><div class="symbol-parameter">
+    <code>eventParameters</code>
+    :
+        <code class="clear">
+            
+                *
+                
+            
+        </code><div class="symbol-description"><p>optional parameters from the
+{@link Relation#setTarget} call that gets
+passed to the callbacks.</p></div></div></section></div><div class="symbol-summary events" id="symbol-relation-event-afterload"><div class="symbol-summary-title"><span class="icon-kind kind-event">E</span>
+        &nbsp;
+    
+    <a href="relation.html#symbol-relation-event-afterload"><code>
+<span class="signature"><span class="signature-name">afterLoad</span></span>
+</code></a></div><section class="description"><p>Fired after the request to the server has been returned and
+processed and the models are loaded.</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>records</code>
+    :
+        <code class="clear">
+            
+                Array.<<a href="record.html">Record</a>>
+                
+            
+        </code><div class="symbol-description"><p>The current records in memory</p></div></div><div class="symbol-parameter">
+    <code>eventParameters</code>
+    :
+        <code class="clear">
+            
+                *
+                
+            
+        </code><div class="symbol-description"><p>optional parameters from the {@link Relation#load} call
+that get passed to the callbacks.</p></div></div></section></div><div class="symbol-summary events" id="symbol-relation-event-afterremove"><div class="symbol-summary-title"><span class="icon-kind kind-event">E</span>
+        &nbsp;
+    
+    <a href="relation.html#symbol-relation-event-afterremove"><code>
+<span class="signature"><span class="signature-name">afterRemove</span></span>
+</code></a></div><section class="description"><p>Fired when records are removed to the relation.</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>removedRecords</code>
+    :
+        <code class="clear">
+            
+                Array.<<a href="record.html">Record</a>>
+                
+            
+        </code><div class="symbol-description"><p>The records that were
+removed from the relation</p></div></div><div class="symbol-parameter">
+    <code>eventParameters</code>
+    :
+        <code class="clear">
+            
+                *
+                
+            
+        </code><div class="symbol-description"><p>optional parameters from the
+{@link Relation#setTarget} call that gets
+passed to the callbacks.</p></div></div></section></div><div class="symbol-summary events" id="symbol-relation-event-beforeload"><div class="symbol-summary-title"><span class="icon-kind kind-event">E</span>
+        &nbsp;
+    
+    <a href="relation.html#symbol-relation-event-beforeload"><code>
+<span class="signature"><span class="signature-name">beforeLoad</span></span>
+</code></a></div><section class="description"><p>Fired before sending the request to the server to load the records.</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>records</code>
+    :
+        <code class="clear">
+            
+                Array.<<a href="record.html">Record</a>>
+                
+            
+        </code><div class="symbol-description"><p>The current records in memory</p></div></div><div class="symbol-parameter">
+    <code>eventParameters</code>
+    :
+        <code class="clear">
+            
+                *
+                
+            
+        </code><div class="symbol-description"><p>optional parameters from the {@link Relation#load} call
+that get passed to the callbacks.</p></div></div></section></div><div class="symbol-summary events" id="symbol-relation-event-beforesettarget"><div class="symbol-summary-title"><span class="icon-kind kind-event">E</span>
+        &nbsp;
+    
+    <a href="relation.html#symbol-relation-event-beforesettarget"><code>
+<span class="signature"><span class="signature-name">beforeSetTarget</span></span>
+</code></a></div><section class="description"><p>Fired before setting (adding or removing) the records of the relation.</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>newRecords</code>
+    :
+        <code class="clear">
+            
+                Array.<<a href="record.html">Record</a>>
+                
+            
+        </code><div class="symbol-description"><p>The records that are being set</p></div></div><div class="symbol-parameter">
+    <code>currentRecords</code>
+    :
+        <code class="clear">
+            
+                Array.<<a href="record.html">Record</a>>
+                
+            
+        </code><div class="symbol-description"><p>The records that are currently
+loaded</p></div></div><div class="symbol-parameter">
+    <code>eventParameters</code>
+    :
+        <code class="clear">
+            
+                *
+                
+            
+        </code><div class="symbol-description"><p>optional parameters from the
+{@link Relation#setTarget} call that gets
+passed to the callbacks.</p></div></div></section></div><div class="symbol-summary events" id="symbol-relation-event-changed"><div class="symbol-summary-title"><span class="icon-kind kind-event">E</span>
+        &nbsp;
+    
+    <a href="relation.html#symbol-relation-event-changed"><code>
+<span class="signature"><span class="signature-name">changed</span></span>
+</code></a></div><section class="description"><p>An attribute of the relation was changed</p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>attribute</code>
+    :
+        <code class="clear">
+            
+                "distinct"
+                |
+            
+                "limit"
+                |
+            
+                "offset"
+                |
+            
+                "order"
+                |
+            
+                "where"
+                
+            
+        </code><div class="symbol-description"><p>The attribute on the query/relation that changed</p></div></div><div class="symbol-parameter">
+    <code>newValue</code>
+    :
+        <code class="clear">
+            
+                *
+                
+            
+        </code><div class="symbol-description"><p>The new value of the attribute</p></div></div></section></div><div class="symbol-summary events" id="symbol-relation-changed-attribute"><div class="symbol-summary-title"><span class="icon-kind kind-event">E</span>
+        &nbsp;
+    
+    <a href="relation.html#symbol-relation-changed-attribute"><code>
+<span class="signature"><span class="signature-name">changed:[attribute]</span></span>
+</code></a></div><section class="description"><p>attribute of the relation was changed; where <code>attribute</code> is any of the following
+<code>&quot;distinct&quot;</code>, <code>&quot;limit&quot;</code>, <code>&quot;offset&quot;</code>, <code>&quot;order&quot;</code>, <code>&quot;where&quot;</code></p></section><section><h2>Parameters</h2><div class="symbol-parameter">
+    <code>newValue</code>
+    :
+        <code class="clear">
+            
+                *
+                
+            
+        </code><div class="symbol-description"><p>The new value of the attribute</p></div></div></section></div></section></article></main><div class="sm-nav"><a href="index.html"><img src="images/logo.png" height="24px"/></a><label for="sm-nav-trigger" class="sm-nav-toggle"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></label></div><script src="/javascripts/jsdoc-press.js"></script></body></html>

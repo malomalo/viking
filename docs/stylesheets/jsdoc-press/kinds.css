@@ -1,0 +1,77 @@
+:root{
+    --module-hue: 40;
+    --function-hue: 80;
+    --event-hue: 120;
+    --member-hue: 160;
+    --class-hue: 200;
+    --typedef-hue: 240;
+    --namespace-hue: 280;
+    --mixin-hue: 320;
+    --interface-hue: 360;
+}
+
+.kind {
+    font-size: 0.9em;
+    text-transform: uppercase;
+    letter-spacing: .08em
+}
+
+.icon-kind {
+    display: inline-flex;
+    width: calc(1em + 0.2em);
+    height: calc(1em + 0.2em);
+    place-items: center;
+    justify-content: center;
+    border-radius: 0.2em;
+    
+    font-weight: bold;
+    font-family: var(--body-family);
+    text-transform: uppercase;
+    line-height: 1;
+}
+
+.kind-color,
+.icon-kind {
+    color: light-dark(oklch(40% 70% var(--hue)), oklch(70% 40% var(--hue)));
+}
+
+.kind-bg,
+.icon-kind {
+    background: light-dark(oklch(80% 70% var(--hue) / 0.4), oklch(60% 50% var(--hue) / 0.4));
+}
+
+.kind-function,
+.kind-method,
+.kind-instance_method,
+.kind-static_method {
+    --hue: var(--function-hue);
+}
+
+.kind-class {
+    --hue: var(--class-hue);
+}
+
+.kind-member {
+    --hue: var(--member-hue);
+}
+
+.kind-event {
+    --hue: var(--event-hue);
+}
+
+.kind-module {
+    --hue: var(--module-hue);
+}
+
+.kind-namespace {
+    --hue: var(--namespace-hue);
+}
+.kind-typedef {
+    --hue: var(--typedef-hue);
+}
+.kind-mixin {
+    --hue: var(--mixin-hue);
+}
+.kind-interface {
+    --hue: var(--interface-hue);
+}

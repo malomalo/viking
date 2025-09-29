@@ -1,0 +1,44 @@
+.symbol-summary {
+    padding-block: 1.5em;
+    & > section {
+        margin-block: 1em;
+        h2 {
+            font-size: 1.2em;
+        }
+        h3 {
+            font-size: 1em;
+        }
+    }
+    section {
+        padding-left: 2em;
+    }
+}
+.symbol-summary-title {
+    font-weight:bold;
+    font-size: 1.1em;
+    display:block;
+    border-bottom: 1px solid var(--body-border);
+    padding-block: 0.5em;
+    
+    code {
+        padding: 0;
+        background: none;
+        color: var(--link-color);
+    }
+}
+.symbol-parameter,
+.symbol-parameter-property {
+    margin-top: 0.5em;
+    & + & {
+        margin-top: 1.5em;
+    }
+}
+.symbol-description {
+    margin-top: 0.5em;
+}
+
+.symbol-parameter-properties {
+    margin-top: 1em;
+    padding-left: 2em;
+    border-left: 3px solid var(--body-border);
+}

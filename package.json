@@ -25,43 +25,19 @@
     "@babel/plugin-proposal-class-properties": "^7.18.6",
     "@babel/preset-env": "^7.20.2",
     "@babel/register": "^7.21.0",
-    "esdoc": "^1.1.0",
-    "esdoc-standard-plugin": "^1.0.0",
+    "highlight.js": "^11.11.1",
+    "jsdoc": "^4.0.3",
+    "jsdoc-export-default-interop": "^0.3.1",
+    "jsdoc-press": "github:bemky/jsdoc-press",
     "jsdom": "^21.1.0",
     "jsdom-global": "^3.0.2",
     "mocha": "^10.2.0",
-    "sinon": "^15.0.1",
-    "esdoc-ecmascript-proposal-plugin": "^1.0.0",
-    "jsdoc": "^4.0.3"
+    "nodemon": "^3.1.9",
+    "sinon": "^15.0.1"
   },
   "scripts": {
     "test": "npx mocha -r @babel/register -r test/testSetup.js test/testHelper.js 'test/**/*Test.js'",
-    "esdoc": "npx esdoc",
-    "jsdoc": "npx jsdoc -c jsdoc.json lib/"
-  },
-  "dependencies": {
-  },
-  "esdoc": {
-    "source": "./lib",
-    "destination": "./esdoc",
-    "plugins": [
-      {
-        "name": "esdoc-standard-plugin",
-        "brand": {
-          "logo": "./logo.png",
-          "title": "Viking.js",
-          "description": "Viking.js is an open-source web framework for JavaScript. Inspired by Backbone.js & Ruby on Rails; it makes it easier to write client side JavaScript applications.",
-          "repository": "https://github.com/malomalo/viking",
-          "site": "http://vikingjs.com",
-          "image": "http://vikingjs.com/logo.png"
-        }
-      },
-      {
-        "name": "esdoc-ecmascript-proposal-plugin",
-        "option": {
-          "all": true
-        }
-      }
-    ]
+    "docs": "jsdoc -c jsdoc.json -u lib",
+    "docs:watch": "nodemon --watch lib --watch docs-src --ext js,md,json,css --exec \"npm run docs\""
   }
 }

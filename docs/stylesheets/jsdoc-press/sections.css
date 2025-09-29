@@ -1,0 +1,9 @@
+.section-title {
+    padding: 1em;
+    text-align: center;
+    background: light-dark(oklch(80% 70% var(--hue, var(--primary-hue)) / 0.4), oklch(60% 50% var(--hue, var(--primary-hue)) / 0.4));
+    color: light-dark(oklch(40% 50% var(--hue, var(--primary-hue))), oklch(70% 40% var(--hue, var(--primary-hue))));
+    text-transform: uppercase;
+    font-weight: 900;
+    font-size: 1rem;
+}

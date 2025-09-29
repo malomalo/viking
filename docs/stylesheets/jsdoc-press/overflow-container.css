@@ -1,0 +1,21 @@
+.overflow-container {
+    position: relative;
+    max-width: 100%;
+    overflow-x: auto;
+    display: inline-flex;
+    align-items: stretch;
+}
+.overflow-container.overflowing:after {
+    content: '';
+    display: block;
+    transition: box-shadow 200ms;
+    position: sticky;
+    right: 0;
+    top: 0;
+    width: 1px;
+    flex: 0 0 1px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5), 0 0 5px rgba(0, 0, 0, 1);
+}
+.overflow-container.overflowing.scroll-end:after {
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0.5), 0 0 0 rgba(0, 0, 0, 1);
+}
