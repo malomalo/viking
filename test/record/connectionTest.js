@@ -21,7 +21,10 @@ describe('Viking.Record', () => {
                 let connection = new Connection('http://example.com', {
                     headers: {
                         foo: '1',
-                        bar: () => '2'
+                        bar: () => '2',
+                        bop: undefined,
+                        pop: null,
+                        pip: ''
                     }
                 });
             
@@ -29,6 +32,9 @@ describe('Viking.Record', () => {
                 const request = this.findRequest('GET', '/')
                 assert.equal('1', request.requestHeaders.foo)
                 assert.equal('2', request.requestHeaders.bar)
+                assert.strictEqual(false, request.requestHeaders.hasOwnProperty('bop'))
+                assert.strictEqual(false, request.requestHeaders.hasOwnProperty('pop'))
+                assert.strictEqual(false, request.requestHeaders.hasOwnProperty('pip'))
             })
         })
         
