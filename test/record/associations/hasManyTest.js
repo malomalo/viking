@@ -65,7 +65,7 @@ describe('Viking.Record::associations', () => {
             }).then(done, done);
         });
 
-        it.only("reload association", function (done) {
+        it("reload association", function (done) {
             const parent = new Parent({id: 2})
             let model = new Model({id: 24, parents: [parent]});
             model.parents.reload().then(firstLoadParents => {

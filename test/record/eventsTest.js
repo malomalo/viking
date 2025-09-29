@@ -13,7 +13,7 @@ describe('Viking.Record#events', () => {
     }
     
     it('change', (done) => {
-        let model = new Record();
+        let model = new Actor();
         
         model.addEventListener('changed', (record, changes) => {
             assert.strictEqual(record, model);
@@ -24,7 +24,7 @@ describe('Viking.Record#events', () => {
     });
     
     it('change:[attribute]', (done) => {
-        let model = new Record();
+        let model = new Actor();
         
         model.addEventListener('changed:name', (record, oldValue, newValue) => {
             assert.strictEqual(record, model);
