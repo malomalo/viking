@@ -1,9 +1,25 @@
 import 'mocha';
 import * as assert from 'assert';
-import {toParam, toQuery, deepAssign} from 'viking/support/object';
+import {pick, toParam, toQuery, deepAssign} from 'viking/support/object';
 
 describe('VikingSupport.Object', () => {
 
+    describe('pick()', () => {
+        it('pick(object, key1, key2)', () => {
+            assert.deepEqual(
+                { "key": 1, "name": 2 },
+                pick({"a": 1, "key": 1, "name": 2}, 'key', 'name')
+            )
+        })
+    
+        it('pick(object, [key1, key2])', () => {
+            assert.deepEqual(
+                { "key": 1, "name": 2 },
+                pick({"a": 1, "key": 1, "name": 2}, ['key', 'name'])
+            )
+        })
+    })
+    
     it('#toParam()', () => {
         assert.equal('1=2013&2=myString&3=true&4&5=false', toParam({1: 2013, 2: 'myString', 3: true, 4: null, 5: false}));
     });
