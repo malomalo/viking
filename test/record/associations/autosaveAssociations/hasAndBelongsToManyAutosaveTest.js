@@ -62,7 +62,7 @@ describe('Viking.Record HasAndBelongsToManyAssociation autosave', () => {
                     phases: [{ name: 'Jerry', id: 11 }]
                 }
             }}, (xhr) => {
-                xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Jerry"}]}');
+                xhr.respond(201, {}, '{"id": 24, "phases": [{"id": 11, "name": "Jerry"}]}');
             });
         });
 
@@ -109,7 +109,7 @@ describe('Viking.Record HasAndBelongsToManyAssociation autosave', () => {
             this.withRequest('PUT', '/requirements/24', { body: {
                 requirement: { phases: [{ id: 11 }] }
             }}, (xhr) => {
-                xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Tim"}]}');
+                xhr.respond(201, {}, '{"id": 24, "phases": [{"id": 11, "name": "Tim"}]}');
             });
         });
     });
@@ -149,7 +149,7 @@ describe('Viking.Record HasAndBelongsToManyAssociation autosave', () => {
                         phases: [{ name: 'Jerry', id: 11 }]
                     }
                 }}, (xhr) => {
-                    xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Jerry"}]}');
+                    xhr.respond(201, {}, '{"id": 24, "phases": [{"id": 11, "name": "Jerry"}]}');
                 });
             });
         });
@@ -166,7 +166,7 @@ describe('Viking.Record HasAndBelongsToManyAssociation autosave', () => {
             this.withRequest('POST', '/requirements', { body: {
                 requirement: { phases: [{ id: 11 }] }
             }}, (xhr) => {
-                xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Tom"}]}');
+                xhr.respond(201, {}, '{"id": 24, "phases": [{"id": 11, "name": "Tom"}]}');
             });
         });
     });
