@@ -61,7 +61,7 @@ describe('Viking.Record HasManyAssociation autosave', () => {
                     phases: [{ name: 'Jerry', id: 11 }]
                 }
             }}, (xhr) => {
-                xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Jerry", "requirement_id": 24}]}');
+                xhr.respond(201, {}, '{"id": 24, "phases": [{"id": 11, "name": "Jerry", "requirement_id": 24}]}');
             });
         });
         
@@ -88,7 +88,7 @@ describe('Viking.Record HasManyAssociation autosave', () => {
             this.withRequest('PUT', '/requirements/24', { body: {
                 requirement: { phases: [{ parts: [{name: 'Bar', id: 3}], id: 11 }] }
             }}, (xhr) => {
-                xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Preparation", "parts": [{"name": "Bar", "id": 3}]}]}');
+                xhr.respond(201, {}, '{"id": 24, "phases": [{"id": 11, "name": "Preparation", "parts": [{"name": "Bar", "id": 3}]}]}');
             });
         });
 
@@ -140,7 +140,7 @@ describe('Viking.Record HasManyAssociation autosave', () => {
                         phases: [{ name: 'Tom' }]
                     }
                 }}, (xhr) => {
-                    xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Tom", "requirement_id": 24}]}');
+                    xhr.respond(201, {}, '{"id": 24, "phases": [{"id": 11, "name": "Tom", "requirement_id": 24}]}');
                 });
             });
         });
@@ -162,7 +162,7 @@ describe('Viking.Record HasManyAssociation autosave', () => {
                         phases: [{ name: 'Jerry', id: 11 }]
                     }
                 }}, (xhr) => {
-                    xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Jerry", "requirement_id": 24}]}');
+                    xhr.respond(201, {}, '{"id": 24, "phases": [{"id": 11, "name": "Jerry", "requirement_id": 24}]}');
                 });
             });
         });
@@ -182,7 +182,7 @@ describe('Viking.Record HasManyAssociation autosave', () => {
                 where: {requirement_id: 11},
                 order: {id: 'desc'}
             }}, xhr => {
-                xhr.respond(201, {}, '[{"id": "99", "name": "Jerry", "requirement_id": 11}]')
+                xhr.respond(201, {}, '[{"id": 99, "name": "Jerry", "requirement_id": 11}]')
             })
         })
     })
