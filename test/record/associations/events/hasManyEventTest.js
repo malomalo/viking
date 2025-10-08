@@ -11,7 +11,7 @@ describe('Viking.Record::Associations', () => {
         }
         
         describe('beforeLoad event on association', () => {
-            it.only('on association.load()', function (done) {
+            it('on association.load()', function (done) {
                 let model = new Model({id: 24});
                 let counter = 1;
                 
@@ -31,7 +31,7 @@ describe('Viking.Record::Associations', () => {
                 });
             })
             
-            it.only('not on association.load() if already loaded', function (done) {
+            it('not on association.load() if already loaded', function (done) {
                 let model = new Model({id: 24});
                 let counter = 1;
                 
@@ -53,7 +53,7 @@ describe('Viking.Record::Associations', () => {
         })
         
         describe('afterLoad event on association', () => {
-            it.only('on association.load()', function (done) {
+            it('on association.load()', function (done) {
                 let model = new Model({id: 24});
                 
                 model.association('parents').addEventListener('afterLoad', records => {
@@ -66,7 +66,7 @@ describe('Viking.Record::Associations', () => {
                 });
             })
             
-            it.only("not on association.load() if already loaded", function (done) {
+            it("not on association.load() if already loaded", function (done) {
                 let model = new Model({id: 24});
                 let counter = 0
                 
@@ -87,7 +87,7 @@ describe('Viking.Record::Associations', () => {
         })
         
         describe('beforeAdd event on association', () => {
-            it.only('on association.setTarget() with a new record', function (done) {
+            it('on association.setTarget() with a new record', function (done) {
                 let model = new Model({id: 2});
                 let parent = new Parent({id: 24});
             
@@ -100,7 +100,7 @@ describe('Viking.Record::Associations', () => {
                 model.parents = [parent];
             });
             
-            it.only("not on association.setTarget() with a record already in the association", function (done) {
+            it("not on association.setTarget() with a record already in the association", function (done) {
                 let model = new Model({id: 2});
                 let parent = new Parent({id: 24});
                 model.parents = [parent]
@@ -113,7 +113,7 @@ describe('Viking.Record::Associations', () => {
                 done()
             });
             
-            it.only('on association.setAttributes() with a new record', function (done) {
+            it('on association.setAttributes() with a new record', function (done) {
                 let model = new Model({id: 2});
             
                 model.association('parents').addEventListener('beforeAdd', records => {
@@ -125,7 +125,7 @@ describe('Viking.Record::Associations', () => {
                 model.parents.setAttributes([{id: 24}])
             });
         
-            it.only("not on association.setAttributes() with a record already in the association", function (done) {
+            it("not on association.setAttributes() with a record already in the association", function (done) {
                 let model = new Model({id: 2});
                 let parent = new Parent({id: 24});
                 model.parents = [parent]
@@ -140,7 +140,7 @@ describe('Viking.Record::Associations', () => {
         })
         
         describe('afterAdd event on association', () => {
-            it.only('on association.setTarget() with a new record', function (done) {
+            it('on association.setTarget() with a new record', function (done) {
                 let model = new Model({id: 2});
                 let parent = new Parent({id: 24});
             
@@ -153,7 +153,7 @@ describe('Viking.Record::Associations', () => {
                 model.parents = [parent]
             });
             
-            it.only("not on association.setTarget() with a record already in the association", function (done) {
+            it("not on association.setTarget() with a record already in the association", function (done) {
                 let model = new Model({id: 2});
                 let parent = new Parent({id: 24});
                 model.parents = [parent]
@@ -166,7 +166,7 @@ describe('Viking.Record::Associations', () => {
                 done()
             });
             
-            it.only('on association.setAttributes() with a new record', function (done) {
+            it('on association.setAttributes() with a new record', function (done) {
                 let model = new Model({id: 2});
             
                 model.association('parents').addEventListener('afterAdd', records => {
@@ -178,7 +178,7 @@ describe('Viking.Record::Associations', () => {
                 model.parents.setAttributes([{id: 24}])
             });
         
-            it.only("not on association.setAttributes() with a record already in the association", function (done) {
+            it("not on association.setAttributes() with a record already in the association", function (done) {
                 let model = new Model();
                 let parent = new Parent({id: 24});
                 model.parents = [parent]
@@ -193,7 +193,7 @@ describe('Viking.Record::Associations', () => {
         })
 
         describe('beforeAdd event on association record', () => {
-            it.only('on association.setTarget() with a new record', function (done) {
+            it('on association.setTarget() with a new record', function (done) {
                 let model = new Model({id: 11});
                 let parent = new Parent({id: 24});
                 model.parents = [];
@@ -207,7 +207,7 @@ describe('Viking.Record::Associations', () => {
                 model.parents = [parent]
             });
             
-            it.only("not on association.setTarget() with a record already in the association", () => {
+            it("not on association.setTarget() with a record already in the association", () => {
                 let model = new Model({id: 11});
                 let parent = new Parent({id: 24});
                 model.parents = [parent];
@@ -247,7 +247,7 @@ describe('Viking.Record::Associations', () => {
         
         describe('afterAdd event on association record', () => {
 
-            it.only('on association.setTarget() with a new record', function (done) {
+            it('on association.setTarget() with a new record', function (done) {
                 let model = new Model({id: 11});
                 let parent = new Parent({id: 24});
                 model.parents = [];
@@ -286,7 +286,7 @@ describe('Viking.Record::Associations', () => {
                 model.parents.setAttributes([{id: 24}]);
             });
             
-            it.only("not on association.setAttributes() with a record already in the association", () => {
+            it("not on association.setAttributes() with a record already in the association", () => {
                 let model = new Model({id: 11});
                 let parent = new Parent({id: 24});
                 model.parents = [parent];
@@ -300,7 +300,7 @@ describe('Viking.Record::Associations', () => {
         });
         
         describe('beforeRemove event on association', () => {
-            it.only('on association.setTarget()', function (done) {
+            it('on association.setTarget()', function (done) {
                 let model = new Model({id: 11});
                 let parent = new Parent({id: 24});
                 model.parents = [parent];
@@ -330,7 +330,7 @@ describe('Viking.Record::Associations', () => {
         });
         
         describe('afterRemove event on association', () => {
-            it.only('on association.setTarget()', function (done) {
+            it('on association.setTarget()', function (done) {
                 let model = new Model({id: 11});
                 let parent = new Parent({id: 24});
                 model.parents = [parent];
@@ -360,7 +360,7 @@ describe('Viking.Record::Associations', () => {
         });
         
         describe('beforeRemove event on association record', () => {
-            it.only('on association.setTarget()', function (done) {
+            it('on association.setTarget()', function (done) {
                 let model = new Model({id: 11});
                 let parent = new Parent({id: 24});
                 model.parents = [parent];
@@ -374,7 +374,7 @@ describe('Viking.Record::Associations', () => {
                 model.parents = []
             });
             
-            it.only('on association.setAttributes()', function (done) {
+            it('on association.setAttributes()', function (done) {
                 let model = new Model({id: 11});
                 let parent = new Parent({id: 24});
                 model.parents = [parent];
@@ -390,7 +390,7 @@ describe('Viking.Record::Associations', () => {
         });
         
         describe('afterRemove event on association record', () => {
-            it.only('on association.setTarget()', function (done) {
+            it('on association.setTarget()', function (done) {
                 let model = new Model({id: 11});
                 let parent = new Parent({id: 24});
                 model.parents = [parent];

@@ -8,9 +8,11 @@ describe('Viking.Record.Types', () => {
     
         class Foo extends Record {
             static schema = {
-                value: {type: (r, changes={}) => {
-                    return changes.type || r.readAttribute('type')
-                }}
+                value: {
+                    type: (attributes, record={}) => {
+                        return attributes.type || record.readAttribute('type')
+                    }
+                }
             }
         }
 
