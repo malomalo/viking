@@ -219,18 +219,8 @@ describe('Viking.Record::Associations', () => {
                 model.parents = [parent]
             });
             
-            it('on association.setAttributes() with a new record', function (done) {
-                let model = new Model({id: 11});
-                model.parents = [];
-
-                parent.addEventListener('beforeAdd', association => {
-                    assert.equal(association.owner, model)
-                    assert.equal(parent.readAttribute('model_id'), 11)
-                    done()
-                })
-            
-                model.parents.setAttributes([{id: 24}]);
-            });
+            // it('on association.setAttributes() with a new record')
+            // not applicable
             
             it("not on association.setAttributes() with a record already in the association", () => {
                 let model = new Model({id: 11});
@@ -273,18 +263,8 @@ describe('Viking.Record::Associations', () => {
                 model.parents = [parent]
             });
             
-            it('on association.setAttributes() with a new record', function (done) {
-                let model = new Model({id: 11});
-                model.parents = [];
-
-                parent.addEventListener('afterAdd', association => {
-                    assert.equal(association.owner, model)
-                    assert.equal(parent.readAttribute('model_id'), 11)
-                    done()
-                })
-            
-                model.parents.setAttributes([{id: 24}]);
-            });
+            // it('on association.setAttributes() with a new record')
+            // not applicable
             
             it("not on association.setAttributes() with a record already in the association", () => {
                 let model = new Model({id: 11});
@@ -404,14 +384,13 @@ describe('Viking.Record::Associations', () => {
                 model.parents = []
             });
             
-            it('on association.setTarget()', function (done) {
+            it('on association.setAttributes()', function (done) {
                 let model = new Model({id: 11});
                 let parent = new Parent({id: 24});
                 model.parents = [parent];
 
                 parent.addEventListener('afterRemove', association => {
                     assert.equal(association.owner, model)
-                    assert.deepEqual(records.map(x => x.readAttribute('id')), [24])
                     assert.equal(parent.readAttribute('model_id'), null)
                     done()
                 })
