@@ -187,7 +187,7 @@ describe('Viking.Record HasAndBelongsToManyAssociation autosave', () => {
                     requirement: { phases: [{ id: 11 }] }
                 }
             }}, (xhr) => {
-                xhr.respond(201, {}, '{"id": 24, "requirement": {"id": 7, "phases": [{"id": "11", "name": "Tom"}]}}');
+                xhr.respond(201, {}, '{"id": 24, "requirement": {"id": 7, "phases": [{"id": 11, "name": "Tom"}]}}');
             });
         });
     });

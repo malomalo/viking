@@ -67,8 +67,11 @@ describe('Viking.Record HasManyAssociation autosave', () => {
         
         it('updates deep subresource', function (done) {
             let model = Requirement.instantiate({
-                id: 24, phases: [{
-                    id: 11, name: 'Preparation', parts: [{
+                id: 24,
+                phases: [{
+                    id: 11,
+                    name: 'Preparation',
+                    parts: [{
                         id: 3, name: 'Cog'
                     }]
                 }]

@@ -90,7 +90,7 @@ describe('Viking.Record::associations', () => {
             });
         })
 
-        it("add to association", async function () {
+        it(".add(record) to association", async function () {
             let model = new Model()
             let parent = new Parent()
             let parent2 = new Parent()
