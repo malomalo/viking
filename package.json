@@ -8,7 +8,7 @@
     "url": "git://github.com/malomalo/viking.git"
   },
   "main": "lib/index.js",
-  "module": "lib/index.js",
+  "type": "module",
   "exports": {
     ".": {
       "import": "./lib/index.js",
