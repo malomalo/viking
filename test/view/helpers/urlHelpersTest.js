@@ -1,5 +1,5 @@
 import 'mocha';
-import * as assert from 'assert';
+import assert from 'assert';
 import {linkTo, mailTo} from 'viking/view/helpers/urlHelpers';
 
 describe('Viking.View.Helpers.urlHelpers', () => {

@@ -1,5 +1,5 @@
 import 'mocha';
-import * as assert from 'assert';
+import assert from 'assert';
 import VikingRecord from 'viking/record';
 import Relation from 'viking/record/relation';
 import { toQuery } from 'viking/support/object';

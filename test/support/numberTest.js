@@ -1,5 +1,5 @@
 import 'mocha';
-import * as assert from 'assert';
+import assert from 'assert';
 import {ordinalize, toParam, toQuery} from 'viking/support/number';
 
 describe('VikingSupport.Number', () => {

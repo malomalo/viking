@@ -1,5 +1,5 @@
 import 'mocha';
-import * as assert from 'assert';
+import assert from 'assert';
 import * as Errors from 'viking/errors';
 import VikingRecord from 'viking/record';
 

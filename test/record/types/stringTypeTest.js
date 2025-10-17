@@ -1,5 +1,5 @@
 import 'mocha';
-import * as assert from 'assert';
+import assert from 'assert';
 import StringType from 'viking/record/types/string';
 
 describe('Viking.Record.Types', () => {
