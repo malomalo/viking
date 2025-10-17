@@ -1,4 +1,4 @@
-import * as assert from 'assert';
+import assert from 'assert';
 // import * as sinon from 'sinon';
 import 'mocha';
 import VikingRecord from 'viking/record';

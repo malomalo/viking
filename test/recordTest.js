@@ -1,5 +1,5 @@
 import 'mocha';
-import * as assert from 'assert';
+import assert from 'assert';
 import Model from 'viking/record';
 
 describe('Viking.Record', () => {

@@ -1,5 +1,5 @@
 import 'mocha';
-import * as assert from 'assert';
+import assert from 'assert';
 import VikingRouter from 'viking/router';
 import VikingController from 'viking/controller';
 

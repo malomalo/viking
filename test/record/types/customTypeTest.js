@@ -1,5 +1,5 @@
 import 'mocha';
-import * as assert from 'assert';
+import assert from 'assert';
 import JSONType from 'viking/record/types/json';
 import Record from 'viking/record';
 import Types from 'viking/record/types';

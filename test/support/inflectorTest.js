@@ -1,5 +1,5 @@
 import 'mocha';
-import * as assert from 'assert';
+import assert from 'assert';
 import * as Inflector from 'viking/support/inflector';
 
 let regularExamples = [
