@@ -4,14 +4,13 @@ import VikingRecord from 'viking/record';
 import { hasAndBelongsToMany } from 'viking/record/associations';
 
 describe('Viking.Record::Associations', () => {
-
     describe('HasAndBelongsTo Events', () => {
         class Parent extends VikingRecord { }
         class Model extends VikingRecord {
             static associations = [hasAndBelongsToMany(Parent)];
         }
         
-        it("setting target fires add event", function (){
+        it("setting target fires add event", function () {
             let model = new Model();
             let parent = new Parent({id: 24});
         

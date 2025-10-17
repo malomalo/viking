@@ -10,8 +10,9 @@ describe('Viking.Record.Types', () => {
     describe('custom', () => {
         
         Types.registry.length = class Length extends Type {
-            static set(key, value, inObject, record, typeSettings) {
-                const units = inObject[typeSettings.units_key] || record.attributes[typeSettings.units_key]
+            static set(key, value, target, attributes, record, typeSettings) {
+                const units = attributes[typeSettings.units_key] || record.attributes[typeSettings.units_key]
+                console.log(attributes, typeSettings)
                 if (!units) {
                     return false
                 }
@@ -20,8 +21,8 @@ describe('Viking.Record.Types', () => {
                     value = { value, units };
                 } 
 
-                inObject[key] = value
-                inObject[typeSettings.units_key] = value.units
+                target[key] = value
+                target[typeSettings.units_key] = value.units
                 
                 return true
             }
