@@ -1,5 +1,5 @@
 import 'mocha';
-import * as assert from 'assert';
+import assert from 'assert';
 import IntegerType from 'viking/record/types/integer';
 
 describe('Viking.Record.Types', () => {

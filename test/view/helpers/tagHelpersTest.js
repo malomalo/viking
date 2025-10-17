@@ -1,13 +1,13 @@
 import 'mocha';
-import * as assert from 'assert';
+import assert from 'assert';
 import Model from 'viking/record';
 import {
     addErrorClassToOptions,
     contentTag,
     sanitizeToId,
-    tagOption,
+    // tagOption,
     tagNameForModelAttribute,
-    dataTagOption,
+    // dataTagOption,
     tag,
     imageTag, buttonTag, checkBoxTag, labelTag, formTag, hiddenFieldTag, textFieldTag,
     submitTag, numberFieldTag, radioButtonTag, passwordFieldTag, timeTag, textAreaTag,

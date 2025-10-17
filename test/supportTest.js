@@ -1,5 +1,5 @@
 import 'mocha';
-import * as assert from 'assert';
+import assert from 'assert';
 import {result} from 'viking/support';
 
 describe('VikingSupport', () => {

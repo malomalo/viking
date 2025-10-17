@@ -1,5 +1,5 @@
 import 'mocha';
-import * as assert from 'assert';
+import assert from 'assert';
 import * as sinon from 'sinon';
 import VikingRecord from 'viking/record';
 import { toQuery } from 'viking/support/object';

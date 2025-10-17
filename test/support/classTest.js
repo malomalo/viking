@@ -1,5 +1,5 @@
 import 'mocha';
-import * as assert from 'assert';
+import assert from 'assert';
 import { extendClass } from 'viking/support/class';
 
 describe('VikingSupport.Class', () => {

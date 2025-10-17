@@ -1,5 +1,5 @@
 import 'mocha';
-import * as assert from 'assert';
+import assert from 'assert';
 import Event from 'viking/eventBus';
 
 describe('Viking.Events', () => {
