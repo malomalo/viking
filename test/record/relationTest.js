@@ -300,7 +300,7 @@ describe('Viking.Relation', () => {
         it('adds to collections on add', function (done) {
             let relation = Model.where({parent_id: 11})
             relation.load().then(records => {
-                assert.deepStrictEqual([[relation], [relation]], records.map(r => r.collections))
+                assert.deepStrictEqual([[relation], [relation]], records.map(r => Array.from(r.collections)))
             }).then(done, done)
             
             this.withRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
@@ -316,7 +316,7 @@ describe('Viking.Relation', () => {
             const relation2 = new Relation(Model)
             relation2.setTarget([model, new Model({id: 3})])
             relation.load().then(records => {
-                assert.deepStrictEqual([relation2], model.collections)
+                assert.deepStrictEqual([relation2], Array.from(model.collections))
             }).then(done, done)
             this.withRequest('GET', '/models', { params: { order: {id: 'desc'} } }, (xhr) => {
                 xhr.respond(200, {}, '[]');
