@@ -11,8 +11,8 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./lib/index.js",
-      "default": "./lib/index.js"
+      "import": "./lib/viking.js",
+      "default": "./lib/viking.js"
     },
     "./*": "./lib/viking/*.js"
   },
