@@ -17,12 +17,12 @@ describe('Viking.Record.Types', () => {
         it("::load coerces iso8601 string to date", function() {
             assert.deepEqual(
                 DateType.load("2013-04-10"),
-                new Date(1365570000000)
+                new Date(2013, 3, 10) // 3 is monthIndex - April / 4th month
             );
 
             assert.equal(
                 DateType.load("2013-04-10").valueOf(),
-                (new Date(1365570000000)).valueOf()
+                new Date(2013, 3, 10).valueOf() // 3 is monthIndex - April / 4th month
             );
         });
 
