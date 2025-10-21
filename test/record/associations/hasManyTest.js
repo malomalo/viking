@@ -180,10 +180,10 @@ describe('Viking.Record::associations', () => {
             it('adds to collections', function () {
                 let parent = new Parent()
                 let model = new Model({parents: [parent]})
-                assert.deepStrictEqual([model.association('parents')], parent.collections)
+                assert.deepStrictEqual([model.association('parents')], Array.from(parent.collections))
 
                 let model2 = new Model({parents: [parent]})
-                assert.deepStrictEqual([model.association('parents'), model2.association('parents')], parent.collections)
+                assert.deepStrictEqual([model.association('parents'), model2.association('parents')], Array.from(parent.collections))
             })
 
             it('removes from collections', function () {
@@ -193,7 +193,7 @@ describe('Viking.Record::associations', () => {
 
                 model.parents = []
 
-                assert.deepStrictEqual([model2.association('parents')], parent.collections)
+                assert.deepStrictEqual([model2.association('parents')], Array.from(parent.collections))
             })
             
             it('mutates target', async function () {
