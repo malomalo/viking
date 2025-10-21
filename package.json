@@ -11,13 +11,10 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./lib/index.js",
-      "default": "./lib/index.js"
+      "import": "./lib/viking.js",
+      "default": "./lib/viking.js"
     },
-    "./*": "./lib/viking/*.js",
-    "./support/*": "./lib/viking/support/*.js",
-    "./record/*": "./lib/viking/record/*.js",
-    "./record/types/*": "./lib/viking/record/types/*.js"
+    "./*": "./lib/viking/*.js"
   },
   "keywords": [
     "backbone",
