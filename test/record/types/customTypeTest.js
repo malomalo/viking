@@ -11,7 +11,6 @@ describe('Viking.Record.Types', () => {
         Types.registry.length = class Length extends Type {
             static set(key, value, target, attributes, record, typeSettings) {
                 const units = attributes[typeSettings.units_key] || record.attributes[typeSettings.units_key]
-                console.log(attributes, typeSettings)
                 if (!units) {
                     return false
                 }

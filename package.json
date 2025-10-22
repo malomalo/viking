@@ -33,11 +33,11 @@
     "jsdoc": "^4.0.3",
     "jsdoc-export-default-interop": "^0.3.1",
     "jsdoc-press": "github:bemky/jsdoc-press",
-    "jsdom": "^21.1.0",
-    "jsdom-global": "^3.0.2",
-    "mocha": "^10.2.0",
+    "jsdom": "*",
+    "jsdom-global": "*",
+    "mocha": "*",
     "nodemon": "^3.1.9",
-    "sinon": "^15.0.1"
+    "sinon": "^19.0.2"
   },
   "scripts": {
     "test": "mocha -r test/testSetup.js test/testHelper.js 'test/**/*Test.js'",
