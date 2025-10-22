@@ -16,45 +16,52 @@ describe('Viking.Record.Types', () => {
         }
 
         it("init", () => {
-            let record = new Foo({
-                type: 'integer',
-                value: 9
-            })
+            // Integer from Integer
+            let record = new Foo({ type: 'integer', value: 9 })
             assert.deepEqual(9, record.value);
             
-            record = new Foo({
-                value: 9,
-                type: 'string'
-            })
+            // Integer from String
+            record = new Foo({ type: 'integer', value: "9" })
+            assert.deepEqual(9, record.value);
+
+            // String from Integer
+            record = new Foo({ type: 'string',  value: 9 })
             assert.deepEqual('9', record.value);
             
-            record = new Foo({
-                type: 'boolean',
-                value: 9
-            })
+            // String from Boolean
+            record = new Foo({ type: 'string',  value: true })
+            assert.deepEqual('true', record.value);
+
+            // Boolean from Boolean
+            record = new Foo({ type: 'boolean', value: true })
             assert.deepEqual(true, record.value);
+            
+            record = new Foo({ type: 'boolean', value: false })
+            assert.deepEqual(false, record.value);
+
+            // Boolean from Integer
+            record = new Foo({ type: 'boolean', value: 9 })
+            assert.deepEqual(true, record.value);
+            
+            // Boolean from null
+            record = new Foo({ type: 'boolean', value: null })
+            assert.deepEqual(null, record.value);
+            
+            // Date from String
+            record = new Foo({ type: 'date', value: '2013-04-10' })
+            assert.deepEqual(new Date(1365570000000).valueOf(), record.value.valueOf());
         });
         
         it("setting attribute", () => {
-            const record = new Foo({
-                value: 9,
-                type: 'string'
-            })
-
+            const record = new Foo({ type: 'string', value: 9 })
             record.value = 3
+            
             assert.deepEqual('3', record.value);
         });
 
         it("asJSON", () => {
-            const record = new Foo({
-                value: 9,
-                type: 'string'
-            })
-
-            assert.deepEqual({
-                type: 'string',
-                value: '9'
-            }, record.asJSON())
+            const record = new Foo({ type: 'string', value: 9 })
+            assert.deepEqual({ type: 'string', value: '9' }, record.asJSON())
         });
 
     });
