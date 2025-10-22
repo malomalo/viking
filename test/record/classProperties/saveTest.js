@@ -1,4 +1,3 @@
-import 'mocha';
 import assert from 'assert';
 import Model from 'viking/record';
 

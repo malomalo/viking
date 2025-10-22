@@ -1,4 +1,3 @@
-import 'mocha';
 import assert from 'assert';
 import Application from 'viking/application';
 import View from 'viking/view';

@@ -1,4 +1,3 @@
-import 'mocha';
 import assert from 'assert';
 import {linkTo, mailTo} from 'viking/view/helpers/urlHelpers';
 

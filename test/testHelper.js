@@ -1,4 +1,3 @@
-import 'mocha';
 import * as sinon from 'sinon';
 import assert from 'assert';
 import { toQuery }  from 'viking/support/object';

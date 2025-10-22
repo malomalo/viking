@@ -1,4 +1,3 @@
-import 'mocha';
 import assert from 'assert';
 import DateTimeType from 'viking/record/types/datetime';
 

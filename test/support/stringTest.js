@@ -1,4 +1,3 @@
-import 'mocha';
 import assert from 'assert';
 import * as StringSupport from 'viking/support/string';
 import { NameError } from 'viking/errors';

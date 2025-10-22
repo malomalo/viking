@@ -1,4 +1,3 @@
-import 'mocha';
 import assert from 'assert';
 import {ordinalize, toParam, toQuery} from 'viking/support/number';
 

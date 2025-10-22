@@ -1,4 +1,3 @@
-import 'mocha';
 import assert from 'assert';
 import Connection from 'viking/record/connection';
 

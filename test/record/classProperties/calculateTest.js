@@ -1,4 +1,3 @@
-import 'mocha';
 import assert from 'assert';
 import * as sinon from 'sinon';
 import VikingRecord from 'viking/record';

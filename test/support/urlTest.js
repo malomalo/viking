@@ -1,4 +1,3 @@
-import 'mocha';
 import assert from 'assert';
 import {toParam} from 'viking/support';
 import {parseSearchParams} from 'viking/support/url';

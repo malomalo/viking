@@ -1,4 +1,3 @@
-import 'mocha';
 import assert from 'assert';
 import BooleanType from 'viking/record/types/boolean';
 

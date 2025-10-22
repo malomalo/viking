@@ -1,5 +1,4 @@
 import assert from 'assert';
-import 'mocha';
 import VikingRecord from 'viking/record';
 import { hasAndBelongsToMany } from 'viking/record/associations';
 

@@ -1,4 +1,3 @@
-import 'mocha';
 import assert from 'assert';
 import * as Errors from 'viking/errors';
 import VView from 'viking/view';

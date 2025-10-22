@@ -1,4 +1,3 @@
-import 'mocha';
 import assert from 'assert';
 import { extendClass } from 'viking/support/class';
 

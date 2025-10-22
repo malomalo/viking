@@ -1,4 +1,3 @@
-import 'mocha';
 import assert from 'assert';
 import Event from 'viking/eventBus';
 

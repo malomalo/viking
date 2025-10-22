@@ -1,4 +1,3 @@
-import 'mocha';
 import assert from 'assert';
 import {pick, toParam, toQuery, deepAssign} from 'viking/support/object';
 

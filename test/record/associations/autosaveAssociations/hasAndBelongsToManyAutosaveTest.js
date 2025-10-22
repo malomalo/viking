@@ -1,5 +1,4 @@
 import assert from 'assert';
-import 'mocha';
 import VikingRecord from 'viking/record';
 import { hasAndBelongsToMany, belongsTo } from 'viking/record/associations';
 import {extendClass} from 'viking/support/class';

@@ -1,4 +1,3 @@
-import 'mocha';
 import assert from 'assert';
 import JSONType from 'viking/record/types/json';
 import Record from 'viking/record';
