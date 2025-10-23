@@ -9,13 +9,8 @@ describe('Viking.Record#callbacks', () => {
                 score: {type: 'integer'}
             }
             
-            static beforeCreate = [
-                'startScore'
-            ]
-            
-            static afterCreate = [
-                'endScore'
-            ]
+            static beforeCreate = [ 'startScore' ]
+            static afterCreate = [ 'endScore' ]
             
             startScore () {
                 this.score = 1

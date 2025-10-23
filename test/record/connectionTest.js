@@ -37,7 +37,7 @@ describe('Viking.Record', () => {
             })
         })
         
-        describe('callbacks', () => {        
+        describe('callbacks', () => {
             it('success', function (done) {
                 let connection = new Connection('http://example.com');
                 let counter = 0;

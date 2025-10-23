@@ -6,7 +6,7 @@ describe('Viking.Record#setAttributes', () => {
         static schema = {
             key:        {type: 'integer', array: true},
             date:       {type: 'date'},
-            datetime:       {type: 'datetime'},
+            datetime:   {type: 'datetime'},
             float:      {type: 'float'},
             integer:    {type: 'integer'},
             string:     {type: 'string'},
@@ -172,7 +172,7 @@ describe('Viking.Record#setAttributes', () => {
         assert.deepEqual(model.changes(), {
             integer: [null, 0],
             boolean: [null, false],
-            string: [null, '']
+            string:  [null, '']
         })
     })
     
@@ -186,7 +186,7 @@ describe('Viking.Record#setAttributes', () => {
         assert.deepEqual(model.changes(), {
             integer: [null, 0],
             boolean: [null, false],
-            string: [null, '']
+            string:  [null, '']
         })
     })
 
