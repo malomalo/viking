@@ -49,7 +49,7 @@ describe('Viking.Record.Types', () => {
             
             // Date from String
             record = new Foo({ type: 'date', value: '2013-04-10' })
-            assert.deepEqual(new Date(1365552000000).valueOf(), record.value.valueOf()+(new Date().getTimezoneOffset()*60*1000));
+            assert.deepEqual(new Date(1365552000000).valueOf(), record.value.valueOf()-(new Date().getTimezoneOffset()*60*1000));
         });
         
         it("setting attribute", () => {
