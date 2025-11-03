@@ -311,8 +311,9 @@ describe('Viking.Record::Associations', () => {
         describe('afterRemove event on association', () => {
             it('on association.setTarget()', function (done) {
                 let model = new Model({id: 11});
-                let parent = new Parent({id: 24});
-                model.parents = [parent];
+                let parent1 = new Parent({id: 24});
+                let parent2 = new Parent({id: 25});
+                model.parents = [parent1, parent2];
 
                 model.association('parents').addEventListener('afterRemove', records => {
                     assert.deepEqual(records.map(r => r.readAttribute('id')), [24])
@@ -320,13 +321,14 @@ describe('Viking.Record::Associations', () => {
                     done()
                 })
             
-                model.parents = []
+                model.parents = [parent2]
             });
             
             it('on association.setAttributes()', function (done) {
                 let model = new Model({id: 11});
-                let parent = new Parent({id: 24});
-                model.parents = [parent];
+                let parent1 = new Parent({id: 24});
+                let parent2 = new Parent({id: 25});
+                model.parents = [parent1, parent2];
 
                 model.association('parents').addEventListener('afterRemove', records => {
                     assert.deepEqual(records.map(r => r.readAttribute('id')), [24])
@@ -334,23 +336,24 @@ describe('Viking.Record::Associations', () => {
                     done()
                 })
             
-                model.parents.setAttributes([])
+                model.parents.setAttributes([parent2])
             });
         });
         
         describe('beforeRemove event on association record', () => {
             it('on association.setTarget()', function (done) {
                 let model = new Model({id: 11});
-                let parent = new Parent({id: 24});
-                model.parents = [parent];
+                let parent1 = new Parent({id: 24});
+                let parent2 = new Parent({id: 25});
+                model.parents = [parent1, parent2];
 
-                parent.addEventListener('beforeRemove', association => {
+                parent1.addEventListener('beforeRemove', association => {
                     assert.equal(association.owner, model)
-                    assert.equal(parent.readAttribute('model_id'), 11)
+                    assert.equal(parent1.readAttribute('model_id'), 11)
                     done()
                 })
             
-                model.parents = []
+                model.parents = [parent2]
             });
             
             it('on association.setAttributes()', function (done) {
@@ -371,16 +374,17 @@ describe('Viking.Record::Associations', () => {
         describe('afterRemove event on association record', () => {
             it('on association.setTarget()', function (done) {
                 let model = new Model({id: 11});
-                let parent = new Parent({id: 24});
-                model.parents = [parent];
+                let parent1 = new Parent({id: 24});
+                let parent2 = new Parent({id: 25});
+                model.parents = [parent1, parent2];
 
-                parent.addEventListener('afterRemove', association => {
+                parent1.addEventListener('afterRemove', association => {
                     assert.equal(association.owner, model)
-                    assert.equal(parent.readAttribute('model_id'), null)
+                    assert.equal(parent1.readAttribute('model_id'), null)
                     done()
                 })
 
-                model.parents = []
+                model.parents = [parent2]
             });
             
             it('on association.setAttributes()', function (done) {
