@@ -15,3 +15,6 @@ nav {
     max-width: 25% !important;
 }
 
+pre.overflow-container {
+    width: 100%
+}
