@@ -166,5 +166,24 @@ describe('Viking.Record belongsToAssociations autosave', () => {
                 xhr.respond(201, {}, '{"id": 24, "planet": "Venus"}');
             });
         });
+        
+        it('circular association that needs saved', function (done) {
+            let phase = Phase.instantiate({ id: 11, name: 'Tom' });
+            let venus = new Requirement({
+                phase: phase,
+                planet: 'Venus'
+            });
+            phase.requirements.push(venus)
+            venus.setAttribute('planet', 'Venus Planet')
+            phase.setAttribute('name', 'Larry')
+            
+            venus.save().then(() => assert.ok(true)).then(done, done);
+
+            this.withRequest('POST', '/requirements', { body: {
+                requirement: { phase_id: 11, planet: 'Venus' }
+            }}, (xhr) => {
+                xhr.respond(201, {}, '{"id": 24, "planet": "Venus"}');
+            });
+        });
     });
 });
