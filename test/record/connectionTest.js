@@ -643,14 +643,14 @@ describe('Viking.Record', () => {
             });
         });
 
-        describe('buildAssociationPath', () => {
+        describe('associationPath', () => {
             it('builds path without record', function () {
                 let connection = new Connection('http://example.com');
                 let owner = {
                     modelName: { routeKey: 'users' },
                     readAttribute(attr) { return attr === 'id' ? 42 : null; }
                 };
-                assert.equal(connection.buildAssociationPath(owner, 'posts'), '/users/42/posts');
+                assert.equal(connection.associationPath(owner, 'posts'), '/users/42/posts');
             });
 
             it('builds path with record', function () {
@@ -662,7 +662,7 @@ describe('Viking.Record', () => {
                 let record = {
                     readAttribute(attr) { return attr === 'id' ? 7 : null; }
                 };
-                assert.equal(connection.buildAssociationPath(owner, 'posts', record), '/users/42/posts/7');
+                assert.equal(connection.associationPath(owner, 'posts', record), '/users/42/posts/7');
             });
         });
 
@@ -798,9 +798,9 @@ describe('Viking.Record', () => {
                 assert.deepEqual(result, {name: ['is required', 'is too short']});
             });
 
-            it('custom buildAssociationPath', function () {
+            it('custom associationPath', function () {
                 class DRFConnection extends Connection {
-                    buildAssociationPath(owner, associationName, record) {
+                    associationPath(owner, associationName, record) {
                         return '/' + [owner.modelName.routeKey, owner.readAttribute('id'), 'relationships', associationName].join('/');
                     }
                 }
@@ -810,7 +810,7 @@ describe('Viking.Record', () => {
                     modelName: { routeKey: 'users' },
                     readAttribute(attr) { return attr === 'id' ? 42 : null; }
                 };
-                assert.equal(connection.buildAssociationPath(owner, 'posts'), '/users/42/relationships/posts');
+                assert.equal(connection.associationPath(owner, 'posts'), '/users/42/relationships/posts');
             });
         });
 

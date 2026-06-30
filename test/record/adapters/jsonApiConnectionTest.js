@@ -354,7 +354,7 @@ describe('Viking.Record', () => {
             });
         });
 
-        describe('buildAssociationPath', () => {
+        describe('associationPath', () => {
             it('builds JSON:API relationships path', function () {
                 let connection = new JSONAPIConnection('http://example.com');
                 let MockClass = { modelName() { return { routeKey: 'blog_posts' }; } };
@@ -363,7 +363,7 @@ describe('Viking.Record', () => {
                     modelName: { routeKey: 'blog_posts' },
                     readAttribute(attr) { return attr === 'id' ? 42 : null; }
                 };
-                assert.equal(connection.buildAssociationPath(owner, 'comments'), '/blog-posts/42/relationships/comments');
+                assert.equal(connection.associationPath(owner, 'comments'), '/blog-posts/42/relationships/comments');
             });
 
             it('ignores the record argument (relationships path has no target id)', function () {
@@ -377,7 +377,7 @@ describe('Viking.Record', () => {
                 let record = {
                     readAttribute(attr) { return attr === 'id' ? 99 : null; }
                 };
-                assert.equal(connection.buildAssociationPath(owner, 'posts', record), '/users/1/relationships/posts');
+                assert.equal(connection.associationPath(owner, 'posts', record), '/users/1/relationships/posts');
             });
         });
 
