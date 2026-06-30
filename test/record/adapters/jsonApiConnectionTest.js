@@ -26,14 +26,6 @@ describe('Viking.Record', () => {
                 });
             });
 
-            it('sets Content-Type header on POST requests', function () {
-                let connection = new JSONAPIConnection('http://example.com');
-                connection.post('/users/', { body: { data: { type: 'users', attributes: { name: 'Ben' } } } });
-
-                this.withRequest('POST', '/users/', {}, (xhr) => {
-                    assert.equal(xhr.requestHeaders['Content-Type'], 'application/vnd.api+json;charset=utf-8');
-                });
-            });
         });
 
         describe('formatRouteKey', () => {

@@ -685,7 +685,9 @@ describe('Viking.Record', () => {
             it('custom headers flow through to sendRequest', function () {
                 class DRFConnection extends Connection {
                     acceptHeader() { return 'application/vnd.api+json'; }
-                    contentTypeHeader() { return 'application/vnd.api+json'; }
+                    serializeRequestBody(body, request) {
+                        return { body: JSON.stringify(body), contentType: 'application/vnd.api+json' };
+                    }
                 }
 
                 let connection = new DRFConnection('http://example.com');
