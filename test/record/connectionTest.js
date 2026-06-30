@@ -196,7 +196,7 @@ describe('Viking.Record', () => {
             it('override transforms request body', function () {
                 class CustomConnection extends Connection {
                     serializeRequestBody(body, request) {
-                        return { data: { attributes: body } };
+                        return { body: JSON.stringify({ data: { attributes: body } }), contentType: 'application/json' };
                     }
                 }
 
@@ -205,6 +205,21 @@ describe('Viking.Record', () => {
 
                 this.withRequest('POST', '/', {}, (xhr) => {
                     assert.deepEqual(JSON.parse(xhr.requestBody), { data: { attributes: { name: 'Ben' } } });
+                });
+            });
+
+            it('override sets the request Content-Type', function () {
+                class CustomConnection extends Connection {
+                    serializeRequestBody(body, request) {
+                        return { body: JSON.stringify(body), contentType: 'application/vnd.custom+json' };
+                    }
+                }
+
+                let connection = new CustomConnection('http://example.com');
+                connection.post('/', { body: { name: 'Ben' } });
+
+                this.withRequest('POST', '/', {}, (xhr) => {
+                    assert.equal(xhr.requestHeaders['Content-Type'], 'application/vnd.custom+json;charset=utf-8');
                 });
             });
 
