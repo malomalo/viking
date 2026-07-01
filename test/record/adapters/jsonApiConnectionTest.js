@@ -341,16 +341,15 @@ describe('Viking.Record', () => {
             });
         });
 
-        describe('associationPath', () => {
+        describe('path (relationships)', () => {
             it('builds JSON:API relationships path', function () {
                 let connection = new JSONAPIConnection('http://example.com');
                 let MockClass = { modelName() { return { routeKey: 'blog_posts' }; } };
                 let owner = {
                     constructor: MockClass,
-                    modelName: { routeKey: 'blog_posts' },
-                    readAttribute(attr) { return attr === 'id' ? 42 : null; }
+                    primaryKey() { return 42; }
                 };
-                assert.equal(connection.associationPath(owner, 'comments'), '/blog-posts/42/relationships/comments');
+                assert.equal(connection.path(owner, 'comments'), '/blog-posts/42/relationships/comments');
             });
 
             it('ignores the record argument (relationships path has no target id)', function () {
@@ -358,13 +357,10 @@ describe('Viking.Record', () => {
                 let MockClass = { modelName() { return { routeKey: 'users' }; } };
                 let owner = {
                     constructor: MockClass,
-                    modelName: { routeKey: 'users' },
-                    readAttribute(attr) { return attr === 'id' ? 1 : null; }
+                    primaryKey() { return 1; }
                 };
-                let record = {
-                    readAttribute(attr) { return attr === 'id' ? 99 : null; }
-                };
-                assert.equal(connection.associationPath(owner, 'posts', record), '/users/1/relationships/posts');
+                let record = { primaryKey() { return 99; } };
+                assert.equal(connection.path(owner, 'posts', record), '/users/1/relationships/posts');
             });
         });
 
@@ -379,7 +375,7 @@ describe('Viking.Record', () => {
                 Record.connection = originalConnection;
             });
 
-            it('urlRoot uses hyphenated routes with trailing slash', function () {
+            it('collection path uses hyphenated routes with trailing slash', function () {
                 let connection = new JSONAPIConnection('http://example.com');
 
                 class BlogPost extends Record {
@@ -387,7 +383,7 @@ describe('Viking.Record', () => {
                     static schema = { title: { type: 'string' } };
                 }
 
-                assert.equal(BlogPost.urlRoot(), '/blog-posts/');
+                assert.equal(connection.path(BlogPost), '/blog-posts/');
             });
 
             it('commit uses PATCH for updates', function () {

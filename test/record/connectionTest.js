@@ -1,5 +1,6 @@
 import assert from 'assert';
 import Connection from 'viking/record/connection';
+import VikingRecord from 'viking/record';
 
 describe('Viking.Record', () => {
     describe('Connection', () => {
@@ -652,26 +653,102 @@ describe('Viking.Record', () => {
             });
         });
 
-        describe('associationPath', () => {
-            it('builds path without record', function () {
-                let connection = new Connection('http://example.com');
-                let owner = {
-                    modelName: { routeKey: 'users' },
-                    readAttribute(attr) { return attr === 'id' ? 42 : null; }
-                };
-                assert.equal(connection.associationPath(owner, 'posts'), '/users/42/posts');
+        describe('path', () => {
+            let connection = new Connection('http://example.com');
+
+            describe('collection (class)', () => {
+                it('returns a path based on modelName', () => {
+                    class Model extends VikingRecord { }
+                    assert.equal(connection.path(Model), '/models');
+
+                    class MyModel extends VikingRecord { }
+                    assert.equal(connection.path(MyModel), '/my_models');
+                });
+
+                it('returns a path based on #path set on the model', () => {
+                    class Model extends VikingRecord {
+                        static path = '/buoys';
+                    }
+                    assert.equal(connection.path(Model), '/buoys');
+                });
+
+                it('returns a path based on #namespace set on the model', () => {
+                    class Boat extends VikingRecord {
+                        static namespace = 'Navy';
+                    }
+                    assert.equal(connection.path(Boat), '/navy/boats');
+                });
+
+                // STI
+                it('returns a path based on modelName of the baseClass', () => {
+                    class Ship extends VikingRecord { }
+                    class Carrier extends Ship { }
+                    assert.equal(connection.path(Carrier), '/ships');
+                });
+
+                it('returns a path based on #path set on the baseClass', () => {
+                    class Ship extends VikingRecord {
+                        static path = '/myships';
+                    }
+                    class Carrier extends Ship { }
+                    assert.equal(connection.path(Carrier), '/myships');
+                });
+
+                it('returns a path based on #path set on the sti model', () => {
+                    class Ship extends VikingRecord { }
+                    class Carrier extends Ship {
+                        static path = '/carriers';
+                    }
+                    assert.equal(connection.path(Carrier), '/carriers');
+                });
             });
 
-            it('builds path with record', function () {
-                let connection = new Connection('http://example.com');
-                let owner = {
-                    modelName: { routeKey: 'users' },
-                    readAttribute(attr) { return attr === 'id' ? 42 : null; }
-                };
-                let record = {
-                    readAttribute(attr) { return attr === 'id' ? 7 : null; }
-                };
-                assert.equal(connection.associationPath(owner, 'posts', record), '/users/42/posts/7');
+            describe('member (record)', () => {
+                it('/pluralModelName/id by default', () => {
+                    class Model extends VikingRecord { }
+                    let model = new Model({id: 42});
+                    assert.equal(connection.path(model), '/models/42');
+                });
+
+                it('/pluralModelName/slug by overriding #toParam()', () => {
+                    class Model extends VikingRecord {
+                        toParam() { return 'slug'; }
+                    }
+                    let model = new Model({id: 42});
+                    assert.equal(connection.path(model), '/models/slug');
+                });
+
+                it('uri encodes the id', () => {
+                    class MyModel extends VikingRecord {
+                        static path = '/collection';
+                    }
+                    let model = new MyModel();
+                    model.setAttributes({id: '+1+'});
+                    assert.equal(connection.path(model), '/collection/%2B1%2B');
+                });
+
+                // STI
+                it('returns a path based on modelName of the baseClass', () => {
+                    class Ship extends VikingRecord { }
+                    class Carrier extends Ship { }
+                    let carrier = new Carrier({id: 42});
+                    assert.equal(connection.path(carrier), '/ships/42');
+                });
+            });
+
+            describe('association', () => {
+                let User = class { static baseClass() { return User; } static modelName() { return { routeKey: 'users' }; } };
+
+                it('builds an association path without record', function () {
+                    let user = { constructor: User, toParam() { return '42'; } };
+                    assert.equal(connection.path(user, 'posts'), '/users/42/posts');
+                });
+
+                it('builds an association path with record', function () {
+                    let user = { constructor: User, toParam() { return '42'; } };
+                    let post = { toParam() { return '7'; } };
+                    assert.equal(connection.path(user, 'posts', post), '/users/42/posts/7');
+                });
             });
         });
 
@@ -809,19 +886,22 @@ describe('Viking.Record', () => {
                 assert.deepEqual(result, {name: ['is required', 'is too short']});
             });
 
-            it('custom associationPath', function () {
+            it('custom association path', function () {
                 class DRFConnection extends Connection {
-                    associationPath(owner, associationName, record) {
-                        return '/' + [owner.modelName.routeKey, owner.readAttribute('id'), 'relationships', associationName].join('/');
+                    path(target, association, record) {
+                        if (typeof target !== 'function' && association) {
+                            return '/' + [target.modelName.routeKey, target.toParam(), 'relationships', association].join('/');
+                        }
+                        return super.path(target, association, record);
                     }
                 }
 
                 let connection = new DRFConnection('http://example.com');
                 let owner = {
                     modelName: { routeKey: 'users' },
-                    readAttribute(attr) { return attr === 'id' ? 42 : null; }
+                    toParam() { return '42'; }
                 };
-                assert.equal(connection.associationPath(owner, 'posts'), '/users/42/relationships/posts');
+                assert.equal(connection.path(owner, 'posts'), '/users/42/relationships/posts');
             });
         });
 
