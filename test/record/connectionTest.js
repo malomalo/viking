@@ -630,16 +630,10 @@ describe('Viking.Record', () => {
         describe('acceptHeader', () => {
             it('returns application/json by default', function () {
                 let connection = new Connection('http://example.com');
-                assert.equal(connection.acceptHeader(), 'application/json');
+                assert.equal(connection.acceptHeader, 'application/json');
             });
         });
 
-        describe('contentTypeHeader', () => {
-            it('returns application/json by default', function () {
-                let connection = new Connection('http://example.com');
-                assert.equal(connection.contentTypeHeader(), 'application/json');
-            });
-        });
 
         describe('buildRequestBody', () => {
             it('wraps attributes under paramRoot by default', function () {
@@ -684,7 +678,7 @@ describe('Viking.Record', () => {
         describe('subclass overrides', () => {
             it('custom headers flow through to sendRequest', function () {
                 class DRFConnection extends Connection {
-                    acceptHeader() { return 'application/vnd.api+json'; }
+                    acceptHeader = 'application/vnd.api+json';
                     serializeRequestBody(body, request) {
                         return { body: JSON.stringify(body), contentType: 'application/vnd.api+json' };
                     }

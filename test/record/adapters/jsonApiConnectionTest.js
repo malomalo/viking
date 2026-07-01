@@ -9,12 +9,7 @@ describe('Viking.Record', () => {
         describe('headers', () => {
             it('acceptHeader returns JSON:API media type', function () {
                 let connection = new JSONAPIConnection('http://example.com');
-                assert.equal(connection.acceptHeader(), 'application/vnd.api+json');
-            });
-
-            it('contentTypeHeader returns JSON:API media type', function () {
-                let connection = new JSONAPIConnection('http://example.com');
-                assert.equal(connection.contentTypeHeader(), 'application/vnd.api+json');
+                assert.equal(connection.acceptHeader, 'application/vnd.api+json');
             });
 
             it('sets Accept header on requests', function () {
