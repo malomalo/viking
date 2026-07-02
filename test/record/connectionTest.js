@@ -591,11 +591,11 @@ describe('Viking.Record', () => {
             });
         });
 
-        describe('formatRouteKey', () => {
+        describe('routeKey', () => {
             it('returns routeKey from the class by default', function () {
                 let connection = new Connection('http://example.com');
-                let klass = { modelName() { return { routeKey: 'blog_posts' }; } };
-                assert.equal(connection.formatRouteKey(klass), 'blog_posts');
+                let klass = { baseClass() { return klass; }, modelName() { return { plural: 'blog_posts' }; } };
+                assert.equal(connection.routeKey(klass), 'blog_posts');
             });
         });
 
@@ -813,15 +813,15 @@ describe('Viking.Record', () => {
                 assert.equal(params.offset, undefined);
             });
 
-            it('custom formatRouteKey and formatPath', function () {
+            it('custom routeKey and formatPath', function () {
                 class DRFConnection extends Connection {
-                    formatRouteKey(klass) { return klass.modelName().plural.replace(/_/g, '-'); }
+                    routeKey(klass) { return klass.modelName().plural.replace(/_/g, '-'); }
                     formatPath(path) { return path.replace(/\/?$/, '/'); }
                 }
 
                 let connection = new DRFConnection('http://example.com');
                 let klass = { modelName() { return { plural: 'blog_posts' }; } };
-                assert.equal(connection.formatRouteKey(klass), 'blog-posts');
+                assert.equal(connection.routeKey(klass), 'blog-posts');
                 assert.equal(connection.formatPath('/blog-posts'), '/blog-posts/');
             });
 

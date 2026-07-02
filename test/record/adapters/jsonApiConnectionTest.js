@@ -23,23 +23,23 @@ describe('Viking.Record', () => {
 
         });
 
-        describe('formatRouteKey', () => {
+        describe('routeKey', () => {
             it('replaces underscores with hyphens', function () {
                 let connection = new JSONAPIConnection('http://example.com');
                 let klass = { modelName() { return { plural: 'blog_posts' }; } };
-                assert.equal(connection.formatRouteKey(klass), 'blog-posts');
+                assert.equal(connection.routeKey(klass), 'blog-posts');
             });
 
             it('handles single-word keys', function () {
                 let connection = new JSONAPIConnection('http://example.com');
                 let klass = { modelName() { return { plural: 'users' }; } };
-                assert.equal(connection.formatRouteKey(klass), 'users');
+                assert.equal(connection.routeKey(klass), 'users');
             });
 
             it('handles multiple underscores', function () {
                 let connection = new JSONAPIConnection('http://example.com');
                 let klass = { modelName() { return { plural: 'user_blog_posts' }; } };
-                assert.equal(connection.formatRouteKey(klass), 'user-blog-posts');
+                assert.equal(connection.routeKey(klass), 'user-blog-posts');
             });
         });
 
