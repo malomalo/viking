@@ -672,13 +672,6 @@ describe('Viking.Record', () => {
                     assert.equal(connection.path(Model), '/buoys');
                 });
 
-                it('returns a path based on #namespace set on the model', () => {
-                    class Boat extends VikingRecord {
-                        static namespace = 'Navy';
-                    }
-                    assert.equal(connection.path(Boat), '/navy/boats');
-                });
-
                 // STI
                 it('returns a path based on modelName of the baseClass', () => {
                     class Ship extends VikingRecord { }
@@ -737,7 +730,7 @@ describe('Viking.Record', () => {
             });
 
             describe('association', () => {
-                let User = class { static baseClass() { return User; } static modelName() { return { routeKey: 'users' }; } };
+                let User = class { static baseClass() { return User; } static modelName() { return { plural: 'users' }; } };
 
                 it('builds an association path without record', function () {
                     let user = { constructor: User, toParam() { return '42'; } };
@@ -822,12 +815,12 @@ describe('Viking.Record', () => {
 
             it('custom formatRouteKey and formatPath', function () {
                 class DRFConnection extends Connection {
-                    formatRouteKey(klass) { return klass.modelName().routeKey.replace(/_/g, '-'); }
+                    formatRouteKey(klass) { return klass.modelName().plural.replace(/_/g, '-'); }
                     formatPath(path) { return path.replace(/\/?$/, '/'); }
                 }
 
                 let connection = new DRFConnection('http://example.com');
-                let klass = { modelName() { return { routeKey: 'blog_posts' }; } };
+                let klass = { modelName() { return { plural: 'blog_posts' }; } };
                 assert.equal(connection.formatRouteKey(klass), 'blog-posts');
                 assert.equal(connection.formatPath('/blog-posts'), '/blog-posts/');
             });
@@ -890,7 +883,7 @@ describe('Viking.Record', () => {
                 class DRFConnection extends Connection {
                     path(target, association, record) {
                         if (typeof target !== 'function' && association) {
-                            return '/' + [target.modelName.routeKey, target.toParam(), 'relationships', association].join('/');
+                            return '/' + [target.modelName.plural, target.toParam(), 'relationships', association].join('/');
                         }
                         return super.path(target, association, record);
                     }
@@ -898,7 +891,7 @@ describe('Viking.Record', () => {
 
                 let connection = new DRFConnection('http://example.com');
                 let owner = {
-                    modelName: { routeKey: 'users' },
+                    modelName: { plural: 'users' },
                     toParam() { return '42'; }
                 };
                 assert.equal(connection.path(owner, 'posts'), '/users/42/relationships/posts');

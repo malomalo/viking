@@ -26,19 +26,19 @@ describe('Viking.Record', () => {
         describe('formatRouteKey', () => {
             it('replaces underscores with hyphens', function () {
                 let connection = new JSONAPIConnection('http://example.com');
-                let klass = { modelName() { return { routeKey: 'blog_posts' }; } };
+                let klass = { modelName() { return { plural: 'blog_posts' }; } };
                 assert.equal(connection.formatRouteKey(klass), 'blog-posts');
             });
 
             it('handles single-word keys', function () {
                 let connection = new JSONAPIConnection('http://example.com');
-                let klass = { modelName() { return { routeKey: 'users' }; } };
+                let klass = { modelName() { return { plural: 'users' }; } };
                 assert.equal(connection.formatRouteKey(klass), 'users');
             });
 
             it('handles multiple underscores', function () {
                 let connection = new JSONAPIConnection('http://example.com');
-                let klass = { modelName() { return { routeKey: 'user_blog_posts' }; } };
+                let klass = { modelName() { return { plural: 'user_blog_posts' }; } };
                 assert.equal(connection.formatRouteKey(klass), 'user-blog-posts');
             });
         });
@@ -344,7 +344,7 @@ describe('Viking.Record', () => {
         describe('path (relationships)', () => {
             it('builds JSON:API relationships path', function () {
                 let connection = new JSONAPIConnection('http://example.com');
-                let MockClass = { modelName() { return { routeKey: 'blog_posts' }; } };
+                let MockClass = { modelName() { return { plural: 'blog_posts' }; } };
                 let owner = {
                     constructor: MockClass,
                     primaryKey() { return 42; }
@@ -354,7 +354,7 @@ describe('Viking.Record', () => {
 
             it('ignores the record argument (relationships path has no target id)', function () {
                 let connection = new JSONAPIConnection('http://example.com');
-                let MockClass = { modelName() { return { routeKey: 'users' }; } };
+                let MockClass = { modelName() { return { plural: 'users' }; } };
                 let owner = {
                     constructor: MockClass,
                     primaryKey() { return 1; }
