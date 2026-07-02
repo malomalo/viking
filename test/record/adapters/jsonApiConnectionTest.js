@@ -55,17 +55,23 @@ describe('Viking.Record', () => {
             });
         });
 
-        describe('method', () => {
-            it('returns patch for update', function () {
+        describe('actions', () => {
+            it('update sends a PATCH request', function () {
                 let connection = new JSONAPIConnection('http://example.com');
-                assert.equal(connection.method('update'), 'patch');
+                connection.update('/users/1');
+                assert.ok(this.findRequest('PATCH', '/users/1'));
             });
 
             it('inherits defaults for other actions', function () {
                 let connection = new JSONAPIConnection('http://example.com');
-                assert.equal(connection.method('create'), 'post');
-                assert.equal(connection.method('read'), 'get');
-                assert.equal(connection.method('destroy'), 'delete');
+                connection.create('/users');
+                assert.ok(this.findRequest('POST', '/users'));
+
+                connection.read('/users');
+                assert.ok(this.findRequest('GET', '/users'));
+
+                connection.destroy('/users/1');
+                assert.ok(this.findRequest('DELETE', '/users/1'));
             });
         });
 

@@ -606,25 +606,29 @@ describe('Viking.Record', () => {
             });
         });
 
-        describe('method', () => {
-            it('returns post for create', function () {
+        describe('actions', () => {
+            it('create sends a POST request', function () {
                 let connection = new Connection('http://example.com');
-                assert.equal(connection.method('create'), 'post');
+                connection.create('/users');
+                assert.ok(this.findRequest('POST', '/users'));
             });
 
-            it('returns get for read', function () {
+            it('read sends a GET request', function () {
                 let connection = new Connection('http://example.com');
-                assert.equal(connection.method('read'), 'get');
+                connection.read('/users');
+                assert.ok(this.findRequest('GET', '/users'));
             });
 
-            it('returns put for update', function () {
+            it('update sends a PUT request', function () {
                 let connection = new Connection('http://example.com');
-                assert.equal(connection.method('update'), 'put');
+                connection.update('/users/1');
+                assert.ok(this.findRequest('PUT', '/users/1'));
             });
 
-            it('returns delete for destroy', function () {
+            it('destroy sends a DELETE request', function () {
                 let connection = new Connection('http://example.com');
-                assert.equal(connection.method('destroy'), 'delete');
+                connection.destroy('/users/1');
+                assert.ok(this.findRequest('DELETE', '/users/1'));
             });
         });
 
@@ -825,19 +829,19 @@ describe('Viking.Record', () => {
                 assert.equal(connection.formatPath('/blog-posts'), '/blog-posts/');
             });
 
-            it('custom method override', function () {
+            it('custom action override', function () {
                 class DRFConnection extends Connection {
-                    method(action) {
-                        if (action === 'update') return 'patch';
-                        return super.method(action);
+                    update(...args) {
+                        return this.patch(...args);
                     }
                 }
 
                 let connection = new DRFConnection('http://example.com');
-                assert.equal(connection.method('update'), 'patch');
-                assert.equal(connection.method('create'), 'post');
-                assert.equal(connection.method('read'), 'get');
-                assert.equal(connection.method('destroy'), 'delete');
+                connection.update('/users/1');
+                assert.ok(this.findRequest('PATCH', '/users/1'));
+
+                connection.create('/users');
+                assert.ok(this.findRequest('POST', '/users'));
             });
 
             it('custom buildRequestBody', function () {
