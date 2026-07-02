@@ -274,26 +274,26 @@ describe('Viking.Record', () => {
         describe('deserializeResponseBody', () => {
             it('flattens a single resource', function () {
                 let connection = new JSONAPIConnection('http://example.com');
-                let response = {
+                let response = JSON.stringify({
                     data: {
                         id: '1',
                         type: 'users',
                         attributes: { name: 'Ben', email: 'ben@example.com' }
                     }
-                };
-                let result = connection.deserializeResponseBody(response, {});
+                });
+                let result = connection.deserializeResponseBody({ response });
                 assert.deepEqual(result, { id: '1', name: 'Ben', email: 'ben@example.com' });
             });
 
             it('flattens an array of resources', function () {
                 let connection = new JSONAPIConnection('http://example.com');
-                let response = {
+                let response = JSON.stringify({
                     data: [
                         { id: '1', type: 'users', attributes: { name: 'Ben' } },
                         { id: '2', type: 'users', attributes: { name: 'Alice' } }
                     ]
-                };
-                let result = connection.deserializeResponseBody(response, {});
+                });
+                let result = connection.deserializeResponseBody({ response });
                 assert.deepEqual(result, [
                     { id: '1', name: 'Ben' },
                     { id: '2', name: 'Alice' }
@@ -302,8 +302,8 @@ describe('Viking.Record', () => {
 
             it('returns null/empty responses unchanged', function () {
                 let connection = new JSONAPIConnection('http://example.com');
-                assert.equal(connection.deserializeResponseBody(null, {}), null);
-                assert.deepEqual(connection.deserializeResponseBody({}, {}), {});
+                assert.equal(connection.deserializeResponseBody({ response: 'null' }), null);
+                assert.deepEqual(connection.deserializeResponseBody({ response: '{}' }), {});
             });
         });
 

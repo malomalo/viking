@@ -908,8 +908,8 @@ describe('Viking.Record', () => {
         describe('deserializeResponseBody', () => {
             it('override transforms response before success callback', function (done) {
                 class CustomConnection extends Connection {
-                    deserializeResponseBody(response, request) {
-                        return response.data.attributes;
+                    deserializeResponseBody(request) {
+                        return JSON.parse(request.response).data.attributes;
                     }
                 }
 
@@ -925,8 +925,8 @@ describe('Viking.Record', () => {
 
             it('transforms response on direct-resolve path', function (done) {
                 class CustomConnection extends Connection {
-                    deserializeResponseBody(response, request) {
-                        return response.data.attributes;
+                    deserializeResponseBody(request) {
+                        return JSON.parse(request.response).data.attributes;
                     }
                 }
 
@@ -941,9 +941,9 @@ describe('Viking.Record', () => {
             it('is skipped for 204 responses', function (done) {
                 let called = false;
                 class CustomConnection extends Connection {
-                    deserializeResponseBody(response, request) {
+                    deserializeResponseBody(request) {
                         called = true;
-                        return response;
+                        return super.deserializeResponseBody(request);
                     }
                 }
 
