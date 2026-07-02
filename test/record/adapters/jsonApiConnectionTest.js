@@ -43,15 +43,20 @@ describe('Viking.Record', () => {
             });
         });
 
-        describe('formatPath', () => {
-            it('adds trailing slash', function () {
+        describe('path', () => {
+            it('adds trailing slash to collection paths', function () {
                 let connection = new JSONAPIConnection('http://example.com');
-                assert.equal(connection.formatPath('/users'), '/users/');
+                function User() {}
+                User.modelName = () => ({ plural: 'users' });
+                assert.equal(connection.path(User), '/users/');
             });
 
-            it('preserves existing trailing slash', function () {
+            it('does not add trailing slash to member paths', function () {
                 let connection = new JSONAPIConnection('http://example.com');
-                assert.equal(connection.formatPath('/users/'), '/users/');
+                function User() {}
+                User.modelName = () => ({ plural: 'users' });
+                let user = { constructor: User, toParam() { return '1'; } };
+                assert.equal(connection.path(user), '/users/1');
             });
         });
 
