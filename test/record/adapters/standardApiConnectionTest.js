@@ -13,6 +13,31 @@ describe('Viking.Record', () => {
             assert.equal(connection.acceptHeader, 'application/json');
         });
 
+        describe('headers', () => {
+            it('sends the Api-Version header', function () {
+                let connection = new StandardAPIConnection('http://example.com');
+                connection.get('/users');
+
+                this.withRequest('GET', '/users', {}, (xhr) => {
+                    assert.equal(xhr.requestHeaders['Api-Version'], '0.5.0');
+                    assert.equal(xhr.requestHeaders['Accept'], 'application/json');
+                });
+            });
+
+            it('automatically adds the CSRF token from the meta tag', function () {
+                document.head.innerHTML = '<meta name="csrf-token" content="ETZaIMiq">';
+
+                let connection = new StandardAPIConnection('http://example.com');
+                connection.get('/');
+
+                this.withRequest('GET', '/', {}, (xhr) => {
+                    assert.equal(xhr.requestHeaders['X-CSRF-Token'], 'ETZaIMiq');
+                });
+
+                document.head.innerHTML = '';
+            });
+        });
+
         describe('buildQueryParams', () => {
             it('builds params with where', function () {
                 let connection = new StandardAPIConnection('http://example.com');

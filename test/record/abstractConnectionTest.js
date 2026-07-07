@@ -7,18 +7,35 @@ import Type from 'viking/record/type';
 describe('Viking.Record', () => {
     describe('AbstractConnection', () => {
 
-        it('Automatically add the CSRF token', function () {
-            document.head.innerHTML = '<meta name="csrf-token" content="ETZaIMiq">';
-            
-            let connection = new AbstractConnection('http://example.com');
-            connection.get('/');
-            
-            this.withRequest('GET', '/', {}, (xhr) => {
-                assert.equal(xhr.requestHeaders['X-CSRF-Token'], "ETZaIMiq");
-            });
-        });
-        
         describe('headers', () => {
+            it('sends no default headers', function () {
+                let connection = new AbstractConnection('http://example.com');
+                connection.get('/');
+
+                this.withRequest('GET', '/', {}, (xhr) => {
+                    assert.equal(xhr.requestHeaders['Accept'], undefined);
+                    assert.equal(xhr.requestHeaders['Api-Version'], undefined);
+                });
+            });
+
+            it('per-request headers do not leak onto the connection', function () {
+                let connection = new AbstractConnection('http://example.com', { headers: { foo: '1' } });
+
+                connection.get('/', { headers: { bar: '2' } });
+                this.withRequest('GET', '/', {}, (xhr) => {
+                    assert.equal(xhr.requestHeaders.foo, '1');
+                    assert.equal(xhr.requestHeaders.bar, '2');
+                });
+
+                connection.get('/');
+                this.withRequest('GET', '/', {}, (xhr) => {
+                    assert.equal(xhr.requestHeaders.foo, '1');
+                    assert.equal(xhr.requestHeaders.bar, undefined);
+                });
+
+                assert.deepEqual(connection.headers, { foo: '1' });
+            });
+
             it('function', function () {
                 let connection = new AbstractConnection('http://example.com', {
                     headers: {
@@ -330,10 +347,11 @@ describe('Viking.Record', () => {
             });
         });
 
-        describe('acceptHeader', () => {
-            it('returns application/json by default', function () {
+        describe('defaultHeaders', () => {
+            it('is empty by default; adapters declare their headers', function () {
                 let connection = new AbstractConnection('http://example.com');
-                assert.equal(connection.acceptHeader, 'application/json');
+                assert.deepEqual(connection.defaultHeaders(), {});
+                assert.equal(connection.acceptHeader, undefined);
             });
         });
 
@@ -556,7 +574,9 @@ describe('Viking.Record', () => {
         describe('subclass overrides', () => {
             it('custom headers flow through to sendRequest', function () {
                 class DRFConnection extends AbstractConnection {
-                    acceptHeader = 'application/vnd.api+json';
+                    defaultHeaders() {
+                        return { ...super.defaultHeaders(), 'Accept': 'application/vnd.api+json' };
+                    }
                     serializeRequestBody(body, request) {
                         return { body: JSON.stringify(body), contentType: 'application/vnd.api+json' };
                     }

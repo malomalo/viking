@@ -12,6 +12,33 @@ describe('Viking.Record', () => {
             assert.equal(connection.acceptHeader, 'application/vnd.api+json');
         });
 
+        describe('csrf', () => {
+            afterEach(() => {
+                document.cookie = 'csrftoken=; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+            });
+
+            it('reads the token from the csrftoken cookie and sends X-CSRFToken', function () {
+                document.cookie = 'csrftoken=d1B2v9Xq';
+
+                let connection = new DjangoJSONAPIConnection('http://example.com');
+                connection.post('/users/');
+
+                this.withRequest('POST', '/users/', {}, (xhr) => {
+                    assert.equal(xhr.requestHeaders['X-CSRFToken'], 'd1B2v9Xq');
+                    assert.equal(xhr.requestHeaders['X-CSRF-Token'], undefined);
+                });
+            });
+
+            it('sends no CSRF header without the cookie', function () {
+                let connection = new DjangoJSONAPIConnection('http://example.com');
+                connection.post('/users/');
+
+                this.withRequest('POST', '/users/', {}, (xhr) => {
+                    assert.equal(xhr.requestHeaders['X-CSRFToken'], undefined);
+                });
+            });
+        });
+
         describe('path', () => {
             it('adds trailing slash to collection paths', function () {
                 let connection = new DjangoJSONAPIConnection('http://example.com');
