@@ -1,6 +1,8 @@
 import assert from 'assert';
 import AbstractConnection from 'viking/record/abstract-connection';
 import VikingRecord from 'viking/record';
+import Types from 'viking/record/types';
+import Type from 'viking/record/type';
 
 describe('Viking.Record', () => {
     describe('AbstractConnection', () => {
@@ -343,6 +345,111 @@ describe('Viking.Record', () => {
                 assert.throws(() => {
                     connection.buildRequestBody(record, {name: 'Ben'});
                 }, /does not implement buildRequestBody/);
+            });
+        });
+
+        describe('attributesForSave', () => {
+            it('returns only the changed attributes, in wire format', function () {
+                let connection = new AbstractConnection('http://example.com');
+
+                class Meeting extends VikingRecord {
+                    static schema = { starts_on: { type: 'date' }, name: { type: 'string' } };
+                }
+
+                let meeting = Meeting.instantiate({ starts_on: '2020-01-15', name: 'Standup' });
+                meeting.starts_on = new Date(2020, 1, 3);
+
+                assert.deepEqual(connection.attributesForSave(meeting), { starts_on: '2020-02-03' });
+            });
+        });
+
+        describe('dumpAttributes', () => {
+            it('serializes attributes using the model schema and type registry', function () {
+                let connection = new AbstractConnection('http://example.com');
+
+                class Meeting extends VikingRecord {
+                    static schema = { starts_on: { type: 'date' }, name: { type: 'string' } };
+                }
+
+                let dumped = connection.dumpAttributes(new Meeting(), {
+                    starts_on: new Date(2020, 0, 15),
+                    name: 'Standup'
+                });
+                assert.equal(dumped.starts_on, '2020-01-15');
+                assert.equal(dumped.name, 'Standup');
+            });
+
+            it('passes through attributes not in the schema', function () {
+                let connection = new AbstractConnection('http://example.com');
+
+                class Meeting extends VikingRecord {
+                    static schema = { name: { type: 'string' } };
+                }
+
+                let dumped = connection.dumpAttributes(new Meeting(), { location_id: 7 });
+                assert.equal(dumped.location_id, 7);
+            });
+
+            it('serializes custom types via their dump', function () {
+                Types.registry.measurement = class extends Type {
+                    static dump(value) {
+                        return value.value;
+                    }
+                };
+
+                class Wall extends VikingRecord {
+                    static schema = { width: { type: 'measurement' } };
+                }
+
+                let connection = new AbstractConnection('http://example.com');
+                let dumped = connection.dumpAttributes(new Wall(), {
+                    width: { value: 3, units: 'm' },
+                    width_units: 'm'
+                });
+                assert.deepEqual(dumped, { width: 3, width_units: 'm' });
+            });
+
+            it('resolves dynamic type functions against the attributes and record', function () {
+                class Setting extends VikingRecord {
+                    static schema = {
+                        value: {
+                            type: (attributes, record = {}) => {
+                                return attributes.type || record.readAttribute('type');
+                            }
+                        }
+                    };
+                }
+
+                let connection = new AbstractConnection('http://example.com');
+                let record = new Setting({ type: 'string', value: 9 });
+                assert.deepEqual(connection.dumpAttributes(record, record.attributes), {
+                    type: 'string',
+                    value: '9'
+                });
+            });
+
+            it('adapters can override how types are encoded', function () {
+                class EpochConnection extends AbstractConnection {
+                    dumpAttributes(record, attributes) {
+                        const dumped = super.dumpAttributes(record, attributes);
+                        const schema = record.constructor.schema;
+                        Object.keys(dumped).forEach((key) => {
+                            if (schema?.[key]?.type === 'date' && attributes[key]) {
+                                dumped[key] = attributes[key].getTime();
+                            }
+                        });
+                        return dumped;
+                    }
+                }
+
+                class Meeting extends VikingRecord {
+                    static schema = { starts_on: { type: 'date' } };
+                }
+
+                let date = new Date(2020, 0, 15);
+                let connection = new EpochConnection('http://example.com');
+                let dumped = connection.dumpAttributes(new Meeting(), { starts_on: date });
+                assert.equal(dumped.starts_on, date.getTime());
             });
         });
 

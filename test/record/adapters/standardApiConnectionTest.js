@@ -1,6 +1,8 @@
 import assert from 'assert';
 import AbstractConnection from 'viking/record/abstract-connection';
 import StandardAPIConnection from 'viking/record/adapters/standard-api-connection';
+import Record from 'viking/record';
+import { belongsTo } from 'viking/record/associations';
 
 describe('Viking.Record', () => {
     describe('StandardAPIConnection', () => {
@@ -364,6 +366,49 @@ describe('Viking.Record', () => {
                 let record = { paramRoot() { return 'user'; } };
                 let result = connection.buildRequestBody(record, {name: 'Ben'});
                 assert.deepEqual(result, {user: {name: 'Ben'}});
+            });
+
+            it('composes changed attributes and dirty associations from the record', function () {
+                let connection = new StandardAPIConnection('http://example.com');
+
+                class Author extends Record {
+                    static schema = { id: { type: 'integer' }, name: { type: 'string' } };
+                }
+                class Post extends Record {
+                    static schema = { id: { type: 'integer' }, title: { type: 'string' } };
+                    static associations = [belongsTo('author', Author)];
+                }
+
+                let post = Post.instantiate({ id: 1, title: 'Hello' });
+                post.title = 'Updated';
+                post.author = new Author({ name: 'Ben' });
+
+                assert.deepEqual(connection.buildRequestBody(post), {
+                    post: {
+                        title: 'Updated',
+                        author: { name: 'Ben' }
+                    }
+                });
+            });
+
+            it('throws when a dirty association uses a different connection', function () {
+                let connection = new StandardAPIConnection('http://example.com');
+                let otherConnection = new StandardAPIConnection('http://other.example.com');
+
+                class Author extends Record {
+                    static connection = otherConnection;
+                    static schema = { id: { type: 'integer' }, name: { type: 'string' } };
+                }
+                class Post extends Record {
+                    static connection = connection;
+                    static schema = { id: { type: 'integer' }, title: { type: 'string' } };
+                    static associations = [belongsTo('author', Author)];
+                }
+
+                let post = Post.instantiate({ id: 1 });
+                post.author = new Author({ name: 'Ben' });
+
+                assert.throws(() => connection.buildRequestBody(post), /different connection/);
             });
         });
 
