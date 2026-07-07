@@ -38,6 +38,22 @@ describe('Viking.Record', () => {
             });
         });
 
+        describe('errorForResponse', () => {
+            it('rejects 422 with ApiVersionUnsupported', function (done) {
+                let connection = new StandardAPIConnection('http://example.com');
+
+                connection.get('/users').then(
+                    () => done(new Error('expected rejection')),
+                    (error) => {
+                        assert.equal(error.name, 'ApiVersionUnsupported');
+                        done();
+                    }
+                );
+
+                this.withRequest('GET', '/users', {}, (xhr) => xhr.respond(422, {}, ''));
+            });
+        });
+
         describe('buildQueryParams', () => {
             it('builds params with where', function () {
                 let connection = new StandardAPIConnection('http://example.com');
@@ -382,6 +398,20 @@ describe('Viking.Record', () => {
                 let params = {};
                 connection.setGroupBy(params, { _groupValues: [] });
                 assert.equal(params.group_by, undefined);
+            });
+        });
+
+        describe('parseErrors', () => {
+            it('extracts errors from a JSON response', function () {
+                let connection = new StandardAPIConnection('http://example.com');
+                let result = connection.parseErrors('{"errors":{"name":["is required"]}}', 'application/json');
+                assert.deepEqual(result, {name: ['is required']});
+            });
+
+            it('returns null for non-JSON responses', function () {
+                let connection = new StandardAPIConnection('http://example.com');
+                assert.equal(connection.parseErrors('<html></html>', 'text/html'), null);
+                assert.equal(connection.parseErrors('error', null), null);
             });
         });
 

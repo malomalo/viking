@@ -116,8 +116,12 @@ describe('Viking.Record', () => {
                 this.withRequest('GET', '/', {}, (xhr) => xhr.respond(500, {}, '{"foo": "bar"}'));
             });
             
-            it('invalid', function (done) {
-                let connection = new AbstractConnection('http://example.com');
+            it('invalid fires for statuses the adapter declares invalid', function (done) {
+                class InvalidConnection extends AbstractConnection {
+                    invalidStatuses = [400];
+                }
+
+                let connection = new InvalidConnection('http://example.com');
                 let counter = 0;
                 
                 connection.get('/', {
@@ -147,25 +151,27 @@ describe('Viking.Record', () => {
             it('error', function (done) {
                 let connection = new AbstractConnection('http://example.com');
                 let counter = 0;
-                
+
                 connection.get('/', {
                     error: response => {
                         counter++;
                     }
                 });
                 this.withRequest('GET', '/', {}, (xhr) => xhr.respond(201, {}, '{"foo": "bar"}'));
-                
+
+                // With no invalidStatuses declared, a 400 is an error like
+                // any other failure status.
                 connection.get('/', {
                     error: response => {
                         counter++;
                     }
                 });
                 this.withRequest('GET', '/', {}, (xhr) => xhr.respond(400, {}, '{"foo": "bar"}'));
-                
+
                 connection.get('/', {
                     error: response => {
                         assert.equal(response, '{"foo": "bar"}');
-                        assert.equal(counter, 0);
+                        assert.equal(counter, 1);
                         done()
                     }
                 });
@@ -347,6 +353,22 @@ describe('Viking.Record', () => {
             });
         });
 
+        describe('errorForResponse', () => {
+            it('rejects 422 with UnprocessableEntity', function (done) {
+                let connection = new AbstractConnection('http://example.com');
+
+                connection.get('/').then(
+                    () => done(new Error('expected rejection')),
+                    (error) => {
+                        assert.equal(error.name, 'UnprocessableEntity');
+                        done();
+                    }
+                );
+
+                this.withRequest('GET', '/', {}, (xhr) => xhr.respond(422, {}, ''));
+            });
+        });
+
         describe('defaultHeaders', () => {
             it('is empty by default; adapters declare their headers', function () {
                 let connection = new AbstractConnection('http://example.com');
@@ -472,10 +494,11 @@ describe('Viking.Record', () => {
         });
 
         describe('parseErrors', () => {
-            it('extracts errors from JSON response', function () {
+            it('throws NotImplementedError', function () {
                 let connection = new AbstractConnection('http://example.com');
-                let result = connection.parseErrors('{"errors":{"name":["is required"]}}', 'application/json');
-                assert.deepEqual(result, {name: ['is required']});
+                assert.throws(() => {
+                    connection.parseErrors('{"errors":{"name":["is required"]}}', 'application/json');
+                }, /does not implement parseErrors/);
             });
         });
 

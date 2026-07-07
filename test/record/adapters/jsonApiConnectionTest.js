@@ -493,6 +493,21 @@ describe('Viking.Record', () => {
                 assert.deepEqual(result, { base: ['Something went wrong'] });
             });
 
+            it('returns null for non-JSON responses', function () {
+                let connection = new JSONAPIConnection('http://example.com');
+                assert.equal(connection.parseErrors('<html></html>', 'text/html'), null);
+                assert.equal(connection.parseErrors('error', null), null);
+            });
+
+            it('accepts plain application/json error responses', function () {
+                let connection = new JSONAPIConnection('http://example.com');
+                let responseText = JSON.stringify({
+                    errors: [{ source: { pointer: '/data/attributes/name' }, detail: 'is required' }]
+                });
+                let result = connection.parseErrors(responseText, 'application/json');
+                assert.deepEqual(result, { name: ['is required'] });
+            });
+
             it('returns empty object when no errors', function () {
                 let connection = new JSONAPIConnection('http://example.com');
                 let responseText = JSON.stringify({});
@@ -608,6 +623,29 @@ describe('Viking.Record', () => {
                     assert.deepEqual(body.data.relationships, {
                         author: { data: { type: 'authors', id: '7' } }
                     });
+                });
+            });
+
+            it('parses validation errors from a 422 response', function (done) {
+                let connection = new JSONAPIConnection('http://example.com');
+
+                class User extends Record {
+                    static connection = connection;
+                    static schema = { id: { type: 'integer' }, name: { type: 'string' } };
+                }
+
+                let user = User.instantiate({ id: 1, name: 'Ben' });
+                user.name = '';
+                user.save().then((saved) => {
+                    assert.equal(saved, false);
+                    assert.deepEqual(user.errors, { name: ['is required'] });
+                    done();
+                }).catch(done);
+
+                this.withRequest('PATCH', '/users/1', {}, (xhr) => {
+                    xhr.respond(422, { 'Content-Type': 'application/vnd.api+json' }, JSON.stringify({
+                        errors: [{ source: { pointer: '/data/attributes/name' }, detail: 'is required' }]
+                    }));
                 });
             });
 
