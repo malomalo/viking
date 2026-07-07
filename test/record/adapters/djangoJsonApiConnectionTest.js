@@ -44,6 +44,7 @@ describe('Viking.Record', () => {
                 let connection = new DjangoJSONAPIConnection('http://example.com');
                 function User() {}
                 User.modelName = () => ({ plural: 'users' });
+                User.baseClass = () => User;
                 assert.equal(connection.path(User), '/users/');
             });
 
@@ -51,13 +52,14 @@ describe('Viking.Record', () => {
                 let connection = new DjangoJSONAPIConnection('http://example.com');
                 function User() {}
                 User.modelName = () => ({ plural: 'users' });
+                User.baseClass = () => User;
                 let user = { constructor: User, toParam() { return '1'; } };
                 assert.equal(connection.path(user), '/users/1');
             });
 
             it('builds JSON:API relationships paths', function () {
                 let connection = new DjangoJSONAPIConnection('http://example.com');
-                let MockClass = { modelName() { return { plural: 'blog_posts' }; } };
+                let MockClass = { baseClass() { return this; }, modelName() { return { plural: 'blog_posts' }; } };
                 let owner = {
                     constructor: MockClass,
                     primaryKey() { return 42; }

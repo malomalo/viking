@@ -26,20 +26,34 @@ describe('Viking.Record', () => {
         describe('routeKey', () => {
             it('replaces underscores with hyphens', function () {
                 let connection = new JSONAPIConnection('http://example.com');
-                let klass = { modelName() { return { plural: 'blog_posts' }; } };
+                let klass = { baseClass() { return this; }, modelName() { return { plural: 'blog_posts' }; } };
                 assert.equal(connection.routeKey(klass), 'blog-posts');
             });
 
             it('handles single-word keys', function () {
                 let connection = new JSONAPIConnection('http://example.com');
-                let klass = { modelName() { return { plural: 'users' }; } };
+                let klass = { baseClass() { return this; }, modelName() { return { plural: 'users' }; } };
                 assert.equal(connection.routeKey(klass), 'users');
             });
 
             it('handles multiple underscores', function () {
                 let connection = new JSONAPIConnection('http://example.com');
-                let klass = { modelName() { return { plural: 'user_blog_posts' }; } };
+                let klass = { baseClass() { return this; }, modelName() { return { plural: 'user_blog_posts' }; } };
                 assert.equal(connection.routeKey(klass), 'user-blog-posts');
+            });
+
+            it('uses the baseClass for STI models', function () {
+                let connection = new JSONAPIConnection('http://example.com');
+
+                class CargoShip extends Record { }
+                class Carrier extends CargoShip { }
+
+                assert.equal(connection.routeKey(Carrier), 'cargo-ships');
+                assert.equal(connection.path(Carrier), '/cargo-ships');
+
+                let carrier = Carrier.instantiate({ id: 42 });
+                carrier.setAttributes({ name: 'Maersk' });
+                assert.equal(connection.buildRequestBody(carrier).data.type, 'cargo-ships');
             });
         });
 
@@ -48,6 +62,7 @@ describe('Viking.Record', () => {
                 let connection = new JSONAPIConnection('http://example.com');
                 function User() {}
                 User.modelName = () => ({ plural: 'users' });
+                User.baseClass = () => User;
                 assert.equal(connection.path(User), '/users');
             });
 
@@ -55,6 +70,7 @@ describe('Viking.Record', () => {
                 let connection = new JSONAPIConnection('http://example.com');
                 function User() {}
                 User.modelName = () => ({ plural: 'users' });
+                User.baseClass = () => User;
                 let user = { constructor: User, toParam() { return '1'; } };
                 assert.equal(connection.path(user), '/users/1');
             });
@@ -488,7 +504,7 @@ describe('Viking.Record', () => {
         describe('path (relationships)', () => {
             it('builds JSON:API relationships path', function () {
                 let connection = new JSONAPIConnection('http://example.com');
-                let MockClass = { modelName() { return { plural: 'blog_posts' }; } };
+                let MockClass = { baseClass() { return this; }, modelName() { return { plural: 'blog_posts' }; } };
                 let owner = {
                     constructor: MockClass,
                     primaryKey() { return 42; }
@@ -498,7 +514,7 @@ describe('Viking.Record', () => {
 
             it('ignores the record argument (relationships path has no target id)', function () {
                 let connection = new JSONAPIConnection('http://example.com');
-                let MockClass = { modelName() { return { plural: 'users' }; } };
+                let MockClass = { baseClass() { return this; }, modelName() { return { plural: 'users' }; } };
                 let owner = {
                     constructor: MockClass,
                     primaryKey() { return 1; }
