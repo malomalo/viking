@@ -1,5 +1,4 @@
 import assert from 'assert';
-import Connection from 'viking/record/connection';
 import JSONAPIConnection from 'viking/record/adapters/json-api-connection';
 import Record from 'viking/record';
 
@@ -44,14 +43,14 @@ describe('Viking.Record', () => {
         });
 
         describe('path', () => {
-            it('adds trailing slash to collection paths', function () {
+            it('does not add a trailing slash to collection paths', function () {
                 let connection = new JSONAPIConnection('http://example.com');
                 function User() {}
                 User.modelName = () => ({ plural: 'users' });
-                assert.equal(connection.path(User), '/users/');
+                assert.equal(connection.path(User), '/users');
             });
 
-            it('does not add trailing slash to member paths', function () {
+            it('builds member paths', function () {
                 let connection = new JSONAPIConnection('http://example.com');
                 function User() {}
                 User.modelName = () => ({ plural: 'users' });
@@ -148,11 +147,11 @@ describe('Viking.Record', () => {
         });
 
         describe('setLimit', () => {
-            it('maps limit to page.size', function () {
+            it('maps limit to page.limit', function () {
                 let connection = new JSONAPIConnection('http://example.com');
                 let params = {};
                 connection.setLimit(params, { _limit: 25 });
-                assert.deepEqual(params.page, { size: 25 });
+                assert.deepEqual(params.page, { limit: 25 });
                 assert.equal(params.limit, undefined);
             });
 
@@ -175,9 +174,9 @@ describe('Viking.Record', () => {
 
             it('merges with existing page params', function () {
                 let connection = new JSONAPIConnection('http://example.com');
-                let params = { page: { size: 25 } };
+                let params = { page: { limit: 25 } };
                 connection.setOffset(params, { _offset: 10 });
-                assert.deepEqual(params.page, { size: 25, offset: 10 });
+                assert.deepEqual(params.page, { limit: 25, offset: 10 });
             });
 
             it('does nothing when null', function () {
@@ -227,7 +226,7 @@ describe('Viking.Record', () => {
                 let params = connection.buildQueryParams(relation);
                 assert.deepEqual(params.filter, { active: true });
                 assert.equal(params.sort, 'name,-created_at');
-                assert.deepEqual(params.page, { size: 25, offset: 50 });
+                assert.deepEqual(params.page, { limit: 25, offset: 50 });
                 assert.equal(params.include, 'posts,comments');
                 // Rails-style keys should be absent
                 assert.equal(params.where, undefined);
@@ -386,7 +385,7 @@ describe('Viking.Record', () => {
                 Record.connection = originalConnection;
             });
 
-            it('collection path uses hyphenated routes with trailing slash', function () {
+            it('collection path uses hyphenated routes', function () {
                 let connection = new JSONAPIConnection('http://example.com');
 
                 class BlogPost extends Record {
@@ -394,7 +393,7 @@ describe('Viking.Record', () => {
                     static schema = { title: { type: 'string' } };
                 }
 
-                assert.equal(connection.path(BlogPost), '/blog-posts/');
+                assert.equal(connection.path(BlogPost), '/blog-posts');
             });
 
             it('commit uses PATCH for updates', function () {
@@ -427,7 +426,7 @@ describe('Viking.Record', () => {
                 let user = new User({ name: 'NewUser' });
                 user.save();
 
-                this.withRequest('POST', '/users/', {}, (xhr) => {
+                this.withRequest('POST', '/users', {}, (xhr) => {
                     let body = JSON.parse(xhr.requestBody);
                     assert.equal(body.data.type, 'users');
                     assert.deepEqual(body.data.attributes, { name: 'NewUser' });
@@ -450,7 +449,7 @@ describe('Viking.Record', () => {
                     done();
                 }).catch(done);
 
-                this.withRequest('GET', '/users/', { params: { sort: '-id' } }, (xhr) => {
+                this.withRequest('GET', '/users', { params: { sort: '-id' } }, (xhr) => {
                     xhr.respond(200, { 'Content-Type': 'application/vnd.api+json' }, JSON.stringify({
                         data: [
                             { id: '1', type: 'users', attributes: { name: 'Ben' } },

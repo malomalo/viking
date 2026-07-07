@@ -1,14 +1,14 @@
 import assert from 'assert';
-import Connection from 'viking/record/connection';
+import AbstractConnection from 'viking/record/abstract-connection';
 import VikingRecord from 'viking/record';
 
 describe('Viking.Record', () => {
-    describe('Connection', () => {
+    describe('AbstractConnection', () => {
 
         it('Automatically add the CSRF token', function () {
             document.head.innerHTML = '<meta name="csrf-token" content="ETZaIMiq">';
             
-            let connection = new Connection('http://example.com');
+            let connection = new AbstractConnection('http://example.com');
             connection.get('/');
             
             this.withRequest('GET', '/', {}, (xhr) => {
@@ -18,7 +18,7 @@ describe('Viking.Record', () => {
         
         describe('headers', () => {
             it('function', function () {
-                let connection = new Connection('http://example.com', {
+                let connection = new AbstractConnection('http://example.com', {
                     headers: {
                         foo: '1',
                         bar: () => '2',
@@ -40,7 +40,7 @@ describe('Viking.Record', () => {
         
         describe('callbacks', () => {
             it('success', function (done) {
-                let connection = new Connection('http://example.com');
+                let connection = new AbstractConnection('http://example.com');
                 let counter = 0;
                 
                 connection.get('/', {
@@ -68,7 +68,7 @@ describe('Viking.Record', () => {
             });
             
             it('complete', function (done) {
-                let connection = new Connection('http://example.com');
+                let connection = new AbstractConnection('http://example.com');
                 let counter = 0;
                 
                 connection.get('/', {
@@ -98,7 +98,7 @@ describe('Viking.Record', () => {
             });
             
             it('invalid', function (done) {
-                let connection = new Connection('http://example.com');
+                let connection = new AbstractConnection('http://example.com');
                 let counter = 0;
                 
                 connection.get('/', {
@@ -126,7 +126,7 @@ describe('Viking.Record', () => {
             });
             
             it('error', function (done) {
-                let connection = new Connection('http://example.com');
+                let connection = new AbstractConnection('http://example.com');
                 let counter = 0;
                 
                 connection.get('/', {
@@ -155,7 +155,7 @@ describe('Viking.Record', () => {
             
             describe('preflight', () => {
                 it('with a function as a callback', function () {
-                    let connection = new Connection('http://example.com');
+                    let connection = new AbstractConnection('http://example.com');
                     let counter = 0;
                 
                     connection.get('/', { preflight: response => counter++ });
@@ -165,7 +165,7 @@ describe('Viking.Record', () => {
                 });
                 
                 it('with a function that returns a promise as a callback', function (done) {
-                    let connection = new Connection('http://example.com');
+                    let connection = new AbstractConnection('http://example.com');
                     let counter = 0;
                     let resolve_preflight = null;
                     const preflight_promise = new Promise((res, rej) => { resolve_preflight = res; }).then(() => {
@@ -195,7 +195,7 @@ describe('Viking.Record', () => {
 
         describe('serializeRequestBody', () => {
             it('override transforms request body', function () {
-                class CustomConnection extends Connection {
+                class CustomConnection extends AbstractConnection {
                     serializeRequestBody(body, request) {
                         return { body: JSON.stringify({ data: { attributes: body } }), contentType: 'application/json' };
                     }
@@ -210,7 +210,7 @@ describe('Viking.Record', () => {
             });
 
             it('override sets the request Content-Type', function () {
-                class CustomConnection extends Connection {
+                class CustomConnection extends AbstractConnection {
                     serializeRequestBody(body, request) {
                         return { body: JSON.stringify(body), contentType: 'application/vnd.custom+json' };
                     }
@@ -226,7 +226,7 @@ describe('Viking.Record', () => {
 
             it('is not called for FormData bodies', function () {
                 let called = false;
-                class CustomConnection extends Connection {
+                class CustomConnection extends AbstractConnection {
                     serializeRequestBody(body, request) {
                         called = true;
                         return body;
@@ -244,356 +244,59 @@ describe('Viking.Record', () => {
             });
         });
 
-        describe('buildQueryParams', () => {
-            it('builds params with where', function () {
-                let connection = new Connection('http://example.com');
-                let relation = {
-                    _where: [{name: 'Ben'}],
-                    _order: [],
-                    _limit: null,
-                    _offset: null,
-                    _include: [],
-                    _distinct: null,
-                    _groupValues: [],
-                    defaultOrder() { return {id: 'desc'}; }
-                };
-                let params = connection.buildQueryParams(relation);
-                assert.deepEqual(params.where, {name: 'Ben'});
+        describe('query parameter hooks (abstract)', () => {
+            const emptyRelation = {
+                _where: [],
+                _order: [],
+                _limit: null,
+                _offset: null,
+                _include: [],
+                _distinct: null,
+                _groupValues: [],
+                defaultOrder() { return {id: 'desc'}; }
+            };
+
+            it('builds empty params for an empty relation', function () {
+                let connection = new AbstractConnection('http://example.com');
+                assert.deepEqual(connection.buildQueryParams(emptyRelation), {});
             });
 
-            it('builds params with multiple where clauses', function () {
-                let connection = new Connection('http://example.com');
-                let relation = {
-                    _where: [{name: 'Ben'}, 'AND', {age: 30}],
-                    _order: [],
-                    _limit: null,
-                    _offset: null,
-                    _include: [],
-                    _distinct: null,
-                    _groupValues: [],
-                    defaultOrder() { return {id: 'desc'}; }
-                };
-                let params = connection.buildQueryParams(relation);
-                assert.deepEqual(params.where, [{name: 'Ben'}, 'AND', {age: 30}]);
-            });
+            it('throws NotImplementedError when a query clause is used', function () {
+                let connection = new AbstractConnection('http://example.com');
 
-            it('uses default order when no order specified', function () {
-                let connection = new Connection('http://example.com');
-                let relation = {
-                    _where: [],
-                    _order: [],
-                    _limit: null,
-                    _offset: null,
-                    _include: [],
-                    _distinct: null,
-                    _groupValues: [],
-                    defaultOrder() { return {id: 'desc'}; }
-                };
-                let params = connection.buildQueryParams(relation);
-                assert.deepEqual(params.order, {id: 'desc'});
-            });
+                assert.throws(() => {
+                    connection.buildQueryParams({...emptyRelation, _where: [{name: 'Ben'}]});
+                }, /does not implement setWhere/);
 
-            it('uses specified order', function () {
-                let connection = new Connection('http://example.com');
-                let relation = {
-                    _where: [],
-                    _order: [{name: 'asc'}],
-                    _limit: null,
-                    _offset: null,
-                    _include: [],
-                    _distinct: null,
-                    _groupValues: [],
-                    defaultOrder() { return {id: 'desc'}; }
-                };
-                let params = connection.buildQueryParams(relation);
-                assert.deepEqual(params.order, {name: 'asc'});
-            });
+                assert.throws(() => {
+                    connection.buildQueryParams({...emptyRelation, _order: [{name: 'asc'}]});
+                }, /does not implement setOrder/);
 
-            it('uses multiple orders', function () {
-                let connection = new Connection('http://example.com');
-                let relation = {
-                    _where: [],
-                    _order: [{name: 'asc'}, {age: 'desc'}],
-                    _limit: null,
-                    _offset: null,
-                    _include: [],
-                    _distinct: null,
-                    _groupValues: [],
-                    defaultOrder() { return {id: 'desc'}; }
-                };
-                let params = connection.buildQueryParams(relation);
-                assert.deepEqual(params.order, [{name: 'asc'}, {age: 'desc'}]);
-            });
+                assert.throws(() => {
+                    connection.buildQueryParams({...emptyRelation, _limit: 10});
+                }, /does not implement setLimit/);
 
-            it('builds params with limit', function () {
-                let connection = new Connection('http://example.com');
-                let relation = {
-                    _where: [],
-                    _order: [],
-                    _limit: 10,
-                    _offset: null,
-                    _include: [],
-                    _distinct: null,
-                    _groupValues: [],
-                    defaultOrder() { return {id: 'desc'}; }
-                };
-                let params = connection.buildQueryParams(relation);
-                assert.equal(params.limit, 10);
-            });
+                assert.throws(() => {
+                    connection.buildQueryParams({...emptyRelation, _offset: 5});
+                }, /does not implement setOffset/);
 
-            it('builds params with offset', function () {
-                let connection = new Connection('http://example.com');
-                let relation = {
-                    _where: [],
-                    _order: [],
-                    _limit: null,
-                    _offset: 5,
-                    _include: [],
-                    _distinct: null,
-                    _groupValues: [],
-                    defaultOrder() { return {id: 'desc'}; }
-                };
-                let params = connection.buildQueryParams(relation);
-                assert.equal(params.offset, 5);
-            });
+                assert.throws(() => {
+                    connection.buildQueryParams({...emptyRelation, _include: ['posts']});
+                }, /does not implement setInclude/);
 
-            it('builds params with include', function () {
-                let connection = new Connection('http://example.com');
-                let relation = {
-                    _where: [],
-                    _order: [],
-                    _limit: null,
-                    _offset: null,
-                    _include: ['posts', 'comments'],
-                    _distinct: null,
-                    _groupValues: [],
-                    defaultOrder() { return {id: 'desc'}; }
-                };
-                let params = connection.buildQueryParams(relation);
-                assert.deepEqual(params.include, ['posts', 'comments']);
-            });
+                assert.throws(() => {
+                    connection.buildQueryParams({...emptyRelation, _distinct: true});
+                }, /does not implement setDistinct/);
 
-            it('builds params with boolean distinct', function () {
-                let connection = new Connection('http://example.com');
-                let relation = {
-                    _where: [],
-                    _order: [],
-                    _limit: null,
-                    _offset: null,
-                    _include: [],
-                    _distinct: true,
-                    _groupValues: [],
-                    defaultOrder() { return {id: 'desc'}; }
-                };
-                let params = connection.buildQueryParams(relation);
-                assert.equal(params.distinct, true);
-                assert.equal(params.distinct_on, undefined);
-            });
-
-            it('builds params with distinct_on', function () {
-                let connection = new Connection('http://example.com');
-                let relation = {
-                    _where: [],
-                    _order: [],
-                    _limit: null,
-                    _offset: null,
-                    _include: [],
-                    _distinct: ['name'],
-                    _groupValues: [],
-                    defaultOrder() { return {id: 'desc'}; }
-                };
-                let params = connection.buildQueryParams(relation);
-                assert.equal(params.distinct, undefined);
-                assert.deepEqual(params.distinct_on, ['name']);
-            });
-
-            it('builds params with single group_by', function () {
-                let connection = new Connection('http://example.com');
-                let relation = {
-                    _where: [],
-                    _order: [],
-                    _limit: null,
-                    _offset: null,
-                    _include: [],
-                    _distinct: null,
-                    _groupValues: ['category'],
-                    defaultOrder() { return {id: 'desc'}; }
-                };
-                let params = connection.buildQueryParams(relation);
-                assert.equal(params.group_by, 'category');
-            });
-
-            it('builds params with multiple group_by', function () {
-                let connection = new Connection('http://example.com');
-                let relation = {
-                    _where: [],
-                    _order: [],
-                    _limit: null,
-                    _offset: null,
-                    _include: [],
-                    _distinct: null,
-                    _groupValues: ['category', 'status'],
-                    defaultOrder() { return {id: 'desc'}; }
-                };
-                let params = connection.buildQueryParams(relation);
-                assert.deepEqual(params.group_by, ['category', 'status']);
-            });
-
-            it('omits unset params', function () {
-                let connection = new Connection('http://example.com');
-                let relation = {
-                    _where: [],
-                    _order: [],
-                    _limit: null,
-                    _offset: null,
-                    _include: [],
-                    _distinct: null,
-                    _groupValues: [],
-                    defaultOrder() { return {id: 'desc'}; }
-                };
-                let params = connection.buildQueryParams(relation);
-                assert.equal(params.where, undefined);
-                assert.equal(params.limit, undefined);
-                assert.equal(params.offset, undefined);
-                assert.equal(params.include, undefined);
-                assert.equal(params.distinct, undefined);
-                assert.equal(params.distinct_on, undefined);
-                assert.equal(params.group_by, undefined);
-                // order always has a value (default)
-                assert.deepEqual(params.order, {id: 'desc'});
-            });
-        });
-
-        describe('setWhere', () => {
-            it('sets single where', function () {
-                let connection = new Connection('http://example.com');
-                let params = {};
-                connection.setWhere(params, { _where: [{active: true}] });
-                assert.deepEqual(params.where, {active: true});
-            });
-
-            it('does nothing for empty where', function () {
-                let connection = new Connection('http://example.com');
-                let params = {};
-                connection.setWhere(params, { _where: [] });
-                assert.equal(params.where, undefined);
-            });
-        });
-
-        describe('setOrder', () => {
-            it('uses default order when empty', function () {
-                let connection = new Connection('http://example.com');
-                let params = {};
-                connection.setOrder(params, { _order: [], defaultOrder() { return {id: 'desc'}; } });
-                assert.deepEqual(params.order, {id: 'desc'});
-            });
-
-            it('uses specified single order', function () {
-                let connection = new Connection('http://example.com');
-                let params = {};
-                connection.setOrder(params, { _order: [{name: 'asc'}], defaultOrder() { return {id: 'desc'}; } });
-                assert.deepEqual(params.order, {name: 'asc'});
-            });
-        });
-
-        describe('setLimit', () => {
-            it('sets limit when present', function () {
-                let connection = new Connection('http://example.com');
-                let params = {};
-                connection.setLimit(params, { _limit: 25 });
-                assert.equal(params.limit, 25);
-            });
-
-            it('does nothing when null', function () {
-                let connection = new Connection('http://example.com');
-                let params = {};
-                connection.setLimit(params, { _limit: null });
-                assert.equal(params.limit, undefined);
-            });
-        });
-
-        describe('setOffset', () => {
-            it('sets offset when present', function () {
-                let connection = new Connection('http://example.com');
-                let params = {};
-                connection.setOffset(params, { _offset: 10 });
-                assert.equal(params.offset, 10);
-            });
-
-            it('does nothing when null', function () {
-                let connection = new Connection('http://example.com');
-                let params = {};
-                connection.setOffset(params, { _offset: null });
-                assert.equal(params.offset, undefined);
-            });
-        });
-
-        describe('setInclude', () => {
-            it('sets include when present', function () {
-                let connection = new Connection('http://example.com');
-                let params = {};
-                connection.setInclude(params, { _include: ['posts'] });
-                assert.deepEqual(params.include, ['posts']);
-            });
-
-            it('does nothing when empty', function () {
-                let connection = new Connection('http://example.com');
-                let params = {};
-                connection.setInclude(params, { _include: [] });
-                assert.equal(params.include, undefined);
-            });
-        });
-
-        describe('setDistinct', () => {
-            it('sets boolean distinct', function () {
-                let connection = new Connection('http://example.com');
-                let params = {};
-                connection.setDistinct(params, { _distinct: true });
-                assert.equal(params.distinct, true);
-            });
-
-            it('sets distinct_on for non-boolean', function () {
-                let connection = new Connection('http://example.com');
-                let params = {};
-                connection.setDistinct(params, { _distinct: ['name'] });
-                assert.deepEqual(params.distinct_on, ['name']);
-            });
-
-            it('does nothing when null', function () {
-                let connection = new Connection('http://example.com');
-                let params = {};
-                connection.setDistinct(params, { _distinct: null });
-                assert.equal(params.distinct, undefined);
-                assert.equal(params.distinct_on, undefined);
-            });
-        });
-
-        describe('setGroupBy', () => {
-            it('sets single group', function () {
-                let connection = new Connection('http://example.com');
-                let params = {};
-                connection.setGroupBy(params, { _groupValues: ['status'] });
-                assert.equal(params.group_by, 'status');
-            });
-
-            it('sets multiple groups', function () {
-                let connection = new Connection('http://example.com');
-                let params = {};
-                connection.setGroupBy(params, { _groupValues: ['status', 'category'] });
-                assert.deepEqual(params.group_by, ['status', 'category']);
-            });
-
-            it('does nothing when empty', function () {
-                let connection = new Connection('http://example.com');
-                let params = {};
-                connection.setGroupBy(params, { _groupValues: [] });
-                assert.equal(params.group_by, undefined);
+                assert.throws(() => {
+                    connection.buildQueryParams({...emptyRelation, _groupValues: ['status']});
+                }, /does not implement setGroupBy/);
             });
         });
 
         describe('routeKey', () => {
             it('returns routeKey from the class by default', function () {
-                let connection = new Connection('http://example.com');
+                let connection = new AbstractConnection('http://example.com');
                 let klass = { baseClass() { return klass; }, modelName() { return { plural: 'blog_posts' }; } };
                 assert.equal(connection.routeKey(klass), 'blog_posts');
             });
@@ -601,25 +304,25 @@ describe('Viking.Record', () => {
 
         describe('actions', () => {
             it('create sends a POST request', function () {
-                let connection = new Connection('http://example.com');
+                let connection = new AbstractConnection('http://example.com');
                 connection.create('/users');
                 assert.ok(this.findRequest('POST', '/users'));
             });
 
             it('read sends a GET request', function () {
-                let connection = new Connection('http://example.com');
+                let connection = new AbstractConnection('http://example.com');
                 connection.read('/users');
                 assert.ok(this.findRequest('GET', '/users'));
             });
 
             it('update sends a PUT request', function () {
-                let connection = new Connection('http://example.com');
+                let connection = new AbstractConnection('http://example.com');
                 connection.update('/users/1');
                 assert.ok(this.findRequest('PUT', '/users/1'));
             });
 
             it('destroy sends a DELETE request', function () {
-                let connection = new Connection('http://example.com');
+                let connection = new AbstractConnection('http://example.com');
                 connection.destroy('/users/1');
                 assert.ok(this.findRequest('DELETE', '/users/1'));
             });
@@ -627,31 +330,32 @@ describe('Viking.Record', () => {
 
         describe('acceptHeader', () => {
             it('returns application/json by default', function () {
-                let connection = new Connection('http://example.com');
+                let connection = new AbstractConnection('http://example.com');
                 assert.equal(connection.acceptHeader, 'application/json');
             });
         });
 
 
         describe('buildRequestBody', () => {
-            it('wraps attributes under paramRoot by default', function () {
-                let connection = new Connection('http://example.com');
+            it('throws NotImplementedError', function () {
+                let connection = new AbstractConnection('http://example.com');
                 let record = { paramRoot() { return 'user'; } };
-                let result = connection.buildRequestBody(record, {name: 'Ben'});
-                assert.deepEqual(result, {user: {name: 'Ben'}});
+                assert.throws(() => {
+                    connection.buildRequestBody(record, {name: 'Ben'});
+                }, /does not implement buildRequestBody/);
             });
         });
 
         describe('parseErrors', () => {
             it('extracts errors from JSON response', function () {
-                let connection = new Connection('http://example.com');
+                let connection = new AbstractConnection('http://example.com');
                 let result = connection.parseErrors('{"errors":{"name":["is required"]}}', 'application/json');
                 assert.deepEqual(result, {name: ['is required']});
             });
         });
 
         describe('path', () => {
-            let connection = new Connection('http://example.com');
+            let connection = new AbstractConnection('http://example.com');
 
             describe('collection (class)', () => {
                 it('returns a path based on modelName', () => {
@@ -744,7 +448,7 @@ describe('Viking.Record', () => {
 
         describe('subclass overrides', () => {
             it('custom headers flow through to sendRequest', function () {
-                class DRFConnection extends Connection {
+                class DRFConnection extends AbstractConnection {
                     acceptHeader = 'application/vnd.api+json';
                     serializeRequestBody(body, request) {
                         return { body: JSON.stringify(body), contentType: 'application/vnd.api+json' };
@@ -761,7 +465,7 @@ describe('Viking.Record', () => {
             });
 
             it('custom buildQueryParams restructures params', function () {
-                class DRFConnection extends Connection {
+                class DRFConnection extends AbstractConnection {
                     setWhere(params, relation) {
                         if (relation._where.length > 0) {
                             params.filter = relation._where.length === 1 ? relation._where[0] : relation._where;
@@ -811,7 +515,7 @@ describe('Viking.Record', () => {
             });
 
             it('custom routeKey and path', function () {
-                class DRFConnection extends Connection {
+                class DRFConnection extends AbstractConnection {
                     routeKey(klass) { return klass.modelName().plural.replace(/_/g, '-'); }
                     path(target, association, record) {
                         return super.path(target, association, record).replace(/\/?$/, '/');
@@ -826,7 +530,7 @@ describe('Viking.Record', () => {
             });
 
             it('custom action override', function () {
-                class DRFConnection extends Connection {
+                class DRFConnection extends AbstractConnection {
                     update(...args) {
                         return this.patch(...args);
                     }
@@ -841,7 +545,7 @@ describe('Viking.Record', () => {
             });
 
             it('custom buildRequestBody', function () {
-                class DRFConnection extends Connection {
+                class DRFConnection extends AbstractConnection {
                     buildRequestBody(record, attributes) {
                         return { data: { type: 'users', attributes } };
                     }
@@ -855,7 +559,7 @@ describe('Viking.Record', () => {
             });
 
             it('custom parseErrors', function () {
-                class DRFConnection extends Connection {
+                class DRFConnection extends AbstractConnection {
                     parseErrors(responseText, contentType) {
                         const body = JSON.parse(responseText);
                         const errors = {};
@@ -880,7 +584,7 @@ describe('Viking.Record', () => {
             });
 
             it('custom association path', function () {
-                class DRFConnection extends Connection {
+                class DRFConnection extends AbstractConnection {
                     path(target, association, record) {
                         if (typeof target !== 'function' && association) {
                             return '/' + [target.modelName.plural, target.toParam(), 'relationships', association].join('/');
@@ -900,7 +604,7 @@ describe('Viking.Record', () => {
 
         describe('deserializeResponseBody', () => {
             it('override transforms response before success callback', function (done) {
-                class CustomConnection extends Connection {
+                class CustomConnection extends AbstractConnection {
                     deserializeResponseBody(request) {
                         return JSON.parse(request.response).data.attributes;
                     }
@@ -917,7 +621,7 @@ describe('Viking.Record', () => {
             });
 
             it('transforms response on direct-resolve path', function (done) {
-                class CustomConnection extends Connection {
+                class CustomConnection extends AbstractConnection {
                     deserializeResponseBody(request) {
                         return JSON.parse(request.response).data.attributes;
                     }
@@ -933,7 +637,7 @@ describe('Viking.Record', () => {
 
             it('is skipped for 204 responses', function (done) {
                 let called = false;
-                class CustomConnection extends Connection {
+                class CustomConnection extends AbstractConnection {
                     deserializeResponseBody(request) {
                         called = true;
                         return super.deserializeResponseBody(request);
