@@ -86,12 +86,13 @@ describe('Viking.Record HasAndBelongsToManyAssociation autosave', () => {
             model.phases.push(phase2).then(() => {
                 return model.phases.remove(phase2);
             }).then(() => {
+                model.setAttribute('planet', 'Venus');
                 model.save().then(() => assert.ok(true)).then(done, done);
 
                 this.withRequest('PUT', '/requirements/24', { body: {
-                    requirement: {}
+                    requirement: { planet: 'Venus' }
                 }}, (xhr) => {
-                    xhr.respond(201, {}, '{"id": 24}');
+                    xhr.respond(201, {}, '{"id": 24, "planet": "Venus"}');
                 });
             });
         });
