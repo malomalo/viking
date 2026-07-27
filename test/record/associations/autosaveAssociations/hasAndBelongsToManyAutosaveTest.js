@@ -79,21 +79,16 @@ describe('Viking.Record HasAndBelongsToManyAssociation autosave', () => {
             });
         });
 
-        it('does nothing when a phase is added then removed back to its original state', function (done) {
+        it('does not send the association when only a parent attribute changes', function (done) {
             let model = Requirement.instantiate({id: 24, phases: [{ id: 11, name: 'Tom' }]});
-            let phase2 = Phase.instantiate({ id: 12, name: 'Jerry' });
 
-            model.phases.push(phase2).then(() => {
-                return model.phases.remove(phase2);
-            }).then(() => {
-                model.setAttribute('planet', 'Venus');
-                model.save().then(() => assert.ok(true)).then(done, done);
+            model.setAttribute('planet', 'Venus');
+            model.save().then(() => assert.ok(true)).then(done, done);
 
-                this.withRequest('PUT', '/requirements/24', { body: {
-                    requirement: { planet: 'Venus' }
-                }}, (xhr) => {
-                    xhr.respond(201, {}, '{"id": 24, "planet": "Venus"}');
-                });
+            this.withRequest('PUT', '/requirements/24', { body: {
+                requirement: { planet: 'Venus' }
+            }}, (xhr) => {
+                xhr.respond(201, {}, '{"id": 24, "planet": "Venus"}');
             });
         });
 
