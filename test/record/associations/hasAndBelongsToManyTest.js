@@ -83,6 +83,27 @@ describe('Viking.Record::associations', () => {
                 assert.deepStrictEqual(models, parents);
                 assert.equal(this.requests.length, 0);
             });
+            
+            it('instantiating included habtm association', async function() {
+                let model = new Model({id: 13, parents: [{id: 1}, {id: 2}]});
+            
+                assert.ok(model._associations.parents.loaded);
+                assert.deepStrictEqual(
+                    model._associations.parents.target.map(x => x.attributes),
+                    [{id: 1}, {id: 2}]
+                );
+            });
+            
+            it('setAttributesAndAssociations with habtm association', async function() {
+                let model = new Model({id: 13});
+                model.setAttributesAndAssociations({parents: [{id: 1}, {id: 2}]})
+            
+                assert.ok(model._associations.parents.loaded);
+                assert.deepStrictEqual(
+                    model._associations.parents.target.map(x => x.attributes),
+                    [{id: 1}, {id: 2}]
+                );
+            });
 
         });
         
