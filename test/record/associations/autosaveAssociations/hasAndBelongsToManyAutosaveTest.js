@@ -79,6 +79,23 @@ describe('Viking.Record HasAndBelongsToManyAssociation autosave', () => {
             });
         });
 
+        it('does nothing when a phase is added then removed back to its original state', function (done) {
+            let model = Requirement.instantiate({id: 24, phases: [{ id: 11, name: 'Tom' }]});
+            let phase2 = Phase.instantiate({ id: 12, name: 'Jerry' });
+
+            model.phases.push(phase2).then(() => {
+                return model.phases.remove(phase2);
+            }).then(() => {
+                model.save().then(() => assert.ok(true)).then(done, done);
+
+                this.withRequest('PUT', '/requirements/24', { body: {
+                    requirement: {}
+                }}, (xhr) => {
+                    xhr.respond(201, {}, '{"id": 24}');
+                });
+            });
+        });
+
         it('removes the relation', function (done) {
             let model = Requirement.instantiate({id: 24, phases: [{ id: 11, name: 'Tom' }]});
             let phase = model.phases.first();
