@@ -1,6 +1,7 @@
 import assert from 'assert';
 import JSONAPIConnection from 'viking/record/adapters/json-api-connection';
 import Record from 'viking/record';
+import { belongsTo, hasMany } from 'viking/record/associations';
 
 describe('Viking.Record', () => {
     describe('JSONAPIConnection', () => {
@@ -25,20 +26,34 @@ describe('Viking.Record', () => {
         describe('routeKey', () => {
             it('replaces underscores with hyphens', function () {
                 let connection = new JSONAPIConnection('http://example.com');
-                let klass = { modelName() { return { plural: 'blog_posts' }; } };
+                let klass = { baseClass() { return this; }, modelName() { return { plural: 'blog_posts' }; } };
                 assert.equal(connection.routeKey(klass), 'blog-posts');
             });
 
             it('handles single-word keys', function () {
                 let connection = new JSONAPIConnection('http://example.com');
-                let klass = { modelName() { return { plural: 'users' }; } };
+                let klass = { baseClass() { return this; }, modelName() { return { plural: 'users' }; } };
                 assert.equal(connection.routeKey(klass), 'users');
             });
 
             it('handles multiple underscores', function () {
                 let connection = new JSONAPIConnection('http://example.com');
-                let klass = { modelName() { return { plural: 'user_blog_posts' }; } };
+                let klass = { baseClass() { return this; }, modelName() { return { plural: 'user_blog_posts' }; } };
                 assert.equal(connection.routeKey(klass), 'user-blog-posts');
+            });
+
+            it('uses the baseClass for STI models', function () {
+                let connection = new JSONAPIConnection('http://example.com');
+
+                class CargoShip extends Record { }
+                class Carrier extends CargoShip { }
+
+                assert.equal(connection.routeKey(Carrier), 'cargo-ships');
+                assert.equal(connection.path(Carrier), '/cargo-ships');
+
+                let carrier = Carrier.instantiate({ id: 42 });
+                carrier.setAttributes({ name: 'Maersk' });
+                assert.equal(connection.buildRequestBody(carrier).data.type, 'cargo-ships');
             });
         });
 
@@ -47,6 +62,7 @@ describe('Viking.Record', () => {
                 let connection = new JSONAPIConnection('http://example.com');
                 function User() {}
                 User.modelName = () => ({ plural: 'users' });
+                User.baseClass = () => User;
                 assert.equal(connection.path(User), '/users');
             });
 
@@ -54,6 +70,7 @@ describe('Viking.Record', () => {
                 let connection = new JSONAPIConnection('http://example.com');
                 function User() {}
                 User.modelName = () => ({ plural: 'users' });
+                User.baseClass = () => User;
                 let user = { constructor: User, toParam() { return '1'; } };
                 assert.equal(connection.path(user), '/users/1');
             });
@@ -281,6 +298,139 @@ describe('Viking.Record', () => {
             });
         });
 
+        describe('buildRequestBody from record state', () => {
+            it('composes changed attributes', function () {
+                let connection = new JSONAPIConnection('http://example.com');
+
+                class User extends Record {
+                    static schema = { id: { type: 'integer' }, name: { type: 'string' }, email: { type: 'string' } };
+                }
+
+                let user = User.instantiate({ id: 42, name: 'Ben', email: 'ben@example.com' });
+                user.name = 'Updated';
+
+                assert.deepEqual(connection.buildRequestBody(user), {
+                    data: {
+                        id: '42',
+                        type: 'users',
+                        attributes: { name: 'Updated' }
+                    }
+                });
+            });
+
+            it('sends a dirty belongsTo as a resource identifier', function () {
+                let connection = new JSONAPIConnection('http://example.com');
+
+                class Author extends Record {
+                    static schema = { id: { type: 'integer' }, name: { type: 'string' } };
+                }
+                class Post extends Record {
+                    static schema = { id: { type: 'integer' }, title: { type: 'string' } };
+                    static associations = [belongsTo('author', Author)];
+                }
+
+                let post = Post.instantiate({ id: 1, title: 'Hello' });
+                post.author = Author.instantiate({ id: 7, name: 'Ben' });
+
+                assert.deepEqual(connection.buildRequestBody(post), {
+                    data: {
+                        id: '1',
+                        type: 'posts',
+                        attributes: {},
+                        relationships: {
+                            author: { data: { type: 'authors', id: '7' } }
+                        }
+                    }
+                });
+            });
+
+            it('sends a dirty hasMany as an array of resource identifiers', function () {
+                let connection = new JSONAPIConnection('http://example.com');
+
+                class Tag extends Record {
+                    static schema = { id: { type: 'integer' }, name: { type: 'string' } };
+                }
+                class Post extends Record {
+                    static schema = { id: { type: 'integer' }, title: { type: 'string' } };
+                    static associations = [hasMany('tags', Tag)];
+                }
+
+                let post = Post.instantiate({ id: 1, title: 'Hello' });
+                post.association('tags').setTarget([
+                    Tag.instantiate({ id: 3, name: 'a' }),
+                    Tag.instantiate({ id: 4, name: 'b' })
+                ]);
+
+                assert.deepEqual(connection.buildRequestBody(post), {
+                    data: {
+                        id: '1',
+                        type: 'posts',
+                        attributes: {},
+                        relationships: {
+                            tags: { data: [{ type: 'tags', id: '3' }, { type: 'tags', id: '4' }] }
+                        }
+                    }
+                });
+            });
+
+            it('throws for an unpersisted associated record', function () {
+                let connection = new JSONAPIConnection('http://example.com');
+
+                class Author extends Record {
+                    static schema = { id: { type: 'integer' }, name: { type: 'string' } };
+                }
+                class Post extends Record {
+                    static schema = { id: { type: 'integer' }, title: { type: 'string' } };
+                    static associations = [belongsTo('author', Author)];
+                }
+
+                let post = Post.instantiate({ id: 1 });
+                post.author = new Author({ name: 'Ben' });
+
+                assert.throws(() => connection.buildRequestBody(post), /save it first/);
+            });
+
+            it('throws when a relationship uses a different connection', function () {
+                let connection = new JSONAPIConnection('http://example.com');
+                let otherConnection = new JSONAPIConnection('http://other.example.com');
+
+                class Author extends Record {
+                    static connection = otherConnection;
+                    static schema = { id: { type: 'integer' }, name: { type: 'string' } };
+                }
+                class Post extends Record {
+                    static connection = connection;
+                    static schema = { id: { type: 'integer' }, title: { type: 'string' } };
+                    static associations = [belongsTo('author', Author)];
+                }
+
+                let post = Post.instantiate({ id: 1 });
+                post.author = Author.instantiate({ id: 7 });
+
+                assert.throws(() => connection.buildRequestBody(post), /different connection/);
+            });
+
+            it('does not add relationships when explicit attributes are given', function () {
+                let connection = new JSONAPIConnection('http://example.com');
+
+                class Author extends Record {
+                    static schema = { id: { type: 'integer' }, name: { type: 'string' } };
+                }
+                class Post extends Record {
+                    static schema = { id: { type: 'integer' }, title: { type: 'string' } };
+                    static associations = [belongsTo('author', Author)];
+                }
+
+                let post = Post.instantiate({ id: 1 });
+                post.author = Author.instantiate({ id: 7 });
+
+                let body = connection.buildRequestBody(post, { title: 'Explicit' });
+                assert.deepEqual(body, {
+                    data: { id: '1', type: 'posts', attributes: { title: 'Explicit' } }
+                });
+            });
+        });
+
         describe('deserializeResponseBody', () => {
             it('flattens a single resource', function () {
                 let connection = new JSONAPIConnection('http://example.com');
@@ -343,6 +493,21 @@ describe('Viking.Record', () => {
                 assert.deepEqual(result, { base: ['Something went wrong'] });
             });
 
+            it('returns null for non-JSON responses', function () {
+                let connection = new JSONAPIConnection('http://example.com');
+                assert.equal(connection.parseErrors('<html></html>', 'text/html'), null);
+                assert.equal(connection.parseErrors('error', null), null);
+            });
+
+            it('accepts plain application/json error responses', function () {
+                let connection = new JSONAPIConnection('http://example.com');
+                let responseText = JSON.stringify({
+                    errors: [{ source: { pointer: '/data/attributes/name' }, detail: 'is required' }]
+                });
+                let result = connection.parseErrors(responseText, 'application/json');
+                assert.deepEqual(result, { name: ['is required'] });
+            });
+
             it('returns empty object when no errors', function () {
                 let connection = new JSONAPIConnection('http://example.com');
                 let responseText = JSON.stringify({});
@@ -354,7 +519,7 @@ describe('Viking.Record', () => {
         describe('path (relationships)', () => {
             it('builds JSON:API relationships path', function () {
                 let connection = new JSONAPIConnection('http://example.com');
-                let MockClass = { modelName() { return { plural: 'blog_posts' }; } };
+                let MockClass = { baseClass() { return this; }, modelName() { return { plural: 'blog_posts' }; } };
                 let owner = {
                     constructor: MockClass,
                     primaryKey() { return 42; }
@@ -364,7 +529,7 @@ describe('Viking.Record', () => {
 
             it('ignores the record argument (relationships path has no target id)', function () {
                 let connection = new JSONAPIConnection('http://example.com');
-                let MockClass = { modelName() { return { plural: 'users' }; } };
+                let MockClass = { baseClass() { return this; }, modelName() { return { plural: 'users' }; } };
                 let owner = {
                     constructor: MockClass,
                     primaryKey() { return 1; }
@@ -431,6 +596,56 @@ describe('Viking.Record', () => {
                     assert.equal(body.data.type, 'users');
                     assert.deepEqual(body.data.attributes, { name: 'NewUser' });
                     assert.equal(body.data.id, undefined);
+                });
+            });
+
+            it('commit sends dirty associations as relationships', function () {
+                let connection = new JSONAPIConnection('http://example.com');
+
+                class Author extends Record {
+                    static connection = connection;
+                    static schema = { id: { type: 'integer' }, name: { type: 'string' } };
+                }
+                class Post extends Record {
+                    static connection = connection;
+                    static schema = { id: { type: 'integer' }, title: { type: 'string' } };
+                    static associations = [belongsTo('author', Author)];
+                }
+
+                let post = Post.instantiate({ id: 1, title: 'Hello' });
+                post.title = 'Updated';
+                post.author = Author.instantiate({ id: 7, name: 'Ben' });
+                post.save();
+
+                this.withRequest('PATCH', '/posts/1', {}, (xhr) => {
+                    let body = JSON.parse(xhr.requestBody);
+                    assert.deepEqual(body.data.attributes, { title: 'Updated' });
+                    assert.deepEqual(body.data.relationships, {
+                        author: { data: { type: 'authors', id: '7' } }
+                    });
+                });
+            });
+
+            it('parses validation errors from a 422 response', function (done) {
+                let connection = new JSONAPIConnection('http://example.com');
+
+                class User extends Record {
+                    static connection = connection;
+                    static schema = { id: { type: 'integer' }, name: { type: 'string' } };
+                }
+
+                let user = User.instantiate({ id: 1, name: 'Ben' });
+                user.name = '';
+                user.save().then((saved) => {
+                    assert.equal(saved, false);
+                    assert.deepEqual(user.errors, { name: ['is required'] });
+                    done();
+                }).catch(done);
+
+                this.withRequest('PATCH', '/users/1', {}, (xhr) => {
+                    xhr.respond(422, { 'Content-Type': 'application/vnd.api+json' }, JSON.stringify({
+                        errors: [{ source: { pointer: '/data/attributes/name' }, detail: 'is required' }]
+                    }));
                 });
             });
 

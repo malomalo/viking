@@ -1,6 +1,8 @@
 import assert from 'assert';
 import AbstractConnection from 'viking/record/abstract-connection';
 import StandardAPIConnection from 'viking/record/adapters/standard-api-connection';
+import Record from 'viking/record';
+import { belongsTo, hasMany } from 'viking/record/associations';
 
 describe('Viking.Record', () => {
     describe('StandardAPIConnection', () => {
@@ -9,6 +11,47 @@ describe('Viking.Record', () => {
             let connection = new StandardAPIConnection('http://example.com');
             assert.ok(connection instanceof AbstractConnection);
             assert.equal(connection.acceptHeader, 'application/json');
+        });
+
+        describe('headers', () => {
+            it('sends the Api-Version header', function () {
+                let connection = new StandardAPIConnection('http://example.com');
+                connection.get('/users');
+
+                this.withRequest('GET', '/users', {}, (xhr) => {
+                    assert.equal(xhr.requestHeaders['Api-Version'], '0.5.0');
+                    assert.equal(xhr.requestHeaders['Accept'], 'application/json');
+                });
+            });
+
+            it('automatically adds the CSRF token from the meta tag', function () {
+                document.head.innerHTML = '<meta name="csrf-token" content="ETZaIMiq">';
+
+                let connection = new StandardAPIConnection('http://example.com');
+                connection.get('/');
+
+                this.withRequest('GET', '/', {}, (xhr) => {
+                    assert.equal(xhr.requestHeaders['X-CSRF-Token'], 'ETZaIMiq');
+                });
+
+                document.head.innerHTML = '';
+            });
+        });
+
+        describe('errorForResponse', () => {
+            it('rejects 422 with ApiVersionUnsupported', function (done) {
+                let connection = new StandardAPIConnection('http://example.com');
+
+                connection.get('/users').then(
+                    () => done(new Error('expected rejection')),
+                    (error) => {
+                        assert.equal(error.name, 'ApiVersionUnsupported');
+                        done();
+                    }
+                );
+
+                this.withRequest('GET', '/users', {}, (xhr) => xhr.respond(422, {}, ''));
+            });
         });
 
         describe('buildQueryParams', () => {
@@ -358,12 +401,96 @@ describe('Viking.Record', () => {
             });
         });
 
+        describe('parseErrors', () => {
+            it('extracts errors from a JSON response', function () {
+                let connection = new StandardAPIConnection('http://example.com');
+                let result = connection.parseErrors('{"errors":{"name":["is required"]}}', 'application/json');
+                assert.deepEqual(result, {name: ['is required']});
+            });
+
+            it('returns null for non-JSON responses', function () {
+                let connection = new StandardAPIConnection('http://example.com');
+                assert.equal(connection.parseErrors('<html></html>', 'text/html'), null);
+                assert.equal(connection.parseErrors('error', null), null);
+            });
+        });
+
         describe('buildRequestBody', () => {
             it('wraps attributes under paramRoot', function () {
                 let connection = new StandardAPIConnection('http://example.com');
                 let record = { paramRoot() { return 'user'; } };
                 let result = connection.buildRequestBody(record, {name: 'Ben'});
                 assert.deepEqual(result, {user: {name: 'Ben'}});
+            });
+
+            it('composes changed attributes and dirty associations from the record', function () {
+                let connection = new StandardAPIConnection('http://example.com');
+
+                class Author extends Record {
+                    static schema = { id: { type: 'integer' }, name: { type: 'string' } };
+                }
+                class Post extends Record {
+                    static schema = { id: { type: 'integer' }, title: { type: 'string' } };
+                    static associations = [belongsTo('author', Author)];
+                }
+
+                let post = Post.instantiate({ id: 1, title: 'Hello' });
+                post.title = 'Updated';
+                post.author = new Author({ name: 'Ben' });
+
+                assert.deepEqual(connection.buildRequestBody(post), {
+                    post: {
+                        title: 'Updated',
+                        author: { name: 'Ben' }
+                    }
+                });
+            });
+
+            it('strips the foreign key from nested hasMany attributes', function () {
+                let connection = new StandardAPIConnection('http://example.com');
+
+                class Comment extends Record {
+                    static schema = { id: { type: 'integer' }, post_id: { type: 'integer' }, body: { type: 'string' } };
+                }
+                class Post extends Record {
+                    static schema = { id: { type: 'integer' }, title: { type: 'string' } };
+                    static associations = [hasMany('comments', Comment)];
+                }
+
+                let post = Post.instantiate({ id: 1, title: 'Hello' });
+                post.association('comments').setTarget([
+                    new Comment({ body: 'first' }),
+                    new Comment({ body: 'second' })
+                ]);
+
+                assert.deepEqual(connection.buildRequestBody(post), {
+                    post: {
+                        comments: [
+                            { body: 'first' },
+                            { body: 'second' }
+                        ]
+                    }
+                });
+            });
+
+            it('throws when a dirty association uses a different connection', function () {
+                let connection = new StandardAPIConnection('http://example.com');
+                let otherConnection = new StandardAPIConnection('http://other.example.com');
+
+                class Author extends Record {
+                    static connection = otherConnection;
+                    static schema = { id: { type: 'integer' }, name: { type: 'string' } };
+                }
+                class Post extends Record {
+                    static connection = connection;
+                    static schema = { id: { type: 'integer' }, title: { type: 'string' } };
+                    static associations = [belongsTo('author', Author)];
+                }
+
+                let post = Post.instantiate({ id: 1 });
+                post.author = new Author({ name: 'Ben' });
+
+                assert.throws(() => connection.buildRequestBody(post), /different connection/);
             });
         });
 

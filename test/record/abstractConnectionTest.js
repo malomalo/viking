@@ -1,22 +1,41 @@
 import assert from 'assert';
 import AbstractConnection from 'viking/record/abstract-connection';
 import VikingRecord from 'viking/record';
+import Types from 'viking/record/types';
+import Type from 'viking/record/type';
 
 describe('Viking.Record', () => {
     describe('AbstractConnection', () => {
 
-        it('Automatically add the CSRF token', function () {
-            document.head.innerHTML = '<meta name="csrf-token" content="ETZaIMiq">';
-            
-            let connection = new AbstractConnection('http://example.com');
-            connection.get('/');
-            
-            this.withRequest('GET', '/', {}, (xhr) => {
-                assert.equal(xhr.requestHeaders['X-CSRF-Token'], "ETZaIMiq");
-            });
-        });
-        
         describe('headers', () => {
+            it('sends no default headers', function () {
+                let connection = new AbstractConnection('http://example.com');
+                connection.get('/');
+
+                this.withRequest('GET', '/', {}, (xhr) => {
+                    assert.equal(xhr.requestHeaders['Accept'], undefined);
+                    assert.equal(xhr.requestHeaders['Api-Version'], undefined);
+                });
+            });
+
+            it('per-request headers do not leak onto the connection', function () {
+                let connection = new AbstractConnection('http://example.com', { headers: { foo: '1' } });
+
+                connection.get('/', { headers: { bar: '2' } });
+                this.withRequest('GET', '/', {}, (xhr) => {
+                    assert.equal(xhr.requestHeaders.foo, '1');
+                    assert.equal(xhr.requestHeaders.bar, '2');
+                });
+
+                connection.get('/');
+                this.withRequest('GET', '/', {}, (xhr) => {
+                    assert.equal(xhr.requestHeaders.foo, '1');
+                    assert.equal(xhr.requestHeaders.bar, undefined);
+                });
+
+                assert.deepEqual(connection.headers, { foo: '1' });
+            });
+
             it('function', function () {
                 let connection = new AbstractConnection('http://example.com', {
                     headers: {
@@ -97,8 +116,12 @@ describe('Viking.Record', () => {
                 this.withRequest('GET', '/', {}, (xhr) => xhr.respond(500, {}, '{"foo": "bar"}'));
             });
             
-            it('invalid', function (done) {
-                let connection = new AbstractConnection('http://example.com');
+            it('invalid fires for statuses the adapter declares invalid', function (done) {
+                class InvalidConnection extends AbstractConnection {
+                    invalidStatuses = [400];
+                }
+
+                let connection = new InvalidConnection('http://example.com');
                 let counter = 0;
                 
                 connection.get('/', {
@@ -128,25 +151,27 @@ describe('Viking.Record', () => {
             it('error', function (done) {
                 let connection = new AbstractConnection('http://example.com');
                 let counter = 0;
-                
+
                 connection.get('/', {
                     error: response => {
                         counter++;
                     }
                 });
                 this.withRequest('GET', '/', {}, (xhr) => xhr.respond(201, {}, '{"foo": "bar"}'));
-                
+
+                // With no invalidStatuses declared, a 400 is an error like
+                // any other failure status.
                 connection.get('/', {
                     error: response => {
                         counter++;
                     }
                 });
                 this.withRequest('GET', '/', {}, (xhr) => xhr.respond(400, {}, '{"foo": "bar"}'));
-                
+
                 connection.get('/', {
                     error: response => {
                         assert.equal(response, '{"foo": "bar"}');
-                        assert.equal(counter, 0);
+                        assert.equal(counter, 1);
                         done()
                     }
                 });
@@ -328,10 +353,27 @@ describe('Viking.Record', () => {
             });
         });
 
-        describe('acceptHeader', () => {
-            it('returns application/json by default', function () {
+        describe('errorForResponse', () => {
+            it('rejects 422 with UnprocessableEntity', function (done) {
                 let connection = new AbstractConnection('http://example.com');
-                assert.equal(connection.acceptHeader, 'application/json');
+
+                connection.get('/').then(
+                    () => done(new Error('expected rejection')),
+                    (error) => {
+                        assert.equal(error.name, 'UnprocessableEntity');
+                        done();
+                    }
+                );
+
+                this.withRequest('GET', '/', {}, (xhr) => xhr.respond(422, {}, ''));
+            });
+        });
+
+        describe('defaultHeaders', () => {
+            it('is empty by default; adapters declare their headers', function () {
+                let connection = new AbstractConnection('http://example.com');
+                assert.deepEqual(connection.defaultHeaders(), {});
+                assert.equal(connection.acceptHeader, undefined);
             });
         });
 
@@ -346,11 +388,117 @@ describe('Viking.Record', () => {
             });
         });
 
-        describe('parseErrors', () => {
-            it('extracts errors from JSON response', function () {
+        describe('attributesForSave', () => {
+            it('returns only the changed attributes, in wire format', function () {
                 let connection = new AbstractConnection('http://example.com');
-                let result = connection.parseErrors('{"errors":{"name":["is required"]}}', 'application/json');
-                assert.deepEqual(result, {name: ['is required']});
+
+                class Meeting extends VikingRecord {
+                    static schema = { starts_on: { type: 'date' }, name: { type: 'string' } };
+                }
+
+                let meeting = Meeting.instantiate({ starts_on: '2020-01-15', name: 'Standup' });
+                meeting.starts_on = new Date(2020, 1, 3);
+
+                assert.deepEqual(connection.attributesForSave(meeting), { starts_on: '2020-02-03' });
+            });
+        });
+
+        describe('dumpAttributes', () => {
+            it('serializes attributes using the model schema and type registry', function () {
+                let connection = new AbstractConnection('http://example.com');
+
+                class Meeting extends VikingRecord {
+                    static schema = { starts_on: { type: 'date' }, name: { type: 'string' } };
+                }
+
+                let dumped = connection.dumpAttributes(new Meeting(), {
+                    starts_on: new Date(2020, 0, 15),
+                    name: 'Standup'
+                });
+                assert.equal(dumped.starts_on, '2020-01-15');
+                assert.equal(dumped.name, 'Standup');
+            });
+
+            it('passes through attributes not in the schema', function () {
+                let connection = new AbstractConnection('http://example.com');
+
+                class Meeting extends VikingRecord {
+                    static schema = { name: { type: 'string' } };
+                }
+
+                let dumped = connection.dumpAttributes(new Meeting(), { location_id: 7 });
+                assert.equal(dumped.location_id, 7);
+            });
+
+            it('serializes custom types via their dump', function () {
+                Types.registry.measurement = class extends Type {
+                    static dump(value) {
+                        return value.value;
+                    }
+                };
+
+                class Wall extends VikingRecord {
+                    static schema = { width: { type: 'measurement' } };
+                }
+
+                let connection = new AbstractConnection('http://example.com');
+                let dumped = connection.dumpAttributes(new Wall(), {
+                    width: { value: 3, units: 'm' },
+                    width_units: 'm'
+                });
+                assert.deepEqual(dumped, { width: 3, width_units: 'm' });
+            });
+
+            it('resolves dynamic type functions against the attributes and record', function () {
+                class Setting extends VikingRecord {
+                    static schema = {
+                        value: {
+                            type: (attributes, record = {}) => {
+                                return attributes.type || record.readAttribute('type');
+                            }
+                        }
+                    };
+                }
+
+                let connection = new AbstractConnection('http://example.com');
+                let record = new Setting({ type: 'string', value: 9 });
+                assert.deepEqual(connection.dumpAttributes(record, record.attributes), {
+                    type: 'string',
+                    value: '9'
+                });
+            });
+
+            it('adapters can override how types are encoded', function () {
+                class EpochConnection extends AbstractConnection {
+                    dumpAttributes(record, attributes) {
+                        const dumped = super.dumpAttributes(record, attributes);
+                        const schema = record.constructor.schema;
+                        Object.keys(dumped).forEach((key) => {
+                            if (schema?.[key]?.type === 'date' && attributes[key]) {
+                                dumped[key] = attributes[key].getTime();
+                            }
+                        });
+                        return dumped;
+                    }
+                }
+
+                class Meeting extends VikingRecord {
+                    static schema = { starts_on: { type: 'date' } };
+                }
+
+                let date = new Date(2020, 0, 15);
+                let connection = new EpochConnection('http://example.com');
+                let dumped = connection.dumpAttributes(new Meeting(), { starts_on: date });
+                assert.equal(dumped.starts_on, date.getTime());
+            });
+        });
+
+        describe('parseErrors', () => {
+            it('throws NotImplementedError', function () {
+                let connection = new AbstractConnection('http://example.com');
+                assert.throws(() => {
+                    connection.parseErrors('{"errors":{"name":["is required"]}}', 'application/json');
+                }, /does not implement parseErrors/);
             });
         });
 
@@ -449,7 +597,9 @@ describe('Viking.Record', () => {
         describe('subclass overrides', () => {
             it('custom headers flow through to sendRequest', function () {
                 class DRFConnection extends AbstractConnection {
-                    acceptHeader = 'application/vnd.api+json';
+                    defaultHeaders() {
+                        return { ...super.defaultHeaders(), 'Accept': 'application/vnd.api+json' };
+                    }
                     serializeRequestBody(body, request) {
                         return { body: JSON.stringify(body), contentType: 'application/vnd.api+json' };
                     }
