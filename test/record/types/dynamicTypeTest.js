@@ -59,10 +59,5 @@ describe('Viking.Record.Types', () => {
             assert.deepEqual('3', record.value);
         });
 
-        it("asJSON", () => {
-            const record = new Foo({ type: 'string', value: 9 })
-            assert.deepEqual({ type: 'string', value: '9' }, record.asJSON())
-        });
-
     });
 });

@@ -2,7 +2,7 @@ import * as sinon from 'sinon';
 import assert from 'assert';
 import { toQuery }  from 'viking/support/object';
 import Model        from 'viking/record';
-import Connection   from 'viking/record/connection';
+import StandardAPIConnection from 'viking/record/adapters/standard-api-connection';
 
 assert.tag = function (tag, name, attrsOrContent, content) {
     var attrs;
@@ -50,7 +50,7 @@ assert.notRequested = function (method, url, options={}) {
     return assert.ok(!this.findRequest(method, url, options))
 }
 
-Model.connection = new Connection('http://example.com');
+Model.connection = new StandardAPIConnection('http://example.com');
 
 before(function() {
     this.requestCallbacks = [];

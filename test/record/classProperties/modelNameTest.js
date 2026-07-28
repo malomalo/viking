@@ -14,10 +14,10 @@ describe('Viking.Record::modelName', () => {
         assert.deepEqual(
             ['players', 'teams', 'conferences', 'leagues'],
             [
-                Player.modelName().routeKey,
-                Team.modelName().routeKey,
-                Conference.modelName().routeKey,
-                League.modelName().routeKey
+                Player.modelName().plural,
+                Team.modelName().plural,
+                Conference.modelName().plural,
+                League.modelName().plural
             ]
         )
     });

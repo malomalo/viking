@@ -152,10 +152,11 @@ describe('Viking.Relation', () => {
                     assert.equal(newValue, true);
                     done()
                 });
-            
+
                 relation.setDistinct();
             })
         })
+
     })
     
     describe('order', () => {
