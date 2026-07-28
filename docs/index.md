@@ -1,26 +1,35 @@
 
 <img src="/images/logo.png" width="400px">
 
-# Installation
-Viking can be installed and/or imported like any other javascript package.
+Viking.js is an open-source web framework for JavaScript web applications.
 
-```
+Inspired by Ruby on Rails and Backbone.js it makes it easier to write client side JavaScript applications. 
+
+# Installation
+
+```shell
 npm install github:malomalo/viking
 ```
 
 # Basic Structure
-|File/Folder|Purpose|
-|-----------|-------|
-|application.js|Viking.Application class that provides global object|
-|router.js|Viking.Router class that configures endpoints and callbacks|
-|/controllers|Folder of Viking.Controllers classes to which the router directs|
-|/models|Folder of Viking.Record classes that setup the schema and configuration for accessing data models|
-|/views|Templates used by Viking.Controllers for rendering|
+
+| File/Folder           | Purpose                                                   |
+|-----------------------|-----------------------------------------------------------|
+| /boot.js              | Boot file to initialize and start the Application         |
+| /application.js       | Application class that provides global object             |
+| /config/router.js     | Router class that maps urls to Controllers or callbacks   |
+| /config/initializers/ | Folder for initializers to be called from the Application | 
+| /controllers/         | Folder for controllers                                    |
+| /models/              | Folder for Record classes                                 |
+| /views/               | View and Templates for controllers to render              |
 
 # Setup
-Define a [Record](/Viking.Record.html)
-```
+Define a [Record](/record.html)
+
+```js
+// /models/cog.js
 import Record from 'viking';
+
 class Cog extends Record {
     static schema = {
         name: {type: 'string'},
@@ -30,32 +39,38 @@ class Cog extends Record {
 }
 ```
 
-Build a [View](/Viking.View.html)
-```
+Build a [View](/view.html)
+```js
 import View from 'viking';
+
 class CogsIndexView extends View {
+  
     render () {
-        const container = document.createElement('div')
-        this.records.forEach(cog => {
+        const container = document.createElement('div');
+        
+        await this.records.forEach(cog => {
             const el = document.createElement('div')
-            container.append(container)
             el.innerHTML = '<span>Title:</span>' + cog.name;
+            container.append(el)
         })
         
         return container
     }
+    
 }
 ```
 
-Define a [Controller](/Viking.Controller.html) to declare resources and set application options
-```
+Define a [Controller](/controller.html) to declare resources and set application
+options
+```js
 import Controller from 'viking';
-import cogsLayout from 'layouts/cogs-layout';
+import CogsIndexView from 'views/cogs/index';
+
 clas CogsController extends Controller {
     index () {
-        this.display(CogsIndexView, {
+        this.display(CogsIndexView.new({
             records: Cogs.where({status: 'active'})
-        }, {
+        }).el, {}, {
             layout: cogsLayout
         })
     }
@@ -66,8 +81,8 @@ clas CogsController extends Controller {
 }
 ```
 
-Configure routes by extending [Router](/Viking.Router.html)
-```javascript
+Configure routes by extending [Router](/router.html)
+```js
 import Router from 'viking';
 class MyRouter extends Router {
     static routes = {
@@ -77,16 +92,19 @@ class MyRouter extends Router {
 }
 ```
 
-Extend [Application](/Viking.Application.html)
-```javascript
+Create the [Application](/application.html)
+```js
 import Application from 'viking';
+
 class MyApplication extends Application {
     static router = MyRouter;
 }
 ```
 
 Start the application on boot
-```javascript
+```js
+import domReady from 'viking/support';
+
 domReady(function(){
     new MyApplication().start()
 })

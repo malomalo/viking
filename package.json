@@ -42,6 +42,6 @@
   "scripts": {
     "test": "mocha -r test/testSetup.js test/testHelper.js 'test/**/*Test.js'",
     "docs": "jsdoc -c jsdoc.json -u lib",
-    "docs:watch": "nodemon --watch lib --watch docs-src --ext js,md,json,css --exec \"npm run docs\""
+    "docs:watch": "nodemon --watch lib --watch docs --ext js,md,json,css --exec \"npm run docs\""
   }
 }

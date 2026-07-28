@@ -9,7 +9,7 @@
     },
     "sourceType": "module",
     "opts": {
-        "destination": "./docs/",
+        "destination": "./_docs/",
         "recurse": true,
         "template": "node_modules/jsdoc-press"
     },
@@ -20,14 +20,14 @@
     "templates": {
         "logo": "images/logo.png",
         "footer": false,
-        "staticFiles": "docs-src/",
+        "staticFiles": "docs/",
         "nav": {
             "order": ["class", "module"],
             "exclude": ["typedef"]
         },
         "stylesheets": [
-          "./docs-src/stylesheets/jsdoc.css"
+          "./docs/stylesheets/jsdoc.css"
         ],
-        "index": "./docs-src/index.md"
+        "index": "./docs/index.md"
     }
 }
