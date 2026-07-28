@@ -23,7 +23,7 @@ describe('Viking.Relation', () => {
         });
 
         it('merges option overrides over the generated params', () => {
-            const path = Model.where({parent_id: 11}).toPath({page: 2});
+            const path = Model.where({parent_id: 11}).toPath({params: {page: 2}});
             assert.strictEqual(
                 path,
                 '/models?where%5Bparent_id%5D=11&order%5Bid%5D=desc&page=2'
@@ -31,7 +31,7 @@ describe('Viking.Relation', () => {
         });
 
         it('allows options to override params generated from the relation', () => {
-            const path = Model.where({parent_id: 11}).toPath({where: {parent_id: 42}});
+            const path = Model.where({parent_id: 11}).toPath({params: {where: {parent_id: 42}}});
             assert.strictEqual(
                 path,
                 '/models?where%5Bparent_id%5D=42&order%5Bid%5D=desc'
