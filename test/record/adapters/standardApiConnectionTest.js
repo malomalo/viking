@@ -2,7 +2,7 @@ import assert from 'assert';
 import AbstractConnection from 'viking/record/abstract-connection';
 import StandardAPIConnection from 'viking/record/adapters/standard-api-connection';
 import Record from 'viking/record';
-import { belongsTo } from 'viking/record/associations';
+import { belongsTo, hasMany } from 'viking/record/associations';
 
 describe('Viking.Record', () => {
     describe('StandardAPIConnection', () => {
@@ -442,6 +442,33 @@ describe('Viking.Record', () => {
                     post: {
                         title: 'Updated',
                         author: { name: 'Ben' }
+                    }
+                });
+            });
+
+            it('strips the foreign key from nested hasMany attributes', function () {
+                let connection = new StandardAPIConnection('http://example.com');
+
+                class Comment extends Record {
+                    static schema = { id: { type: 'integer' }, post_id: { type: 'integer' }, body: { type: 'string' } };
+                }
+                class Post extends Record {
+                    static schema = { id: { type: 'integer' }, title: { type: 'string' } };
+                    static associations = [hasMany('comments', Comment)];
+                }
+
+                let post = Post.instantiate({ id: 1, title: 'Hello' });
+                post.association('comments').setTarget([
+                    new Comment({ body: 'first' }),
+                    new Comment({ body: 'second' })
+                ]);
+
+                assert.deepEqual(connection.buildRequestBody(post), {
+                    post: {
+                        comments: [
+                            { body: 'first' },
+                            { body: 'second' }
+                        ]
                     }
                 });
             });
