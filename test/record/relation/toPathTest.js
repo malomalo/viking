@@ -5,61 +5,56 @@ describe('Viking.Relation', () => {
 
     class Model extends VikingRecord {}
 
-    describe('toURL', () => {
+    describe('toPath', () => {
 
-        it('returns the urlRoot with the default order params', () => {
+        it('returns the path with the default order params', () => {
             assert.strictEqual(
-                Model.all().toURL(),
+                Model.all().toPath(),
                 '/models?order%5Bid%5D=desc'
             );
         });
 
         it('appends a query string built from the relation state', () => {
-            const url = Model.where({parent_id: 11}).order('name').toURL();
+            const path = Model.where({parent_id: 11}).order('name').toPath();
             assert.strictEqual(
-                url,
+                path,
                 '/models?where%5Bparent_id%5D=11&order%5Bname%5D=desc'
             );
         });
 
         it('merges option overrides over the generated params', () => {
-            const url = Model.where({parent_id: 11}).toURL({page: 2});
+            const path = Model.where({parent_id: 11}).toPath({page: 2});
             assert.strictEqual(
-                url,
+                path,
                 '/models?where%5Bparent_id%5D=11&order%5Bid%5D=desc&page=2'
             );
         });
 
         it('allows options to override params generated from the relation', () => {
-            const url = Model.where({parent_id: 11}).toURL({where: {parent_id: 42}});
+            const path = Model.where({parent_id: 11}).toPath({where: {parent_id: 42}});
             assert.strictEqual(
-                url,
+                path,
                 '/models?where%5Bparent_id%5D=42&order%5Bid%5D=desc'
             );
         });
 
-        it('plucks content_type from options and appends it as a file extension', () => {
-            const url = Model.where({parent_id: 11}).toURL({content_type: 'csv'});
+        it('plucks extension from options and appends it as a file extension', () => {
+            const path = Model.where({parent_id: 11}).toPath({extension: 'csv'});
             assert.strictEqual(
-                url,
+                path,
                 '/models.csv?where%5Bparent_id%5D=11&order%5Bid%5D=desc'
             );
         });
 
-        it('converts mime-type style content_type to a file extension', () => {
-            const url = Model.all().toURL({content_type: 'text/csv'});
-            assert.strictEqual(url, '/models.csv?order%5Bid%5D=desc');
-        });
-
-        it('does not include content_type in the query string', () => {
-            const url = Model.all().toURL({content_type: 'csv'});
-            assert.ok(!url.includes('content_type'));
+        it('does not include extension in the query string', () => {
+            const path = Model.all().toPath({extension: 'csv'});
+            assert.ok(!path.includes('extension'));
         });
 
         it('appends the extension before the query string', () => {
-            const url = Model.where({parent_id: 11}).toURL({content_type: 'json'});
+            const path = Model.where({parent_id: 11}).toPath({extension: 'json'});
             assert.strictEqual(
-                url,
+                path,
                 '/models.json?where%5Bparent_id%5D=11&order%5Bid%5D=desc'
             );
         });
