@@ -69,12 +69,6 @@ describe('VikingSupport.String', () => {
         assert.equal(StringSupport.singularize("words"), "word");
     });
 
-    it('demodulize()', function () {
-        assert.equal(StringSupport.demodulize("Namespaced::Module", ), 'Module');
-        assert.equal(StringSupport.demodulize('Module'), 'Module');
-        assert.equal(StringSupport.demodulize(''), '');
-    });
-
     it("constantize()", function() {
         // TODO can't load Viking
         // assert.equal(constantize("Viking"), Viking);

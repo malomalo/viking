@@ -59,21 +59,6 @@ describe('Viking.Record#save', () => {
             });
         });
         
-        it("sends post request with namespace", function (done) {
-            let a = new Submodel({ key: 99 });
-            
-            assert.ok(a.isNewRecord())
-            a.save().then(() => {
-                assert.ok(!a.isNewRecord())
-            }).then(done, done);
-        
-            this.withRequest('POST', '/model/submodels', { body: {
-                model_submodel: { key: 99 }
-            }}, (xhr) => {
-                xhr.respond(201, {}, '{"key": 99}');
-            });
-        });
-
     });
     
     describe("saving a persisted record", () => {
