@@ -126,7 +126,7 @@ describe('Viking.Record::associations', () => {
         
         describe('include', () => {
             it('instantiating null', function(done) {
-                Model.includes('parent').find(24).then(model => {
+                Model.eagerLoad('parent').find(24).then(model => {
                     assert.strictEqual(model.parent, null);
                 }).then(done, done);
             
