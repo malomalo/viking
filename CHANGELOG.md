@@ -2,6 +2,9 @@
 
 Major Changes:
 
+ - Renamed `Relation#includes` / `Record::includes` to `Relation#eagerLoad` /
+   `Record::eagerLoad` (and `Relation#setIncludes` to `Relation#setEagerLoads`)
+
 ## 0.9.0 (May 8th, 2016)
 
 Major Changes:

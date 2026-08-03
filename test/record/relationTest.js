@@ -155,6 +155,17 @@ describe('Viking.Relation', () => {
 
                 relation.setDistinct();
             })
+
+            it('changed:eagerload', function (done) {
+                const relation = Model.where({parent_id: 11})
+
+                relation.addEventListener('changed:eagerload', (newValue) => {
+                    assert.deepEqual(newValue, ['parent']);
+                    done()
+                });
+
+                relation.setEagerLoads('parent');
+            })
         })
 
     })
