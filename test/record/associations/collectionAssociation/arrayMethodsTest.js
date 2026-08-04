@@ -139,6 +139,26 @@ describe('Viking.Record::associations', () => {
                     xhr.respond(200, {}, '[{"id": 2, "name": "Viking A"},{"id": 3, "name": "Viking B"}]');
                 });
             });
+
+            it("toJSON serializes the loaded records and throws when not loaded", function(done) {
+                let model = new Model({id: 24});
+
+                assert.throws(() => JSON.stringify(model.parents), Errors.VikingError);
+
+                model.parents.load().then(() => {
+                    assert.deepStrictEqual(model.parents.toJSON(), model.parents.target);
+                }).then(done, done);
+
+                this.withRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}} }, (xhr) => {
+                    xhr.respond(200, {}, '[{"id": 2, "name": "Viking A"},{"id": 3, "name": "Viking B"}]');
+                });
+            });
+
+            it("has a toStringTag", function() {
+                let model = new Model({id: 24});
+
+                assert.equal(Object.prototype.toString.call(model.parents), '[object HasManyAssociation]');
+            });
         });
     });
 });

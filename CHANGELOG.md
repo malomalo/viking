@@ -10,6 +10,11 @@ Major Changes:
    `Array.fromAsync`) and sync iterable once loaded (`Array.from`, spread)
  - Removed `CollectionAssociation#toArray`; use `load()` for the live records
    or `Array.fromAsync(association)` for a detached copy
+ - Added `toJSON` and `Symbol.toStringTag` to `Relation` and collection
+   associations; `JSON.stringify` serializes the loaded records and throws
+   if the collection is not loaded (it previously dumped internal state)
+ - Added `Record#toJSON`; `JSON.stringify(record)` emits a copy of the
+   record's attributes instead of dumping internal state
 
 ## 0.9.0 (May 8th, 2016)
 

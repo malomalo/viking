@@ -103,5 +103,25 @@ describe('Viking.Relation', () => {
                 xhr.respond(200, {}, '[{"id": 1}, {"id": 2}]');
             });
         })
+
+        it('toJSON serializes the loaded records and throws when not loaded', function (done) {
+            const relation = Model.where({parent_id: 11})
+
+            assert.throws(() => JSON.stringify(relation), Errors.VikingError);
+
+            relation.load().then(() => {
+                assert.deepStrictEqual(relation.toJSON(), relation.target);
+            }).then(done, done);
+
+            this.withRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 1}, {"id": 2}]');
+            });
+        })
+
+        it('has a toStringTag', function () {
+            const relation = Model.where({parent_id: 11})
+
+            assert.equal(Object.prototype.toString.call(relation), '[object Relation]');
+        })
     })
 })
