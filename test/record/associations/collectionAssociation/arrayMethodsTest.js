@@ -146,7 +146,14 @@ describe('Viking.Record::associations', () => {
                 assert.throws(() => JSON.stringify(model.parents), Errors.VikingError);
 
                 model.parents.load().then(() => {
-                    assert.deepStrictEqual(model.parents.toJSON(), model.parents.target);
+                    assert.deepStrictEqual(model.parents.toJSON(), [
+                        {id: 2, model_id: 24, name: "Viking A"},
+                        {id: 3, model_id: 24, name: "Viking B"}
+                    ]);
+                    assert.deepStrictEqual(JSON.parse(JSON.stringify(model.parents)), [
+                        {id: 2, model_id: 24, name: "Viking A"},
+                        {id: 3, model_id: 24, name: "Viking B"}
+                    ]);
                 }).then(done, done);
 
                 this.withRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}} }, (xhr) => {

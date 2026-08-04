@@ -110,7 +110,8 @@ describe('Viking.Relation', () => {
             assert.throws(() => JSON.stringify(relation), Errors.VikingError);
 
             relation.load().then(() => {
-                assert.deepStrictEqual(relation.toJSON(), relation.target);
+                assert.deepStrictEqual(relation.toJSON(), [{id: 1}, {id: 2}]);
+                assert.deepStrictEqual(JSON.parse(JSON.stringify(relation)), [{id: 1}, {id: 2}]);
             }).then(done, done);
 
             this.withRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
