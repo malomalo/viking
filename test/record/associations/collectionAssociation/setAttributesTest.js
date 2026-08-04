@@ -15,7 +15,7 @@ describe('Viking.Record::associations', () => {
                 let parent = Parent.instantiate({id: 1, name: 'Alpha'})
                 let model = Model.instantiate({id: 24, parents: [parent]});
 
-                model.parents.toArray().then((models) => {
+                model.parents.load().then((models) => {
                     assert.equal(models.length, 1);
                     let model = models[0];
                     assert.ok(model instanceof Parent);
@@ -29,7 +29,7 @@ describe('Viking.Record::associations', () => {
                     {id: 1, name: 'Alpha'}
                 ])
                 
-                model.parents.toArray().then((models) => {
+                model.parents.load().then((models) => {
                     assert.equal(models.length, 2);
                     let a = models[0];
                     assert.ok(a instanceof Parent);

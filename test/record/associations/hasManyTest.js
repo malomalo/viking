@@ -14,7 +14,7 @@ describe('Viking.Record::associations', () => {
             it("load association", function(done) {
                 let model = new Model({id: 24});
 
-                model.parents.toArray().then((models) => {
+                model.parents.load().then((models) => {
                     assert.equal(models.length, 1);
                     let model = models[0];
                     assert.ok(model instanceof Parent);
@@ -109,7 +109,7 @@ describe('Viking.Record::associations', () => {
                 parents.forEach((m) => { assert.equal(m.readAttribute('model_id'), 13); });
                 assert.ok(model._associations.parents.loaded);
                 assert.deepStrictEqual(model._associations.parents.target, parents);
-                assert.deepStrictEqual(await model.parents.toArray(), parents);
+                assert.deepStrictEqual(await model.parents.load(), parents);
                 assert.equal(this.requests.length, 0);
             });
 
@@ -332,7 +332,7 @@ describe('Viking.Record::associations', () => {
         it("load association", function(done) {
             let model = new Child({id: 24});
 
-            model.parents.toArray().then((models) => {
+            model.parents.load().then((models) => {
                 assert.ok(models[0] instanceof Parent);
                 assert.equal(models[0].readAttribute('id'), 11);
                 assert.equal(models[0].readAttribute('name'), 'Viking');
@@ -352,7 +352,7 @@ describe('Viking.Record::associations', () => {
                 assert.equal(parent.readAttribute('offspring_id'), 24);
                 assert.ok(child._associations.parents.loaded);
                 assert.strictEqual(child._associations.parents.target[0], parent);
-                child.parents.toArray().then(models => {
+                child.parents.load().then(models => {
                     assert.strictEqual(models[0], parent);
                 }).then(done, done);
                 assert.equal(this.requests.length, 0);
@@ -369,7 +369,7 @@ describe('Viking.Record::associations', () => {
         it("load association", function(done) {
             let model = new Child({id: 24});
 
-            model.parents.toArray().then((models) => {
+            model.parents.load().then((models) => {
                 assert.ok(models[0] instanceof Parent);
                 assert.equal(models[0].readAttribute('id'), 11);
                 assert.equal(models[0].readAttribute('name'), 'Viking');
@@ -389,7 +389,7 @@ describe('Viking.Record::associations', () => {
                 assert.equal(parent.readAttribute('offspring_id'), 24);
                 assert.ok(model._associations.parents.loaded);
                 assert.strictEqual(model._associations.parents.target[0], parent);
-                model.parents.toArray().then(models => {
+                model.parents.load().then(models => {
                     assert.strictEqual(models[0], parent);
                 }).then(done, done);
                 assert.equal(this.requests.length, 0);

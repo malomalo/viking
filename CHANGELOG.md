@@ -4,6 +4,12 @@ Major Changes:
 
  - Renamed `Relation#includes` / `Record::includes` to `Relation#eagerLoad` /
    `Record::eagerLoad` (and `Relation#setIncludes` to `Relation#setEagerLoads`)
+ - Added `includes`, `some`, `every`, and `reduce` to `Relation` and
+   collection associations, proxying to the loaded records like `map`/`filter`
+ - `Relation` and collection associations are now async iterable (`for await`,
+   `Array.fromAsync`) and sync iterable once loaded (`Array.from`, spread)
+ - Removed `CollectionAssociation#toArray`; use `load()` for the live records
+   or `Array.fromAsync(association)` for a detached copy
 
 ## 0.9.0 (May 8th, 2016)
 
