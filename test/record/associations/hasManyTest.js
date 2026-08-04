@@ -387,12 +387,25 @@ describe('Viking.Record::associations', () => {
                 model.parents = [parent];
 
                 assert.equal(parent.readAttribute('offspring_id'), 24);
+                assert.equal(parent.readAttribute('offspring_type'), 'Child');
                 assert.ok(model._associations.parents.loaded);
                 assert.strictEqual(model._associations.parents.target[0], parent);
                 model.parents.load().then(models => {
                     assert.strictEqual(models[0], parent);
                 }).then(done, done);
                 assert.equal(this.requests.length, 0);
+            });
+        });
+
+        describe('removing from the association', () => {
+            it('unsets the foreign key and type', function() {
+                let model = new Child({id: 24});
+                let parent = new Parent({id: 13});
+                model.parents = [parent];
+                model.parents = [];
+
+                assert.equal(parent.readAttribute('offspring_id'), null);
+                assert.equal(parent.readAttribute('offspring_type'), null);
             });
         });
     });

@@ -13,7 +13,6 @@
 //         human: 'Parent',
 //         paramKey: 'parent',
 //         plural: 'parents',
-//         routeKey: 'parents',
 //         singular: 'parent',
 //         collection: 'parents',
 //         collectionName: 'ParentCollection',

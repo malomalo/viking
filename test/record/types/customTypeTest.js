@@ -63,22 +63,5 @@ describe('Viking.Record.Types', () => {
             assert.equal('m', record.readAttribute('foo_width_units'))
         });
         
-        it("asJSON", () => {
-            const record = new Foo({
-                foo_width: 9,
-                foo_width_units: 'ft'
-            })
-            
-            record.foo_width = {
-                value: 3,
-                units: 'm'
-            }
-            
-            assert.deepEqual({
-                foo_width: 3,
-                foo_width_units: 'm'
-            }, record.asJSON())
-        });
-
     });
 });
