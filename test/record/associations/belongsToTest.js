@@ -136,6 +136,18 @@ describe('Viking.Record::associations', () => {
                 assert.strictEqual(model.association('parent').toJSON(), null);
             });
 
+            it('asyncToJSON loads and serializes the record', function(done) {
+                let model = new Model({parent_id: 24});
+
+                model.association('parent').asyncToJSON().then((json) => {
+                    assert.deepStrictEqual(json, {id: 24, name: 'Viking'});
+                }).then(done, done);
+
+                this.withRequest('GET', '/parents', { params: {where: {id: 24}, order: {id: 'desc'}, limit: 1} }, (xhr) => {
+                    xhr.respond(200, {}, '[{"id": 24, "name": "Viking"}]');
+                });
+            });
+
             it('has a toStringTag', function() {
                 let model = new Model({parent_id: 24});
                 assert.equal(Object.prototype.toString.call(model.association('parent')), '[object BelongsToAssociation]');

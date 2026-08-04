@@ -161,6 +161,21 @@ describe('Viking.Record::associations', () => {
                 });
             });
 
+            it("asyncToJSON loads and serializes the records", function(done) {
+                let model = new Model({id: 24});
+
+                model.parents.asyncToJSON().then((json) => {
+                    assert.deepStrictEqual(json, [
+                        {id: 2, model_id: 24, name: "Viking A"},
+                        {id: 3, model_id: 24, name: "Viking B"}
+                    ]);
+                }).then(done, done);
+
+                this.withRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}} }, (xhr) => {
+                    xhr.respond(200, {}, '[{"id": 2, "name": "Viking A"},{"id": 3, "name": "Viking B"}]');
+                });
+            });
+
             it("has a toStringTag", function() {
                 let model = new Model({id: 24});
 

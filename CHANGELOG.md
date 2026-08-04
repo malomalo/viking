@@ -12,7 +12,8 @@ Major Changes:
    or `Array.fromAsync(association)` for a detached copy
  - Added `toJSON` and `Symbol.toStringTag` to `Relation` and all
    associations; `JSON.stringify` serializes the loaded record(s) and throws
-   if the association is not loaded (it previously dumped internal state)
+   if the association is not loaded (it previously dumped internal state).
+   `asyncToJSON()` loads on demand and resolves to the same output
  - Added `Record#toJSON` and `Record#[Symbol.toStringTag]`;
    `JSON.stringify(record)` emits a copy of the record's attributes instead
    of dumping internal state, and records log as `[object ModelName]`

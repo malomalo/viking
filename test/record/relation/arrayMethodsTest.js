@@ -119,6 +119,18 @@ describe('Viking.Relation', () => {
             });
         })
 
+        it('asyncToJSON loads and serializes the records', function (done) {
+            const relation = Model.where({parent_id: 11})
+
+            relation.asyncToJSON().then((json) => {
+                assert.deepStrictEqual(json, [{id: 1}, {id: 2}]);
+            }).then(done, done);
+
+            this.withRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 1}, {"id": 2}]');
+            });
+        })
+
         it('has a toStringTag', function () {
             const relation = Model.where({parent_id: 11})
 
