@@ -124,6 +124,24 @@ describe('Viking.Record::associations', () => {
             });
         });
         
+        describe('serialization', () => {
+            it('toJSON serializes the loaded record and throws when not loaded', function() {
+                let model = new Model({parent_id: 24});
+                assert.throws(() => JSON.stringify(model.association('parent')), Errors.VikingError);
+
+                model.parent = new Parent({id: 24, name: 'Viking'});
+                assert.deepStrictEqual(model.association('parent').toJSON(), {id: 24, name: 'Viking'});
+
+                model.parent = null;
+                assert.strictEqual(model.association('parent').toJSON(), null);
+            });
+
+            it('has a toStringTag', function() {
+                let model = new Model({parent_id: 24});
+                assert.equal(Object.prototype.toString.call(model.association('parent')), '[object BelongsToAssociation]');
+            });
+        });
+
         describe('include', () => {
             it('instantiating null', function(done) {
                 Model.eagerLoad('parent').find(24).then(model => {

@@ -11,6 +11,21 @@ describe('Viking.Record::associations', () => {
     }
     
     describe('hasOne(Parent)', () => {
+        describe('serialization', () => {
+            it('toJSON serializes the loaded record and throws when not loaded', function() {
+                let model = new Model({id: 24});
+                assert.throws(() => JSON.stringify(model.association('parent')), Errors.VikingError);
+
+                model.parent = new Parent({id: 1, name: 'Viking'});
+                assert.deepStrictEqual(model.association('parent').toJSON(), {id: 1, model_id: 24, name: 'Viking'});
+            });
+
+            it('has a toStringTag', function() {
+                let model = new Model({id: 24});
+                assert.equal(Object.prototype.toString.call(model.association('parent')), '[object HasOneAssociation]');
+            });
+        });
+
         it("load association", function(done) {
             let model = new Model({id: 24});
 
