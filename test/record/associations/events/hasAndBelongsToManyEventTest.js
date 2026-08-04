@@ -61,7 +61,7 @@ describe('Viking.Record::Associations', () => {
             model.association('parents').addEventListener('afterLoad', records => {
                 assert.equal(records[0].readAttribute('id'), 2)
             })
-            model.parents.toArray().then(x => done(), x => done());
+            model.parents.load().then(x => done(), x => done());
             this.withRequest('GET', '/parents', { params: {where: {models_parents:{model_id: 24}}, order: {id: 'desc'} }}, (xhr) => {
                 xhr.respond(200, {}, '[{"id": 2, "name": "Viking"}]');
             });

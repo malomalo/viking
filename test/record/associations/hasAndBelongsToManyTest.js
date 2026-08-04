@@ -16,7 +16,7 @@ describe('Viking.Record::associations', () => {
             it("load association", function(done) {
                 let model = new Model({id: 24});
 
-                model.parents.toArray().then((models) => {
+                model.parents.load().then((models) => {
                     assert.equal(models.length, 1);
                     let model = models[0];
                     assert.ok(model instanceof Parent);
@@ -53,7 +53,7 @@ describe('Viking.Record::associations', () => {
         it("reload association", function (done) {
             let model = new Model({id: 24});
             
-            model.parents.toArray().then(parents => {
+            model.parents.load().then(parents => {
                 model.association('parents').reload().then(secondLoadParents => {
                     assert.deepEqual(parents.map(x => x.cid), secondLoadParents.map(x => x.cid))
                     assert.deepEqual(['Viking 2'], secondLoadParents.map(x => x.readAttribute('name')));
@@ -79,7 +79,7 @@ describe('Viking.Record::associations', () => {
 
                 assert.ok(model._associations.parents.loaded);
                 assert.deepStrictEqual(model._associations.parents.target, parents);
-                let models = await model.parents.toArray();
+                let models = await model.parents.load();
                 assert.deepStrictEqual(models, parents);
                 assert.equal(this.requests.length, 0);
             });
@@ -241,7 +241,7 @@ describe('Viking.Record::associations', () => {
         it("load association", function(done) {
             let model = new Model({id: 24});
             
-            model.parents.toArray().then((models) => {
+            model.parents.load().then((models) => {
                 assert.equal(models.length, 1);
                 let model = models[0];
                 assert.ok(model instanceof Parent);
@@ -263,7 +263,7 @@ describe('Viking.Record::associations', () => {
         it("load association", function(done) {
             let model = new Model({id: 24});
             
-            model.parents.toArray().then((models) => {
+            model.parents.load().then((models) => {
                 assert.equal(models.length, 1);
                 let model = models[0];
                 assert.ok(model instanceof Parent);

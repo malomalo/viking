@@ -1,5 +1,6 @@
 import assert from 'assert';
 import VikingRecord from 'viking/record';
+import * as Errors from 'viking/errors';
 
 describe('Viking.Relation', () => {
 
@@ -55,6 +56,85 @@ describe('Viking.Relation', () => {
             this.withRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
                 xhr.respond(200, {}, '[{"id": 1}, {"id": 2}]');
             });
+        })
+
+        it('is async iterable', function (done) {
+            const relation = Model.where({parent_id: 11})
+
+            Array.fromAsync(relation).then((records) => {
+                assert.deepEqual(records.map(r => r.readAttribute('id')), [1, 2]);
+            }).then(done, done);
+
+            this.withRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 1}, {"id": 2}]');
+            });
+        })
+
+        it('can be async iterated more than once without re-fetching', function (done) {
+            const relation = Model.where({parent_id: 11})
+
+            // Only one request is stubbed; the first iteration loads, the
+            // second serves from the loaded target or the test would hang
+            // waiting on a second request.
+            Array.fromAsync(relation).then(async (first) => {
+                const ids = [];
+                for await (const record of relation) {
+                    ids.push(record.readAttribute('id'));
+                }
+                assert.deepEqual(ids, [1, 2]);
+            }).then(done, done);
+
+            this.withRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 1}, {"id": 2}]');
+            });
+        })
+
+        it('is sync iterable when loaded and throws when not', function (done) {
+            const relation = Model.where({parent_id: 11})
+
+            assert.throws(() => Array.from(relation), Errors.VikingError);
+
+            relation.load().then(() => {
+                assert.deepEqual(Array.from(relation).map(r => r.readAttribute('id')), [1, 2]);
+                assert.deepEqual([...relation].map(r => r.readAttribute('id')), [1, 2]);
+            }).then(done, done);
+
+            this.withRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 1}, {"id": 2}]');
+            });
+        })
+
+        it('toJSON serializes the loaded records and throws when not loaded', function (done) {
+            const relation = Model.where({parent_id: 11})
+
+            assert.throws(() => JSON.stringify(relation), Errors.VikingError);
+
+            relation.load().then(() => {
+                assert.deepStrictEqual(relation.toJSON(), [{id: 1}, {id: 2}]);
+                assert.deepStrictEqual(JSON.parse(JSON.stringify(relation)), [{id: 1}, {id: 2}]);
+            }).then(done, done);
+
+            this.withRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 1}, {"id": 2}]');
+            });
+        })
+
+        it('asyncToJSON loads and serializes the records', function (done) {
+            const relation = Model.where({parent_id: 11})
+
+            relation.asyncToJSON().then((json) => {
+                assert.deepStrictEqual(json, [{id: 1}, {id: 2}]);
+            }).then(done, done);
+
+            this.withRequest('GET', '/models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 1}, {"id": 2}]');
+            });
+        })
+
+        it('has a toStringTag', function () {
+            const relation = Model.where({parent_id: 11})
+
+            assert.equal(Object.prototype.toString.call(relation), '[object Relation]');
         })
     })
 })

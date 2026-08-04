@@ -1,7 +1,15 @@
 import assert from 'assert';
-import {toParam, toQuery} from 'viking/support/array';
+import {toParam, toQuery, toArray} from 'viking/support/array';
 
 describe('VikingSupport.Array', () => {
+
+    it('#toArray()', () => {
+        const array = [1, 2];
+        assert.strictEqual(toArray(array), array);
+        assert.deepStrictEqual(toArray(5), [5]);
+        assert.deepStrictEqual(toArray('abc'), ['abc']);
+        assert.deepStrictEqual(toArray(null), [null]);
+    });
 
     it('#toParam()', () => {
         assert.equal('2013/myString/true', toParam([2013, 'myString', true]));
