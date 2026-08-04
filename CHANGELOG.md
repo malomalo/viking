@@ -17,6 +17,12 @@ Major Changes:
  - Added `Record#toJSON` and `Record#[Symbol.toStringTag]`;
    `JSON.stringify(record)` emits a copy of the record's attributes instead
    of dumping internal state, and records log as `[object ModelName]`
+ - Collection associations are now thenable: `await model.parents` loads the
+   association and resolves to the records, mirroring `await model.parent`
+   on singular associations. Deep chaining (`model.parent.children.where(…)`)
+   still works — the association getter proxy shields chained associations
+   from promise assimilation. Note an association returned from an async
+   function or passed through a Promise resolves to its records
 
 ## 0.9.0 (May 8th, 2016)
 
