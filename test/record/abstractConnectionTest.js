@@ -1,4 +1,5 @@
 import assert from 'assert';
+import * as Errors from 'viking/errors';
 import AbstractConnection from 'viking/record/abstract-connection';
 import VikingRecord from 'viking/record';
 import Types from 'viking/record/types';
@@ -366,6 +367,53 @@ describe('Viking.Record', () => {
                 );
 
                 this.withRequest('GET', '/', {}, (xhr) => xhr.respond(422, {}, ''));
+            });
+        });
+
+        describe('transport failures', () => {
+            it('rejects a network error with NetworkError', function (done) {
+                let connection = new AbstractConnection('http://example.com');
+
+                connection.get('/').then(
+                    () => done(new Error('expected rejection')),
+                    (error) => {
+                        assert.ok(error instanceof Error);
+                        assert.ok(error instanceof Errors.NetworkError);
+                        done();
+                    }
+                );
+
+                this.withRequest('GET', '/', {}, (xhr) => xhr.error());
+            });
+
+            it('rejects an abort with AbortError', function (done) {
+                let connection = new AbstractConnection('http://example.com');
+
+                connection.get('/').then(
+                    () => done(new Error('expected rejection')),
+                    (error) => {
+                        assert.ok(error instanceof Error);
+                        assert.ok(error instanceof Errors.AbortError);
+                        done();
+                    }
+                );
+
+                this.withRequest('GET', '/', {}, (xhr) => xhr.abort());
+            });
+
+            it('rejects a timeout with TimeoutError', function (done) {
+                let connection = new AbstractConnection('http://example.com');
+
+                connection.get('/').then(
+                    () => done(new Error('expected rejection')),
+                    (error) => {
+                        assert.ok(error instanceof Error);
+                        assert.ok(error instanceof Errors.TimeoutError);
+                        done();
+                    }
+                );
+
+                this.withRequest('GET', '/', {}, (xhr) => xhr.triggerTimeout());
             });
         });
 
