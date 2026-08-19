@@ -169,8 +169,36 @@ describe('Viking.Record#callbacks', () => {
                 xhr.respond(201, {}, '{"id": 1, "name": "Jon"}');
             });
         })
+
+        // Guards the scope of the sent-values snapshot in the save success
+        // handler: clearing change tracking is limited to the attributes this
+        // request carried. An edit to a *different* attribute made while the
+        // save is in flight must survive — it was never sent, so the response
+        // must not clear it. (Uses a callback-free record so the score-mutating
+        // callbacks above don't interfere.)
+        it('preserves an edit to a different attribute made during an in-flight save', function (done) {
+            class Doc extends Record {
+                static schema = { name: {type: 'string'}, score: {type: 'integer'} }
+            }
+            const doc = Doc.instantiate({id: 1, name: 'Ben', score: 1})
+
+            doc.setAttribute('name', 'Jon')
+            const first = doc.save()
+
+            doc.setAttribute('score', 5) // different attribute, edited mid-flight
+
+            first.then(() => {
+                assert.equal(doc.readAttribute('name'), 'Jon')
+                assert.equal(doc.readAttribute('score'), 5)
+                assert.deepEqual(doc.changes(), { score: [1, 5] })
+            }).then(done, done)
+
+            this.withRequest('PUT', '/docs/1', { body: { doc: { name: 'Jon' } } }, (xhr) => {
+                xhr.respond(201, {}, '{"id": 1, "name": "Jon"}')
+            });
+        })
     })
-    
+
     describe('destroy', async () => {
         let beforeDestroyFlag = false;
         let afterDestroyFlag = false;
