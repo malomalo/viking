@@ -190,11 +190,11 @@ describe('Viking.Record#callbacks', () => {
             first.then(() => {
                 assert.equal(doc.readAttribute('name'), 'Jon')
                 assert.equal(doc.readAttribute('score'), 5)
-                assert.deepEqual(doc.changes(), { score: [1, 5] })
+                assert.deepEqual(doc.changes(), { score: [2, 5] })
             }).then(done, done)
 
             this.withRequest('PUT', '/docs/1', { body: { doc: { name: 'Jon' } } }, (xhr) => {
-                xhr.respond(201, {}, '{"id": 1, "name": "Jon"}')
+                xhr.respond(201, {}, '{"id": 1, "name": "Jon", "score": 2}')
             });
         })
     })
