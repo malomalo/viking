@@ -42,6 +42,52 @@ describe('Viking.Record HasManyAssociation autosave', () => {
             });
         });
         
+        it('a save queued behind another does not resubmit a just-created child', function (done) {
+            // Regression: a second save issued before the first responds used
+            // to freeze its request body up front, so it resubmitted the new
+            // child without the id the first save assigned it — the server
+            // rejected the duplicate. The queued save must build its body only
+            // after the first lands, by which point the child is persisted and
+            // no longer part of the payload.
+            let model = Requirement.instantiate({id: 24});
+            let phase = new Phase({ name: 'Tom' });
+
+            let phaseCreates = 0;
+
+            this.onRequest('PUT', '/requirements/24', { body: {
+                requirement: { phases: [{ name: 'Tom' }] }
+            }}, (xhr) => {
+                phaseCreates++;
+                xhr.respond(201, {}, '{"id": 24, "phases": [{"id": "11", "name": "Tom", "requirement_id": 24}]}');
+            });
+
+            this.onRequest('PUT', '/requirements/24', { body: {
+                requirement: { reference: 'R-2' }
+            }}, (xhr) => {
+                xhr.respond(201, {}, '{"id": 24, "reference": "R-2"}');
+            });
+
+            model.phases.push(phase).then(() => {
+                const first = model.save();
+                model.setAttribute('reference', 'R-2');
+                const second = model.save();
+
+                Promise.all([first, second]).then(() => {
+                    assert.ok(phase.isPersisted());
+                    assert.equal(phase.readAttribute('id'), 11);
+                    assert.equal(phaseCreates, 1);
+                    assert.ok(!model.association('phases').needsSaved());
+                }).then(done, done);
+            });
+
+            this.onRequest('GET', '/phases', { params: {
+                where: { requirement_id: 24 },
+                order: { id: 'desc'}
+            }}, (xhr) => {
+                xhr.respond(201, {}, '[]');
+            });
+        });
+
         it('updates the subresource', function (done) {
             let model = Requirement.instantiate({id: 24, phases: [{ id: 11, name: 'Tom' }]});
             let phase = model.phases.first();

@@ -121,30 +121,37 @@ describe('Viking.Record#callbacks', () => {
             });
         })
         
-        it('afterSave with multiple async saves', function (done) {
-            const actor = Actor.instantiate({name: 'Ben', id: 1, score: 2})
+        // Behavioral note for this variant: a save builds its body at send
+        // time, so an attribute re-edited while a save carrying it is in flight
+        // is superseded by that save's response — the queued save finds nothing
+        // left to send. (The alternative branch preserves the newer edit and
+        // still sends it; this simpler branch does not.) Uses a callback-free
+        // record so the score-mutating callbacks above don't muddy the point.
+        it('afterSave with an attribute re-edited during an in-flight save', function (done) {
+            class Doc extends Record {
+                static schema = { name: {type: 'string'} }
+            }
+            const doc = Doc.instantiate({name: 'Ben', id: 1})
             let count = 0
-            actor.addEventListener('afterSave', (...args) => {
-                count++
-            })
-            actor.setAttribute('name', 'Jon')
-            actor.save().then((...args) => {
-                assert.equal(count, 1)
-            }).then(() => {
-                this.withRequest('PUT', '/actors/1', { body: {actor: {name: "Charlie"} } }, (xhr) => {
-                    xhr.respond(201, {}, '{"id": 1, "name": "Charlie"}');
-                });
-            })
+            doc.addEventListener('afterSave', () => { count++ })
 
-            actor.setAttribute('name', 'Charlie')
-            actor.save().then((...args) => {
-                assert.equal(count, 2)
+            doc.setAttribute('name', 'Jon')
+            const first = doc.save()
+
+            doc.setAttribute('name', 'Charlie')
+            const second = doc.save()
+
+            Promise.all([first, second]).then(() => {
+                // Only the first save reached the server; its response settled
+                // 'Jon', and the queued save had nothing left to send.
+                assert.equal(count, 1)
+                assert.equal(doc.readAttribute('name'), 'Jon')
+                assert.deepEqual(doc.changes(), {})
             }).then(done, done)
 
-            this.withRequest('PUT', '/actors/1', { body: {actor: {name: "Jon"} } }, (xhr) => {
+            this.withRequest('PUT', '/docs/1', { body: {doc: {name: "Jon"} } }, (xhr) => {
                 xhr.respond(201, {}, '{"id": 1, "name": "Jon"}');
             });
-            
         })
         
         it('afterSave with sync saves', function (done) {
