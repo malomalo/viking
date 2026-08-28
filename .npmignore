@@ -1,8 +1,12 @@
+lib/
+site/
+.eslintrc
+.tm_properties
+.travis.yml
+docco.css
+logo.jpg
+TODO.md
 test/
-Rakefile
 docs/
-raw/
 out/
 examples/
-index.html
-.jshintrc
