@@ -1,7 +1,7 @@
 import assert from 'assert';
 import FloatType from 'viking/model/types/float';
 
-describe('Viking.Record.Types', () => {
+describe('Viking.Model.Types', () => {
     describe('Float', () => {
 
         it("::load coerces number to number", () => {

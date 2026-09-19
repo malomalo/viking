@@ -1,8 +1,8 @@
 import assert from 'assert';
-import VikingRecord from 'viking/record';
+import VikingModel from 'viking/model';
 
-describe('Viking.Record#setAttributes', () => {
-    class Model extends VikingRecord {
+describe('Viking.Model#setAttributes', () => {
+    class Model extends VikingModel {
         static schema = {
             key:        {type: 'integer', array: true},
             date:       {type: 'date'},
@@ -191,14 +191,14 @@ describe('Viking.Record#setAttributes', () => {
     })
 
     it('set an empty string', () => {
-        let model = new VikingRecord({name: 'Model'});
+        let model = new VikingModel({name: 'Model'});
         model.setAttributes({name: ''});
         assert.equal(model.readAttribute('name'), '');
     });
 
     it('setting an object', () => {
         let counter = 0;
-        let model = new VikingRecord({
+        let model = new VikingModel({
             custom: {foo: 1}
         });
 
@@ -213,7 +213,7 @@ describe('Viking.Record#setAttributes', () => {
     });
 
     it('set and unset', () => {
-        let a = new VikingRecord({id: 'id', foo: 1, bar: 2, baz: 3});
+        let a = new VikingModel({id: 'id', foo: 1, bar: 2, baz: 3});
         let changeCount = 0;
         a.addEventListener('changed:foo', () => { changeCount += 1; });
         a.setAttributes({foo: 2});

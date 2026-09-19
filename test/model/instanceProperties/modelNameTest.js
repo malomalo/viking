@@ -1,7 +1,7 @@
 import assert from 'assert';
-import Model from 'viking/record';
+import Model from 'viking/model';
 
-describe('Viking.Record#modelName', () => {
+describe('Viking.Model#modelName', () => {
 
     it('is set on instantiation', () => {
         class MyModel extends Model { }

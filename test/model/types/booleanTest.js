@@ -1,7 +1,7 @@
 import assert from 'assert';
 import BooleanType from 'viking/model/types/boolean';
 
-describe('Viking.Record.Types', () => {
+describe('Viking.Model.Types', () => {
     describe('Boolean', () => {
 
         it("::load coerces the string 'true' to true", function() {

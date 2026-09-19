@@ -1,8 +1,8 @@
 import assert from 'assert';
-import VikingRecord from 'viking/record';
+import Model from 'viking/model';
 
-describe('Viking.Record#[Symbol.toStringTag]', () => {
-    class Ship extends VikingRecord { }
+describe('Viking.Model#[Symbol.toStringTag]', () => {
+    class Ship extends Model { }
 
     it('reports the model class name', () => {
         assert.equal(Object.prototype.toString.call(new Ship()), '[object Ship]');

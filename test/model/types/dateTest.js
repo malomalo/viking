@@ -1,7 +1,7 @@
 import assert from 'assert';
 import DateType from 'viking/model/types/date';
 
-describe('Viking.Record.Types', () => {
+describe('Viking.Model.Types', () => {
     describe('Date', () => {
 
         it("::load thows error when can't coerce value", function() {

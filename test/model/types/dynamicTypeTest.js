@@ -1,11 +1,11 @@
 import assert from 'assert';
-import Record from 'viking/record';
+import Model from 'viking/model';
 
-describe('Viking.Record.Types', () => {
+describe('Viking.Model.Types', () => {
     
     describe('custom', () => {
     
-        class Foo extends Record {
+        class Foo extends Model {
             static schema = {
                 value: {
                     type: (attributes, record={}) => {
