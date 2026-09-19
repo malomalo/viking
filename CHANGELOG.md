@@ -2,6 +2,17 @@
 
 Major Changes:
 
+ - Extracted in-memory attribute handling into a new `Model` base class, which
+   `Record` now extends. `Model` provides schema-typed attribute accessors, type
+   coercion, default values, dirty/change tracking, and model naming (`modelName`,
+   `baseClass`, single-table inheritance) — everything a memory-level data object
+   needs without querying or persistence. Associations, querying, and persistence
+   remain `Record` features.
+ - Moved the attribute type system and model naming from `viking/record/*` to
+   `viking/model/*`: `viking/model/name`, `viking/model/type`, `viking/model/types`
+   (and `viking/model/types/*`). The old `viking/record/*` paths still work via
+   re-export shims that emit a one-time deprecation warning and will be removed in
+   a future release.
  - Renamed `Relation#includes` / `Record::includes` to `Relation#eagerLoad` /
    `Record::eagerLoad` (and `Relation#setIncludes` to `Relation#setEagerLoads`)
  - Added `includes`, `some`, `every`, and `reduce` to `Relation` and
@@ -14,7 +25,7 @@ Major Changes:
    associations; `JSON.stringify` serializes the loaded record(s) and throws
    if the association is not loaded (it previously dumped internal state).
    `asyncToJSON()` loads on demand and resolves to the same output
- - Added `Record#toJSON` and `Record#[Symbol.toStringTag]`;
+ - Added `Model#toJSON` and `Model#[Symbol.toStringTag]` (inherited by `Record`);
    `JSON.stringify(record)` emits a copy of the record's attributes instead
    of dumping internal state, and records log as `[object ModelName]`
 
