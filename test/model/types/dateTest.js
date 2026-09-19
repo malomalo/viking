@@ -1,5 +1,5 @@
 import assert from 'assert';
-import DateType from 'viking/record/types/date';
+import DateType from 'viking/model/types/date';
 
 describe('Viking.Record.Types', () => {
     describe('Date', () => {

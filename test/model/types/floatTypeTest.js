@@ -1,5 +1,5 @@
 import assert from 'assert';
-import FloatType from 'viking/record/types/float';
+import FloatType from 'viking/model/types/float';
 
 describe('Viking.Record.Types', () => {
     describe('Float', () => {

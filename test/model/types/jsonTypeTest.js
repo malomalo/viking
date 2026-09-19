@@ -1,5 +1,5 @@
 import assert from 'assert';
-import JSONType from 'viking/record/types/json';
+import JSONType from 'viking/model/types/json';
 import Record from 'viking/record';
 
 describe('Viking.Record.Types', () => {

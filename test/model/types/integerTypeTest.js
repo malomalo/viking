@@ -1,5 +1,5 @@
 import assert from 'assert';
-import IntegerType from 'viking/record/types/integer';
+import IntegerType from 'viking/model/types/integer';
 
 describe('Viking.Record.Types', () => {
     describe('Integer', () => {

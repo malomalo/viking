@@ -1,5 +1,5 @@
 import assert from 'assert';
-import BooleanType from 'viking/record/types/boolean';
+import BooleanType from 'viking/model/types/boolean';
 
 describe('Viking.Record.Types', () => {
     describe('Boolean', () => {

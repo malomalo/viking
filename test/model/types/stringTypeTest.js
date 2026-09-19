@@ -1,5 +1,5 @@
 import assert from 'assert';
-import StringType from 'viking/record/types/string';
+import StringType from 'viking/model/types/string';
 
 describe('Viking.Record.Types', () => {
     describe('String', () => {
