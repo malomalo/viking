@@ -135,6 +135,38 @@ describe('Viking.Model', () => {
         });
     });
 
+    describe('construction hooks', () => {
+        it('declareProperties runs before attributes are applied', () => {
+            let attributesAtDeclare;
+            class Foo extends Model {
+                static schema = { name: {type: 'string'} };
+                declareProperties() { attributesAtDeclare = {...this.attributes}; }
+            }
+            new Foo({name: 'Rod'});
+            assert.deepEqual(attributesAtDeclare, {});
+        });
+
+        it('initialize runs after attributes are applied', () => {
+            let nameAtInitialize;
+            class Foo extends Model {
+                static schema = { name: {type: 'string'} };
+                initialize() { nameAtInitialize = this.name; }
+            }
+            new Foo({name: 'Rod'});
+            assert.equal(nameAtInitialize, 'Rod');
+        });
+
+        it('initialize overrides need not call super', () => {
+            class Foo extends Model {
+                static schema = { name: {type: 'string'} };
+                initialize() { this.ready = true; }
+            }
+            const foo = new Foo({name: 'Rod'});
+            assert.equal(foo.ready, true);
+            assert.equal(foo.name, 'Rod');
+        });
+    });
+
     describe('is not a Record', () => {
         it('has no persistence or association API', () => {
             let model = new Actor();
