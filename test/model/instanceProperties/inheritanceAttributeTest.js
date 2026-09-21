@@ -1,10 +1,10 @@
 import assert from 'assert';
-import VikingRecord from 'viking/record';
+import Model from 'viking/model';
 
-describe('Viking.Record#inheritanceAttribute', () => {
+describe('Viking.Model#inheritanceAttribute', () => {
 
     it("default to `type`", () => {
-        class Ship extends VikingRecord {
+        class Ship extends Model {
             static schema = {
                 type: {type: 'string'}
             }
@@ -20,7 +20,7 @@ describe('Viking.Record#inheritanceAttribute', () => {
     });
 
     it("override", () => {
-        class Ship extends VikingRecord {
+        class Ship extends Model {
             static inheritanceAttribute = 'class_name';
         }
         let ship = new Ship();

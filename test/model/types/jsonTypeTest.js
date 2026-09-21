@@ -1,16 +1,24 @@
 import assert from 'assert';
-import JSONType from 'viking/record/types/json';
-import Record from 'viking/record';
+import JSONType from 'viking/model/types/json';
+import Model from 'viking/model';
 
-describe('Viking.Record.Types', () => {
+describe('Viking.Model.Types', () => {
     describe('JSON', () => {
-        class Actor extends Record {
+        class Actor extends Model {
             static schema = {
                 preferences: {type: "json", default: {}}
             }
         }
+
+        // A Model is never saved, so it has no `persist()`. Build the model and
+        // clear `_changes` to treat the given attributes as the clean baseline.
+        const persisted = (attributes) => {
+            const model = new Actor(attributes);
+            model._changes = {};
+            return model;
+        };
         
-        it("coerces {} to Viking.Record", () => {
+        it("coerces {} to Viking.Model", () => {
             let model = new Actor({preferences: {}})
             assert.deepEqual(model.preferences, {});
             
@@ -48,7 +56,7 @@ describe('Viking.Record.Types', () => {
         describe("changes", () => {
 
             it("first level key", () => {
-                let model = new Actor({preferences: {fruit: 'apple', water: 'still'}}).persist()
+                let model = persisted({preferences: {fruit: 'apple', water: 'still'}})
 
                 model.preferences.fruit = 'orange'
                 assert.deepEqual(model.changes(), {
@@ -63,7 +71,7 @@ describe('Viking.Record.Types', () => {
             })
             
             it("low level key", () => {
-                const model = new Actor({preferences: {fruit: {green_room: 'apple'}, water: 'still'}}).persist()
+                const model = persisted({preferences: {fruit: {green_room: 'apple'}, water: 'still'}})
 
                 model.preferences.fruit.green_room = 'orange'
                 assert.deepEqual(model.changes(), {
@@ -78,7 +86,7 @@ describe('Viking.Record.Types', () => {
             })
   
             it("array", () => {
-                let model = new Actor({preferences: {fruit: 'apple', agents: ["Rod", "Jerry"]}}).persist()
+                let model = persisted({preferences: {fruit: 'apple', agents: ["Rod", "Jerry"]}})
 
                 model.preferences.agents = ["Rod", "Jerry", "Kim"]
                 assert.deepEqual(model.changes(), {
@@ -91,7 +99,7 @@ describe('Viking.Record.Types', () => {
                 model.preferences.agents = ["Rod", "Jerry"]
                 assert.deepEqual(model.changes(), {});
 
-                model = new Actor({preferences: {
+                model = persisted({preferences: {
                     agents: [{
                         name: "Jerry",
                         region: "CA"
@@ -99,7 +107,7 @@ describe('Viking.Record.Types', () => {
                         name: "Rod",
                         region: "TX"
                     }]
-                }}).persist()
+                }})
 
                 const agent = model.preferences.agents.find(x => x.name == "Jerry")
                 agent.region = "CA,WA"
@@ -137,13 +145,13 @@ describe('Viking.Record.Types', () => {
         
         describe('clone', () => {
             it('initiates new references', () => {
-                let model = new Actor({preferences: {fruit: 'apple', water: 'still'}}).persist()
+                let model = persisted({preferences: {fruit: 'apple', water: 'still'}})
                 let clone = model.clone()
                 
                 clone.preferences.fruit = 'orange'
                 assert.equal(model.preferences.fruit, 'apple')
                 
-                model = new Actor({preferences: {fruit: {green_room: 'apple'}, water: 'still'}}).persist()
+                model = persisted({preferences: {fruit: {green_room: 'apple'}, water: 'still'}})
                 clone = model.clone()
                 clone.preferences.fruit.green_room = 'orange'
                 assert.equal(model.preferences.fruit.green_room, 'apple')

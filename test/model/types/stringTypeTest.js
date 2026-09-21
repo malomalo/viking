@@ -1,7 +1,7 @@
 import assert from 'assert';
-import StringType from 'viking/record/types/string';
+import StringType from 'viking/model/types/string';
 
-describe('Viking.Record.Types', () => {
+describe('Viking.Model.Types', () => {
     describe('String', () => {
 
         it("::load coerces boolean to string", function() {

@@ -1,10 +1,10 @@
 import assert from 'assert';
-import VikingRecord from 'viking/record';
+import Model from 'viking/model';
 
-describe('Viking.Record#hasAttribute', () => {
+describe('Viking.Model#hasAttribute', () => {
 
     it('hasAttribute', () => {
-        let model = new VikingRecord();
+        let model = new Model();
 
         assert.strictEqual(model.hasAttribute('name'), false);
 

@@ -1,10 +1,10 @@
 import assert from 'assert';
-import JSONType from 'viking/record/types/json';
-import Record from 'viking/record';
-import Types from 'viking/record/types';
-import Type from 'viking/record/type';
+import JSONType from 'viking/model/types/json';
+import Model from 'viking/model';
+import Types from 'viking/model/types';
+import Type from 'viking/model/type';
 
-describe('Viking.Record.Types', () => {
+describe('Viking.Model.Types', () => {
     
     describe('custom', () => {
         
@@ -30,7 +30,7 @@ describe('Viking.Record.Types', () => {
             }
         }
     
-        class Foo extends Record {
+        class Foo extends Model {
             static schema = {
                 foo_width: {type: 'length', units_key: 'foo_width_units'}
             }

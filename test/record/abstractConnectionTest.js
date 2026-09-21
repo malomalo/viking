@@ -2,8 +2,8 @@ import assert from 'assert';
 import * as Errors from 'viking/errors';
 import AbstractConnection from 'viking/record/abstract-connection';
 import VikingRecord from 'viking/record';
-import Types from 'viking/record/types';
-import Type from 'viking/record/type';
+import Types from 'viking/model/types';
+import Type from 'viking/model/type';
 
 describe('Viking.Record', () => {
     describe('AbstractConnection', () => {

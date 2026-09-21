@@ -1,17 +1,17 @@
 import assert from 'assert';
-import VikingRecord from 'viking/record';
+import Model from 'viking/model';
 
-describe('Viking.Record#baseClass', () => {
+describe('Viking.Model#baseClass', () => {
 
-    it("return self when extending Viking.Record", () => {
-        class Ship extends VikingRecord { }
+    it("return self when extending Viking.Model", () => {
+        class Ship extends Model { }
         let ship = new Ship();
 
         assert.strictEqual(Ship, ship.baseClass);
     });
 
-    it("returns self when extending an abstract Viking.Record", () => {
-        class RussianShip extends VikingRecord {
+    it("returns self when extending an abstract Viking.Model", () => {
+        class RussianShip extends Model {
             static abstract = true;
         }
         class Ship extends RussianShip { }
@@ -21,7 +21,7 @@ describe('Viking.Record#baseClass', () => {
     });
 
     it("returns the parent Model when extending after extending that Model", () => {
-        class Ship extends VikingRecord { }
+        class Ship extends Model { }
         class Carrier extends Ship { }
         let carrier = new Carrier();
 
