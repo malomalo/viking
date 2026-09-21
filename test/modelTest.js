@@ -167,6 +167,33 @@ describe('Viking.Model', () => {
         });
     });
 
+    describe('collections', () => {
+        it('is an empty set by default', () => {
+            let model = new Actor();
+            assert.strictEqual(model.collections.size, 0);
+        });
+
+        it('notifies added collection-like objects of changes', () => {
+            let changed = [];
+            let changedName = [];
+            const collection = {
+                dispatchEvent(event, record, ...args) {
+                    if (event === 'record:changed') changed.push(args[0]);
+                    if (event === 'record:changed:name') changedName.push(args);
+                }
+            };
+
+            let model = new Actor({name: 'Rod'});
+            model._changes = {};
+            model.collections.add(collection);
+
+            model.setAttribute('name', 'Andy');
+
+            assert.deepEqual(changed, [{name: ['Rod', 'Andy']}]);
+            assert.deepEqual(changedName, [['Rod', 'Andy']]);
+        });
+    });
+
     describe('is not a Record', () => {
         it('has no persistence or association API', () => {
             let model = new Actor();
