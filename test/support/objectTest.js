@@ -23,9 +23,19 @@ describe('VikingSupport.Object', () => {
         assert.equal('1=2013&2=myString&3=true&4&5=false', toParam({1: 2013, 2: 'myString', 3: true, 4: null, 5: false}));
     });
 
-    it('#toParam(namespace)', () => {
+    it('#toParam({namespace})', () => {
         assert.equal('namespace%5B1%5D=2013&namespace%5B2%5D=myString&namespace%5B3%5D=true&namespace%5B4%5D&namespace%5B5%5D=false',
-              toParam({1: 2013, 2: 'myString', 3: true, 4: null, 5: false}, 'namespace'));
+              toParam({1: 2013, 2: 'myString', 3: true, 4: null, 5: false}, {namespace: 'namespace'}));
+    });
+
+    it('#toParam({removeBlanks})', () => {
+        assert.equal('a=included',
+              toParam({a: 'included', b: ''}, {removeBlanks: true}));
+    });
+
+    it('#toParam({namespace, removeBlanks})', () => {
+        assert.equal('ns%5Ba%5D=included',
+              toParam({a: 'included', b: null, c: ''}, {namespace: 'ns', removeBlanks: true}));
     });
 
     it('#toQuery is an alias for #toParam', () => {

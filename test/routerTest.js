@@ -366,7 +366,34 @@ describe('Viking.Router', () => {
         this.router.navigateTo('/projects_with_nested_params', {nest: {counter: 2}})
         this.router.navigateTo('/projects_with_array_params', {ids: [1 ,2]})
     })
-    
+
+    it('setSearch sets the current URL query string', function () {
+        this.router = new VikingRouter();
+
+        this.router.setSearch({counter: 2});
+
+        assert.equal(this.router.getSearch(), '?counter=2');
+    });
+
+    it('setSearch replaces rather than appends to an existing query string', function () {
+        this.router = new VikingRouter();
+
+        this.router.setSearch({counter: 2});
+        this.router.setSearch({page: 3});
+
+        assert.equal(this.router.getSearch(), '?page=3');
+    });
+
+    it('setSearch passes options through to toParam', function () {
+        this.router = new VikingRouter();
+
+        this.router.setSearch({counter: 2, blank: ''}, {removeBlanks: true});
+        assert.equal(this.router.getSearch(), '?counter=2');
+
+        this.router.setSearch({counter: 2}, {namespace: 'filter'});
+        assert.equal(this.router.getSearch(), '?filter%5Bcounter%5D=2');
+    });
+
     describe('events', function () {
         it('beforeNavigation', function (done) {
             let counter = 0;
