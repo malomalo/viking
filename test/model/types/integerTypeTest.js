@@ -1,7 +1,7 @@
 import assert from 'assert';
-import IntegerType from 'viking/record/types/integer';
+import IntegerType from 'viking/model/types/integer';
 
-describe('Viking.Record.Types', () => {
+describe('Viking.Model.Types', () => {
     describe('Integer', () => {
 
         it("::load coerces number to number", () => {

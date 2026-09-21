@@ -1,16 +1,16 @@
 import assert from 'assert';
-import VikingRecord from 'viking/record';
+import Model from 'viking/model';
 
-describe('Viking.Record::inheritanceAttribute', () => {
+describe('Viking.Model::inheritanceAttribute', () => {
 
     it("defaults to `type`", () => {
-        class Ship extends VikingRecord { }
+        class Ship extends Model { }
 
         assert.equal('type', Ship.inheritanceAttribute);
     });
 
     it("explictly set the inheritanceAttribute", () => {
-        class Ship extends VikingRecord {
+        class Ship extends Model {
             static inheritanceAttribute = 'class_name';
         }
 
@@ -18,7 +18,7 @@ describe('Viking.Record::inheritanceAttribute', () => {
     });
 
     it("set inheritanceAttribute to false to disable STI", () => {
-        class Ship extends VikingRecord {
+        class Ship extends Model {
             static inheritanceAttribute = false;
         }
         class Battleship extends Ship { }

@@ -94,9 +94,9 @@ describe('Viking.Record::associations', () => {
                 );
             });
             
-            it('setAttributesAndAssociations with habtm association', async function() {
+            it('setAttributes with habtm association', async function() {
                 let model = new Model({id: 13});
-                model.setAttributesAndAssociations({parents: [{id: 1}, {id: 2}]})
+                model.setAttributes({parents: [{id: 1}, {id: 2}]})
             
                 assert.ok(model._associations.parents.loaded);
                 assert.deepStrictEqual(
