@@ -384,12 +384,14 @@ describe('Viking.Router', () => {
         assert.equal(this.router.getSearch(), '?page=3');
     });
 
-    it('setSearch passes extra args through to toParam', function () {
+    it('setSearch passes options through to toParam', function () {
         this.router = new VikingRouter();
 
-        this.router.setSearch({counter: 2, blank: ''}, null, {removeBlanks: true});
-
+        this.router.setSearch({counter: 2, blank: ''}, {removeBlanks: true});
         assert.equal(this.router.getSearch(), '?counter=2');
+
+        this.router.setSearch({counter: 2}, {namespace: 'filter'});
+        assert.equal(this.router.getSearch(), '?filter%5Bcounter%5D=2');
     });
 
     describe('events', function () {
