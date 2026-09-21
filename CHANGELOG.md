@@ -8,6 +8,9 @@ Major Changes:
    `baseClass`, single-table inheritance) — everything a memory-level data object
    needs without querying or persistence. Associations, querying, and persistence
    remain `Record` features.
+ - Removed `Record#setAttributesAndAssociations`; `Record#setAttributes` now
+   routes association keys to their associations (in addition to plain
+   attributes), so call `setAttributes` instead.
  - Moved the attribute type system and model naming from `viking/record/*` to
    `viking/model/*`: `viking/model/name`, `viking/model/type`, `viking/model/types`
    (and `viking/model/types/*`). This is a breaking change to those import paths;
