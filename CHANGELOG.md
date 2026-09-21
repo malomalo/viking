@@ -8,6 +8,9 @@ Major Changes:
    `baseClass`, single-table inheritance) — everything a memory-level data object
    needs without querying or persistence. Associations, querying, and persistence
    remain `Record` features.
+ - Added `Model#flushChanges`, which clears tracked changes and returns the model,
+   marking the current attributes as the clean baseline. `Record#persist` builds
+   on it (then flips `_new_record`).
  - Removed `Record#setAttributesAndAssociations`; `Record#setAttributes` now
    routes association keys to their associations (in addition to plain
    attributes), so call `setAttributes` instead.

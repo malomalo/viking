@@ -70,18 +70,26 @@ describe('Viking.Model', () => {
 
         it('setting an attribute back to its baseline clears the change', () => {
             let model = new Actor({name: 'Rod'});
-            model._changes = {}; // simulate a clean baseline
+            model.flushChanges(); // clean baseline
             model.setAttribute('name', 'Andy');
             assert.deepEqual(model.changes(), {name: ['Rod', 'Andy']});
             model.setAttribute('name', 'Rod');
             assert.deepEqual(model.changes(), {});
+        });
+
+        it('#flushChanges clears tracked changes and returns this', () => {
+            let model = new Actor({name: 'Rod', age: 30});
+            assert.strictEqual(model.hasChanged(), true);
+            assert.strictEqual(model.flushChanges(), model);
+            assert.deepEqual(model.changes(), {});
+            assert.strictEqual(model.hasChanged(), false);
         });
     });
 
     describe('events', () => {
         it('fires changed and changed:{attribute}', () => {
             let model = new Actor({name: 'Rod'});
-            model._changes = {};
+            model.flushChanges();
 
             let changed = [];
             let changedName = [];
@@ -184,7 +192,7 @@ describe('Viking.Model', () => {
             };
 
             let model = new Actor({name: 'Rod'});
-            model._changes = {};
+            model.flushChanges();
             model.collections.add(collection);
 
             model.setAttribute('name', 'Andy');

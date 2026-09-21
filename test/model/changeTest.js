@@ -12,17 +12,11 @@ describe('Viking.Model', () => {
         }
     }
 
-    // A Model is never saved, so it has no `persist()`. Clearing `_changes`
-    // marks the current attributes as the clean baseline — the in-memory
-    // equivalent of a freshly-loaded record — which is all these tests need in
-    // order to exercise change tracking from a known starting point.
-    const baseline = (model) => { model._changes = {}; };
-
     it('#changes()', () => {
         let model = new Actor({name: 'Rod Kimbal', age: 30});
         assert.deepEqual(model.changes(), { name: [null, 'Rod Kimbal'], age: [null, 30], preferences: [null, {}] });
 
-        baseline(model);
+        model.flushChanges();
         assert.deepEqual(model.changes(), {});
 
         model.setAttribute('name', 'Andy Sanberg');
@@ -49,7 +43,7 @@ describe('Viking.Model', () => {
             ]
         });
 
-        baseline(model);
+        model.flushChanges();
         model.preferences = {green_room: true, red_room: false};
         assert.deepEqual(model.changes(), {
             preferences: [
@@ -58,7 +52,7 @@ describe('Viking.Model', () => {
             ]
         });
 
-        baseline(model);
+        model.flushChanges();
         model.preferences = {green_room: true, red_room: true};
         assert.deepEqual(model.changes(), {
             preferences: [
@@ -68,7 +62,7 @@ describe('Viking.Model', () => {
         });
 
         model.preferences = [{foo: 'bar'}]
-        baseline(model)
+        model.flushChanges()
         model.preferences = [{
             foo: 'echo'
         }]
@@ -83,7 +77,7 @@ describe('Viking.Model', () => {
 
     it('#changedAttributes()', () => {
         let model = new Actor({name: 'Time', age: 30});
-        baseline(model);
+        model.flushChanges();
 
         assert.equal(model.hasChanged(), false);
 
@@ -100,7 +94,7 @@ describe('Viking.Model', () => {
 
     it('#hasChanged()', () => {
         let model = new Actor({name: 'Time', age: 30});
-        baseline(model);
+        model.flushChanges();
 
         assert.equal(model.hasChanged(), false);
 
@@ -113,7 +107,7 @@ describe('Viking.Model', () => {
 
     it('#hasChanged(attributeName)', () => {
         let model = new Actor({name: 'Time', age: 30});
-        baseline(model);
+        model.flushChanges();
         model.setAttributes({age: 28});
 
         assert.equal(model.hasChanged('name'), false);
