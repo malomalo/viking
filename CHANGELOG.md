@@ -10,9 +10,8 @@ Major Changes:
    remain `Record` features.
  - Moved the attribute type system and model naming from `viking/record/*` to
    `viking/model/*`: `viking/model/name`, `viking/model/type`, `viking/model/types`
-   (and `viking/model/types/*`). The old `viking/record/*` paths still work via
-   re-export shims that emit a one-time deprecation warning and will be removed in
-   a future release.
+   (and `viking/model/types/*`). This is a breaking change to those import paths;
+   update imports from `viking/record/*` to `viking/model/*`.
  - Renamed `Relation#includes` / `Record::includes` to `Relation#eagerLoad` /
    `Record::eagerLoad` (and `Relation#setIncludes` to `Relation#setEagerLoads`)
  - Added `includes`, `some`, `every`, and `reduce` to `Relation` and
