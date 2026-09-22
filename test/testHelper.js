@@ -133,6 +133,7 @@ after(function () {
 
 beforeEach(function () {
     this.requests = [];
+    this.requestCallbacks = [];
 });
 
 global.createElement = (tag, content) => {
