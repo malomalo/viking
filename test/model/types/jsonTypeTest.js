@@ -131,7 +131,7 @@ describe('Viking.Model.Types', () => {
             })
 
             it("array.push", () => {
-                const model = new Actor({preferences: {agents: ["Rod", "Jerry"]}}).persist()
+                const model = new Actor({preferences: {agents: ["Rod", "Jerry"]}}).flushChanges()
 
                 model.preferences.agents.push("Kim")
                 assert.deepEqual(model.changes(), {
@@ -146,7 +146,7 @@ describe('Viking.Model.Types', () => {
             })
 
             it("array.splice", () => {
-                const model = new Actor({preferences: {agents: ["Rod", "Jerry"]}}).persist()
+                const model = new Actor({preferences: {agents: ["Rod", "Jerry"]}}).flushChanges()
 
                 model.preferences.agents.splice(1, 1, "Kim")
                 assert.deepEqual(model.changes(), {
@@ -161,7 +161,7 @@ describe('Viking.Model.Types', () => {
             })
 
             it("array index assignment", () => {
-                const model = new Actor({preferences: {agents: ["Rod", "Jerry"]}}).persist()
+                const model = new Actor({preferences: {agents: ["Rod", "Jerry"]}}).flushChanges()
 
                 model.preferences.agents[0] = "Kim"
                 assert.deepEqual(model.changes(), {
@@ -176,7 +176,7 @@ describe('Viking.Model.Types', () => {
             })
 
             it("mutating an object pushed onto an array", () => {
-                const model = new Actor({preferences: {agents: [{name: "Rod"}]}}).persist()
+                const model = new Actor({preferences: {agents: [{name: "Rod"}]}}).flushChanges()
 
                 model.preferences.agents.push({name: "Jerry"})
                 model.preferences.agents[1].name = "Kim"
