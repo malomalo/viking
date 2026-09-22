@@ -84,6 +84,18 @@ describe('Viking.Model', () => {
             assert.deepEqual(model.changes(), {});
             assert.strictEqual(model.hasChanged(), false);
         });
+
+        it('#revertChanges restores attributes to their baseline and returns this', () => {
+            let model = new Actor({name: 'Rod'});
+            model.flushChanges(); // clean baseline
+
+            model.setAttributes({name: 'Andy', age: 30});
+            assert.strictEqual(model.revertChanges(), model);
+            assert.strictEqual(model.name, 'Rod');
+            assert.strictEqual(model.age, null);
+            assert.deepEqual(model.changes(), {});
+            assert.strictEqual(model.hasChanged(), false);
+        });
     });
 
     describe('events', () => {
