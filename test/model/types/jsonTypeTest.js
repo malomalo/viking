@@ -129,10 +129,65 @@ describe('Viking.Model.Types', () => {
                 agent.region = "CA"
                 assert.deepEqual(model.changes(), {});
             })
-  //
-  //           it("array.push")
-  //
-  //           it("array.remove")
+
+            it("array.push", () => {
+                const model = new Actor({preferences: {agents: ["Rod", "Jerry"]}}).flushChanges()
+
+                model.preferences.agents.push("Kim")
+                assert.deepEqual(model.changes(), {
+                    preferences: [
+                        {agents: ["Rod", "Jerry"]},
+                        {agents: ["Rod", "Jerry", "Kim"]}
+                    ]
+                });
+
+                model.preferences.agents.pop()
+                assert.deepEqual(model.changes(), {});
+            })
+
+            it("array.splice", () => {
+                const model = new Actor({preferences: {agents: ["Rod", "Jerry"]}}).flushChanges()
+
+                model.preferences.agents.splice(1, 1, "Kim")
+                assert.deepEqual(model.changes(), {
+                    preferences: [
+                        {agents: ["Rod", "Jerry"]},
+                        {agents: ["Rod", "Kim"]}
+                    ]
+                });
+
+                model.preferences.agents.splice(1, 1, "Jerry")
+                assert.deepEqual(model.changes(), {});
+            })
+
+            it("array index assignment", () => {
+                const model = new Actor({preferences: {agents: ["Rod", "Jerry"]}}).flushChanges()
+
+                model.preferences.agents[0] = "Kim"
+                assert.deepEqual(model.changes(), {
+                    preferences: [
+                        {agents: ["Rod", "Jerry"]},
+                        {agents: ["Kim", "Jerry"]}
+                    ]
+                });
+
+                model.preferences.agents[0] = "Rod"
+                assert.deepEqual(model.changes(), {});
+            })
+
+            it("mutating an object pushed onto an array", () => {
+                const model = new Actor({preferences: {agents: [{name: "Rod"}]}}).flushChanges()
+
+                model.preferences.agents.push({name: "Jerry"})
+                model.preferences.agents[1].name = "Kim"
+
+                assert.deepEqual(model.changes(), {
+                    preferences: [
+                        {agents: [{name: "Rod"}]},
+                        {agents: [{name: "Rod"}, {name: "Kim"}]}
+                    ]
+                });
+            })
         })
         
         describe('clone', () => {
