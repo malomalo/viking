@@ -1,8 +1,8 @@
 import assert from 'assert';
-import VikingRecord from 'viking/record';
+import VikingModel from 'viking/model';
 
-describe('Viking.Record#toJSON', () => {
-    class Model extends VikingRecord {
+describe('Viking.Model#toJSON', () => {
+    class Model extends VikingModel {
         static schema = {
             date:    {type: 'date'},
             integer: {type: 'integer'},

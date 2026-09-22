@@ -1,8 +1,8 @@
 import assert from 'assert';
-import Record from 'viking/record';
+import Model from 'viking/model';
 
-describe('Viking.Record', () => {
-    class Actor extends Record {
+describe('Viking.Model', () => {
+    class Actor extends Model {
         static schema = {
             id: {type: "integer"},
             name: {type: 'string'},
@@ -16,7 +16,7 @@ describe('Viking.Record', () => {
         let model = new Actor({name: 'Rod Kimbal', age: 30});
         assert.deepEqual(model.changes(), { name: [null, 'Rod Kimbal'], age: [null, 30], preferences: [null, {}] });
 
-        model.persist();
+        model.flushChanges();
         assert.deepEqual(model.changes(), {});
 
         model.setAttribute('name', 'Andy Sanberg');
@@ -30,7 +30,7 @@ describe('Viking.Record', () => {
             name: ['Rod Kimbal', 'Andy Sanberg'],
             age: [30, 36]
         });
-        
+
         model.preferences = {
             green_room: true
         }
@@ -42,8 +42,8 @@ describe('Viking.Record', () => {
                 {green_room: true}
             ]
         });
-        
-        model.persist();
+
+        model.flushChanges();
         model.preferences = {green_room: true, red_room: false};
         assert.deepEqual(model.changes(), {
             preferences: [
@@ -51,8 +51,8 @@ describe('Viking.Record', () => {
                 {green_room: true, red_room: false}
             ]
         });
-        
-        model.persist();
+
+        model.flushChanges();
         model.preferences = {green_room: true, red_room: true};
         assert.deepEqual(model.changes(), {
             preferences: [
@@ -60,13 +60,13 @@ describe('Viking.Record', () => {
                 {green_room: true, red_room: true}
             ]
         });
-        
+
         model.preferences = [{foo: 'bar'}]
-        model.persist()
+        model.flushChanges()
         model.preferences = [{
             foo: 'echo'
         }]
-        
+
         assert.deepEqual(model.changes(), {
             preferences: [
                 [{foo: 'bar'}],
@@ -74,10 +74,10 @@ describe('Viking.Record', () => {
             ]
         });
     });
-    
+
     it('#changedAttributes()', () => {
         let model = new Actor({name: 'Time', age: 30});
-        model.persist();
+        model.flushChanges();
 
         assert.equal(model.hasChanged(), false);
 
@@ -86,15 +86,15 @@ describe('Viking.Record', () => {
 
         model.setAttributes({name: 'Time'});
         assert.equal(model.hasChanged(), false);
-        
+
         let actor = new Actor()
         actor.name = "Rod Kimbal";
         assert.deepEqual(actor.changedAttributes(), ['preferences', 'name']);
     });
-    
+
     it('#hasChanged()', () => {
         let model = new Actor({name: 'Time', age: 30});
-        model.persist();
+        model.flushChanges();
 
         assert.equal(model.hasChanged(), false);
 
@@ -103,14 +103,11 @@ describe('Viking.Record', () => {
 
         model.setAttributes({name: 'Time'});
         assert.equal(model.hasChanged(), false);
-        
-        let actor = Actor.instantiate({id: 11, name: 'Jeff Johnson', union: false})
-        assert.equal(model.hasChanged(), false);
     });
-    
+
     it('#hasChanged(attributeName)', () => {
         let model = new Actor({name: 'Time', age: 30});
-        model.persist();
+        model.flushChanges();
         model.setAttributes({age: 28});
 
         assert.equal(model.hasChanged('name'), false);
@@ -121,5 +118,5 @@ describe('Viking.Record', () => {
         model.setAttributes({name: 'Time'});
         assert.equal(model.hasChanged('name'), false);
     });
-    
+
 })

@@ -1,14 +1,13 @@
 import assert from 'assert';
-import DateTimeType from 'viking/record/types/datetime';
+import DateType from 'viking/model/types/date';
 
-describe('Viking.Record.Types', () => {
-    describe('DateTime', () => {
+describe('Viking.Model.Types', () => {
+    describe('Date', () => {
 
         it("::load thows error when can't coerce value", function() {
-            assert.throws(function() { DateTimeType.load(true) }, TypeError);
-
+            assert.throws(function() { DateType.load(true) }, TypeError);
             try {
-                DateTimeType.load(true);
+                DateType.load(true);
             } catch (e) {
                 assert.equal(e.message, "boolean can't be coerced into Date");
             }
@@ -16,44 +15,39 @@ describe('Viking.Record.Types', () => {
 
         it("::load coerces iso8601 string to date", function() {
             assert.deepEqual(
-                DateTimeType.load("2013-04-10T21:24+00:00"),
-                new Date(1365629040000)
-            );
-            
-            assert.deepEqual(
-                DateTimeType.load("2013-04-10T21:24:28+00:00"),
-                new Date(1365629068000)
+                DateType.load("2013-04-10"),
+                new Date(2013, 3, 10) // 3 is monthIndex - April / 4th month
             );
 
             assert.equal(
-                DateTimeType.load("2013-04-10T21:24:28+00:00").valueOf(),
-                (new Date(1365629068000)).valueOf()
+                DateType.load("2013-04-10").valueOf(),
+                new Date(2013, 3, 10).valueOf() // 3 is monthIndex - April / 4th month
             );
         });
 
         it("::load coerces int(milliseconds since epoch) to date", function() {
             assert.deepEqual(
-                DateTimeType.load(1365629126097),
+                DateType.load(1365629126097),
                 new Date(1365629126097)
             );
-
+            
             assert.equal(
-                DateTimeType.load(1365629126097).valueOf(),
+                DateType.load(1365629126097).valueOf(),
                 (new Date(1365629126097)).valueOf()
             );
         });
 
         it("::load coerces date to date", function() {
             assert.equal(
-                DateTimeType.load(new Date(1365629126097)).valueOf(),
+                DateType.load(new Date(1365629126097)).valueOf(),
                 (new Date(1365629126097)).valueOf()
             );
         });
 
         it("::dump coerces Date to ISOString", function() {
             assert.deepEqual(
-                DateTimeType.dump(new Date(1365629068000)),
-                "2013-04-10T21:24:28.000Z"
+                DateType.dump(new Date(1365629068000)),
+                "2013-04-10"
             );
         });
 
