@@ -237,7 +237,7 @@ describe('Viking.Model#setAttributes', () => {
         collection.addEventListener('record:changed:status', (record, oldValue, newValue, context) => { received['record:changed:status'] = context; });
         a.collections.add(collection);
 
-        a.withContext({silentNotification: true}, () => a.setAttributes({status: 'active'}));
+        VikingModel.withContext({silentNotification: true}, () => a.setAttributes({status: 'active'}));
 
         assert.deepEqual(received, {
             changed: {silentNotification: true},

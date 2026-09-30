@@ -792,16 +792,16 @@ describe('Viking.Events', () => {
         const obj = new Event();
         let received;
         obj.addEventListener('event', (...args) => { received = args; });
-        obj.withContext({silent: true}, () => obj.dispatchEvent('event', 1, 2));
+        Event.withContext({silent: true}, () => obj.dispatchEvent('event', 1, 2));
         assert.deepEqual(received, [1, 2, {silent: true}]);
       });
 
-      it('appends the context to events dispatched on other buses', () => {
+      it('called on a subclass, appends the context to events on any bus', () => {
+        class Subclass extends Event { }
         const obj = new Event();
-        const other = new Event();
         let received;
-        other.addEventListener('event', (...args) => { received = args; });
-        obj.withContext({silent: true}, () => other.dispatchEvent('event', 1));
+        obj.addEventListener('event', (...args) => { received = args; });
+        Subclass.withContext({silent: true}, () => obj.dispatchEvent('event', 1));
         assert.deepEqual(received, [1, {silent: true}]);
       });
 
@@ -809,7 +809,7 @@ describe('Viking.Events', () => {
         const obj = new Event();
         const received = [];
         obj.addEventListener(['a', 'b'], (...args) => { received.push(args); });
-        obj.withContext('ctx', () => obj.dispatchEvent(['a', 'b'], 1));
+        Event.withContext('ctx', () => obj.dispatchEvent(['a', 'b'], 1));
         assert.deepEqual(received, [[1, 'ctx'], [1, 'ctx']]);
       });
 
@@ -817,7 +817,7 @@ describe('Viking.Events', () => {
         const obj = new Event();
         let received;
         obj.addEventListener('*', (...args) => { received = args; });
-        obj.withContext('ctx', () => obj.dispatchEvent('event', 1));
+        Event.withContext('ctx', () => obj.dispatchEvent('event', 1));
         assert.deepEqual(received, ['event', 1, 'ctx']);
       });
 
@@ -825,7 +825,7 @@ describe('Viking.Events', () => {
         const obj = new Event();
         let received;
         obj.addEventListener('event', (...args) => { received = args; });
-        obj.withContext('ctx', () => {});
+        Event.withContext('ctx', () => {});
         obj.dispatchEvent('event', 1);
         assert.deepEqual(received, [1]);
       });
@@ -834,26 +834,26 @@ describe('Viking.Events', () => {
         const obj = new Event();
         const received = [];
         obj.addEventListener('event', (...args) => { received.push(args); });
-        obj.withContext('outer', () => {
-          obj.withContext('inner', () => obj.dispatchEvent('event'));
+        Event.withContext('outer', () => {
+          Event.withContext('inner', () => obj.dispatchEvent('event'));
           obj.dispatchEvent('event');
         });
         assert.deepEqual(received, [['inner'], ['outer']]);
       });
 
-      it('returns the value of the block and calls it with this', () => {
-        const obj = new Event();
-        let self;
-        const result = obj.withContext('ctx', function () { self = this; return 42; });
-        assert.equal(result, 42);
-        assert.strictEqual(self, obj);
+      it('returns the value of the block', () => {
+        assert.equal(Event.withContext('ctx', () => 42), 42);
+      });
+
+      it('is not an instance method', () => {
+        assert.equal(new Event().withContext, undefined);
       });
 
       it('removes the context when the block throws', () => {
         const obj = new Event();
         let received;
         obj.addEventListener('event', (...args) => { received = args; });
-        assert.throws(() => obj.withContext('ctx', () => { throw new Error('boom'); }), /boom/);
+        assert.throws(() => Event.withContext('ctx', () => { throw new Error('boom'); }), /boom/);
         obj.dispatchEvent('event', 1);
         assert.deepEqual(received, [1]);
       });
