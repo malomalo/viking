@@ -787,4 +787,76 @@ describe('Viking.Events', () => {
       assert.equal(Object.keys(obj.bindedObjects).length, 0);
     });
 
+    describe('withContext', () => {
+      it('appends the context to events dispatched in the block', () => {
+        const obj = new Event();
+        let received;
+        obj.addEventListener('event', (...args) => { received = args; });
+        obj.withContext({silent: true}, () => obj.dispatchEvent('event', 1, 2));
+        assert.deepEqual(received, [1, 2, {silent: true}]);
+      });
+
+      it('appends the context to events dispatched on other buses', () => {
+        const obj = new Event();
+        const other = new Event();
+        let received;
+        other.addEventListener('event', (...args) => { received = args; });
+        obj.withContext({silent: true}, () => other.dispatchEvent('event', 1));
+        assert.deepEqual(received, [1, {silent: true}]);
+      });
+
+      it('appends the context once per event when dispatching multiple event names', () => {
+        const obj = new Event();
+        const received = [];
+        obj.addEventListener(['a', 'b'], (...args) => { received.push(args); });
+        obj.withContext('ctx', () => obj.dispatchEvent(['a', 'b'], 1));
+        assert.deepEqual(received, [[1, 'ctx'], [1, 'ctx']]);
+      });
+
+      it('appends the context to "*" listeners after the event name', () => {
+        const obj = new Event();
+        let received;
+        obj.addEventListener('*', (...args) => { received = args; });
+        obj.withContext('ctx', () => obj.dispatchEvent('event', 1));
+        assert.deepEqual(received, ['event', 1, 'ctx']);
+      });
+
+      it('does not append the context outside the block', () => {
+        const obj = new Event();
+        let received;
+        obj.addEventListener('event', (...args) => { received = args; });
+        obj.withContext('ctx', () => {});
+        obj.dispatchEvent('event', 1);
+        assert.deepEqual(received, [1]);
+      });
+
+      it('uses the innermost context when nested and restores the outer one', () => {
+        const obj = new Event();
+        const received = [];
+        obj.addEventListener('event', (...args) => { received.push(args); });
+        obj.withContext('outer', () => {
+          obj.withContext('inner', () => obj.dispatchEvent('event'));
+          obj.dispatchEvent('event');
+        });
+        assert.deepEqual(received, [['inner'], ['outer']]);
+      });
+
+      it('returns the value of the block and calls it with this', () => {
+        const obj = new Event();
+        let self;
+        const result = obj.withContext('ctx', function () { self = this; return 42; });
+        assert.equal(result, 42);
+        assert.strictEqual(self, obj);
+      });
+
+      it('removes the context when the block throws', () => {
+        const obj = new Event();
+        let received;
+        obj.addEventListener('event', (...args) => { received = args; });
+        assert.throws(() => obj.withContext('ctx', () => { throw new Error('boom'); }), /boom/);
+        obj.dispatchEvent('event', 1);
+        assert.deepEqual(received, [1]);
+      });
+    });
+
 });

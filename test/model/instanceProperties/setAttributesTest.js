@@ -1,5 +1,6 @@
 import assert from 'assert';
 import VikingModel from 'viking/model';
+import EventBus from 'viking/eventBus';
 
 describe('Viking.Model#setAttributes', () => {
     class Model extends VikingModel {
@@ -224,6 +225,26 @@ describe('Viking.Model#setAttributes', () => {
         a.setAttributes({foo: 2});
         assert.equal(a.readAttribute('foo'), 2, 'Foo should NOT have changed, still 2');
         assert.equal(changeCount, 1, 'Change count should NOT have incremented.');
+    });
+
+    it('passes withContext context to change events', () => {
+        let a = new VikingModel({status: 'pending'});
+        const received = {};
+        a.addEventListener('changed', (record, changes, context) => { received.changed = context; });
+        a.addEventListener('changed:status', (record, oldValue, newValue, context) => { received.attribute = context; });
+        const collection = new EventBus();
+        collection.addEventListener('record:changed', (record, changes, context) => { received['record:changed'] = context; });
+        collection.addEventListener('record:changed:status', (record, oldValue, newValue, context) => { received['record:changed:status'] = context; });
+        a.collections.add(collection);
+
+        a.withContext({silentNotification: true}, () => a.setAttributes({status: 'active'}));
+
+        assert.deepEqual(received, {
+            changed: {silentNotification: true},
+            attribute: {silentNotification: true},
+            'record:changed': {silentNotification: true},
+            'record:changed:status': {silentNotification: true}
+        });
     });
 
 });
