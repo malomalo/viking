@@ -421,11 +421,11 @@ describe('Viking.Router', () => {
             this.router.navigateTo('/')
             this.router.navigateTo('/foo')
         })
-        it('navigateTo passes details to the navigation events', function () {
+        it('navigateTo passes eventParameters to the navigation events', function () {
             this.router = new VikingRouter();
             const received = [];
-            this.router.addEventListener(['beforeNavigation', 'afterNavigation'], (url, details) => {
-                received.push([url, details]);
+            this.router.addEventListener(['beforeNavigation', 'afterNavigation'], (url, eventParameters) => {
+                received.push([url, eventParameters]);
             });
 
             this.router.navigateTo('/foo', {page: 2}, {silentNotification: true});

@@ -50,19 +50,19 @@ describe('Viking.Relation', () => {
             });
         })
 
-        it('record:changed passes setAttributes details', function (done) {
+        it('record:changed passes setAttributes eventParameters', function (done) {
             const relation = NamedModel.where({parent_id: 11})
 
             relation.load().then(() => {
                 const record = relation.target[0]
-                let attributeDetails;
+                let attributeEventParameters;
 
-                relation.addEventListener('record:changed:name', (r, oldValue, newValue, details) => {
-                    attributeDetails = details;
+                relation.addEventListener('record:changed:name', (r, oldValue, newValue, eventParameters) => {
+                    attributeEventParameters = eventParameters;
                 });
-                relation.addEventListener('record:changed', (r, changes, details) => {
-                    assert.deepEqual(attributeDetails, {silentNotification: true});
-                    assert.deepEqual(details, {silentNotification: true});
+                relation.addEventListener('record:changed', (r, changes, eventParameters) => {
+                    assert.deepEqual(attributeEventParameters, {silentNotification: true});
+                    assert.deepEqual(eventParameters, {silentNotification: true});
                     done();
                 });
 

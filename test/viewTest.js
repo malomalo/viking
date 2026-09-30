@@ -583,12 +583,12 @@ describe('Viking.View', () => {
         assert.equal(counter, 1);
     });
 
-    it("#remove(details) passes details to the remove events of the view and its subviews", () => {
+    it("#remove(eventParameters) passes eventParameters to the remove events of the view and its subviews", () => {
         const view = new View();
         const subview = view.subView(View);
         const received = [];
-        const listen = (name, v) => v.addEventListener(['beforeRemove', 'afterRemove'], (removed, details) => {
-            received.push([name, details]);
+        const listen = (name, v) => v.addEventListener(['beforeRemove', 'afterRemove'], (removed, eventParameters) => {
+            received.push([name, eventParameters]);
         });
         listen('view', view);
         listen('subview', subview);
