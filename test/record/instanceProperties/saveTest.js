@@ -1,5 +1,6 @@
 import assert from 'assert';
 import VikingRecord from 'viking/record';
+import EventBus from 'viking/eventBus';
 
 describe('Viking.Record#save', () => {
     
@@ -95,6 +96,42 @@ describe('Viking.Record#save', () => {
                 model: { integer: 0, boolean: false, string: '' }
             }}, (xhr) => {
                 xhr.respond(201, {}, '{"id": 96, "integer": 3, "string": "bye", "boolean": true}');
+            });
+        });
+    });
+
+    describe('within EventBus.withContext', () => {
+        it('only passes the context to events fired before the response', function(done) {
+            let model = Model.instantiate({ id: 99, string: 'hello' });
+            const context = {silentNotification: true};
+            const received = [];
+            model.addEventListener('*', (name, ...args) => {
+                received.push([name, args[args.length - 1] === context]);
+            });
+
+            EventBus.withContext(context, () => {
+                model.string = 'bye';
+                return model.save();
+            }).then(() => {
+                assert.deepEqual(received, [
+                    // dispatched synchronously within the block
+                    ['changed:string', true],
+                    ['changed', true],
+                    ['beforeSave', true],
+                    ['beforeSync', true],
+                    // dispatched after the response, once the block has returned
+                    ['changed:string', false],
+                    ['changed', false],
+                    ['afterSave', false],
+                    ['afterSync', false],
+                    ['afterSync:string', false]
+                ]);
+            }).then(done, done);
+
+            this.withRequest('PUT', '/models/99', { body: {
+                model: { string: 'bye' }
+            }}, (xhr) => {
+                xhr.respond(200, {}, '{"id": 99, "string": "server"}');
             });
         });
     });
