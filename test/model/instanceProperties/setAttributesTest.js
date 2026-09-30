@@ -258,6 +258,26 @@ describe('Viking.Model#setAttributes', () => {
             a.setAttributes({status: 'active'});
             assert.deepEqual(details, {});
         });
+
+        it('passes details through setAttribute', () => {
+            let a = new VikingModel({status: 'pending'});
+            const received = {};
+            a.addEventListener('changed', (record, changes, d) => { received.changed = d; });
+            a.addEventListener('changed:status', (record, oldValue, newValue, d) => { received.attribute = d; });
+            a.setAttribute('status', 'active', {silentNotification: true});
+            assert.deepEqual(received, {
+                changed: {silentNotification: true},
+                attribute: {silentNotification: true}
+            });
+        });
+
+        it('passes dirty through setAttribute', () => {
+            let a = new VikingModel({status: 'pending'});
+            a.flushChanges();
+            a.setAttribute('status', 'active', {dirty: false});
+            assert.equal(a.readAttribute('status'), 'active');
+            assert.ok(!a.hasChanged('status'));
+        });
     });
 
 });
