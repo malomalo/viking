@@ -50,6 +50,30 @@ describe('Viking.Relation', () => {
             });
         })
 
+        it('record:changed passes setAttributes details', function (done) {
+            const relation = NamedModel.where({parent_id: 11})
+
+            relation.load().then(() => {
+                const record = relation.target[0]
+                let attributeDetails;
+
+                relation.addEventListener('record:changed:name', (r, oldValue, newValue, details) => {
+                    attributeDetails = details;
+                });
+                relation.addEventListener('record:changed', (r, changes, details) => {
+                    assert.deepEqual(attributeDetails, {silentNotification: true});
+                    assert.deepEqual(details, {silentNotification: true});
+                    done();
+                });
+
+                record.setAttributes({name: 'bar'}, {silentNotification: true});
+            });
+
+            this.withRequest('GET', '/named_models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 1, "name": "foo"}]');
+            });
+        })
+
         it('record:afterSync', function (done) {
             const relation = NamedModel.where({parent_id: 11})
 

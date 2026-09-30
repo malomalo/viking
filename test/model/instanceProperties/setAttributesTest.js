@@ -226,4 +226,38 @@ describe('Viking.Model#setAttributes', () => {
         assert.equal(changeCount, 1, 'Change count should NOT have incremented.');
     });
 
+    describe('details', () => {
+        it('passes unplucked options to the changed event', () => {
+            let a = new VikingModel({status: 'pending'});
+            let details;
+            a.addEventListener('changed', (record, changes, d) => { details = d; });
+            a.setAttributes({status: 'active'}, {silentNotification: true});
+            assert.deepEqual(details, {silentNotification: true});
+        });
+
+        it('passes unplucked options to the changed:{attribute} event', () => {
+            let a = new VikingModel({status: 'pending'});
+            let details;
+            a.addEventListener('changed:status', (record, oldValue, newValue, d) => { details = d; });
+            a.setAttributes({status: 'active'}, {silentNotification: true});
+            assert.deepEqual(details, {silentNotification: true});
+        });
+
+        it('does not pass coerced or dirty through', () => {
+            let a = new VikingModel({status: 'pending'});
+            let details;
+            a.addEventListener('changed', (record, changes, d) => { details = d; });
+            a.setAttributes({status: 'active'}, {dirty: false, coerced: true, source: 'sync'});
+            assert.deepEqual(details, {source: 'sync'});
+        });
+
+        it('defaults to an empty object', () => {
+            let a = new VikingModel({status: 'pending'});
+            let details;
+            a.addEventListener('changed', (record, changes, d) => { details = d; });
+            a.setAttributes({status: 'active'});
+            assert.deepEqual(details, {});
+        });
+    });
+
 });
