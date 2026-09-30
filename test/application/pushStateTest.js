@@ -29,9 +29,35 @@ describe('Viking/Application', () => {
             app.el.append(link);
             this.click(link);
 
-            assert.deepEqual(navigations, ['/path']);
+            assert.deepEqual(navigations, [link.href]);
         });
-        
+
+        it('includes the query string when capturing clicks on links', function () {
+            let navigations = [];
+
+            class MyRouter extends Router {
+                static routes = {
+                    '/path': () => { }
+                };
+                navigateTo(url, params) {
+                    navigations.push(url);
+                }
+            }
+
+            class MyApplication extends Application {
+                static router = MyRouter;
+            }
+
+            let app = new MyApplication();
+            let link = document.createElement('a');
+            link.href = '/path?a=1&b=2';
+            app.el.append(link);
+            this.click(link);
+
+            assert.deepEqual(navigations, [link.href]);
+            assert.ok(navigations[0].endsWith('/path?a=1&b=2'));
+        });
+
         it('caputres clicks on fqdn links', function () {
             let navigations = [];
         
@@ -54,9 +80,9 @@ describe('Viking/Application', () => {
             app.el.append(link);
             this.click(link);
 
-            assert.deepEqual(navigations, ['/path']);
+            assert.deepEqual(navigations, ['http://example.com/path']);
         });
-        
+
         it('ignores clicks on links clicked with a modifier key', function () {
             let navigations = [];
         
