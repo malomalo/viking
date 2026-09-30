@@ -421,6 +421,23 @@ describe('Viking.Router', () => {
             this.router.navigateTo('/')
             this.router.navigateTo('/foo')
         })
+        it('navigateTo passes details to the navigation events', function () {
+            this.router = new VikingRouter();
+            const received = [];
+            this.router.addEventListener(['beforeNavigation', 'afterNavigation'], (url, details) => {
+                received.push([url, details]);
+            });
+
+            this.router.navigateTo('/foo', {page: 2}, {silentNotification: true});
+            this.router.navigateTo('/bar');
+
+            assert.deepEqual(received, [
+                ['/foo?page=2', {silentNotification: true}],
+                ['/foo?page=2', {silentNotification: true}],
+                ['/bar', {}],
+                ['/bar', {}]
+            ]);
+        })
         it('afterNavigation', function (done) {
             let counter = 0;
             let fooCounter = 0;
