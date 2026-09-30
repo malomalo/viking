@@ -583,7 +583,7 @@ describe('Viking.View', () => {
         assert.equal(counter, 1);
     });
 
-    it("#remove(eventParameters) passes eventParameters to the remove events of the view and its subviews", () => {
+    it("#remove({eventParameters}) passes eventParameters to the remove events of the view and its subviews", () => {
         const view = new View();
         const subview = view.subView(View);
         const received = [];
@@ -593,7 +593,7 @@ describe('Viking.View', () => {
         listen('view', view);
         listen('subview', subview);
 
-        view.remove({silentNotification: true});
+        view.remove({eventParameters: {silentNotification: true}});
 
         assert.deepEqual(received, [
             ['view', {silentNotification: true}],

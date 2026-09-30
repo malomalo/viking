@@ -22,14 +22,14 @@ describe('Viking eventParameters', () => {
     }
 
     describe('Record', () => {
-        it('#save passes eventParameters, without request options, to every event', function (done) {
+        it('#save passes only the eventParameters option to every event', function (done) {
             const actor = Actor.instantiate({id: 1, name: 'Fred'});
             const received = recordEventParameters(actor);
 
             actor.name = 'Rod';
             received.length = 0;
 
-            actor.save({silentNotification: true, headers: {'X-Test': '1'}, label: 'test'}).then(() => {
+            actor.save({eventParameters, headers: {'X-Test': '1'}, label: 'test'}).then(() => {
                 assert.deepEqual(received, [
                     ['beforeSave', eventParameters],
                     ['beforeSync', eventParameters],
@@ -50,7 +50,7 @@ describe('Viking eventParameters', () => {
             const actor = new Actor({name: 'Fred'});
             const received = recordEventParameters(actor);
 
-            actor.save({silentNotification: true}).then(() => {
+            actor.save({eventParameters: {silentNotification: true}}).then(() => {
                 const names = received.map(([name]) => name);
                 assert.ok(names.includes('beforeCreate'));
                 assert.ok(names.includes('afterCreate'));
@@ -72,7 +72,7 @@ describe('Viking eventParameters', () => {
                 relation.addEventListener('record:afterSync:name', (r, oldValue, newValue, d) => { attributeEventParameters = d; });
 
                 actor.name = 'Rod';
-                const saving = actor.save({silentNotification: true}).then(() => {
+                const saving = actor.save({eventParameters: {silentNotification: true}}).then(() => {
                     assert.deepEqual(syncEventParameters, eventParameters);
                     assert.deepEqual(attributeEventParameters, eventParameters);
                 });
@@ -95,7 +95,7 @@ describe('Viking eventParameters', () => {
                 assert.deepEqual(d, eventParameters);
                 done();
             });
-            actor.save({silentNotification: true});
+            actor.save({eventParameters: {silentNotification: true}});
 
             this.withRequest('POST', '/actors', { body: {actor: {name: 'Fred'}} }, (xhr) => {
                 xhr.respond(400, {'Content-Type': 'application/json'}, '{"errors": {"name": ["can only be Jimmy"]}}');
@@ -109,7 +109,7 @@ describe('Viking eventParameters', () => {
                 assert.deepEqual(d, eventParameters);
                 done();
             });
-            actor.save({silentNotification: true});
+            actor.save({eventParameters: {silentNotification: true}});
 
             this.withRequest('POST', '/actors', { body: {actor: {name: 'Fred'}} }, (xhr) => {
                 xhr.respond(500, {}, 'something went wrong');
@@ -120,7 +120,7 @@ describe('Viking eventParameters', () => {
             const actor = Actor.instantiate({id: 1, name: 'Fred'});
             const received = recordEventParameters(actor);
 
-            actor.update({name: 'Rod'}, {silentNotification: true}).then(() => {
+            actor.update({name: 'Rod'}, {eventParameters: {silentNotification: true}}).then(() => {
                 assert.ok(received.length > 0);
                 received.forEach(([name, d]) => assert.deepEqual(d, eventParameters, name));
             }).then(done, done);
@@ -134,7 +134,7 @@ describe('Viking eventParameters', () => {
             const actor = Actor.instantiate({id: 1, name: 'Fred'});
             const received = recordEventParameters(actor);
 
-            actor.destroy({silentNotification: true}).then(() => {
+            actor.destroy({eventParameters: {silentNotification: true}}).then(() => {
                 assert.deepEqual(received, [
                     ['beforeDestroy', eventParameters],
                     ['afterDestroy', eventParameters]
@@ -150,7 +150,7 @@ describe('Viking eventParameters', () => {
             const actor = Actor.instantiate({id: 1, name: 'Fred'});
             const received = recordEventParameters(actor);
 
-            actor.reload({silentNotification: true}).then(() => {
+            actor.reload({eventParameters: {silentNotification: true}}).then(() => {
                 assert.ok(received.length > 0);
                 received.forEach(([name, d]) => assert.deepEqual(d, eventParameters, name));
             }).then(done, done);
@@ -165,7 +165,7 @@ describe('Viking eventParameters', () => {
             actor.name = 'Rod';
             const received = recordEventParameters(actor);
 
-            actor.revertChanges({silentNotification: true});
+            actor.revertChanges({eventParameters: {silentNotification: true}});
             assert.deepEqual(received, [['changed:name', eventParameters], ['changed', eventParameters]]);
         });
 
@@ -189,7 +189,7 @@ describe('Viking eventParameters', () => {
             const relation = Actor.where({name: 'Fred'});
             const received = recordEventParameters(relation);
 
-            relation.load({silentNotification: true}).then(() => {
+            relation.load({eventParameters: {silentNotification: true}}).then(() => {
                 assert.deepEqual(received, [
                     ['beforeLoad', eventParameters],
                     ['beforeSetTarget', eventParameters],
@@ -211,7 +211,7 @@ describe('Viking eventParameters', () => {
                 let changedEventParameters;
                 actor.addEventListener('changed', (r, changes, d) => { changedEventParameters = d; });
 
-                const reloading = relation.reload({silentNotification: true}).then(() => {
+                const reloading = relation.reload({eventParameters: {silentNotification: true}}).then(() => {
                     assert.deepEqual(changedEventParameters, eventParameters);
                 });
                 this.withRequest('GET', '/actors', { params: {where: {name: 'Fred'}, order: {id: 'desc'}} }, (xhr) => {
@@ -232,7 +232,7 @@ describe('Viking eventParameters', () => {
             relation.setTarget([a]);
             const received = recordEventParameters(relation);
 
-            relation.setTarget([b], {silentNotification: true});
+            relation.setTarget([b], {eventParameters: {silentNotification: true}});
             assert.deepEqual(received, [
                 ['beforeSetTarget', eventParameters],
                 ['afterAdd', eventParameters],
@@ -248,14 +248,14 @@ describe('Viking eventParameters', () => {
                 return r;
             };
 
-            listen(relation.spawn()).applyWhere({name: 'Fred'}, eventParameters);
-            listen(relation.spawn()).applyRewhere({name: 'Fred'}, eventParameters);
-            listen(relation.spawn()).setWhere({name: 'Fred'}, eventParameters);
-            listen(relation.spawn()).applyOrder({name: 'asc'}, eventParameters);
-            listen(relation.spawn()).setOrder({name: 'asc'}, eventParameters);
-            listen(relation.spawn()).setLimit(5, eventParameters);
-            listen(relation.spawn()).setOffset(5, eventParameters);
-            listen(relation.spawn()).setReverseOrder(eventParameters);
+            listen(relation.spawn()).applyWhere({name: 'Fred'}, {eventParameters});
+            listen(relation.spawn()).applyRewhere({name: 'Fred'}, {eventParameters});
+            listen(relation.spawn()).setWhere({name: 'Fred'}, {eventParameters});
+            listen(relation.spawn()).applyOrder({name: 'asc'}, {eventParameters});
+            listen(relation.spawn()).setOrder({name: 'asc'}, {eventParameters});
+            listen(relation.spawn()).setLimit(5, {eventParameters});
+            listen(relation.spawn()).setOffset(5, {eventParameters});
+            listen(relation.spawn()).setReverseOrder({eventParameters});
 
             assert.deepEqual(received, [
                 ['where', eventParameters], ['where', eventParameters], ['where', eventParameters],
@@ -282,7 +282,7 @@ describe('Viking eventParameters', () => {
             const association = model.association('children');
             const received = recordEventParameters(association);
 
-            association.load({silentNotification: true}).then(() => {
+            association.load({eventParameters: {silentNotification: true}}).then(() => {
                 assert.deepEqual(received, [
                     ['beforeLoad', eventParameters],
                     ['beforeAdd', eventParameters],
@@ -305,7 +305,7 @@ describe('Viking eventParameters', () => {
             model.children = [child];
             received.length = 0;
             childReceived.length = 0;
-            model.association('children').setTarget([], {silentNotification: true});
+            model.association('children').setTarget([], {eventParameters: {silentNotification: true}});
 
             assert.deepEqual(received, [
                 ['beforeRemove', eventParameters],
@@ -334,7 +334,7 @@ describe('Viking eventParameters', () => {
             const received = recordEventParameters(owner.association('profile'));
             const profileReceived = recordEventParameters(profile);
 
-            owner.association('profile').setTarget(profile, {silentNotification: true});
+            owner.association('profile').setTarget(profile, {eventParameters: {silentNotification: true}});
 
             assert.deepEqual(received, [['beforeAdd', eventParameters], ['afterAdd', eventParameters]]);
             assert.deepEqual(profileReceived, [
@@ -351,7 +351,7 @@ describe('Viking eventParameters', () => {
             const received = recordEventParameters(model.association('parent'));
             const ownerReceived = recordEventParameters(model);
 
-            model.setAttributes({parent}, {silentNotification: true});
+            model.setAttributes({parent}, {eventParameters: {silentNotification: true}});
 
             assert.deepEqual(received, [['beforeAdd', eventParameters], ['afterAdd', eventParameters]]);
             assert.deepEqual(ownerReceived, [['changed:parent_id', eventParameters], ['changed', eventParameters]]);

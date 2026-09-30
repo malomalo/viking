@@ -428,7 +428,7 @@ describe('Viking.Router', () => {
                 received.push([url, eventParameters]);
             });
 
-            this.router.navigateTo('/foo', {page: 2}, {silentNotification: true});
+            this.router.navigateTo('/foo', {page: 2}, {eventParameters: {silentNotification: true}});
             this.router.navigateTo('/bar');
 
             assert.deepEqual(received, [

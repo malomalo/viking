@@ -66,7 +66,7 @@ describe('Viking.Relation', () => {
                     done();
                 });
 
-                record.setAttributes({name: 'bar'}, {silentNotification: true});
+                record.setAttributes({name: 'bar'}, {eventParameters: {silentNotification: true}});
             });
 
             this.withRequest('GET', '/named_models', { params: { where: {parent_id: 11}, order: {id: 'desc'} } }, (xhr) => {
