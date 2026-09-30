@@ -226,4 +226,66 @@ describe('Viking.Model#setAttributes', () => {
         assert.equal(changeCount, 1, 'Change count should NOT have incremented.');
     });
 
+    describe('eventParameters', () => {
+        it('passes the eventParameters option to the changed event', () => {
+            let a = new VikingModel({status: 'pending'});
+            let eventParameters;
+            a.addEventListener('changed', (record, changes, d) => { eventParameters = d; });
+            a.setAttributes({status: 'active'}, {eventParameters: {silentNotification: true}});
+            assert.deepEqual(eventParameters, {silentNotification: true});
+        });
+
+        it('passes the eventParameters option to the changed:{attribute} event', () => {
+            let a = new VikingModel({status: 'pending'});
+            let eventParameters;
+            a.addEventListener('changed:status', (record, oldValue, newValue, d) => { eventParameters = d; });
+            a.setAttributes({status: 'active'}, {eventParameters: {silentNotification: true}});
+            assert.deepEqual(eventParameters, {silentNotification: true});
+        });
+
+        it('only passes the eventParameters option, not other options', () => {
+            let a = new VikingModel({status: 'pending'});
+            let eventParameters;
+            a.addEventListener('changed', (record, changes, d) => { eventParameters = d; });
+            a.setAttributes({status: 'active'}, {dirty: false, source: 'sync', eventParameters: {silentNotification: true}});
+            assert.deepEqual(eventParameters, {silentNotification: true});
+        });
+
+        it('does not treat unknown option keys as eventParameters', () => {
+            let a = new VikingModel({status: 'pending'});
+            let eventParameters;
+            a.addEventListener('changed', (record, changes, d) => { eventParameters = d; });
+            a.setAttributes({status: 'active'}, {silentNotification: true});
+            assert.deepEqual(eventParameters, {});
+        });
+
+        it('defaults to an empty object', () => {
+            let a = new VikingModel({status: 'pending'});
+            let eventParameters;
+            a.addEventListener('changed', (record, changes, d) => { eventParameters = d; });
+            a.setAttributes({status: 'active'});
+            assert.deepEqual(eventParameters, {});
+        });
+
+        it('passes eventParameters through setAttribute', () => {
+            let a = new VikingModel({status: 'pending'});
+            const received = {};
+            a.addEventListener('changed', (record, changes, d) => { received.changed = d; });
+            a.addEventListener('changed:status', (record, oldValue, newValue, d) => { received.attribute = d; });
+            a.setAttribute('status', 'active', {eventParameters: {silentNotification: true}});
+            assert.deepEqual(received, {
+                changed: {silentNotification: true},
+                attribute: {silentNotification: true}
+            });
+        });
+
+        it('passes dirty through setAttribute', () => {
+            let a = new VikingModel({status: 'pending'});
+            a.flushChanges();
+            a.setAttribute('status', 'active', {dirty: false});
+            assert.equal(a.readAttribute('status'), 'active');
+            assert.ok(!a.hasChanged('status'));
+        });
+    });
+
 });

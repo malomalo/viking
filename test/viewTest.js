@@ -583,6 +583,26 @@ describe('Viking.View', () => {
         assert.equal(counter, 1);
     });
 
+    it("#remove({eventParameters}) passes eventParameters to the remove events of the view and its subviews", () => {
+        const view = new View();
+        const subview = view.subView(View);
+        const received = [];
+        const listen = (name, v) => v.addEventListener(['beforeRemove', 'afterRemove'], (removed, eventParameters) => {
+            received.push([name, eventParameters]);
+        });
+        listen('view', view);
+        listen('subview', subview);
+
+        view.remove({eventParameters: {silentNotification: true}});
+
+        assert.deepEqual(received, [
+            ['view', {silentNotification: true}],
+            ['subview', {silentNotification: true}],
+            ['subview', {silentNotification: true}],
+            ['view', {silentNotification: true}]
+        ]);
+    });
+
     // test('#bindEl() with a model', async () => {
     //     const model = new Viking.Model();
     //     const view = new Viking.View({ model });

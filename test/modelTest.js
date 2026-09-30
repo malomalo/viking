@@ -210,7 +210,7 @@ describe('Viking.Model', () => {
             model.setAttribute('name', 'Andy');
 
             assert.deepEqual(changed, [{name: ['Rod', 'Andy']}]);
-            assert.deepEqual(changedName, [['Rod', 'Andy']]);
+            assert.deepEqual(changedName, [['Rod', 'Andy', {}]]);
         });
     });
 
