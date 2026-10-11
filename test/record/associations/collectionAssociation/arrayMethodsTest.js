@@ -176,6 +176,20 @@ describe('Viking.Record::associations', () => {
                 });
             });
 
+            it("is thenable: awaiting resolves to the records", function(done) {
+                let model = new Model({id: 24});
+
+                model.parents.then((records) => {
+                    assert.deepEqual(records.map(p => p.readAttribute('id')), [2, 3]);
+                    // the association handle is untouched and still chainable
+                    assert.equal(typeof model.parents.where, 'function');
+                }).then(done, done);
+
+                this.withRequest('GET', '/parents', { params: {where: {model_id: 24}, order: {id: 'desc'}} }, (xhr) => {
+                    xhr.respond(200, {}, '[{"id": 2, "name": "Viking A"},{"id": 3, "name": "Viking B"}]');
+                });
+            });
+
             it("has a toStringTag", function() {
                 let model = new Model({id: 24});
 

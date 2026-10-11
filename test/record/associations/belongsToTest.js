@@ -80,6 +80,28 @@ describe('Viking.Record::associations', () => {
             );
         });
 
+        it("resolves a chained collection association when awaited", async function() {
+            class A extends VikingRecord { }
+            class B extends VikingRecord {
+                static associations = [hasMany(A)];
+            }
+            class C extends VikingRecord {
+                static associations = [belongsTo(B)];
+            }
+
+            this.onRequest('GET', '/bs', { params: {where: {id: 2}, order: {id: 'desc'}, limit: 1} }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 5, "name": "B"}]');
+            });
+            this.onRequest('GET', '/as', { params: {where: {b_id: 5}, order: {id: 'desc'} } }, (xhr) => {
+                xhr.respond(200, {}, '[{"id": 1, "name": "A Up"}]');
+            });
+
+            let model = new C({id: 3, b_id: 2})
+
+            const as = await model.b.as;
+            assert.deepEqual(as.map((x) => x.readAttribute('id')), [1]);
+        });
+
         it("doesn't send query if not foriegnKey present", async function() {
             let model = new Model();
             
