@@ -24,7 +24,7 @@ describe('Viking.Record::instantiate', () => {
             static schema = { type: { type: 'string' } };
         }
         class Battleship extends Ship { }
-        new Battleship(); // registers Battleship as a descendant of Ship
+        new Battleship();
 
         let attributes = { id: 1, type: 'Battleship' };
         let ship = Ship.instantiate(attributes);
