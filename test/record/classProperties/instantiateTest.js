@@ -19,6 +19,23 @@ describe('Viking.Record::instantiate', () => {
         assert.equal(ship.readAttribute('name'), 'Galactica');
     });
     
+    it('instantiates the descendant named by the inheritance attribute', () => {
+        class Ship extends VikingRecord {
+            static schema = { type: { type: 'string' } };
+        }
+        class Battleship extends Ship {
+            static { this.registerDescendant(); }
+        }
+
+        let ship = Ship.instantiate({ id: 1, type: 'Battleship' });
+
+        assert.ok(ship instanceof Battleship);
+        assert.equal(ship.readAttribute('type'), 'Battleship');
+        assert.deepEqual(ship.changes(), {});
+
+        assert.strictEqual(Ship.instantiate({ id: 2, type: 'Ship' }).constructor, Ship);
+    });
+
     // it('with belongsTo Association', () => {
     //     class Fleet extends VikingRecord { }
     //     class Ship extends VikingRecord {
