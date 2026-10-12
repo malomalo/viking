@@ -19,6 +19,21 @@ describe('Viking.Record::instantiate', () => {
         assert.equal(ship.readAttribute('name'), 'Galactica');
     });
     
+    it('keeps the stored inheritance attribute when loaded through the base class', () => {
+        class Ship extends VikingRecord {
+            static schema = { type: { type: 'string' } };
+        }
+        class Battleship extends Ship { }
+        new Battleship();
+
+        let attributes = { id: 1, type: 'Battleship' };
+        let ship = Ship.instantiate(attributes);
+
+        assert.equal(ship.readAttribute('type'), 'Battleship');
+        assert.deepEqual(ship.changes(), {});
+        assert.equal(attributes.type, 'Battleship');
+    });
+
     // it('with belongsTo Association', () => {
     //     class Fleet extends VikingRecord { }
     //     class Ship extends VikingRecord {
