@@ -33,6 +33,10 @@ Major Changes:
  - Added `Model#toJSON` and `Model#[Symbol.toStringTag]` (inherited by `Record`);
    `JSON.stringify(record)` emits a copy of the record's attributes instead
    of dumping internal state, and records log as `[object ModelName]`
+ - Added `Model#defineProperty(key)`, which defines an attribute's
+   getter/setter. The constructor uses it for each key in `Model#schema`; a
+   model that sets up a per-record schema in `declareProperties` calls it for
+   the keys it adds
 
 ## 0.9.0 (May 8th, 2016)
 
