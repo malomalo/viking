@@ -516,11 +516,22 @@ describe('Viking.Record', () => {
                 });
             });
 
+            it('uses the record\'s instance schema', function () {
+                class Setting extends VikingRecord {
+                    static schema = { value: { type: 'string' } };
+                    get schema() { return { value: { type: 'integer' } }; }
+                }
+
+                let connection = new AbstractConnection('http://example.com');
+                let record = new Setting({ value: '9' });
+                assert.deepEqual(connection.dumpAttributes(record, record.attributes), { value: 9 });
+            });
+
             it('adapters can override how types are encoded', function () {
                 class EpochConnection extends AbstractConnection {
                     dumpAttributes(record, attributes) {
                         const dumped = super.dumpAttributes(record, attributes);
-                        const schema = record.constructor.schema;
+                        const schema = record.schema;
                         Object.keys(dumped).forEach((key) => {
                             if (schema?.[key]?.type === 'date' && attributes[key]) {
                                 dumped[key] = attributes[key].getTime();
